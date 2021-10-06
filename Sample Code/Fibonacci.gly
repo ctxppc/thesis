@@ -1,0 +1,10 @@
+/// Computes the Fibonacci number at index `n`.
+let fib: (Int) -> (Int) = { n in
+	if n == 0 {
+		0
+	} else if n == 1 {
+		1
+	} else {
+		fib(n - 1) + fib(n - 2)
+	}
+}
