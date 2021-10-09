@@ -1,6 +1,7 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-enum Register : Int {
+/// A register in the base language.
+enum BLRegister : Int, Codable {
 	
 	/// The always-zero register.
 	case zero = 0
