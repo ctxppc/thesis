@@ -4,46 +4,46 @@
 enum RVIntegerInstruction : Codable {
 	
 	/// Assigns the sum of the integers in `rs1` and `rs2` to `rd`.
-	case add(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case add(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Assigns the sum of `imm` and the integer in `rs1` to `rd`.
-	case addImm(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case addImm(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 	/// Assigns the difference of the integers in `rs1` and `rs2` to `rd`.
-	case subtract(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case subtract(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Assigns the bitwise conjunction of the bitfields in `rs1` and `rs2` to `rd`.
-	case and(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case and(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Assigns the bitwise conjunction of `imm` and the bitfield in `rs1` to `rd.
-	case andImm(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case andImm(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 	/// Assigns the bitwise disjunction of the bitfields in `rs1` and `rs2` to `rd`.
-	case or(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case or(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Assigns the bitwise disjunction of `imm` and the bitfield in `rs1` to `rd.
-	case orImm(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case orImm(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 	/// Assigns the bitwise exclusive disjunction of the bitfields in `rs1` and `rs2` to `rd`.
-	case xor(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case xor(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Assigns the bitwise exclusive disjunction of `imm` and the bitfield in `rs1` to `rd.
-	case xorImm(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case xorImm(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 	/// Left-shifts the bitfield in `rs1` by as many bits as the integer in `rs2` and assigns the result to `rd`.
-	case leftShift(rd: BLRegister, rs1: BLRegister, rs2: BLRegister)
+	case leftShift(rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
 	
 	/// Left-shifts the bitfield in `rs1` by `rs2` bits and assigns the result to `rd`.
-	case leftShiftImm(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case leftShiftImm(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 	/// Right-shifts the bitfield in `rs1` by as many bits as the integer in `rs2` and assigns the result to `rd`, extending the MSB if `extendingMSB` is `true` and extending with zero bits otherwise.
-	case rightShift(rd: BLRegister, rs1: BLRegister, rs2: BLRegister, extendingMSB: Bool = false)
+	case rightShift(rd: RVRegister, rs1: RVRegister, rs2: RVRegister, extendingMSB: Bool = false)
 	
 	/// Right-shifts the bitfield in `rs1` by `rs2` bits and assigns the result to `rd`, extending the MSB if `extendingMSB` is `true` and extending with zero bits otherwise.
-	case rightShiftImm(rd: BLRegister, rs1: BLRegister, imm: Int, extendingMSB: Bool = false)
+	case rightShiftImm(rd: RVRegister, rs1: RVRegister, imm: Int, extendingMSB: Bool = false)
 	
 	/// Loads the word in memory at the address in `rs1` and offset by `imm` to `rd`.
-	case loadWord(rd: BLRegister, rs1: BLRegister, imm: Int)
+	case loadWord(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 }
 

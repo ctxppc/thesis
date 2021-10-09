@@ -9,3 +9,13 @@ enum RVInstruction : Codable {
 	case integer(RVIntegerInstruction)
 	
 }
+
+extension RVInstruction {
+	
+	var assembly: String {
+		switch self {
+			case .integer(let instruction):	return instruction.assembly
+		}
+	}
+	
+}
