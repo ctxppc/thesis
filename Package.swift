@@ -6,13 +6,23 @@ import PackageDescription
 let package = Package(
 	name: "Glyco",
 	products: [
-		.library(name: "Glyco", targets: ["Glyco"]),
+		.executable(name: "Glyco", targets: ["Glyco"]),
+		.library(name: "GlycoKit", targets: ["GlycoKit"]),
 	],
 	dependencies: [
 		.package(url: "https://github.com/ctxppc/DepthKit.git", .upToNextMinor(from: "0.10.0")),
 	],
 	targets: [
-		.target(name: "Glyco", dependencies: ["DepthKit"]),
-		.testTarget(name: "GlycoTests", dependencies: ["Glyco"]),
+		.executableTarget(name: "Glyco", dependencies: [
+			"GlycoKit",
+			.product(name: "DepthKit", package: "DepthKit"),
+		]),
+		.target(name: "GlycoKit", dependencies: [
+			.product(name: "DepthKit", package: "DepthKit"),
+		]),
+		.testTarget(name: "GlycoKitTests", dependencies: [
+			"GlycoKit",
+			.product(name: "DepthKit", package: "DepthKit"),
+		]),
 	]
 )

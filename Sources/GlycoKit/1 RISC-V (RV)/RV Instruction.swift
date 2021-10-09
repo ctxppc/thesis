@@ -5,8 +5,11 @@
 /// These instructions map one to one to assembly instructions.
 enum RVInstruction : Codable {
 	
-	/// An integer instruction.
-	case integer(RVIntegerInstruction)
+	/// An integral instruction.
+	case integral(RVIntegralInstruction)
+	
+	/// A load instruction.
+	case load(RVLoadInstruction)
 	
 }
 
@@ -14,7 +17,8 @@ extension RVInstruction {
 	
 	var assembly: String {
 		switch self {
-			case .integer(let instruction):	return instruction.assembly
+			case .integral(let instruction):	return instruction.assembly
+			case .load(let instruction):		return instruction.assembly
 		}
 	}
 	
