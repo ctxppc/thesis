@@ -4,10 +4,10 @@
 enum FOEffect : Codable {
 	
 	/// Assigns the value at `source` to `destination`.
-	case assign(destination: FLLocation, source: FOSource)
+	case assign(destination: FOLocation, source: FOSource)
 	
 	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: FLLocation, lhs: FOSource, operation: BinaryIntegralOperation, rhs: FOSource)
+	case operation(destination: FOLocation, lhs: FOSource, operation: BinaryIntegralOperation, rhs: FOSource)
 	
 	/// An integral operation.
 	typealias BinaryIntegralOperation = FLIntegralInstruction.Operation
@@ -33,7 +33,7 @@ extension FOEffect {
 		/// Writes the value in `temporaryRegister` to `destination` if `destination` isn't a register.
 		///
 		/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register whereon to write the result of the effect.
-		func finalise(destination: FLLocation, temporaryRegister: RVRegister) -> ([FLInstruction], RVRegister) {
+		func finalise(destination: FOLocation, temporaryRegister: RVRegister) -> ([FLInstruction], RVRegister) {
 			switch destination {
 				case .register(let r):	return ([], r)
 				case .frameCell(let c):	return ([.store(c <- temporaryRegister)], temporaryRegister)

@@ -4,21 +4,21 @@
 enum NEEffect : Codable {
 	
 	/// Assigns the value at `source` to `destination`.
-	case assign(destination: FLLocation, source: Source)
+	case assign(destination: NELocation, source: NESource)
 	
 	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: FLLocation, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+	case operation(destination: NELocation, lhs: NESource, operation: BinaryIntegralOperation, rhs: NESource)
 	
 	/// Executes a sequence of effects.
 	case sequence([NEEffect])
-	
-	/// A datum source.
-	typealias Source = FOSource
 	
 	/// An integral operation.
 	typealias BinaryIntegralOperation = FOEffect.BinaryIntegralOperation
 	
 }
+
+typealias NELocation = FLLocation
+typealias NESource = FOSource
 
 extension NEEffect {
 	
