@@ -18,3 +18,7 @@ extension FLLoadInstruction {
 	}
 	
 }
+
+func <- (rd: RVRegister, src: FLFrameCellLocation) -> FLLoadInstruction {
+	.word(destination: rd, source: src)
+}

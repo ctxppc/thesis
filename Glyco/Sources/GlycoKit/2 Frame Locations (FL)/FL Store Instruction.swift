@@ -18,3 +18,7 @@ extension FLStoreInstruction {
 	}
 	
 }
+
+func <- (dest: FLFrameCellLocation, src: RVRegister) -> FLStoreInstruction {
+	.word(destination: dest, source: src)
+}
