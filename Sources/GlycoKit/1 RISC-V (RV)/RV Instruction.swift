@@ -11,14 +11,19 @@ enum RVInstruction : Codable {
 	/// A load instruction.
 	case load(RVLoadInstruction)
 	
+	/// A store instruction.
+	case store(RVStoreInstruction)
+	
 }
 
 extension RVInstruction {
 	
+	/// The assembly representation of `self`.
 	var assembly: String {
 		switch self {
 			case .integral(let instruction):	return instruction.assembly
 			case .load(let instruction):		return instruction.assembly
+			case .store(let instruction):		return instruction.assembly
 		}
 	}
 	

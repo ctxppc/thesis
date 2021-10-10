@@ -1,9 +1,9 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An RV32I instruction that loads from memory to a register.
+/// An RV32I instruction that loads a register value from memory.
 enum RVLoadInstruction : Codable {
 	
-	/// An instruction that loads the word in memory at the address in `rs1` and offset by `imm` to `rd`.
+	/// An instruction that retrieves the word in memory at the address in `rs1`, with the address offset by `imm`, and stores it in `rd`.
 	case word(rd: RVRegister, rs1: RVRegister, imm: Int)
 	
 }

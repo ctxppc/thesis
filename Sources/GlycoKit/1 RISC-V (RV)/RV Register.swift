@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A register in the base language.
+/// A machine register.
 enum RVRegister : Int, Codable {
 	
 	/// The always-zero register.
