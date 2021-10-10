@@ -7,10 +7,10 @@ enum FOEffect : Codable {
 	case assign(destination: FLLocation, source: FOSource)
 	
 	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: FLLocation, lhs: FOSource, operation: Operation, rhs: FOSource)
+	case operation(destination: FLLocation, lhs: FOSource, operation: BinaryIntegralOperation, rhs: FOSource)
 	
 	/// An integral operation.
-	typealias Operation = FLIntegralInstruction.Operation
+	typealias BinaryIntegralOperation = FLIntegralInstruction.Operation
 	
 }
 
