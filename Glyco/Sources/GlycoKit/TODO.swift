@@ -2,4 +2,4 @@
 
 import DepthKit
 
-typealias TODO = DepthKit.TODO
+public typealias TODO = DepthKit.TODO

@@ -3,7 +3,7 @@
 extension FO {
 	
 	/// A datum source.
-	enum Source : Codable {
+	public enum Source : Codable {
 		
 		/// The operand is to be retrieved from a given location.
 		case location(Location)
@@ -13,6 +13,6 @@ extension FO {
 		
 	}
 	
-	typealias Location = FL.Location
+	public typealias Location = FL.Location
 	
 }

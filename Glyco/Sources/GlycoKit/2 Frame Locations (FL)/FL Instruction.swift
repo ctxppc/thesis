@@ -5,7 +5,7 @@ extension FL {
 	/// A CHERI-RISC-V instruction.
 	///
 	/// These instructions map one to one to assembly instructions.
-	enum Instruction : Codable {
+	public enum Instruction : Codable {
 		
 		/// An integral instruction.
 		case integral(IntegralInstruction)
@@ -23,7 +23,7 @@ extension FL {
 extension FL.Instruction {
 	
 	/// The RV representation of `self`.
-	var rvInstruction: RV.Instruction {
+	public var rvInstruction: RV.Instruction {
 		switch self {
 			case .integral(let instruction):	return .integral(instruction.rvInstruction)
 			case .load(let instruction):		return .load(instruction.rvInstruction)

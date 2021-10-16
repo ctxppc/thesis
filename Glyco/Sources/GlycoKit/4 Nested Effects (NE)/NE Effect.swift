@@ -3,7 +3,7 @@
 extension NE {
 	
 	/// An effect on an NE machine.
-	enum Effect : Codable {
+	public enum Effect : Codable {
 		
 		/// Assigns the value at `source` to `destination`.
 		case assign(destination: Location, source: Source)
@@ -15,19 +15,19 @@ extension NE {
 		case sequence([Effect])
 		
 		/// An integral operation.
-		typealias BinaryIntegralOperation = FO.Effect.BinaryIntegralOperation
+		public typealias BinaryIntegralOperation = FO.Effect.BinaryIntegralOperation
 		
 	}
 	
-	typealias Location = FL.Location
-	typealias Source = FO.Source
+	public typealias Location = FL.Location
+	public typealias Source = FO.Source
 	
 }
 
 extension NE.Effect {
 	
 	/// The FO representation of `self`.
-	var foEffects: [FO.Effect] {
+	public var foEffects: [FO.Effect] {
 		switch self {
 				
 			case .assign(destination: let destination, source: let source):

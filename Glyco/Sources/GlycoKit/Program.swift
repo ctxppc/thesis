@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-protocol Program {
+public protocol Program {
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered() -> LowerProgram
@@ -16,13 +16,13 @@ protocol Program {
 }
 
 extension Program {
-	func compiled() -> String {
+	public func compiled() -> String {
 		lowered().compiled()
 	}
 }
 
 extension Never : Program {
-	func lowered() -> Self {
+	public func lowered() -> Self {
 		switch self {}
 	}
 }

@@ -3,7 +3,7 @@
 extension FO {
 	
 	/// An effect on an FO machine.
-	enum Effect : Codable {
+	public enum Effect : Codable {
 		
 		/// Assigns the value at `source` to `destination`.
 		case assign(destination: Location, source: Source)
@@ -12,7 +12,7 @@ extension FO {
 		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
 		
 		/// An integral operation.
-		typealias BinaryIntegralOperation = FL.IntegralInstruction.Operation
+		public typealias BinaryIntegralOperation = FL.IntegralInstruction.Operation
 		
 	}
 	
@@ -21,7 +21,7 @@ extension FO {
 extension FO.Effect {
 	
 	/// The FL representation of `self`.
-	var flInstructions: [FL.Instruction] {
+	public var flInstructions: [FL.Instruction] {
 		
 		/// Fetches the value in `source` in `temporaryRegister` if `source` isn't a register.
 		///

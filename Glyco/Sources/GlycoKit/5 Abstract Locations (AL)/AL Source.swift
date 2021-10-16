@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// A datum source.
-	enum Source : Codable {
+	public enum Source : Codable {
 		
 		/// The operand is to be retrieved from a given location.
 		case location(Location)
@@ -18,7 +18,7 @@ extension AL {
 extension AL.Source {
 	
 	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<AL.Location> {
+	public func accessedLocations() -> Set<AL.Location> {
 		switch self {
 			case .location(let location):	return [location]
 			case .immediate:				return []
@@ -30,7 +30,7 @@ extension AL.Source {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neSource(homes: [AL.Location : NE.Location]) -> NE.Source {
+	public func neSource(homes: [AL.Location : NE.Location]) -> NE.Source {
 		switch self {
 			case .location(let location):	return .location(location.neLocation(homes: homes))
 			case .immediate(let imm):		return .immediate(imm)

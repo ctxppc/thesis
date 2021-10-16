@@ -3,10 +3,10 @@
 extension FL {
 	
 	/// A location to a frame cell on an FL machine.
-	struct FrameCellLocation : Codable {
+	public struct FrameCellLocation : Codable {
 		
 		/// Allocates a new location, different from every other previously allocated location.
-		static func allocate() -> Self {
+		public static func allocate() -> Self {
 			defer { allocations += 1 }
 			return Self(offset: -(allocations * stride))
 		}
@@ -18,12 +18,12 @@ extension FL {
 		private static let stride = 4
 		
 		/// Creates a location with given offset (in bytes) from the frame pointer.
-		init(offset: Int) {
+		public init(offset: Int) {
 			self.offset = offset
 		}
 		
 		/// The location's offset from the frame pointer, in bytes.
-		let offset: Int
+		public let offset: Int
 		
 	}
 	

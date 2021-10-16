@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// A machine register.
-	enum Register : Int, Codable {
+	public enum Register : Int, Codable {
 		
 		/// The always-zero register.
 		case zero = 0
@@ -46,4 +46,10 @@ extension RV {
 		
 	}
 	
+}
+
+extension RV.Register : CustomStringConvertible {
+	public var description: String {
+		"x\(rawValue)"
+	}
 }

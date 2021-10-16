@@ -3,10 +3,15 @@
 extension AL {
 	
 	/// An AL effect where the machine halts execution of the program.
-	struct HaltEffect : Codable {
+	public struct HaltEffect : Codable {
+		
+		/// Creates a halt effect with given result.
+		public init(result: Source) {
+			self.result = result
+		}
 		
 		/// The source of the result value.
-		var result: Source
+		public var result: Source
 		
 	}
 	
@@ -15,7 +20,7 @@ extension AL {
 extension AL.HaltEffect {
 	
 	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<AL.Location> {
+	public func accessedLocations() -> Set<AL.Location> {
 		result.accessedLocations()
 	}
 	
@@ -24,7 +29,7 @@ extension AL.HaltEffect {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neEffect(homes: [AL.Location : NE.Location]) -> NE.HaltEffect {
+	public func neEffect(homes: [AL.Location : NE.Location]) -> NE.HaltEffect {
 		.init(result: result.neSource(homes: homes))
 	}
 	

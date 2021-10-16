@@ -3,10 +3,10 @@
 extension FO {
 	
 	/// An FO effect where the machine halts execution of the program.
-	struct HaltEffect : Codable {
+	public struct HaltEffect : Codable {
 		
 		/// The source of the result value.
-		var result: Source
+		public var result: Source
 		
 	}
 	
@@ -15,7 +15,7 @@ extension FO {
 extension FO.HaltEffect {
 	
 	/// The FL instruction representing `self`.
-	var flInstruction: FL.Instruction {
+	public var flInstruction: FL.Instruction {
 		switch result {
 			case .immediate(let imm):				return .integral(.a0 <- imm)
 			case .location(.register(let result)):	return .integral(.a0 <- result)

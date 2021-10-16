@@ -5,10 +5,10 @@ import DepthKit
 extension AL {
 	
 	/// An abstract storage location on an AL machine.
-	struct Location : Codable, Hashable {
+	public struct Location : Codable, Hashable {
 		
 		/// Allocates a new location, different from every other previously allocated location.
-		static func allocate(scopeIdentifier: String = "tmp") -> Self {
+		public static func allocate(scopeIdentifier: String = "tmp") -> Self {
 			defer { allocations += 1 }
 			return Self(scopeIdentifier: scopeIdentifier, sequenceNumber: allocations)
 		}
@@ -17,17 +17,17 @@ extension AL {
 		private static var allocations = 0
 		
 		/// A value identifying the score of the storage.
-		let scopeIdentifier: String
+		public let scopeIdentifier: String
 		
 		/// A number uniquely identifying the storage.
-		let sequenceNumber: Int
+		public let sequenceNumber: Int
 		
 	}
 	
 }
 
 extension AL.Location : CustomStringConvertible {
-	var description: String {
+	public var description: String {
 		"\(scopeIdentifier).\(sequenceNumber)"
 	}
 }
@@ -39,7 +39,7 @@ extension AL.Location {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neLocation(homes: [AL.Location : NE.Location]) -> NE.Location {
+	public func neLocation(homes: [AL.Location : NE.Location]) -> NE.Location {
 		homes[self] !! "Expected a home for \(self)"
 	}
 	

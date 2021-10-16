@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// An effect on an AL machine.
-	enum Effect : Codable {
+	public enum Effect : Codable {
 		
 		/// Assigns the value at `source` to `destination`.
 		case assign(destination: Location, source: Source)
@@ -15,7 +15,7 @@ extension AL {
 		case sequence([Effect])
 		
 		/// An integral operation.
-		typealias BinaryIntegralOperation = NE.Effect.BinaryIntegralOperation
+		public typealias BinaryIntegralOperation = NE.Effect.BinaryIntegralOperation
 		
 	}
 	
@@ -24,7 +24,7 @@ extension AL {
 extension AL.Effect {
 	
 	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<AL.Location> {
+	public func accessedLocations() -> Set<AL.Location> {
 		switch self {
 			
 			case .assign(destination: let destination, source: let source):
@@ -44,7 +44,7 @@ extension AL.Effect {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neEffect(homes: [AL.Location : NE.Location]) -> NE.Effect {
+	public func neEffect(homes: [AL.Location : NE.Location]) -> NE.Effect {
 		switch self {
 				
 			case .assign(destination: let destination, source: let source):
