@@ -1,17 +1,21 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A program in the base language.
-struct FLProgram : Codable {
+enum FL {
 	
-	/// The program's instructions.
-	var instructions: [FLInstruction] = []
+	/// A program in the base language.
+	struct Program : Codable {
+		
+		/// The program's instructions.
+		var instructions: [Instruction] = []
+		
+	}
 	
 }
 
-extension FLProgram {
+extension FL.Program {
 	
 	/// The RV representation of `self`.
-	var rvProgram: RVProgram {
+	var rvProgram: RV.Program {
 		.init(instructions: instructions.map(\.rvInstruction))
 	}
 	

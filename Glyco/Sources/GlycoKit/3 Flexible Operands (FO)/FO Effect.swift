@@ -1,28 +1,32 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An effect on an FO machine.
-enum FOEffect : Codable {
+extension FO {
 	
-	/// Assigns the value at `source` to `destination`.
-	case assign(destination: FOLocation, source: FOSource)
-	
-	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: FOLocation, lhs: FOSource, operation: BinaryIntegralOperation, rhs: FOSource)
-	
-	/// An integral operation.
-	typealias BinaryIntegralOperation = FLIntegralInstruction.Operation
+	/// An effect on an FO machine.
+	enum Effect : Codable {
+		
+		/// Assigns the value at `source` to `destination`.
+		case assign(destination: Location, source: Source)
+		
+		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
+		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+		
+		/// An integral operation.
+		typealias BinaryIntegralOperation = FL.IntegralInstruction.Operation
+		
+	}
 	
 }
 
-extension FOEffect {
+extension FO.Effect {
 	
 	/// The FL representation of `self`.
-	var flInstructions: [FLInstruction] {
+	var flInstructions: [FL.Instruction] {
 		
 		/// Fetches the value in `source` in `temporaryRegister` if `source` isn't a register.
 		///
 		/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the fetched datum is located.
-		func prepare(source: FOSource, temporaryRegister: RVRegister) -> ([FLInstruction], RVRegister) {
+		func prepare(source: FO.Source, temporaryRegister: RV.Register) -> ([FL.Instruction], RV.Register) {
 			switch source {
 				case .immediate(let imm):			return ([.integral(temporaryRegister <- imm)], temporaryRegister)
 				case .location(.register(let r)):	return ([], r)
@@ -33,7 +37,7 @@ extension FOEffect {
 		/// Writes the value in `temporaryRegister` to `destination` if `destination` isn't a register.
 		///
 		/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register whereon to write the result of the effect.
-		func finalise(destination: FOLocation, temporaryRegister: RVRegister) -> ([FLInstruction], RVRegister) {
+		func finalise(destination: FO.Location, temporaryRegister: RV.Register) -> ([FL.Instruction], RV.Register) {
 			switch destination {
 				case .register(let r):	return ([], r)
 				case .frameCell(let c):	return ([.store(c <- temporaryRegister)], temporaryRegister)

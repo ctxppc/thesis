@@ -1,25 +1,29 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A CHERI-RISC-V instruction.
-///
-/// These instructions map one to one to assembly instructions.
-enum FLInstruction : Codable {
+extension FL {
 	
-	/// An integral instruction.
-	case integral(FLIntegralInstruction)
-	
-	/// A load instruction.
-	case load(FLLoadInstruction)
-	
-	/// A store instruction.
-	case store(FLStoreInstruction)
+	/// A CHERI-RISC-V instruction.
+	///
+	/// These instructions map one to one to assembly instructions.
+	enum Instruction : Codable {
+		
+		/// An integral instruction.
+		case integral(IntegralInstruction)
+		
+		/// A load instruction.
+		case load(LoadInstruction)
+		
+		/// A store instruction.
+		case store(StoreInstruction)
+		
+	}
 	
 }
 
-extension FLInstruction {
+extension FL.Instruction {
 	
 	/// The RV representation of `self`.
-	var rvInstruction: RVInstruction {
+	var rvInstruction: RV.Instruction {
 		switch self {
 			case .integral(let instruction):	return .integral(instruction.rvInstruction)
 			case .load(let instruction):		return .load(instruction.rvInstruction)

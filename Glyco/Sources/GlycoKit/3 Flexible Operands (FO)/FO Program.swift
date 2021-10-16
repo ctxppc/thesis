@@ -1,20 +1,24 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An FO program.
-struct FOProgram : Codable {
+enum FO {
 	
-	/// The main effect of the program.
-	var mainEffects: [FOEffect]
-	
-	/// The halt effect after executing `mainEffects`.
-	var haltEffect: FOHaltEffect
+	/// An FO program.
+	struct Program : Codable {
+		
+		/// The main effect of the program.
+		var mainEffects: [Effect]
+		
+		/// The halt effect after executing `mainEffects`.
+		var haltEffect: HaltEffect
+		
+	}
 	
 }
 
-extension FOProgram {
+extension FO.Program {
 	
 	/// The FL representation of `self`.
-	var flProgram: FLProgram {
+	var flProgram: FL.Program {
 		.init(instructions: mainEffects.flatMap(\.flInstructions) + [haltEffect.flInstruction])
 	}
 	

@@ -1,22 +1,26 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A program on an NE machine.
-struct NEProgram : Codable {
+enum NE {
 	
-	/// The main effect of the program.
-	var mainEffects: [NEEffect]
+	/// A program on an NE machine.
+	struct Program : Codable {
+		
+		/// The main effect of the program.
+		var mainEffects: [Effect]
+		
+		/// The halt effect after executing `mainEffects`.
+		var haltEffect: HaltEffect
+		
+	}
 	
-	/// The halt effect after executing `mainEffects`.
-	var haltEffect: NEHaltEffect
+	typealias HaltEffect = FO.HaltEffect
 	
 }
 
-typealias NEHaltEffect = FOHaltEffect
-
-extension NEProgram {
+extension NE.Program {
 	
 	/// The FO representation of `self`.
-	var foProgram: FOProgram {
+	var foProgram: FO.Program {
 		.init(mainEffects: mainEffects.flatMap(\.foEffects), haltEffect: haltEffect)
 	}
 	

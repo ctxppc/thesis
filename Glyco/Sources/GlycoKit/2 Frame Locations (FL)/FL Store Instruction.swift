@@ -1,17 +1,21 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An FL instruction that stores a register value in memory.
-enum FLStoreInstruction : Codable {
+extension FL {
 	
-	/// An instruction that retrieves the word in `source` and stores it in memory at the address in `destination`.
-	case word(destination: FLFrameCellLocation, source: RVRegister)
+	/// An FL instruction that stores a register value in memory.
+	enum StoreInstruction : Codable {
+		
+		/// An instruction that retrieves the word in `source` and stores it in memory at the address in `destination`.
+		case word(destination: FrameCellLocation, source: RV.Register)
+		
+	}
 	
 }
 
-extension FLStoreInstruction {
+extension FL.StoreInstruction {
 	
 	/// The RV representation of `self`.
-	var rvInstruction: RVStoreInstruction {
+	var rvInstruction: RV.StoreInstruction {
 		switch self {
 			case .word(destination: let destination, source: let source):	return .word(rs1: .fp, rs2: source, imm: destination.offset)
 		}
@@ -19,6 +23,6 @@ extension FLStoreInstruction {
 	
 }
 
-func <- (dest: FLFrameCellLocation, src: RVRegister) -> FLStoreInstruction {
+func <- (dest: FL.FrameCellLocation, src: RV.Register) -> FL.StoreInstruction {
 	.word(destination: dest, source: src)
 }

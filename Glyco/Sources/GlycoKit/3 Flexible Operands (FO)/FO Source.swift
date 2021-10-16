@@ -1,14 +1,18 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A datum source.
-enum FOSource : Codable {
+extension FO {
 	
-	/// The operand is to be retrieved from a given location.
-	case location(FOLocation)
+	/// A datum source.
+	enum Source : Codable {
+		
+		/// The operand is to be retrieved from a given location.
+		case location(Location)
+		
+		/// The operand is a given value.
+		case immediate(Int)
+		
+	}
 	
-	/// The operand is a given value.
-	case immediate(Int)
+	typealias Location = FL.Location
 	
 }
-
-typealias FOLocation = FLLocation

@@ -1,14 +1,18 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A program in the base language.
-struct RVProgram : Codable {
+enum RV {
 	
-	/// The program's instructions.
-	var instructions: [RVInstruction] = []
+	/// A program in the base language.
+	struct Program : Codable {
+		
+		/// The program's instructions.
+		var instructions: [Instruction] = []
+		
+	}
 	
 }
 
-extension RVProgram {
+extension RV.Program {
 	
 	/// The assembly representation of `self`.
 	var assembly: String {

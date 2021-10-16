@@ -1,24 +1,28 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An RV32I instruction that performs an operation on integers.
-enum RVIntegralInstruction : Codable {
+extension RV {
 	
-	/// Performs *x* `operation` *y* and assigns the result to `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-	case registerRegister(operation: Operation, rd: RVRegister, rs1: RVRegister, rs2: RVRegister)
-	
-	/// Performs *x* `operation` `imm` and assigns the result to `rd`, where *x* is the value in `rs1`.
-	case registerImmediate(operation: Operation, rd: RVRegister, rs1: RVRegister, imm: Int)
-	
-	/// An integral operation.
-	enum Operation : String, Codable {
-		case add, subtract = "sub"
-		case and, or, xor
-		case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
+	/// An RV32I instruction that performs an operation on integers.
+	enum IntegralInstruction : Codable {
+		
+		/// Performs *x* `operation` *y* and assigns the result to `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		case registerRegister(operation: Operation, rd: Register, rs1: Register, rs2: Register)
+		
+		/// Performs *x* `operation` `imm` and assigns the result to `rd`, where *x* is the value in `rs1`.
+		case registerImmediate(operation: Operation, rd: Register, rs1: Register, imm: Int)
+		
+		/// An integral operation.
+		enum Operation : String, Codable {
+			case add, subtract = "sub"
+			case and, or, xor
+			case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
+		}
+		
 	}
 	
 }
 
-extension RVIntegralInstruction {
+extension RV.IntegralInstruction {
 	
 	/// The assembly representation of `self`.
 	var assembly: String {

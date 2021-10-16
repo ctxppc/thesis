@@ -1,17 +1,21 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An AL effect where the machine halts execution of the program.
-struct ALHaltEffect : Codable {
+extension AL {
 	
-	/// The source of the result value.
-	var result: ALSource
+	/// An AL effect where the machine halts execution of the program.
+	struct HaltEffect : Codable {
+		
+		/// The source of the result value.
+		var result: Source
+		
+	}
 	
 }
 
-extension ALHaltEffect {
+extension AL.HaltEffect {
 	
 	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<ALLocation> {
+	func accessedLocations() -> Set<AL.Location> {
 		result.accessedLocations()
 	}
 	
@@ -20,7 +24,7 @@ extension ALHaltEffect {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neEffect(homes: [ALLocation : NELocation]) -> NEHaltEffect {
+	func neEffect(homes: [AL.Location : NE.Location]) -> NE.HaltEffect {
 		.init(result: result.neSource(homes: homes))
 	}
 	

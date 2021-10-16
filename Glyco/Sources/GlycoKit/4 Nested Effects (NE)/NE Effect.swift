@@ -1,29 +1,33 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An effect on an NE machine.
-enum NEEffect : Codable {
+extension NE {
 	
-	/// Assigns the value at `source` to `destination`.
-	case assign(destination: NELocation, source: NESource)
+	/// An effect on an NE machine.
+	enum Effect : Codable {
+		
+		/// Assigns the value at `source` to `destination`.
+		case assign(destination: Location, source: Source)
+		
+		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
+		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+		
+		/// Executes a sequence of effects.
+		case sequence([Effect])
+		
+		/// An integral operation.
+		typealias BinaryIntegralOperation = FO.Effect.BinaryIntegralOperation
+		
+	}
 	
-	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: NELocation, lhs: NESource, operation: BinaryIntegralOperation, rhs: NESource)
-	
-	/// Executes a sequence of effects.
-	case sequence([NEEffect])
-	
-	/// An integral operation.
-	typealias BinaryIntegralOperation = FOEffect.BinaryIntegralOperation
+	typealias Location = FL.Location
+	typealias Source = FO.Source
 	
 }
 
-typealias NELocation = FLLocation
-typealias NESource = FOSource
-
-extension NEEffect {
+extension NE.Effect {
 	
 	/// The FO representation of `self`.
-	var foEffects: [FOEffect] {
+	var foEffects: [FO.Effect] {
 		switch self {
 				
 			case .assign(destination: let destination, source: let source):

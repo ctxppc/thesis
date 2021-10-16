@@ -1,26 +1,30 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An effect on an AL machine.
-enum ALEffect : Codable {
+extension AL {
 	
-	/// Assigns the value at `source` to `destination`.
-	case assign(destination: ALLocation, source: ALSource)
-	
-	/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-	case operation(destination: ALLocation, lhs: ALSource, operation: BinaryIntegralOperation, rhs: ALSource)
-	
-	/// Executes a sequence of effects.
-	case sequence([ALEffect])
-	
-	/// An integral operation.
-	typealias BinaryIntegralOperation = NEEffect.BinaryIntegralOperation
+	/// An effect on an AL machine.
+	enum Effect : Codable {
+		
+		/// Assigns the value at `source` to `destination`.
+		case assign(destination: Location, source: Source)
+		
+		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
+		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+		
+		/// Executes a sequence of effects.
+		case sequence([Effect])
+		
+		/// An integral operation.
+		typealias BinaryIntegralOperation = NE.Effect.BinaryIntegralOperation
+		
+	}
 	
 }
 
-extension ALEffect {
+extension AL.Effect {
 	
 	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<ALLocation> {
+	func accessedLocations() -> Set<AL.Location> {
 		switch self {
 			
 			case .assign(destination: let destination, source: let source):
@@ -40,7 +44,7 @@ extension ALEffect {
 	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
 	///
 	/// - Returns: An NE representation of `self`.
-	func neEffect(homes: [ALLocation : NELocation]) -> NEEffect {
+	func neEffect(homes: [AL.Location : NE.Location]) -> NE.Effect {
 		switch self {
 				
 			case .assign(destination: let destination, source: let source):

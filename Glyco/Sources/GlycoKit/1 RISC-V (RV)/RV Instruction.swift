@@ -1,22 +1,26 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A CHERI-RISC-V instruction.
-///
-/// These instructions map one to one to assembly instructions.
-enum RVInstruction : Codable {
+extension RV {
 	
-	/// An integral instruction.
-	case integral(RVIntegralInstruction)
-	
-	/// A load instruction.
-	case load(RVLoadInstruction)
-	
-	/// A store instruction.
-	case store(RVStoreInstruction)
+	/// A CHERI-RISC-V instruction.
+	///
+	/// These instructions map one to one to assembly instructions.
+	enum Instruction : Codable {
+		
+		/// An integral instruction.
+		case integral(IntegralInstruction)
+		
+		/// A load instruction.
+		case load(LoadInstruction)
+		
+		/// A store instruction.
+		case store(StoreInstruction)
+		
+	}
 	
 }
 
-extension RVInstruction {
+extension RV.Instruction {
 	
 	/// The assembly representation of `self`.
 	var assembly: String {

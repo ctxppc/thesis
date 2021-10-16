@@ -1,14 +1,18 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// An RV32I instruction that stores a register value in memory.
-enum RVStoreInstruction : Codable {
+extension RV {
 	
-	/// An instruction that retrieves the word in `rs2` and stores it in memory at the address in `rs1`, with the address offset by `imm`.
-	case word(rs1: RVRegister, rs2: RVRegister, imm: Int)
+	/// An RV32I instruction that stores a register value in memory.
+	enum StoreInstruction : Codable {
+		
+		/// An instruction that retrieves the word in `rs2` and stores it in memory at the address in `rs1`, with the address offset by `imm`.
+		case word(rs1: Register, rs2: Register, imm: Int)
+		
+	}
 	
 }
 
-extension RVStoreInstruction {
+extension RV.StoreInstruction {
 	
 	/// The assembly representation of `self`.
 	var assembly: String {
