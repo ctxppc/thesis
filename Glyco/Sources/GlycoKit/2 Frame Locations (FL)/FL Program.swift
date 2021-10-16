@@ -1,22 +1,21 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-enum FL {
+enum FL : Language {
 	
 	/// A program in the base language.
-	struct Program : Codable {
+	struct Program : Codable, GlycoKit.Program {
 		
 		/// The program's instructions.
 		var instructions: [Instruction] = []
 		
+		// See protocol.
+		func lowered() -> Lower.Program {
+			.init(instructions: instructions.map(\.rvInstruction))
+		}
+		
 	}
 	
-}
-
-extension FL.Program {
-	
-	/// The RV representation of `self`.
-	var rvProgram: RV.Program {
-		.init(instructions: instructions.map(\.rvInstruction))
-	}
+	// See protocol.
+	typealias Lower = RV
 	
 }

@@ -1,9 +1,9 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-enum AL {
+enum AL : Language {
 	
 	/// A program on an AL machine.
-	struct Program : Codable {
+	struct Program : Codable, GlycoKit.Program {
 		
 		/// The main effect of the program.
 		var mainEffects: [Effect]
@@ -11,21 +11,20 @@ enum AL {
 		/// The halt effect after executing `mainEffects`.
 		var haltEffect: HaltEffect
 		
+		// See protocol.
+		func lowered() -> Lower.Program {
+			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, NE.Location.frameCell(.allocate())) })
+			return .init(mainEffects: mainEffects.map { $0.neEffect(homes: homes) }, haltEffect: haltEffect.neEffect(homes: homes))
+		}
+		
+		/// Returns a set of locations (potentially) accessed by `self`.
+		func accessedLocations() -> Set<AL.Location> {
+			haltEffect.accessedLocations().union(mainEffects.lazy.flatMap { $0.accessedLocations() })
+		}
+		
 	}
 	
-}
-
-extension AL.Program {
-	
-	/// Returns a set of locations (potentially) accessed by `self`.
-	func accessedLocations() -> Set<AL.Location> {
-		haltEffect.accessedLocations().union(mainEffects.lazy.flatMap { $0.accessedLocations() })
-	}
-	
-	/// Returns a NE representation of `self`.
-	func neProgram() -> NE.Program {
-		let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, NE.Location.frameCell(.allocate())) })
-		return .init(mainEffects: mainEffects.map { $0.neEffect(homes: homes) }, haltEffect: haltEffect.neEffect(homes: homes))
-	}
+	// See protocol.
+	typealias Lower = NE
 	
 }

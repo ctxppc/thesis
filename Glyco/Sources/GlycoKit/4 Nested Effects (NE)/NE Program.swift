@@ -1,9 +1,9 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-enum NE {
+enum NE : Language {
 	
 	/// A program on an NE machine.
-	struct Program : Codable {
+	struct Program : Codable, GlycoKit.Program {
 		
 		/// The main effect of the program.
 		var mainEffects: [Effect]
@@ -11,17 +11,16 @@ enum NE {
 		/// The halt effect after executing `mainEffects`.
 		var haltEffect: HaltEffect
 		
+		// See protocol.
+		func lowered() -> Lower.Program {
+			.init(mainEffects: mainEffects.flatMap(\.foEffects), haltEffect: haltEffect)
+		}
+		
 	}
 	
-	typealias HaltEffect = FO.HaltEffect
+	// See protocol.
+	typealias Lower = FO
 	
-}
-
-extension NE.Program {
-	
-	/// The FO representation of `self`.
-	var foProgram: FO.Program {
-		.init(mainEffects: mainEffects.flatMap(\.foEffects), haltEffect: haltEffect)
-	}
+	typealias HaltEffect = Lower.HaltEffect
 	
 }
