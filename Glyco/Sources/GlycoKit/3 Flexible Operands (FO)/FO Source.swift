@@ -13,6 +13,6 @@ extension FO {
 		
 	}
 	
-	public typealias Location = FL.Location
+	public typealias Location = Lower.Location
 	
 }

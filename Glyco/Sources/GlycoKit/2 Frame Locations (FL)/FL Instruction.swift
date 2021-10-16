@@ -16,19 +16,15 @@ extension FL {
 		/// A store instruction.
 		case store(StoreInstruction)
 		
-	}
-	
-}
-
-extension FL.Instruction {
-	
-	/// The RV representation of `self`.
-	public var rvInstruction: RV.Instruction {
-		switch self {
-			case .integral(let instruction):	return .integral(instruction.rvInstruction)
-			case .load(let instruction):		return .load(instruction.rvInstruction)
-			case .store(let instruction):		return .store(instruction.rvInstruction)
+		/// Returns a representation of `self` in a lower language.
+		public func lowered() -> Lower.Instruction {
+			switch self {
+				case .integral(let instruction):	return .integral(instruction.lowered())
+				case .load(let instruction):		return .load(instruction.lowered())
+				case .store(let instruction):		return .store(instruction.lowered())
+			}
 		}
+		
 	}
 	
 }

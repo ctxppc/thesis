@@ -22,6 +22,15 @@ extension AL {
 		/// A number uniquely identifying the storage.
 		public let sequenceNumber: Int
 		
+		/// Returns a representation of `self` in a lower language.
+		///
+		/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
+		///
+		/// - Returns: A representation of `self` in a lower language.
+		public func lowered(homes: [Location : Lower.Location]) -> Lower.Location {
+			homes[self] !! "Expected a home for \(self)"
+		}
+		
 	}
 	
 }
@@ -30,17 +39,4 @@ extension AL.Location : CustomStringConvertible {
 	public var description: String {
 		"\(scopeIdentifier).\(sequenceNumber)"
 	}
-}
-
-extension AL.Location {
-	
-	/// Returns an NE representation of `self`.
-	///
-	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
-	///
-	/// - Returns: An NE representation of `self`.
-	public func neLocation(homes: [AL.Location : NE.Location]) -> NE.Location {
-		homes[self] !! "Expected a home for \(self)"
-	}
-	
 }

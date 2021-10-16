@@ -15,31 +15,27 @@ extension NE {
 		case sequence([Effect])
 		
 		/// An integral operation.
-		public typealias BinaryIntegralOperation = FO.Effect.BinaryIntegralOperation
+		public typealias BinaryIntegralOperation = Lower.Effect.BinaryIntegralOperation
+		
+		/// Returns a representation of `self` in a lower language.
+		public func lowered() -> [Lower.Effect] {
+			switch self {
+				
+				case .assign(destination: let destination, source: let source):
+				return [.assign(destination: destination, source: source)]
+				
+				case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
+				return [.operation(destination: destination, lhs: lhs, operation: operation, rhs: rhs)]
+				
+				case .sequence(let effects):
+				return effects.flatMap { $0.lowered() }
+				
+			}
+		}
 		
 	}
 	
 	public typealias Location = FL.Location
 	public typealias Source = FO.Source
-	
-}
-
-extension NE.Effect {
-	
-	/// The FO representation of `self`.
-	public var foEffects: [FO.Effect] {
-		switch self {
-				
-			case .assign(destination: let destination, source: let source):
-			return [.assign(destination: destination, source: source)]
-				
-			case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
-			return [.operation(destination: destination, lhs: lhs, operation: operation, rhs: rhs)]
-				
-			case .sequence(let effects):
-			return effects.flatMap(\.foEffects)
-				
-		}
-	}
 	
 }

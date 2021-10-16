@@ -6,11 +6,13 @@ extension FL {
 	public enum Location : Codable {
 		
 		/// A location to a register.
-		case register(RV.Register)
+		case register(Register)
 		
 		/// A location to a frame cell.
 		case frameCell(FrameCellLocation)
 		
 	}
+	
+	public typealias Register = Lower.Register
 	
 }

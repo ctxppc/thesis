@@ -13,7 +13,7 @@ public enum FO : Language {
 		
 		// See protocol.
 		public func lowered() -> Lower.Program {
-			.init(instructions: mainEffects.flatMap(\.flInstructions) + [haltEffect.flInstruction])
+			.init(instructions: mainEffects.flatMap { $0.lowered() } + [haltEffect.lowered()])
 		}
 		
 	}

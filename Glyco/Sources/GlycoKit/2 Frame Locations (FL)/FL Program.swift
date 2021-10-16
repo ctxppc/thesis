@@ -10,7 +10,7 @@ public enum FL : Language {
 		
 		// See protocol.
 		public func lowered() -> Lower.Program {
-			.init(instructions: instructions.map(\.rvInstruction))
+			.init(instructions: instructions.map { $0.lowered() })
 		}
 		
 	}

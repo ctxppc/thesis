@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-public extension RV {
+extension RV {
 	
 	/// A CHERI-RISC-V instruction.
 	///
@@ -16,12 +16,12 @@ public extension RV {
 		/// A store instruction.
 		case store(StoreInstruction)
 		
-		/// The assembly representation of `self`.
-		public var assembly: String {
+		/// Returns the assembly representation of `self`.
+		public func compiled() -> String {
 			switch self {
-				case .integral(let instruction):	return instruction.assembly
-				case .load(let instruction):		return instruction.assembly
-				case .store(let instruction):		return instruction.assembly
+				case .integral(let instruction):	return instruction.compiled()
+				case .load(let instruction):		return instruction.compiled()
+				case .store(let instruction):		return instruction.compiled()
 			}
 		}
 		

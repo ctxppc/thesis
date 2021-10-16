@@ -6,23 +6,19 @@ extension FL {
 	public enum StoreInstruction : Codable {
 		
 		/// An instruction that retrieves the word in `source` and stores it in memory at the address in `destination`.
-		case word(destination: FrameCellLocation, source: RV.Register)
+		case word(destination: FrameCellLocation, source: Register)
+		
+		/// Returns a representation of `self` in a lower language.
+		public func lowered() -> Lower.StoreInstruction {
+			switch self {
+				case .word(destination: let destination, source: let source):	return .word(rs1: .fp, rs2: source, imm: destination.offset)
+			}
+		}
 		
 	}
 	
 }
 
-extension FL.StoreInstruction {
-	
-	/// The RV representation of `self`.
-	public var rvInstruction: RV.StoreInstruction {
-		switch self {
-			case .word(destination: let destination, source: let source):	return .word(rs1: .fp, rs2: source, imm: destination.offset)
-		}
-	}
-	
-}
-
-public func <- (dest: FL.FrameCellLocation, src: RV.Register) -> FL.StoreInstruction {
+public func <- (dest: FL.FrameCellLocation, src: FL.Register) -> FL.StoreInstruction {
 	.word(destination: dest, source: src)
 }

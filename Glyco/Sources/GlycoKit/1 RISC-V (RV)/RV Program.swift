@@ -17,7 +17,7 @@ public enum RV : Language {
 		public func compiled() -> String {
 			// TODO: Sections, entry points, etc.
 			instructions
-				.map(\.assembly)
+				.map { $0.compiled() }
 				.joined(separator: "\n")
 		}
 		

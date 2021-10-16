@@ -13,7 +13,7 @@ public enum NE : Language {
 		
 		// See protocol.
 		public func lowered() -> Lower.Program {
-			.init(mainEffects: mainEffects.flatMap(\.foEffects), haltEffect: haltEffect)
+			.init(mainEffects: mainEffects.flatMap { $0.lowered() }, haltEffect: haltEffect)
 		}
 		
 	}

@@ -18,8 +18,8 @@ extension RV {
 			case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
 		}
 		
-		/// The assembly representation of `self`.
-		public var assembly: String {
+		/// Returns the assembly representation of `self`.
+		public func compiled() -> String {
 			switch self {
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):

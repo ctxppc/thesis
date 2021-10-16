@@ -13,24 +13,20 @@ extension AL {
 		/// The source of the result value.
 		public var result: Source
 		
-	}
-	
-}
-
-extension AL.HaltEffect {
-	
-	/// Returns a set of locations (potentially) accessed by `self`.
-	public func accessedLocations() -> Set<AL.Location> {
-		result.accessedLocations()
-	}
-	
-	/// Returns an NE representation of `self`.
-	///
-	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
-	///
-	/// - Returns: An NE representation of `self`.
-	public func neEffect(homes: [AL.Location : NE.Location]) -> NE.HaltEffect {
-		.init(result: result.neSource(homes: homes))
+		/// Returns a set of locations (potentially) accessed by `self`.
+		public func accessedLocations() -> Set<Location> {
+			result.accessedLocations()
+		}
+		
+		/// Returns a representation of `self` in a lower language.
+		///
+		/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
+		///
+		/// - Returns: A representation of `self` in a lower language.
+		public func lowered(homes: [Location : Lower.Location]) -> Lower.HaltEffect {
+			.init(result: result.lowered(homes: homes))
+		}
+		
 	}
 	
 }

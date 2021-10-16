@@ -15,48 +15,44 @@ extension AL {
 		case sequence([Effect])
 		
 		/// An integral operation.
-		public typealias BinaryIntegralOperation = NE.Effect.BinaryIntegralOperation
+		public typealias BinaryIntegralOperation = Lower.Effect.BinaryIntegralOperation
 		
-	}
-	
-}
-
-extension AL.Effect {
-	
-	/// Returns a set of locations (potentially) accessed by `self`.
-	public func accessedLocations() -> Set<AL.Location> {
-		switch self {
-			
-			case .assign(destination: let destination, source: let source):
-			return source.accessedLocations().union([destination])
-			
-			case .operation(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs):
-			return lhs.accessedLocations().union(rhs.accessedLocations()).union([destination])
-			
-			case .sequence(let effects):
-			return .init(effects.lazy.flatMap { $0.accessedLocations() })
-			
+		/// Returns a set of locations (potentially) accessed by `self`.
+		public func accessedLocations() -> Set<Location> {
+			switch self {
+				
+				case .assign(destination: let destination, source: let source):
+				return source.accessedLocations().union([destination])
+				
+				case .operation(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs):
+				return lhs.accessedLocations().union(rhs.accessedLocations()).union([destination])
+				
+				case .sequence(let effects):
+				return .init(effects.lazy.flatMap { $0.accessedLocations() })
+				
+			}
 		}
-	}
-	
-	/// Returns an NE representation of `self`.
-	///
-	/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
-	///
-	/// - Returns: An NE representation of `self`.
-	public func neEffect(homes: [AL.Location : NE.Location]) -> NE.Effect {
-		switch self {
-				
-			case .assign(destination: let destination, source: let source):
-			return .assign(destination: destination.neLocation(homes: homes), source: source.neSource(homes: homes))
-				
-			case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
-			return .operation(destination: destination.neLocation(homes: homes), lhs: lhs.neSource(homes: homes), operation: operation, rhs: rhs.neSource(homes: homes))
-				
-			case .sequence(let effects):
-			return .sequence(effects.map { $0.neEffect(homes: homes) })
-				
+		
+		/// Returns a representation of `self` in a lower language.
+		///
+		/// - Parameter homes: A dictionary mapping abstract locations to physical locations.
+		///
+		/// - Returns: A representation of `self` in a lower language.
+		public func lowered(homes: [Location : Lower.Location]) -> Lower.Effect {
+			switch self {
+					
+				case .assign(destination: let destination, source: let source):
+				return .assign(destination: destination.lowered(homes: homes), source: source.lowered(homes: homes))
+					
+				case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
+				return .operation(destination: destination.lowered(homes: homes), lhs: lhs.lowered(homes: homes), operation: operation, rhs: rhs.lowered(homes: homes))
+					
+				case .sequence(let effects):
+				return .sequence(effects.map { $0.lowered(homes: homes) })
+					
+			}
 		}
+		
 	}
 	
 }

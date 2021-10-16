@@ -19,12 +19,12 @@ public enum AL : Language {
 		
 		// See protocol.
 		public func lowered() -> Lower.Program {
-			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, NE.Location.frameCell(.allocate())) })
-			return .init(mainEffects: mainEffects.map { $0.neEffect(homes: homes) }, haltEffect: haltEffect.neEffect(homes: homes))
+			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, Lower.Location.frameCell(.allocate())) })
+			return .init(mainEffects: mainEffects.map { $0.lowered(homes: homes) }, haltEffect: haltEffect.lowered(homes: homes))
 		}
 		
 		/// Returns a set of locations (potentially) accessed by `self`.
-		public func accessedLocations() -> Set<AL.Location> {
+		public func accessedLocations() -> Set<Location> {
 			haltEffect.accessedLocations().union(mainEffects.lazy.flatMap { $0.accessedLocations() })
 		}
 		
