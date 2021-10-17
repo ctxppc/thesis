@@ -16,12 +16,16 @@ extension RV {
 		/// A store instruction.
 		case store(StoreInstruction)
 		
+		/// A return instruction.
+		case `return`
+		
 		/// Returns the assembly representation of `self`.
 		public func compiled() -> String {
 			switch self {
 				case .integral(let instruction):	return instruction.compiled()
 				case .load(let instruction):		return instruction.compiled()
 				case .store(let instruction):		return instruction.compiled()
+				case .return:						return "cret"
 			}
 		}
 		

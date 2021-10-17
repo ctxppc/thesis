@@ -15,10 +15,26 @@ public enum RV : Language {
 		
 		// See protocol.
 		public func compiled() -> String {
-			// TODO: Sections, entry points, etc.
-			instructions
-				.map { $0.compiled() }
-				.joined(separator: "\n")
+			"""
+							.text
+							.attribute	4, 16
+							.attribute	5, "rv64i2p0_xcheri0p0"
+							.file		"<unknown>.gly"
+							
+							# -- Begin function _start
+							.globl		_start
+							.p2align	2
+							.type		_start, @function
+			_start:			\(instructions
+								.map { $0.compiled() }
+								.joined(separator: "\n\t\t\t\t"))
+			.Lfunc_end0:	.size		_start, .Lfunc_end0-_start
+							# -- End function _start
+							
+							.ident		"glyco version 0.1"
+							.section	".note.GNU-stack","",@progbits
+							.addrsig
+			"""
 		}
 		
 	}
