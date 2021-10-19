@@ -8,13 +8,10 @@ extension AL {
 	public struct Location : Codable, Hashable {
 		
 		/// Allocates a new location, different from every other previously allocated location.
-		public static func allocate(scopeIdentifier: String = "tmp") -> Self {
-			defer { allocations += 1 }
-			return Self(scopeIdentifier: scopeIdentifier, sequenceNumber: allocations)
+		public static func allocate(scopeIdentifier: String = "tmp", context: inout Context) -> Self {
+			defer { context.numberOfAllocatedLocations += 1 }
+			return Self(scopeIdentifier: scopeIdentifier, sequenceNumber: context.numberOfAllocatedLocations)
 		}
-		
-		/// The number of locations allocated.
-		private static var allocations = 0
 		
 		/// A value identifying the score of the storage.
 		public let scopeIdentifier: String

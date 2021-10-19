@@ -17,11 +17,11 @@ extension FL {
 		case store(StoreInstruction)
 		
 		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> Lower.Instruction {
+		func lowered(context: inout Context) -> Lower.Instruction {
 			switch self {
-				case .integral(let instruction):	return .integral(instruction.lowered())
-				case .load(let instruction):		return .load(instruction.lowered())
-				case .store(let instruction):		return .store(instruction.lowered())
+				case .integral(let instruction):	return .integral(instruction.lowered(context: &context))
+				case .load(let instruction):		return .load(instruction.lowered(context: &context))
+				case .store(let instruction):		return .store(instruction.lowered(context: &context))
 			}
 		}
 		

@@ -10,7 +10,8 @@ public enum FL : Language {
 		
 		// See protocol.
 		public func lowered() -> Lower.Program {
-			.init(instructions: instructions.map { $0.lowered() })
+			var context = Context()
+			return .init(instructions: instructions.map { $0.lowered(context: &context) })
 		}
 		
 	}

@@ -15,7 +15,7 @@ extension FL {
 		public typealias Operation = Lower.IntegralInstruction.Operation
 		
 		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> Lower.IntegralInstruction {
+		func lowered(context: inout Context) -> Lower.IntegralInstruction {
 			switch self {
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):

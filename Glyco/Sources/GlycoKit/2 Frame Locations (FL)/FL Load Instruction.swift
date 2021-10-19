@@ -9,7 +9,7 @@ extension FL {
 		case word(destination: Register, source: FrameCellLocation)
 		
 		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> Lower.LoadInstruction {
+		func lowered(context: inout Context) -> Lower.LoadInstruction {
 			switch self {
 				case .word(destination: let destination, source: let source):	return .word(rd: destination, rs1: .fp, imm: source.offset)
 			}
