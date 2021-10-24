@@ -18,7 +18,7 @@ public enum AL : Language {
 		public var haltEffect: HaltEffect
 		
 		// See protocol.
-		public func lowered() -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Lower.Context()
 			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, Lower.Location.frameCell(.allocate(context: &context))) })
 			return .init(mainEffects: mainEffects.map { $0.lowered(homes: homes) }, haltEffect: haltEffect.lowered(homes: homes))

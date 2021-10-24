@@ -9,7 +9,7 @@ public enum FL : Language {
 		public var instructions: [Instruction] = []
 		
 		// See protocol.
-		public func lowered() -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Context()
 			return .init(instructions: instructions.map { $0.lowered(context: &context) })
 		}

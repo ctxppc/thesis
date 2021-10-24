@@ -12,7 +12,7 @@ public enum FO : Language {
 		public var haltEffect: HaltEffect
 		
 		// See protocol.
-		public func lowered() -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			.init(instructions: mainEffects.flatMap { $0.lowered() } + [haltEffect.lowered()])
 		}
 		
