@@ -13,15 +13,22 @@ public protocol Program {
 	/// Lowers `self` to ASM, encodes it into an object, and links it into an ELF executable.
 	///
 	/// This method must be implemented by languages that cannot be lowered. The default implementation lowers `self` and invokes `elf(configuration:)` on the lower language.
-	func elf(configuration: CompilationConfiguration) -> Data
+	func elf(configuration: CompilationConfiguration) throws -> Data
 	
 }
 
 public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
-	public init(target: Target) {
+	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil) {
 		self.target = target
+		self.toolchainURL = toolchainURL ?? FileManager
+			.default
+			.homeDirectoryForCurrentUser
+			.appendingPathComponent("cheri", isDirectory: true)
+		self.systemURL = systemURL ?? self.toolchainURL
+			.appendingPathComponent("output")
+			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
 	}
 	
 	/// The program's target platform.
@@ -36,11 +43,17 @@ public struct CompilationConfiguration {
 		
 	}
 	
+	/// A URL to a CHERI-RISC-V toolchain.
+	public var toolchainURL: URL
+	
+	/// A URL to a CheriBSD system root.
+	public var systemURL: URL
+	
 }
 
 extension Program {
-	public func elf(configuration: CompilationConfiguration) -> Data {
-		lowered(configuration: configuration)
+	public func elf(configuration: CompilationConfiguration) throws -> Data {
+		try lowered(configuration: configuration)
 			.elf(configuration: configuration)
 	}
 }
