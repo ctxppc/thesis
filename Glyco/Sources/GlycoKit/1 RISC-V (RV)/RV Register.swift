@@ -44,6 +44,10 @@ extension RV {
 		/// A register for temporaries.
 		case t3, t4, t5, t6
 		
+		public var c: String {
+			"c\(rawValue)"
+		}
+		
 	}
 	
 }

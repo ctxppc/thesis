@@ -11,7 +11,7 @@ extension RV {
 		/// Returns the assembly representation of `self`.
 		public func compiled() -> String {
 			switch self {
-				case .word(rs1: let rs1, rs2: let rs2, imm: let imm):	return "sw \(rs2), \(imm)(\(rs1))"
+				case .word(rs1: let rs1, rs2: let rs2, imm: let imm):	return "sw.cap \(rs1), \(imm)(\(rs2.c))"
 			}
 		}
 		
