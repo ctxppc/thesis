@@ -13,6 +13,7 @@ let package = Package(
 	dependencies:	[
 		.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.1"),
 		.package(url: "https://github.com/ctxppc/DepthKit.git", .upToNextMinor(from: "0.10.0")),
+		.package(url: "https://github.com/jpsim/Yams.git", from: "4.0.6"),
 	],
 	targets:		[
 		.executableTarget(name: "Glyco", dependencies: [
@@ -22,6 +23,7 @@ let package = Package(
 		]),
 		.target(name: "GlycoKit", dependencies: [
 			.product(name: "DepthKit", package: "DepthKit"),
+			"Yams",
 		]),
 		.testTarget(name: "GlycoKitTests", dependencies: [
 			"GlycoKit",

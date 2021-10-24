@@ -37,10 +37,9 @@ public enum ASM : Language {
 				"""
 			
 			var clangArguments = [
-				"clang",
 				"-O2",
 				"-target", "riscv64-unknown-freebsd",
-				"--sysroot=\(configuration.systemURL.absoluteString)",
+				"--sysroot=\(configuration.systemURL.path)",
 				"-fuse-ld=lld",
 				"-mno-relax",
 				"-march=rv64gcxcheri",
@@ -52,19 +51,18 @@ public enum ASM : Language {
 			}
 			
 			let tmpURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: configuration.toolchainURL, create: true)
+			defer { try? FileManager.default.removeItem(at: tmpURL) }
+			
 			let assemblyURL = tmpURL.appendingPathComponent("asm.S")
 			let linkerCommandsURL = tmpURL.appendingPathComponent("linkage.ld")
 			let elfURL = tmpURL.appendingPathComponent("elf")
 			
 			try assemblyRepresentation.write(to: assemblyURL, atomically: false, encoding: .utf8)
-			defer { try? FileManager.default.removeItem(at: assemblyURL) }
-			
 			try linkerCommands.write(to: linkerCommandsURL, atomically: false, encoding: .utf8)
-			defer { try? FileManager.default.removeItem(at: linkerCommandsURL) }
 			
 			clangArguments += [
-				linkerCommandsURL.absoluteString, assemblyURL.absoluteString,
-				"-o", elfURL.absoluteString
+				linkerCommandsURL.path, assemblyURL.path,
+				"-o", elfURL.path
 			]
 			
 			let clang = Process()
@@ -76,13 +74,22 @@ public enum ASM : Language {
 			clang.arguments = clangArguments
 			
 			try clang.run()
-			defer { try? FileManager.default.removeItem(at: elfURL) }
 			clang.waitUntilExit()
+			guard clang.terminationStatus == 0 else { throw CompilationError.clangError }
 			
 			return try Data(contentsOf: elfURL)
 			
 		}
 		
+	}
+	
+	enum CompilationError : LocalizedError {
+		case clangError
+		var errorDescription: String? {
+			switch self {
+				case .clangError:	return "Clang exited with a nonzero code."
+			}
+		}
 	}
 	
 	// See protocol.

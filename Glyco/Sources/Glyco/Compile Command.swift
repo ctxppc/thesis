@@ -4,12 +4,13 @@ import ArgumentParser
 import DepthKit
 import Foundation
 import GlycoKit
+import Yams
 
 @main
 struct CompileCommand : ParsableCommand {
 	
 	// See protocol.
-	static let configuration = CommandConfiguration(abstract: "Compiles Gly source files to CHERI-RISC-V executables.")
+	static let configuration = CommandConfiguration(commandName: "Glyco", abstract: "Compiles Gly source files to CHERI-RISC-V executables.")
 	
 	@Option(name: .shortAndLong, help: "The path to a CHERI-RISC-V toolchain, as built by cheribuild. Omit to use ~/cheri.")
 	var toolchain: String?
@@ -34,7 +35,7 @@ struct CompileCommand : ParsableCommand {
 		let sourceData = try Data(contentsOf: URL(fileURLWithPath: source))
 		let outputURL = output.map(URL.init(fileURLWithPath:))
 		
-		let program = try JSONDecoder().decode(AL.Program.self, from: sourceData)
+		let program = try YAMLDecoder().decode(AL.Program.self, from: sourceData)
 		let elf = try program.elf(configuration: configuration)
 		
 		if let outputURL = outputURL {
