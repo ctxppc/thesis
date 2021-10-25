@@ -12,7 +12,7 @@ extension FO {
 		case operation(destination: Location, lhs: Source, operation: BinaryOperation, rhs: Source)
 		
 		/// An integral operation.
-		public typealias BinaryOperation = Lower.Instruction.BinaryOperation
+		public typealias BinaryOperation = Lower.BinaryExpression.Operation
 		
 		/// Returns a representation of `self` in a lower language.
 		public func lowered() -> [Lower.Instruction] {
@@ -61,7 +61,7 @@ extension FO {
 				case .operation(destination: let dest, lhs: let lhs, operation: let operation, rhs: .immediate(let rhs)):
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t0)
 				let (resFinalise, resReg) = finalise(destination: dest, temporaryRegister: .t2)
-				return lhsPrep + [.registerImmediate(operation: operation, rd: resReg, rs1: lhsReg, imm: rhs)] + resFinalise
+				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(rs1: lhsReg, operation: operation, imm: rhs)] + resFinalise
 				
 				case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t0)
@@ -69,7 +69,7 @@ extension FO {
 				let (resFinalise, resReg) = finalise(destination: destination, temporaryRegister: .t2)
 				return lhsPrep
 					+ rhsPrep
-					+ [.registerRegister(operation: operation, rd: resReg, rs1: lhsReg, rs2: rhsReg)]
+					+ [resReg <- FL.BinaryExpression.registerRegister(rs1: lhsReg, operation: operation, rs2: rhsReg)]
 					+ resFinalise
 				
 			}

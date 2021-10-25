@@ -7,14 +7,8 @@ extension FL {
 	/// These instructions map one to one to assembly instructions.
 	public enum Instruction : Codable {
 		
-		/// Performs *x* `operation` *y* and assigns the result to `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case registerRegister(operation: BinaryOperation, rd: Register, rs1: Register, rs2: Register)
-		
-		/// Performs *x* `operation` `imm` and assigns the result to `rd`, where *x* is the value in `rs1`.
-		case registerImmediate(operation: BinaryOperation, rd: Register, rs1: Register, imm: Int)
-		
-		/// An integral operation.
-		public typealias BinaryOperation = Lower.Instruction.BinaryOperation
+		/// Computes `value` and assigns the result to `rd`.
+		case assign(rd: Register, value: BinaryExpression)
 		
 		/// An instruction that retrieves the word in memory at the address in `rs1`, with the address offset by `imm`, and stores it in `rd`.
 		case load(destination: Register, source: FrameCellLocation)
@@ -26,10 +20,10 @@ extension FL {
 		func lowered(context: inout Context) -> Lower.Instruction {
 			switch self {
 				
-				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
+				case .assign(rd: let rd, value: .registerRegister(rs1: let rs1, operation: let operation, rs2: let rs2)):
 				return .registerRegister(operation: operation, rd: rd, rs1: rs1, rs2: rs2)
 				
-				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
+				case .assign(rd: let rd, value: .registerImmediate(rs1: let rs1, operation: let operation, imm: let imm)):
 				return .registerImmediate(operation: operation, rd: rd, rs1: rs1, imm: imm)
 				
 				case .load(destination: let destination, source: let source):
@@ -45,16 +39,16 @@ extension FL {
 	
 }
 
+public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Instruction {
+	.assign(rd: rd, value: value)
+}
+
 public func <- (rd: FL.Register, imm: Int) -> FL.Instruction {
-	.registerImmediate(operation: .add, rd: rd, rs1: .zero, imm: imm)
+	rd <- FL.Register.zero + imm
 }
 
 public func <- (rd: FL.Register, rs: FL.Register) -> FL.Instruction {
-	.registerRegister(operation: .add, rd: rd, rs1: rs, rs2: .zero)
-}
-
-public func <- (rd: FL.Register, binop: FL.BinaryExpression) -> FL.Instruction {
-	.registerRegister(operation: binop.operation, rd: rd, rs1: binop.firstOperand, rs2: binop.secondOperand)
+	rd <- rs + .zero
 }
 
 public func <- (rd: FL.Register, src: FL.FrameCellLocation) -> FL.Instruction {
