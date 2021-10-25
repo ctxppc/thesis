@@ -9,13 +9,13 @@ extension NE {
 		case assign(destination: Location, source: Source)
 		
 		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+		case operation(destination: Location, lhs: Source, operation: BinaryOperation, rhs: Source)
 		
 		/// Executes a sequence of effects.
 		case sequence([Effect])
 		
 		/// An integral operation.
-		public typealias BinaryIntegralOperation = Lower.Effect.BinaryIntegralOperation
+		public typealias BinaryOperation = Lower.Effect.BinaryOperation
 		
 		/// Returns a representation of `self` in a lower language.
 		public func lowered() -> [Lower.Effect] {

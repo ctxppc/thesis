@@ -2,9 +2,9 @@
 
 extension FL {
 	
-	public struct BinaryOperation {
+	public struct BinaryExpression {
 		
-		fileprivate init(firstOperand: Register, operation: IntegralInstruction.Operation, secondOperand: Register) {
+		fileprivate init(firstOperand: Register, operation: Instruction.BinaryOperation, secondOperand: Register) {
 			self.firstOperand = firstOperand
 			self.operation = operation
 			self.secondOperand = secondOperand
@@ -14,7 +14,7 @@ extension FL {
 		public let firstOperand: Register
 		
 		/// The operation.
-		public let operation: IntegralInstruction.Operation
+		public let operation: Instruction.BinaryOperation
 		
 		/// The second operand.
 		public let secondOperand: Register
@@ -23,22 +23,22 @@ extension FL {
 	
 }
 
-public func + (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryOperation {
+public func + (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
 	.init(firstOperand: lhs, operation: .add, secondOperand: rhs)
 }
 
-public func - (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryOperation {
+public func - (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
 	.init(firstOperand: lhs, operation: .subtract, secondOperand: rhs)
 }
 
-public func & (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryOperation {
+public func & (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
 	.init(firstOperand: lhs, operation: .and, secondOperand: rhs)
 }
 
-public func | (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryOperation {
+public func | (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
 	.init(firstOperand: lhs, operation: .or, secondOperand: rhs)
 }
 
-public func ^ (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryOperation {
+public func ^ (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
 	.init(firstOperand: lhs, operation: .xor, secondOperand: rhs)
 }

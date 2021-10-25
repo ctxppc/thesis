@@ -9,10 +9,10 @@ extension FO {
 		case assign(destination: Location, source: Source)
 		
 		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-		case operation(destination: Location, lhs: Source, operation: BinaryIntegralOperation, rhs: Source)
+		case operation(destination: Location, lhs: Source, operation: BinaryOperation, rhs: Source)
 		
 		/// An integral operation.
-		public typealias BinaryIntegralOperation = Lower.IntegralInstruction.Operation
+		public typealias BinaryOperation = Lower.Instruction.BinaryOperation
 		
 		/// Returns a representation of `self` in a lower language.
 		public func lowered() -> [Lower.Instruction] {
@@ -22,9 +22,9 @@ extension FO {
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the fetched datum is located.
 			func prepare(source: Source, using temporaryRegister: Lower.Register) -> ([Lower.Instruction], Lower.Register) {
 				switch source {
-					case .immediate(let imm):			return ([.integral(temporaryRegister <- imm)], temporaryRegister)
+					case .immediate(let imm):			return ([temporaryRegister <- imm], temporaryRegister)
 					case .location(.register(let r)):	return ([], r)
-					case .location(.frameCell(let c)):	return ([.load(temporaryRegister <- c)], temporaryRegister)
+					case .location(.frameCell(let c)):	return ([temporaryRegister <- c], temporaryRegister)
 				}
 			}
 			
@@ -34,34 +34,34 @@ extension FO {
 			func finalise(destination: Location, temporaryRegister: Lower.Register) -> ([Lower.Instruction], Lower.Register) {
 				switch destination {
 					case .register(let r):	return ([], r)
-					case .frameCell(let c):	return ([.store(c <- temporaryRegister)], temporaryRegister)
+					case .frameCell(let c):	return ([c <- temporaryRegister], temporaryRegister)
 				}
 			}
 			
 			switch self {
 				
 				case .assign(destination: .register(let dest), source: .immediate(let imm)):
-				return [.integral(dest <- imm)]
+				return [dest <- imm]
 				
 				case .assign(destination: .register(let dest), source: .location(.register(let src))):
-				return [.integral(dest <- src)]
+				return [dest <- src]
 				
 				case .assign(destination: .register(let dest), source: .location(.frameCell(let src))):
-				return [.load(dest <- src)]
+				return [dest <- src]
 				
 				case .assign(destination: .frameCell(let dest), source: .immediate(let imm)):
-				return [.integral(.t0 <- imm), .store(dest <- .t0)]
+				return [.t0 <- imm, dest <- .t0]
 				
 				case .assign(destination: .frameCell(let dest), source: .location(.register(let src))):
-				return [.store(dest <- src)]
+				return [dest <- src]
 				
 				case .assign(destination: .frameCell(let dest), source: .location(.frameCell(let src))):
-				return [.load(.t0 <- src), .store(dest <- .t0)]
+				return [.t0 <- src, dest <- .t0]
 				
 				case .operation(destination: let dest, lhs: let lhs, operation: let operation, rhs: .immediate(let rhs)):
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t0)
 				let (resFinalise, resReg) = finalise(destination: dest, temporaryRegister: .t2)
-				return lhsPrep + [.integral(.registerImmediate(operation: operation, rd: resReg, rs1: lhsReg, imm: rhs))] + resFinalise
+				return lhsPrep + [.registerImmediate(operation: operation, rd: resReg, rs1: lhsReg, imm: rhs)] + resFinalise
 				
 				case .operation(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t0)
@@ -69,7 +69,7 @@ extension FO {
 				let (resFinalise, resReg) = finalise(destination: destination, temporaryRegister: .t2)
 				return lhsPrep
 					+ rhsPrep
-					+ [.integral(.registerRegister(operation: operation, rd: resReg, rs1: lhsReg, rs2: rhsReg))]
+					+ [.registerRegister(operation: operation, rd: resReg, rs1: lhsReg, rs2: rhsReg)]
 					+ resFinalise
 				
 			}

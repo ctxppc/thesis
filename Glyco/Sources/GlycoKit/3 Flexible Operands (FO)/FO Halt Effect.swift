@@ -11,9 +11,9 @@ extension FO {
 		/// Returns a representation of `self` in a lower language.
 		public func lowered() -> Lower.Instruction {
 			switch result {
-				case .immediate(let imm):				return .integral(.a0 <- imm)
-				case .location(.register(let result)):	return .integral(.a0 <- result)
-				case .location(.frameCell(let result)):	return .load(.a0 <- result)
+				case .immediate(let imm):				return .a0 <- imm
+				case .location(.register(let result)):	return .a0 <- result
+				case .location(.frameCell(let result)):	return .a0 <- result
 			}
 		}
 		
