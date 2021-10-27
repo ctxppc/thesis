@@ -11,10 +11,10 @@ extension FL {
 		case assign(rd: Register, value: BinaryExpression)
 		
 		/// An instruction that retrieves the word in memory at the address in `rs1`, with the address offset by `imm`, and stores it in `rd`.
-		case load(destination: Register, source: FrameCellLocation)
+		case load(DataType, destination: Register, source: FrameCellLocation)
 		
 		/// An instruction that retrieves the word in `source` and stores it in memory at the address in `destination`.
-		case store(destination: FrameCellLocation, source: Register)
+		case store(DataType, destination: FrameCellLocation, source: Register)
 		
 		/// Returns a representation of `self` in a lower language.
 		func lowered(context: inout Context) -> Lower.Instruction {
@@ -26,16 +26,18 @@ extension FL {
 				case .assign(rd: let rd, value: .registerImmediate(rs1: let rs1, operation: let operation, imm: let imm)):
 				return .registerImmediate(operation: operation, rd: rd, rs1: rs1, imm: imm)
 				
-				case .load(destination: let destination, source: let source):
-				return .loadWord(rd: destination, ca: .fp, imm: source.offset)
+				case .load(let type, destination: let destination, source: let source):
+				return .load(type, destination: destination, address: .fp, offset: source.offset)
 				
-				case .store(destination: let destination, source: let source):
-				return .storeWord(rs: source, ca: .fp, imm: destination.offset)
+				case .store(let type, destination: let destination, source: let source):
+				return .store(type, source: source, address: .fp, offset: destination.offset)
 				
 			}
 		}
 		
 	}
+	
+	public typealias DataType = Lower.DataType
 	
 }
 
@@ -52,9 +54,9 @@ public func <- (rd: FL.Register, rs: FL.Register) -> FL.Instruction {
 }
 
 public func <- (rd: FL.Register, src: FL.FrameCellLocation) -> FL.Instruction {
-	.load(destination: rd, source: src)
+	.load(.word, destination: rd, source: src)		// TODO: Capability support
 }
 
 public func <- (dest: FL.FrameCellLocation, src: FL.Register) -> FL.Instruction {
-	.store(destination: dest, source: src)
+	.store(.word, destination: dest, source: src)	// TODO: Capability support
 }

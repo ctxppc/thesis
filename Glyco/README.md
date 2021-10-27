@@ -31,7 +31,7 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 	<tr>
 		<td><code>RV</code></td>
 		<td>CHERI-RISC-V</td>
-		<td>Maps directly to CHERI-RISC-V instructions.</td>
+		<td>Maps directly to CHERI-RISC-V (pseudo-)instructions.</td>
 	</tr>
 	<tr>
 		<td><code>FL</code></td>

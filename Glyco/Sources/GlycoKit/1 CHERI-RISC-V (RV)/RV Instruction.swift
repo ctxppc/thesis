@@ -20,26 +20,14 @@ extension RV {
 			case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
 		}
 		
-		/// An instruction that retrieves the word in memory at the address in `cs`, with the address offset by `imm`, and stores it in `rd`.
-		case loadWord(rd: Register, ca: Register, imm: Int)
+		/// An instruction that retrieves the datum of type `type` in memory at the address in `address`, with the address offset by `offset`, and stores it in `destination`.
+		case load(DataType, destination: Register, address: Register, offset: Int)
 		
-		/// An instruction that retrieves the capability in memory at the address in `cs`, with the address offset by `imm`, and stores it in `cd`.
-		case loadCapability(cd: Register, ca: Register, imm: Int)
-		
-		/// An instruction that retrieves the word in `rs` and stores it in memory at the address in `ca`, with the address offset by `imm`.
-		case storeWord(rs: Register, ca: Register, imm: Int)
-		
-		/// An instruction that retrieves the capability in `cs` and stores it in memory at the address in `ca`, with the address offset by `imm`.
-		case storeCapability(cs: Register, ca: Register, imm: Int)
+		/// An instruction that retrieves the datum of type `type` in `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
+		case store(DataType, source: Register, address: Register, offset: Int)
 		
 		/// An instruction that jumps `offset` bytes forward if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case branch(rs1: Register, relation: BranchRelation, rs2: Register, offset: Int)
-		public enum BranchRelation : String, Codable {
-			case equal = "eq"
-			case unequal = "ne"
-			case less = "lt"
-			case greaterOrEqual = "ge"
-		}
+		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
 		/// An instruction that assigns the next PPC to `cd` and jumps to address *x*, where *x* is the value in `cs1`.
 		case jump(cd: Register, cs1: Register)
@@ -60,20 +48,20 @@ extension RV {
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(operation)i \(rd.x), \(rs1.x), \(imm)"
 				
-				case .loadWord(rd: let rd, ca: let ca, imm: let imm):
-				return "lw.cap \(rd.x), \(imm)(\(ca.c))"
+				case .load(.word, destination: let rd, address: let address, offset: let offset):
+				return "lw.cap \(rd.x), \(offset)(\(address.c))"
 				
-				case .loadCapability(cd: let cd, ca: let ca, imm: let imm):
-				return "clc \(cd.x), \(imm)(\(ca.c))"
+				case .load(.capability, destination: let cd, address: let address, offset: let offset):
+				return "clc \(cd.x), \(offset)(\(address.c))"
 				
-				case .storeWord(rs: let rs, ca: let ca, imm: let imm):
-				return "sw.cap \(rs.x), \(imm)(\(ca.c))"
+				case .store(.word, source: let rs, address: let address, offset: let offset):
+				return "sw.cap \(rs.x), \(offset)(\(address.c))"
 				
-				case .storeCapability(cs: let cs, ca: let ca, imm: let imm):
-				return "clc \(cs.x), \(imm)(\(ca.c))"
+				case .store(.capability, source: let cs, address: let address, offset: let offset):
+				return "clc \(cs.x), \(offset)(\(address.c))"
 				
-				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, offset: let offset):
-				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(offset)"
+				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
+				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
 				case .jump(cd: let cd, cs1: let cs1):
 				return "cjalr \(cd.c), \(cs1.c)"
