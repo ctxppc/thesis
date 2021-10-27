@@ -7,18 +7,14 @@ extension RV {
 	/// Each instruction maps to exactly one assembly instruction.
 	public enum Instruction : Codable {
 		
+		/// Copies the contents of `source` into `destination`.
+		case copy(DataType, destination: Register, source: Register)
+		
 		/// Performs *x* `operation` *y* and assigns the result to `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case registerRegister(operation: BinaryOperation, rd: Register, rs1: Register, rs2: Register)
+		case registerRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
 		
 		/// Performs *x* `operation` `imm` and assigns the result to `rd`, where *x* is the value in `rs1`.
-		case registerImmediate(operation: BinaryOperation, rd: Register, rs1: Register, imm: Int)
-		
-		/// An operation between two registers.
-		public enum BinaryOperation : String, Codable {
-			case add, subtract = "sub"
-			case and, or, xor
-			case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
-		}
+		case registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
 		/// An instruction that retrieves the datum of type `type` in memory at the address in `address`, with the address offset by `offset`, and stores it in `destination`.
 		case load(DataType, destination: Register, address: Register, offset: Int)
@@ -41,6 +37,12 @@ extension RV {
 		/// Returns the assembly representation of `self`.
 		public func compiled() -> String {
 			switch self {
+				
+				case .copy(.word, destination: let destination, source: let source):
+				return "mv \(destination.x), \(source.x)"
+				
+				case .copy(.capability, destination: let destination, source: let source):
+				return "cmove \(destination.c), \(source.c)"
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
 				return "\(operation) \(rd.x), \(rs1.x), \(rs2.x)"

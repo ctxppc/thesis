@@ -9,10 +9,7 @@ extension FO {
 		case assign(destination: Location, source: Source)
 		
 		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-		case operation(destination: Location, lhs: Source, operation: BinaryOperation, rhs: Source)
-		
-		/// An integral operation.
-		public typealias BinaryOperation = Lower.BinaryExpression.Operation
+		case operation(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
 		
 		/// Returns a representation of `self` in a lower language.
 		public func lowered() -> [Lower.Instruction] {
@@ -77,5 +74,8 @@ extension FO {
 		}
 	
 	}
+	
+	/// An integral operation.
+	public typealias BinaryOperator = Lower.BinaryOperator
 	
 }

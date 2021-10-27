@@ -9,13 +9,10 @@ extension AL {
 		case assign(destination: Location, source: Source)
 		
 		/// Assigns the result of `lhs` `operation` `rhs` to `destination`.
-		case operation(destination: Location, lhs: Source, operation: BinaryOperation, rhs: Source)
+		case operation(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
 		
 		/// Executes a sequence of effects.
 		case sequence([Effect])
-		
-		/// An integral operation.
-		public typealias BinaryOperation = Lower.Effect.BinaryOperation
 		
 		/// Returns a set of locations (potentially) accessed by `self`.
 		public func accessedLocations() -> Set<Location> {
@@ -54,6 +51,8 @@ extension AL {
 		}
 		
 	}
+	
+	public typealias BinaryOperator = Lower.BinaryOperator
 	
 }
 

@@ -5,15 +5,15 @@ extension FL {
 	public enum BinaryExpression : Codable {
 		
 		/// Performs *x* `operation` *y* where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case registerRegister(rs1: Register, operation: Operation, rs2: Register)
+		case registerRegister(rs1: Register, operation: BinaryOperator, rs2: Register)
 		
 		/// Performs *x* `operation` `imm` where *x* is the value in `rs1`.
-		case registerImmediate(rs1: Register, operation: Operation, imm: Int)
-		
-		/// An operation between two operands.
-		public typealias Operation = Lower.Instruction.BinaryOperation
+		case registerImmediate(rs1: Register, operation: BinaryOperator, imm: Int)
 		
 	}
+	
+	/// An operation between two operands.
+	public typealias BinaryOperator = Lower.BinaryOperator
 	
 }
 
