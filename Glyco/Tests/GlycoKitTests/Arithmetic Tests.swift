@@ -10,8 +10,8 @@ final class ArithmeticTests : XCTestCase {
 		var context = AL.Context()
 		let location = AL.Location.allocate(context: &context)
 		let program = AL.Program(mainEffects: [
-			.assign(destination: location, source: .immediate(1)),
-			.operation(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
+			.copy(destination: location, source: .immediate(1)),
+			.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
 		], haltEffect: .init(result: .location(location)))
 		
 		let configuration = CompilationConfiguration(target: .cheriBSD)

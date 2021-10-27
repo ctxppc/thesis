@@ -5,30 +5,35 @@ extension RV {
 	/// A CHERI-RISC-V instruction.
 	///
 	/// Each instruction maps to exactly one assembly instruction.
+	///
+	/// As a convention, the following verbiage is used in the context of data movement:
+	/// * a datum is *loaded from* or *stored in* memory;
+	/// * a datum is *retrieved from* or *put in* a register; and
+	/// * a datum is *copied from* a register *to* a register.
 	public enum Instruction : Codable {
 		
-		/// Copies the contents of `source` into `destination`.
+		/// An instruction that copies the datum from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)
 		
-		/// Performs *x* `operation` *y* and assigns the result to `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		/// An instruction that performs *x* `operation` *y* and puts the result in `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case registerRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
 		
-		/// Performs *x* `operation` `imm` and assigns the result to `rd`, where *x* is the value in `rs1`.
+		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
 		case registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
-		/// An instruction that retrieves the datum of type `type` in memory at the address in `address`, with the address offset by `offset`, and stores it in `destination`.
+		/// An instruction that loads the datum of type `type` from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
 		case load(DataType, destination: Register, address: Register, offset: Int)
 		
-		/// An instruction that retrieves the datum of type `type` in `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
+		/// An instruction that retrieves the datum of type `type` from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
 		case store(DataType, source: Register, address: Register, offset: Int)
 		
-		/// An instruction that jumps `offset` bytes forward if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
-		/// An instruction that assigns the next PPC to `cd` and jumps to address *x*, where *x* is the value in `cs1`.
+		/// An instruction that puts the PCC in `cd` then jumps to address *x*, where *x* is the value in `cs1`.
 		case jump(cd: Register, cs1: Register)
 		
-		/// An instruction that can jumped to using a label.
+		/// An instruction that can be jumped to using given label.
 		indirect case labelled(Label, Instruction)
 		
 		/// A return instruction.
