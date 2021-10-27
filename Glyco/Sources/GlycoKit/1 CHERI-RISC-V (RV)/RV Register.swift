@@ -44,16 +44,16 @@ extension RV {
 		/// A register for temporaries.
 		case t3, t4, t5, t6
 		
+		/// The integer register's identifier.
+		public var x: String {
+			"x\(rawValue)"
+		}
+		
+		/// The capability register's identifier.
 		public var c: String {
 			"c\(rawValue)"
 		}
 		
 	}
 	
-}
-
-extension RV.Register : CustomStringConvertible {
-	public var description: String {
-		"x\(rawValue)"
-	}
 }

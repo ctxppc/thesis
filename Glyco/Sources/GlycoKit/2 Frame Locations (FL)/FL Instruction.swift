@@ -27,10 +27,10 @@ extension FL {
 				return .registerImmediate(operation: operation, rd: rd, rs1: rs1, imm: imm)
 				
 				case .load(destination: let destination, source: let source):
-				return .load(rd: destination, rs1: .fp, imm: source.offset)
+				return .loadWord(rd: destination, ca: .fp, imm: source.offset)
 				
 				case .store(destination: let destination, source: let source):
-				return .store(rs1: .fp, rs2: source, imm: destination.offset)
+				return .storeWord(rs: source, ca: .fp, imm: destination.offset)
 				
 			}
 		}
