@@ -11,6 +11,14 @@ extension RV {
 		/// An 8-byte capability.
 		case capability
 		
+		/// The size of a datum of this type, in bytes.
+		public var byteSize: Int {
+			switch self {
+				case .word:			return 4
+				case .capability:	return 8
+			}
+		}
+		
 	}
 	
 }

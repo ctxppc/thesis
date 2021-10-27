@@ -20,7 +20,7 @@ public enum AL : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Lower.Context()
-			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, Lower.Location.frameCell(.allocate(context: &context))) })
+			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, Lower.Location.frameCell(.allocate(.word, context: &context))) })
 			return .init(mainEffects: mainEffects.map { $0.lowered(homes: homes) }, haltEffect: haltEffect.lowered(homes: homes))
 		}
 		
