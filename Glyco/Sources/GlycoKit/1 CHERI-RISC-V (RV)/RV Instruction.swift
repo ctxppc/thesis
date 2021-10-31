@@ -21,11 +21,20 @@ extension RV {
 		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
 		case registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
-		/// An instruction that loads the datum of type `type` from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
-		case load(DataType, destination: Register, address: Register, offset: Int)
+		/// An instruction that loads the word of type `type` from memory at the address in `address`, with the address offset by `offset`.
+		case loadWord(destination: Register, address: Register)
 		
-		/// An instruction that retrieves the datum of type `type` from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
-		case store(DataType, source: Register, address: Register, offset: Int)
+		/// An instruction that loads the capability of type `type` from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
+		case loadCapability(destination: Register, address: Register, offset: Int)
+		
+		/// An instruction that retrieves the word of type `type` from `source` and stores it in memory at the address in `address`.
+		case storeWord(source: Register, address: Register)
+		
+		/// An instruction that retrieves the capability of type `type` from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
+		case storeCapability(source: Register, address: Register, offset: Int)
+		
+		/// An instruction that offsets the capability in `source` by `offset` and puts it in `destination`.
+		case offsetCapability(destination: Register, source: Register, offset: Int)
 		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
@@ -55,17 +64,20 @@ extension RV {
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(operation)i \(rd.x), \(rs1.x), \(imm)"
 				
-				case .load(.word, destination: let rd, address: let address, offset: let offset):
-				return "lw.cap \(rd.x), \(offset)(\(address.c))"
+				case .loadWord(destination: let rd, address: let address):
+				return "lw.cap \(rd.x), 0(\(address.c))"
 				
-				case .load(.capability, destination: let cd, address: let address, offset: let offset):
+				case .loadCapability(destination: let cd, address: let address, offset: let offset):
 				return "clc \(cd.x), \(offset)(\(address.c))"
 				
-				case .store(.word, source: let rs, address: let address, offset: let offset):
-				return "sw.cap \(rs.x), \(offset)(\(address.c))"
+				case .storeWord(source: let rs, address: let address):
+				return "sw.cap \(rs.x), 0(\(address.c))"
 				
-				case .store(.capability, source: let cs, address: let address, offset: let offset):
+				case .storeCapability(source: let cs, address: let address, offset: let offset):
 				return "clc \(cs.x), \(offset)(\(address.c))"
+				
+				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
+				return "cincoffsetimm \(destination.c), \(source.c), \(offset)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"

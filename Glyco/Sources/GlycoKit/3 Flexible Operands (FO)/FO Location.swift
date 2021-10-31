@@ -1,8 +1,8 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-extension FL {
+extension FO {
 	
-	/// A location to a register or frame cell on an FL machine.
+	/// A location to a register or frame cell on an FO machine.
 	public enum Location : Codable {
 		
 		/// A location to a register.
@@ -12,5 +12,7 @@ extension FL {
 		case frameCell(FrameCellLocation)
 		
 	}
+	
+	public typealias FrameCellLocation = Lower.FrameCellLocation
 	
 }

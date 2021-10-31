@@ -13,6 +13,4 @@ extension FO {
 		
 	}
 	
-	public typealias Location = Lower.Location
-	
 }

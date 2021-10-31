@@ -32,32 +32,45 @@ extension FL {
 		static var nop: Self { .zero <- Register.zero + .zero }
 		
 		/// Returns a representation of `self` in a lower language.
-		func lowered(context: inout Context) -> Lower.Instruction {
+		func lowered(context: inout Context) -> [Lower.Instruction] {
 			switch self {
 				
 				case .copy(let type, destination: let destination, source: let source):
-				return .copy(type, destination: destination, source: source)
+				return [.copy(type, destination: destination.lowered(), source: source.lowered())]
 				
 				case .compute(destination: let destination, value: .registerRegister(rs1: let rs1, operation: let operation, rs2: let rs2)):
-				return .registerRegister(operation: operation, rd: destination, rs1: rs1, rs2: rs2)
+				return [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
 				case .compute(destination: let destination, value: .registerImmediate(rs1: let rs1, operation: let operation, imm: let imm)):
-				return .registerImmediate(operation: operation, rd: destination, rs1: rs1, imm: imm)
+				return [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
-				case .load(let type, destination: let destination, source: let source):
-				return .load(type, destination: destination, address: .fp, offset: source.offset)
+				case .load(.word, destination: let destination, source: let source):
+				return [
+					.offsetCapability(destination: .t0, source: .fp, offset: source.offset),
+					.loadWord(destination: destination.lowered(), address: .t0)
+				]
 				
-				case .store(let type, destination: let destination, source: let source):
-				return .store(type, source: source, address: .fp, offset: destination.offset)
+				case .load(.capability, destination: let destination, source: let source):
+				return [.loadCapability(destination: destination.lowered(), address: .fp, offset: source.offset)]
+				
+				case .store(.word, destination: let destination, source: let source):
+				return [
+					.offsetCapability(destination: .t0, source: .fp, offset: destination.offset),
+					.storeWord(source: source.lowered(), address: .t0)
+				]
+				
+				case .store(.capability, destination: let destination, source: let source):
+				return [.storeCapability(source: source.lowered(), address: .fp, offset: destination.offset)]
 				
 				case .branch(target: let target, rs1: let rs1, relation: let relation, rs2: let rs2):
-				return .branch(rs1: rs1, relation: relation, rs2: rs2, target: target)
+				return [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
 				
 				case .jump(cd: let cd, cs1: let cs1):
-				return .jump(cd: cd, cs1: cs1)
+				return [.jump(cd: cd.lowered(), cs1: cs1.lowered())]
 				
 				case .labelled(let label, let instruction):
-				return .labelled(label, instruction.lowered(context: &context))
+				guard let (first, tail) = instruction.lowered(context: &context).splittingFirst() else { TODO.unimplemented }
+				return [.labelled(label, first)].appending(contentsOf: tail)
 				
 			}
 		}
