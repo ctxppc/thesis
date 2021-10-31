@@ -3,10 +3,10 @@
 extension RV {
 	
 	/// A machine register.
-	public enum Register : Int, Codable {
+	public enum Register : String, Codable {
 		
 		/// The always-zero register.
-		case zero = 0
+		case zero
 		
 		/// The return address register.
 		case ra
@@ -46,7 +46,7 @@ extension RV {
 		
 		/// The integer register's identifier.
 		public var x: String {
-			"x\(rawValue)"
+			"\(rawValue)"
 		}
 		
 		/// The capability register's identifier.

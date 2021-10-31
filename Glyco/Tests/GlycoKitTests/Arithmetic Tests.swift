@@ -44,7 +44,7 @@ final class ArithmeticTests : XCTestCase {
 						.addrsig
 		"""
 		
-		XCTAssertEqual(loweredProgram.assemblyRepresentation, expected)
+		XCTAssertEqual(loweredProgram.body, expected)
 		
 	}
 	

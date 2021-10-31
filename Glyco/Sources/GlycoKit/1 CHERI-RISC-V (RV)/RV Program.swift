@@ -29,28 +29,32 @@ public enum RV : Language {
 								.cfi_endproc
 								
 								.ident		"glyco version 0.1"
-								.section	".note.GNU-stack","",@progbits
+								.section	".note.GNU-stack", "", @progbits
 								.addrsig
 				""")
 				
 				case .sail:
 				return .init(body: """
-							.section .text
-							.align 4
-							.globl _start
-				_start:		jalr ra, zero, main
+							.text
+							.align		4
+							.globl		_start
+							.globl		main
+							.type		main, @function
+				_start:		clgc		ct0, main
+							cjalr		cra, ct0
 							ecall
 				main:		\(instructions
 								.map { $0.compiled() }
 								.joined(separator: "\n\t\t\t"))
+				main.end:	.size		main, main.end-main
 							
-							.section .tohost, "aw", @progbits
-							.align 6
-							.global tohost
-				tohost:		.dword 0
-							.align 6
-							.global fromhost
-				fromhost:	.dword 0
+							.section	.tohost, "aw", @progbits
+							.align		6
+							.global		tohost
+				tohost:		.dword		0
+							.align		6
+							.global		fromhost
+				fromhost:	.dword		0
 				""")
 				
 			}

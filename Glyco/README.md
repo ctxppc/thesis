@@ -24,9 +24,9 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<th>Description</th>
 	</tr>
 	<tr>
-		<td><code>ASM</code></td>
+		<td><code>S</code></td>
 		<td>CHERI-RISC-V Assembly</td>
-		<td>Is input for Clang.</td>
+		<td>Input for Clang</td>
 	</tr>
 	<tr>
 		<td><code>RV</code></td>
@@ -36,7 +36,7 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 	<tr>
 		<td><code>FL</code></td>
 		<td>Frame Locations</td>
-		<td>Introduces frame locations, i.e., memory locations relative to the frame pointer (<code>fp</code>).</td>
+		<td>Introduces frame locations, i.e., memory locations relative to the frame pointer <code>fp</code>.</td>
 	</tr>
 	<tr>
 		<td><code>FO</code></td>
