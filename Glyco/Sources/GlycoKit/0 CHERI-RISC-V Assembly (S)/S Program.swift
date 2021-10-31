@@ -3,17 +3,17 @@
 import DepthKit
 import Foundation
 
-public enum ASM : Language {
+public enum S : Language {
 	
-	/// A program in the ASM language.
+	/// A program in the S language.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// The program's assembly representation.
-		public let assemblyRepresentation: String
+		public let body: String
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Never {
-			fatalError("Cannot lower ASM to another language; use `elf(configuration:)` to encode the assembly representation and link the executable.")
+			fatalError("Cannot lower S to another language; use `elf(configuration:)` to encode the assembly representation and link the executable.")
 		}
 		
 		// See protocol.
@@ -57,12 +57,15 @@ public enum ASM : Language {
 			let linkerCommandsURL = tmpURL.appendingPathComponent("linkage.ld")
 			let elfURL = tmpURL.appendingPathComponent("elf")
 			
-			try assemblyRepresentation.write(to: assemblyURL, atomically: false, encoding: .utf8)
+			try body.write(to: assemblyURL, atomically: false, encoding: .utf8)
 			try linkerCommands.write(to: linkerCommandsURL, atomically: false, encoding: .utf8)
 			
+			if configuration.target == .sail {
+				clangArguments.append(linkerCommandsURL.path)
+			}
+			
 			clangArguments += [
-				linkerCommandsURL.path, assemblyURL.path,
-				"-o", elfURL.path
+				assemblyURL.path, "-o", elfURL.path
 			]
 			
 			let clang = Process()
@@ -94,5 +97,37 @@ public enum ASM : Language {
 	
 	// See protocol.
 	public typealias Lower = Never
+	
+	// See protocol.
+	public static func loweredProgramRepresentation(fromData data: Data, sourceLanguage: String, targetLanguage: String, configuration: CompilationConfiguration) throws -> String {
+		guard isNamed(sourceLanguage) else { throw LoweringError.unknownLanguage(sourceLanguage) }
+		guard isNamed(targetLanguage) else { throw LoweringError.unknownLanguage(targetLanguage) }
+		guard let assembly = String(data: data, encoding: .utf8) else { throw LoweringError.invalidEncoding }
+		return assembly
+	}
+	
+	// See protocol.
+	public static func loweredProgramRepresentation(_ program: Program, targetLanguage: String, configuration: CompilationConfiguration) throws -> String {
+		guard isNamed(targetLanguage) else { throw LoweringError.unknownLanguage(targetLanguage) }
+		return program.body
+	}
+	
+	// See protocol.
+	public static func elfFromProgram(fromData data: Data, sourceLanguage: String, configuration: CompilationConfiguration) throws -> Data {
+		guard isNamed(sourceLanguage) else { throw LoweringError.unknownLanguage(sourceLanguage) }
+		guard let assembly = String(data: data, encoding: .utf8) else { throw LoweringError.invalidEncoding }
+		return try Program(body: assembly).elf(configuration: configuration)
+	}
+	
+	enum LoweringError : LocalizedError {
+		case unknownLanguage(String)
+		case invalidEncoding
+		var errorDescription: String? {
+			switch self {
+				case .unknownLanguage(let language):	return "“\(language)” is not a language supported by Glyco."
+				case .invalidEncoding:					return "Expected S in UTF-8."
+			}
+		}
+	}
 	
 }

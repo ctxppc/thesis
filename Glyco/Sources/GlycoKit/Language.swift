@@ -11,6 +11,15 @@ public protocol Language {
 	/// The lower language.
 	associatedtype Lower : Language
 	
+	/// Lowers a representation `data` of a program in a language named `sourceLanguage` to a representation in a lower language named `targetLanguage`.
+	static func loweredProgramRepresentation(fromData data: Data, sourceLanguage: String, targetLanguage: String, configuration: CompilationConfiguration) throws -> String
+	
+	/// Lowers `program` to a representation in a lower language named `targetLanguage`.
+	static func loweredProgramRepresentation(_ program: Program, targetLanguage: String, configuration: CompilationConfiguration) throws -> String
+	
+	/// Lowers a representation `data` of a program in a language named `sourceLanguage` to S, encodes it into an object, and links it into an ELF executable.
+	static func elfFromProgram(fromData data: Data, sourceLanguage: String, configuration: CompilationConfiguration) throws -> Data
+	
 }
 
 extension Never : Language {
@@ -48,7 +57,7 @@ extension Language {
 		}
 	}
 	
-	/// Lowers a representation `data` of a program in a language named `sourceLanguage` to ASM, encodes it into an object, and links it into an ELF executable.
+	/// Lowers a representation `data` of a program in a language named `sourceLanguage` to S, encodes it into an object, and links it into an ELF executable.
 	public static func elfFromProgram(fromData data: Data, sourceLanguage: String, configuration: CompilationConfiguration) throws -> Data {
 		if isNamed(sourceLanguage) {
 			let program = try YAMLDecoder().decode(Program.self, from: data)
@@ -59,7 +68,7 @@ extension Language {
 	}
 	
 	/// Returns a Boolean value indicating whether `Self` is named `name`.
-	private static func isNamed(_ name: String) -> Bool {
+	static func isNamed(_ name: String) -> Bool {
 		"\(self)" == name
 	}
 	

@@ -10,7 +10,7 @@ public protocol Program : Codable {
 	/// A program in the lower language.
 	associatedtype LowerProgram : Program
 	
-	/// Lowers `self` to ASM, encodes it into an object, and links it into an ELF executable.
+	/// Lowers `self` to S, encodes it into an object, and links it into an ELF executable.
 	///
 	/// This method must be implemented by languages that cannot be lowered. The default implementation lowers `self` and invokes `elf(configuration:)` on the lower language.
 	func elf(configuration: CompilationConfiguration) throws -> Data
@@ -33,13 +33,13 @@ public struct CompilationConfiguration {
 	
 	/// The program's target platform.
 	public var target: Target
-	public enum Target {
+	public enum Target : String, CaseIterable {
 		
 		/// The target platform is CheriBSD.
-		case cheriBSD
+		case cheriBSD = "CheriBSD"
 		
 		/// The target platform is the CHERI-RISC-V Sail model.
-		case sail
+		case sail = "Sail"
 		
 	}
 	

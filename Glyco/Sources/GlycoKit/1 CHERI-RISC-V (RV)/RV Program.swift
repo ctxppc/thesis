@@ -9,11 +9,11 @@ public enum RV : Language {
 		public var instructions: [Instruction] = []
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> ASM.Program {
+		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			switch configuration.target {
 				
 				case .cheriBSD:
-				return .init(assemblyRepresentation: """
+				return .init(body: """
 								.text
 								.attribute	4, 16
 								.attribute	5, "rv64i2p0_xcheri0p0"
@@ -34,7 +34,7 @@ public enum RV : Language {
 				""")
 				
 				case .sail:
-				return .init(assemblyRepresentation: """
+				return .init(body: """
 							.section .text
 							.align 4
 							.globl _start
@@ -59,6 +59,6 @@ public enum RV : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = ASM
+	public typealias Lower = S
 	
 }
