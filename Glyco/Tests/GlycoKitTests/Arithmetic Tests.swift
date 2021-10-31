@@ -30,12 +30,12 @@ final class ArithmeticTests : XCTestCase {
 						.type		main, @function
 		main:			.cfi_startproc
 						addi x5, x0, 1
-						sw.cap x9, 0(c5)
+						sw.cap x5, -4(c9)
 						addi x5, x0, 2
-						lw.cap x6, 0(c9)
+						lw.cap x6, -4(c9)
 						add x7, x5, x6
-						sw.cap x9, 0(c7)
-						lw.cap x11, 0(c9)
+						sw.cap x7, -4(c9)
+						lw.cap x11, -4(c9)
 		main.end:		.size		main, main.end-main
 						.cfi_endproc
 						
