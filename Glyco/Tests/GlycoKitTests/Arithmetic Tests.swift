@@ -8,7 +8,7 @@ final class ArithmeticTests : XCTestCase {
 	func testSimpleSum() {
 		
 		var context = AL.Context()
-		let location = AL.Location.allocate(context: &context)
+		let location = AL.Location.allocate(in: &context)
 		let program = AL.Program(mainEffects: [
 			.copy(destination: location, source: .immediate(1)),
 			.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),

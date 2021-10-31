@@ -5,16 +5,13 @@ import DepthKit
 extension AL {
 	
 	/// An abstract storage location on an AL machine.
-	public struct Location : Codable, Hashable {
+	public struct Location : Hashable {
 		
 		/// Allocates a new location, different from every other previously allocated location.
-		public static func allocate(scopeIdentifier: String = "tmp", context: inout Context) -> Self {
+		public static func allocate(in context: inout Context) -> Self {
 			defer { context.numberOfAllocatedLocations += 1 }
-			return Self(scopeIdentifier: scopeIdentifier, sequenceNumber: context.numberOfAllocatedLocations)
+			return Self(sequenceNumber: context.numberOfAllocatedLocations)
 		}
-		
-		/// A value identifying the score of the storage.
-		public let scopeIdentifier: String
 		
 		/// A number uniquely identifying the storage.
 		public let sequenceNumber: Int
@@ -34,6 +31,19 @@ extension AL {
 
 extension AL.Location : CustomStringConvertible {
 	public var description: String {
-		"\(scopeIdentifier).\(sequenceNumber)"
+		"\(sequenceNumber)"
 	}
+}
+
+extension AL.Location : Codable {
+	
+	public init(from decoder: Decoder) throws {
+		sequenceNumber = try decoder.singleValueContainer().decode(Int.self)
+	}
+	
+	public func encode(to encoder: Encoder) throws {
+		var container = encoder.singleValueContainer()
+		try container.encode(sequenceNumber)
+	}
+	
 }

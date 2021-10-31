@@ -2,7 +2,7 @@
 
 import Foundation
 
-public protocol Program {
+public protocol Program : Codable {
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) -> LowerProgram
@@ -59,7 +59,17 @@ extension Program {
 }
 
 extension Never : Program {
+	
+	public init(from decoder: Decoder) throws {
+		fatalError("Cannot decode an instance of Never")
+	}
+	
+	public func encode(to encoder: Encoder) throws {
+		switch self {}
+	}
+	
 	public func lowered(configuration: CompilationConfiguration) -> Self {
 		switch self {}
 	}
+	
 }

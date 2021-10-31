@@ -10,39 +10,64 @@ import Yams
 struct CompileCommand : ParsableCommand {
 	
 	// See protocol.
-	static let configuration = CommandConfiguration(commandName: "Glyco", abstract: "Compiles Gly source files to CHERI-RISC-V executables.")
+	static let configuration = CommandConfiguration(commandName: "Glyco", abstract: "Compiles Gly source files to CHERI-RISC-V executables.", discussion: discussion)
 	
-	@Option(name: .shortAndLong, help: "The path to a CHERI-RISC-V toolchain, as built by cheribuild. Omit to use ~/cheri.")
-	var toolchain: String?
+	private static let discussion = """
+	Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the CHERITOOLCHAIN environment variable; if omitted, Glyco assumes it‘s in ~/cheri. The path to the system root can be provided through the CHERISYSROOT environment variable; if omitted, Glyco assumes it‘s in output/rootfs-riscv64-purecap within the toolchain.
+	"""
 	
-	@Option(name: .shortAndLong, help: "The path to a CheriBSD system root, as built by cheribuild. Omit to use output/rootfs-riscv64-purecap within the toolchain.")
-	var system: String?
-	
-	@Argument(help: "The path or filename to a Gly file.")
+	@Argument(help: "The path to a Gly or intermediate file. The file‘s extension must be .gly or the lowercased name of an intermediate language (e.g., .fo).")
 	var source: String
 	
-	@Option(name: .shortAndLong, help: "The path of the generated ELF file (will be overwritten). Omit for a dry run.")
+	@Option(name: .shortAndLong, help: "The intermediate language (ASM, FL, FO, etc.) to emit. Omit to build an ELF file.")
+	var language: String?
+	
+	@Option(name: .shortAndLong, help: "The path of the generated file (will be overwritten). Omit to discard the ELF file or to print the intermediate representation to standard out.")
 	var output: String?
+	
+	/// The highest intermediate language supported by Glyco.
+	///
+	/// Update this typealias whenever a higher language is added.
+	private typealias HighestSupportedLanguage = AL
 	
 	/// Executes the command.
 	mutating func run() throws {
 		
-		let toolchainURL = toolchain.map(URL.init(fileURLWithPath:))
-			?? FileManager.default.homeDirectoryForCurrentUser.appendingPathComponent("cheri", isDirectory: true)
-		let systemURL = system.map(URL.init(fileURLWithPath:))
-			?? toolchainURL.appendingPathComponent("output").appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
+		let environment = ProcessInfo.processInfo.environment
+		let toolchainURL = environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:))
+		let systemURL = environment["CHERISYSROOT"].map(URL.init(fileURLWithPath:))
 		let configuration = CompilationConfiguration(target: .cheriBSD, toolchainURL: toolchainURL, systemURL: systemURL)
-		let sourceData = try Data(contentsOf: URL(fileURLWithPath: source))
+		
+		let sourceURL = URL(fileURLWithPath: source)
+		let sourceLanguage = sourceURL.pathExtension.uppercased()
+		let sourceData = try Data(contentsOf: sourceURL)
 		let outputURL = output.map(URL.init(fileURLWithPath:))
 		
-		let program = try YAMLDecoder().decode(AL.Program.self, from: sourceData)
-		let elf = try program.elf(configuration: configuration)
-		
-		if let outputURL = outputURL {
-			try elf.write(to: outputURL)
-			print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
+		if let language = language {
+			let ir = try HighestSupportedLanguage.loweredProgramRepresentation(
+				fromData:		sourceData,
+				sourceLanguage:	sourceLanguage,
+				targetLanguage:	language.uppercased(),
+				configuration:	configuration
+			)
+			if let outputURL = outputURL {
+				try ir.write(to: outputURL, atomically: false, encoding: .utf8)
+				print("Exported \(language.uppercased()) representation to \(outputURL.absoluteString).")
+			} else {
+				print(ir)
+			}
 		} else {
-			print("ELF is \(elf.count) bytes long. Re-run this command with the -o <file> option to save the ELF to disk.")
+			let elf = try HighestSupportedLanguage.elfFromProgram(
+				fromData:		sourceData,
+				sourceLanguage:	sourceLanguage,
+				configuration:	configuration
+			)
+			if let outputURL = outputURL {
+				try elf.write(to: outputURL)
+				print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
+			} else {
+				print("ELF is \(elf.count) bytes long. Re-run this command with the -o <file> option to save the ELF to disk.")
+			}
 		}
 		
 	}
