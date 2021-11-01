@@ -8,7 +8,7 @@ extension FO {
 	/// * a datum is *retrieved from* a source or location;
 	/// * a datum is *put in* a location;
 	/// * a datum is *copied from* a source or location *to* a location.
-	public enum Effect : Codable {
+	public enum Effect : Codable, MultiplyLowerable {
 		
 		/// An effect that copies the datum from `source` to `destination`.
 		case copy(destination: Location, source: Source)
@@ -34,8 +34,8 @@ extension FO {
 		/// An effect that does nothing.
 		public static var nop: Self { .compute(destination: .register(.zero), lhs: .location(.register(.zero)), operation: .add, rhs: .location(.register(.zero))) }
 		
-		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> [Lower.Instruction] {
+		// See protocol.
+		public func lowered(in context: inout ()) -> [Lower.Instruction] {
 			
 			/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 			///

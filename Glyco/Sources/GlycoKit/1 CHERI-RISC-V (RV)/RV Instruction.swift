@@ -10,7 +10,7 @@ extension RV {
 	/// * a datum is *loaded from* or *stored in* memory;
 	/// * a datum is *retrieved from* or *put in* a register; and
 	/// * a datum is *copied from* a register *to* a register.
-	public enum Instruction : Codable {
+	public enum Instruction : Codable, SimplyLowerable {
 		
 		/// An instruction that copies the datum from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)
@@ -51,8 +51,8 @@ extension RV {
 		/// An instruction that can be jumped to using given label.
 		indirect case labelled(Label, Instruction)
 		
-		/// Returns the assembly representation of `self`.
-		public func compiled() -> String {
+		// See protocol.
+		public func lowered(in context: inout ()) -> String {
 			switch self {
 				
 				case .copy(.word, destination: let destination, source: let source):
@@ -95,7 +95,7 @@ extension RV {
 				return "cret"
 				
 				case .labelled(let label, let instruction):
-				return "\(label.rawValue): \(instruction.compiled())"
+				return "\(label.rawValue): \(instruction.lowered())"
 				
 			}
 		}

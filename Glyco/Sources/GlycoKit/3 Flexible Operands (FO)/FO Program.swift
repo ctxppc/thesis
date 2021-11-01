@@ -10,7 +10,7 @@ public enum FO : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			.init(instructions: effects.flatMap { $0.lowered() })
+			.init(instructions: effects.lowered())
 		}
 		
 	}

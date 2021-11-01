@@ -24,9 +24,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-								\(instructions
-									.map { $0.compiled() }
-									.joined(separator: "\n\t\t\t\t"))
+								\(instructions.lowered().joined(separator: "\n\t\t\t\t"))
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
 								
@@ -49,9 +47,7 @@ public enum RV : Language {
 							.align		4
 							.globl		body
 							.type		body, @function
-				body:		\(instructions
-								.map { $0.compiled() }
-								.joined(separator: "\n\t\t\t"))
+				body:		\(instructions.lowered().joined(separator: "\n\t\t\t"))
 				body.end:	.size		body, body.end-body
 							
 							.section	.tohost, "aw", @progbits

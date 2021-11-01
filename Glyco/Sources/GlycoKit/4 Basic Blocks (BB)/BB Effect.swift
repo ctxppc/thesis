@@ -3,7 +3,7 @@
 extension BB {
 	
 	/// An effect on an BB machine.
-	public enum Effect : Codable {
+	public enum Effect : Codable, MultiplyLowerable {
 		
 		/// An effect that retrieves the value in `source` and puts it in `destination`.
 		case copy(destination: Location, source: Source)
@@ -11,8 +11,8 @@ extension BB {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
 		case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
 		
-		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> [Lower.Effect] {
+		// See protocol.
+		public func lowered(in context: inout ()) -> [Lower.Effect] {
 			switch self {
 				
 				case .copy(destination: let destination, source: let source):

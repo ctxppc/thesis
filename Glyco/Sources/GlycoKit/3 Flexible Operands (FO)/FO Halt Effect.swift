@@ -3,13 +3,13 @@
 extension FO {
 	
 	/// An FO effect where the machine halts execution of the program.
-	public struct HaltEffect : Codable {
+	public struct HaltEffect : Codable, SimplyLowerable {
 		
 		/// The source of the result value.
 		public var result: Source
 		
-		/// Returns a representation of `self` in a lower language.
-		public func lowered() -> Lower.Instruction {
+		// See protocol.
+		public func lowered(in context: inout ()) -> Lower.Instruction {
 			switch result {
 				case .immediate(let imm):				return .a0 <- imm
 				case .location(.register(let result)):	return .a0 <- result.lowered()

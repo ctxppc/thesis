@@ -3,7 +3,7 @@
 extension FL {
 	
 	/// A machine register.
-	public enum Register : String, Codable {
+	public enum Register : String, Codable, SimplyLowerable {
 		
 		/// The always-zero register.
 		case zero
@@ -38,8 +38,8 @@ extension FL {
 		/// A register for temporaries.
 		case t3, t4, t5, t6
 		
-		/// Lowers the register to a register in a lower language.
-		func lowered() -> Lower.Register {
+		// See protocol.
+		func lowered(in context: inout ()) -> Lower.Register {
 			switch self {
 				case .zero:	return .zero
 				case .sp:	return .sp

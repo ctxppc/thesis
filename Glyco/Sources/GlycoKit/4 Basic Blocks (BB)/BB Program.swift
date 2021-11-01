@@ -12,7 +12,7 @@ public enum BB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			.init(effects: blocks.flatMap { $0.lowered() })
+			.init(effects: blocks.lowered())
 		}
 		
 	}

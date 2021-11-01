@@ -5,7 +5,7 @@ extension FL {
 	/// A CHERI-RISC-V instruction.
 	///
 	/// These instructions map one to one to assembly instructions.
-	public enum Instruction : Codable {
+	public enum Instruction : Codable, MultiplyLowerable {
 		
 		/// An instruction that copies the contents from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)
@@ -37,8 +37,8 @@ extension FL {
 		/// An instruction that does nothing.
 		static var nop: Self { .zero <- Register.zero + .zero }
 		
-		/// Returns a representation of `self` in a lower language.
-		func lowered(context: inout Context) -> [Lower.Instruction] {
+		// See protocol.
+		func lowered(in context: inout Context) -> [Lower.Instruction] {
 			switch self {
 				
 				case .copy(let type, destination: let destination, source: let source):
@@ -81,7 +81,7 @@ extension FL {
 				return [.return]
 				
 				case .labelled(let label, let instruction):
-				guard let (first, tail) = instruction.lowered(context: &context).splittingFirst() else { TODO.unimplemented }
+				guard let (first, tail) = instruction.lowered(in: &context).splittingFirst() else { TODO.unimplemented }
 				return [.labelled(label, first)].appending(contentsOf: tail)
 				
 			}

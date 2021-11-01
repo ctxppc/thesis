@@ -2,7 +2,7 @@
 
 import Foundation
 
-protocol DirectlyLowerable {
+protocol SimplyLowerable {
 	
 	/// A representation of `self` in a lower language.
 	associatedtype Lowered
@@ -19,7 +19,7 @@ protocol DirectlyLowerable {
 	
 }
 
-extension DirectlyLowerable where Context == () {
+extension SimplyLowerable where Context == () {
 	
 	/// Returns a representation of `self` in a lower language.
 	///
@@ -60,13 +60,13 @@ extension MultiplyLowerable where Context == () {
 	
 }
 
-extension Sequence where Element : DirectlyLowerable {
+extension Sequence where Element : SimplyLowerable {
 	func lowered(in context: inout Element.Context) -> [Element.Lowered] {
 		self.map { $0.lowered(in: &context) }
 	}
 }
 
-extension Sequence where Element : DirectlyLowerable, Element.Context == () {
+extension Sequence where Element : SimplyLowerable, Element.Context == () {
 	func lowered() -> [Element.Lowered] {
 		self.map { $0.lowered() }
 	}
