@@ -42,11 +42,14 @@ extension RV {
 		/// An instruction that puts the PCC in `cd` then jumps to address *x*, where *x* is the value in `cs1`.
 		case jump(cd: Register, cs1: Register)
 		
+		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
+		case call(target: Label)
+		
+		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
+		case `return`
+		
 		/// An instruction that can be jumped to using given label.
 		indirect case labelled(Label, Instruction)
-		
-		/// A return instruction.
-		case `return`
 		
 		/// Returns the assembly representation of `self`.
 		public func compiled() -> String {
@@ -84,12 +87,15 @@ extension RV {
 				
 				case .jump(cd: let cd, cs1: let cs1):
 				return "cjalr \(cd.c), \(cs1.c)"
-				
-				case .labelled(let label, let instruction):
-				return "\(label.rawValue): \(instruction.compiled())"
+					
+				case .call(target: let target):
+				return "ccall \(target.rawValue)"
 				
 				case .return:
 				return "cret"
+				
+				case .labelled(let label, let instruction):
+				return "\(label.rawValue): \(instruction.compiled())"
 				
 			}
 		}

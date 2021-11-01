@@ -25,6 +25,12 @@ extension FL {
 		/// An instruction that puts the PCC in `cd` then jumps to address *x*, where *x* is the value in `cs1`.
 		case jump(cd: Register, cs1: Register)
 		
+		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
+		case call(target: Label)
+		
+		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
+		case `return`
+		
 		/// An instruction that can jumped to using given label.
 		indirect case labelled(Label, Instruction)
 		
@@ -67,6 +73,12 @@ extension FL {
 				
 				case .jump(cd: let cd, cs1: let cs1):
 				return [.jump(cd: cd.lowered(), cs1: cs1.lowered())]
+				
+				case .call(target: let label):
+				return [.call(target: label)]
+				
+				case .return:
+				return [.return]
 				
 				case .labelled(let label, let instruction):
 				guard let (first, tail) = instruction.lowered(context: &context).splittingFirst() else { TODO.unimplemented }

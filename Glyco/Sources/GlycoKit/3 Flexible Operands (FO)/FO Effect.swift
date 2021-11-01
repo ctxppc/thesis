@@ -19,7 +19,13 @@ extension FO {
 		/// An effect that jumps to `target` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(target: Label, lhs: Source, relation: BranchRelation, rhs: Source)
 		
-		// TODO: Add appropriate jump effect.
+		// TODO: Add (unconditional) jump effect?
+		
+		/// An effect that links the return address then jumps to `target`.
+		case call(target: Label)
+		
+		/// An effect that jumps to the previously linked return address.
+		case `return`
 		
 		/// An effect that can jumped to using given label.
 		indirect case labelled(Label, Effect)
@@ -89,6 +95,12 @@ extension FO {
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = prepare(source: rhs, using: .t2)
 				return lhsPrep + rhsPrep + [.branch(target: target, rs1: lhsReg, relation: relation, rs2: rhsReg)]
+				
+				case .call(target: let label):
+				return [.call(target: label)]
+				
+				case .return:
+				return [.return]
 				
 				case .labelled(let label, let effect):
 				guard let (first, tail) = effect.lowered().splittingFirst() else { return [.labelled(label, .nop)] }

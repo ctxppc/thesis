@@ -21,7 +21,7 @@ public enum S : Language {
 			
 			let linkerCommands = """
 				OUTPUT_ARCH("riscv")
-				ENTRY(_start)
+				ENTRY(main)
 				SECTIONS {
 				  . = 0x80000000;
 				  .text.init : { *(.text.init) }

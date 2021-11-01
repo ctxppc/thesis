@@ -15,9 +15,11 @@ public enum RV : Language {
 				case .cheriBSD:
 				return .init(body: """
 								.text
+								
 								.attribute	4, 16
 								.attribute	5, "rv64i2p0_xcheri0p0"
 								.file		"<unknown>.gly"
+								
 								.globl		main
 								.p2align	1
 								.type		main, @function
@@ -36,22 +38,28 @@ public enum RV : Language {
 				case .sail:
 				return .init(body: """
 							.text
+							
 							.align		4
-							.globl		_start
 							.globl		main
 							.type		main, @function
-				_start:		clgc		ct0, main
-							cjalr		cra, ct0
+				main:		ccall		body
 							ecall
-				main:		\(instructions
-								.map { $0.compiled() }
-								.joined(separator: "\n\t\t\t"))
 				main.end:	.size		main, main.end-main
 							
+							.align		4
+							.globl		body
+							.type		body, @function
+				body:		\(instructions
+								.map { $0.compiled() }
+								.joined(separator: "\n\t\t\t"))
+				body.end:	.size		body, body.end-body
+							
 							.section	.tohost, "aw", @progbits
+							
 							.align		6
 							.global		tohost
 				tohost:		.dword		0
+							
 							.align		6
 							.global		fromhost
 				fromhost:	.dword		0

@@ -14,6 +14,12 @@ extension NE {
 		/// An effect that jumps to `target` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(target: Label, lhs: Source, relation: BranchRelation, rhs: Source)
 		
+		/// An effect that links the return address then jumps to `target`.
+		case call(target: Label)
+		
+		/// An effect that jumps to the previously linked return address.
+		case `return`
+		
 		/// An effect that consists of a sequence of effects.
 		case `do`([Effect])
 		
@@ -32,6 +38,12 @@ extension NE {
 				
 				case .branch(target: let target, lhs: let lhs, relation: let relation, rhs: let rhs):
 				return [.branch(target: target, lhs: lhs, relation: relation, rhs: rhs)]
+				
+				case .call(target: let target):
+				return [.call(target: target)]
+				
+				case .return:
+				return [.return]
 				
 				case .do(let effects):
 				return effects.flatMap { $0.lowered() }

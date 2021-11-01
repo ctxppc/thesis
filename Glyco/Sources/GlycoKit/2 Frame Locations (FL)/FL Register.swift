@@ -8,9 +8,6 @@ extension FL {
 		/// The always-zero register.
 		case zero
 		
-		/// The return address register.
-		case ra
-		
 		/// The stack pointer register.
 		case sp
 		
@@ -45,7 +42,6 @@ extension FL {
 		func lowered() -> Lower.Register {
 			switch self {
 				case .zero:	return .zero
-				case .ra:	return .ra
 				case .sp:	return .sp
 				case .gp:	return .gp
 				case .tp:	return .tp
