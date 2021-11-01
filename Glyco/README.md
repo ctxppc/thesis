@@ -49,6 +49,11 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td>Groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.</td>
 	</tr>
 	<tr>
+		<td><code>PR</code></td>
+		<td>Predicates</td>
+		<td>Introduces predicates in branches.</td>
+	</tr>
+	<tr>
 		<td><code>AL</code></td>
 		<td>Abstract Locations</td>
 		<td>Introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.</td>

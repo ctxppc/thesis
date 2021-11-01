@@ -29,7 +29,5 @@ extension BB {
 	public typealias Location = Lower.Location
 	public typealias Source = Lower.Source
 	public typealias BinaryOperator = Lower.BinaryOperator
-	public typealias Label = Lower.Label
-	public typealias BranchRelation = Lower.BranchRelation
 	
 }

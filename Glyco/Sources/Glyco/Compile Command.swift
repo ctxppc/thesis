@@ -32,7 +32,7 @@ struct CompileCommand : ParsableCommand {
 	/// The highest intermediate language supported by Glyco.
 	///
 	/// Update this typealias whenever a higher language is added.
-	private typealias HighestSupportedLanguage = AL
+	private typealias HighestSupportedLanguage = PR
 	
 	/// Executes the command.
 	mutating func run() throws {
