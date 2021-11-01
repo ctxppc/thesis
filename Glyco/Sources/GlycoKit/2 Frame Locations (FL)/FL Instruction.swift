@@ -22,8 +22,8 @@ extension FL {
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(target: Label, rs1: Register, relation: BranchRelation, rs2: Register)
 		
-		/// An instruction that puts the PCC in `cd` then jumps to address *x*, where *x* is the value in `cs1`.
-		case jump(cd: Register, cs1: Register)
+		/// An instruction that jumps to `target`.
+		case jump(target: Label)
 		
 		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
 		case call(target: Label)
@@ -71,8 +71,8 @@ extension FL {
 				case .branch(target: let target, rs1: let rs1, relation: let relation, rs2: let rs2):
 				return [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
 				
-				case .jump(cd: let cd, cs1: let cs1):
-				return [.jump(cd: cd.lowered(), cs1: cs1.lowered())]
+				case .jump(target: let target):
+				return [.jump(target: target)]
 				
 				case .call(target: let label):
 				return [.call(target: label)]

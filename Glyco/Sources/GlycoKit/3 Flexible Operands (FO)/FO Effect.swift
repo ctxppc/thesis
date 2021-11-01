@@ -19,7 +19,8 @@ extension FO {
 		/// An effect that jumps to `target` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(target: Label, lhs: Source, relation: BranchRelation, rhs: Source)
 		
-		// TODO: Add (unconditional) jump effect?
+		/// An effect that jumps to `target`.
+		case jump(target: Label)
 		
 		/// An effect that links the return address then jumps to `target`.
 		case call(target: Label)
@@ -95,6 +96,9 @@ extension FO {
 				let (lhsPrep, lhsReg) = prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = prepare(source: rhs, using: .t2)
 				return lhsPrep + rhsPrep + [.branch(target: target, rs1: lhsReg, relation: relation, rs2: rhsReg)]
+				
+				case .jump(target: let target):
+				return [.jump(target: target)]
 				
 				case .call(target: let label):
 				return [.call(target: label)]

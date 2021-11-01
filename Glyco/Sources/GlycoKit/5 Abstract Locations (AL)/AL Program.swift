@@ -6,32 +6,28 @@ public enum AL : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given effects.
-		public init(mainEffects: [Effect], haltEffect: HaltEffect) {
-			self.mainEffects = mainEffects
-			self.haltEffect = haltEffect
+		public init(effects: [Effect]) {
+			self.effects = effects
 		}
 		
-		/// The main effect of the program.
-		public var mainEffects: [Effect]
-		
-		/// The halt effect after executing `mainEffects`.
-		public var haltEffect: HaltEffect
+		/// The effects of the program.
+		public var effects: [Effect]
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Lower.Context()
 			let homes = Dictionary(uniqueKeysWithValues: accessedLocations().map { ($0, Lower.Location.frameCell(.allocate(.word, context: &context))) })
-			return .init(mainEffects: mainEffects.map { $0.lowered(homes: homes) }, haltEffect: haltEffect.lowered(homes: homes))
+			TODO.unimplemented
 		}
 		
 		/// Returns a set of locations (potentially) accessed by `self`.
 		public func accessedLocations() -> Set<Location> {
-			haltEffect.accessedLocations().union(mainEffects.lazy.flatMap { $0.accessedLocations() })
+			Set(effects.lazy.flatMap { $0.accessedLocations() })
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = NE
+	public typealias Lower = BB
 	
 }

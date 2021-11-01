@@ -54,16 +54,21 @@ extension AL {
 				return .copy(destination: destination.lowered(homes: homes), source: source.lowered(homes: homes))
 					
 				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
-				return .compute(destination: destination.lowered(homes: homes), lhs: lhs.lowered(homes: homes), operation: operation, rhs: rhs.lowered(homes: homes))
-					
+				return .compute(
+					destination:	destination.lowered(homes: homes),
+					lhs:			lhs.lowered(homes: homes),
+					operation:		operation,
+					rhs:			rhs.lowered(homes: homes)
+				)
+				
 				case .do(let effects):
-				return .do(effects.map { $0.lowered(homes: homes) })
-					
+				TODO.unimplemented
+				
 				case .branch(target: let target, lhs: let lhs, relation: let relation, rhs: let rhs):
-				return .branch(target: target, lhs: lhs.lowered(homes: homes), relation: relation, rhs: rhs.lowered(homes: homes))
+				TODO.unimplemented
 				
 				case .labelled(let label, let effect):
-				return .labelled(label, effect.lowered(homes: homes))
+				TODO.unimplemented
 				
 			}
 		}

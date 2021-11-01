@@ -9,10 +9,10 @@ final class ArithmeticTests : XCTestCase {
 		
 		var context = AL.Context()
 		let location = AL.Location.allocate(in: &context)
-		let program = AL.Program(mainEffects: [
+		let program = AL.Program(effects: [
 			.copy(destination: location, source: .immediate(1)),
 			.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
-		], haltEffect: .init(result: .location(location)))
+		])
 		
 		let configuration = CompilationConfiguration(target: .cheriBSD)
 		let loweredProgram = program.lowered(configuration: configuration)

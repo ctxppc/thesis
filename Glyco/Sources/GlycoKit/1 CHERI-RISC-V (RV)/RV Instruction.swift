@@ -39,8 +39,8 @@ extension RV {
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
-		/// An instruction that puts the PCC in `cd` then jumps to address *x*, where *x* is the value in `cs1`.
-		case jump(cd: Register, cs1: Register)
+		/// An instruction that jumps to `target`.
+		case jump(target: Label)
 		
 		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
 		case call(target: Label)
@@ -85,9 +85,9 @@ extension RV {
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
-				case .jump(cd: let cd, cs1: let cs1):
-				return "cjalr \(cd.c), \(cs1.c)"
-					
+				case .jump(target: let target):
+				return "j \(target.rawValue)"
+				
 				case .call(target: let target):
 				return "ccall \(target.rawValue)"
 				

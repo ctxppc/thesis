@@ -1,5 +1,5 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-extension NE {
+extension BB {
 	public typealias Context = Lower.Context
 }
