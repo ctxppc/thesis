@@ -42,9 +42,18 @@ extension PR {
 							 affirmative: let affirmative, negative: let negative):
 				return .branch(label: label, effects: effects, lhs: lhs, relation: relation, rhs: rhs, affirmative: affirmative, negative: negative)
 				
-				case .final(let label, let effects, let result):
+				case .final(label: let label, effects: let effects, result: let result):
 				return .final(label: label, effects: effects, result: result)
 				
+			}
+		}
+		
+		/// The block's label.
+		public var label: Label {
+			switch self {
+				case .intermediate(label: let label, effects: _, successor: _):							return label
+				case .branch(label: let label, effects: _, predicate: _, affirmative: _, negative: _):	return label
+				case .final(label: let label, effects: _, result: _):									return label
 			}
 		}
 		

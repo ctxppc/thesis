@@ -15,7 +15,25 @@ extension RV {
 		case less = "lt"
 		
 		/// The branch is taken if the first value is greater than or equal to the second value.
+		case lessOrEqual = "le"
+		
+		/// The branch is taken if the first value is less than the second value.
+		case greater = "gt"
+		
+		/// The branch is taken if the first value is greater than or equal to the second value.
 		case greaterOrEqual = "ge"
+		
+		/// Returns a relation *R* such that *x* *R* *y* iff ¬(*x* `self` *y*).
+		public var negated: Self {
+			switch self {
+				case .equal:			return .unequal
+				case .unequal:			return .equal
+				case .less:				return .greaterOrEqual
+				case .lessOrEqual:		return .greater
+				case .greater:			return .lessOrEqual
+				case .greaterOrEqual:	return .less
+			}
+		}
 		
 	}
 	

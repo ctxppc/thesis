@@ -54,10 +54,15 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td>Introduces predicates in branches.</td>
 	</tr>
 	<tr>
+		<td><code>CD</code></td>
+		<td>Conditionals</td>
+		<td>Introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).</td>
+	</tr>
+	<!--<tr>
 		<td><code>AL</code></td>
 		<td>Abstract Locations</td>
 		<td>Introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.</td>
-	</tr>
+	</tr>-->
 </table>
 
 Glyco focusses on a single high-level language *Gly* and thus this list can be seen as a linked list, but the nanopass approach allows for a tree of intermediate languages to be defined with `S` as the root, or even a directed (possibly acyclic) graph of languages from numerous low-level (machine) languages to high-level (programmer-optimised) languages.

@@ -2,7 +2,7 @@
 
 public enum PR : Language {
 	
-	/// A program on an BB machine.
+	/// A program on a PR machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// The program's blocks.
@@ -19,5 +19,8 @@ public enum PR : Language {
 	
 	// See protocol.
 	public typealias Lower = BB
+	
+	public typealias Location = Lower.Location
+	public typealias BinaryOperator = Lower.BinaryOperator
 	
 }
