@@ -1,9 +1,14 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-public enum CD : Language {
+public enum AL : Language {
 	
-	/// A program on an CD machine.
+	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
+		
+		/// Creates a program with given effects.
+		public init(effect: Effect) {
+			self.effect = effect
+		}
 		
 		/// The program's effect.
 		public var effect: Effect
@@ -11,15 +16,12 @@ public enum CD : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Context()
-			return .init(blocks: effect.lowered(in: &context, entryLabel: .main, previousEffects: []))
+			return .init(effect: effect.lowered(in: &context))
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = PR
-	
-	public typealias Frame = Lower.Frame
-	public typealias Source = Lower.Source
+	public typealias Lower = CD
 	
 }

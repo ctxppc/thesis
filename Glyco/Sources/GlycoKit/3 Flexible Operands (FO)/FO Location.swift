@@ -9,10 +9,10 @@ extension FO {
 		case register(Register)
 		
 		/// A location to a frame cell.
-		case frameCell(FrameCellLocation)
+		case frameCell(Frame.Location)
 		
 	}
 	
-	public typealias FrameCellLocation = Lower.FrameCellLocation
+	public typealias Frame = Lower.Frame
 	
 }

@@ -20,7 +20,8 @@ public enum PR : Language {
 	// See protocol.
 	public typealias Lower = BB
 	
-	public typealias Location = Lower.Location
 	public typealias BinaryOperator = Lower.BinaryOperator
+	public typealias Location = Lower.Location
+	public typealias Frame = Lower.Frame
 	
 }

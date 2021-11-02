@@ -14,10 +14,10 @@ extension FL {
 		case compute(destination: Register, value: BinaryExpression)
 		
 		/// An instruction that loads the datum at the address in `rs1`, offset by `imm`, and puts it in `rd`.
-		case load(DataType, destination: Register, source: FrameCellLocation)
+		case load(DataType, destination: Register, source: Frame.Location)
 		
 		/// An instruction that retrieves the datum from `source` and stores it in `destination`.
-		case store(DataType, destination: FrameCellLocation, source: Register)
+		case store(DataType, destination: Frame.Location, source: Register)
 		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(target: Label, rs1: Register, relation: BranchRelation, rs2: Register)
@@ -38,7 +38,7 @@ extension FL {
 		static var nop: Self { .zero <- Register.zero + .zero }
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> [Lower.Instruction] {
+		func lowered(in context: inout Frame) -> [Lower.Instruction] {
 			switch self {
 				
 				case .copy(let type, destination: let destination, source: let source):
@@ -111,18 +111,18 @@ public func <= (rd: FL.Register, rs: FL.Register) -> FL.Instruction {
 	.copy(.capability, destination: rd, source: rs)
 }
 
-public func <- (rd: FL.Register, src: FL.FrameCellLocation) -> FL.Instruction {
+public func <- (rd: FL.Register, src: FL.Frame.Location) -> FL.Instruction {
 	.load(.word, destination: rd, source: src)
 }
 
-public func <= (rd: FL.Register, src: FL.FrameCellLocation) -> FL.Instruction {
+public func <= (rd: FL.Register, src: FL.Frame.Location) -> FL.Instruction {
 	.load(.capability, destination: rd, source: src)
 }
 
-public func <- (dest: FL.FrameCellLocation, src: FL.Register) -> FL.Instruction {
+public func <- (dest: FL.Frame.Location, src: FL.Register) -> FL.Instruction {
 	.store(.word, destination: dest, source: src)
 }
 
-public func <= (dest: FL.FrameCellLocation, src: FL.Register) -> FL.Instruction {
+public func <= (dest: FL.Frame.Location, src: FL.Register) -> FL.Instruction {
 	.store(.capability, destination: dest, source: src)
 }

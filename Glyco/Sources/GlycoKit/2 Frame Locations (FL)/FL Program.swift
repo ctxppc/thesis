@@ -10,8 +10,8 @@ public enum FL : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			var context = Context()
-			return .init(instructions: instructions.lowered(in: &context))
+			var frame = Frame()
+			return .init(instructions: instructions.lowered(in: &frame))
 		}
 		
 	}

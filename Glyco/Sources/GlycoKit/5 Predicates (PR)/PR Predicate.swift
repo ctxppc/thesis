@@ -2,7 +2,7 @@
 
 extension PR {
 	
-	/// A sequence of effects with a single entry and exit point.
+	/// A value that can be used in a conditional.
 	public enum Predicate : Codable {
 		
 		/// A constant predicate.

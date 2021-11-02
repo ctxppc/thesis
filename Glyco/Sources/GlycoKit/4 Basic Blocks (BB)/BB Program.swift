@@ -20,4 +20,6 @@ public enum BB : Language {
 	// See protocol.
 	public typealias Lower = FO
 	
+	public typealias Frame = Lower.Frame
+	
 }

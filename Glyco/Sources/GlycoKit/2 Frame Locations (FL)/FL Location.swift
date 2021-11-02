@@ -9,7 +9,7 @@ extension FL {
 		case register(Register)
 		
 		/// A location to a frame cell.
-		case frameCell(FrameCellLocation)
+		case frameCell(Frame.Location)
 		
 	}
 	
