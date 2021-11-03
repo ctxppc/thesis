@@ -1,0 +1,14 @@
+stages:
+  - build
+
+.build: &build
+  stage: build
+  script:
+    - cd Glyco
+    - swift build
+  cache:
+    key: "$CI_JOB_NAME"
+    paths:
+      - "Glyco/.build"
+
+swift-5.5: {<<: *build, image: "swift:5.5"}
