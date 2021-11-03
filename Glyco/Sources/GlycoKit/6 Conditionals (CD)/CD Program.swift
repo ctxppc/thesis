@@ -11,7 +11,7 @@ public enum CD : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
 			var context = Context()
-			return .init(blocks: effect.lowered(in: &context, entryLabel: .main, previousEffects: []))
+			return .init(blocks: effect.lowered(in: &context, entryLabel: .entry, previousEffects: []))
 		}
 		
 	}

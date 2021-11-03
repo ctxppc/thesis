@@ -23,8 +23,7 @@ final class ArithmeticTests : XCTestCase {
 			)
 		)
 		
-		
-		let configuration = CompilationConfiguration(target: .cheriBSD)
+		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = program.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -33,27 +32,41 @@ final class ArithmeticTests : XCTestCase {
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 		let expected = """
-						.text
-						.attribute	4, 16
-						.attribute	5, "rv64i2p0_xcheri0p0"
-						.file		"<unknown>.gly"
-						.globl		main
-						.p2align	1
-						.type		main, @function
-		main:			.cfi_startproc
-						addi x5, x0, 1
-						sw.cap x5, -4(c9)
-						addi x5, x0, 2
-						lw.cap x6, -4(c9)
-						add x7, x5, x6
-						sw.cap x7, -4(c9)
-						lw.cap x11, -4(c9)
-		main.end:		.size		main, main.end-main
-						.cfi_endproc
-						
-						.ident		"glyco version 0.1"
-						.section	".note.GNU-stack","",@progbits
-						.addrsig
+					.text
+					
+					.align		4
+					.globl		main
+					.type		main, @function
+		main:		ccall		body
+					ecall
+		main.end:	.size		main, main.end-main
+					
+					.align		4
+					.globl		body
+					.type		body, @function
+		body:		entry: addi t1, zero, 1
+					cincoffsetimm ct0, cfp, -4
+					sw.cap t1, 0(ct0)
+					addi t1, zero, 2
+					cincoffsetimm ct0, cfp, -12
+					lw.cap t2, 0(ct0)
+					add t3, t1, t2
+					cincoffsetimm ct0, cfp, -8
+					sw.cap t3, 0(ct0)
+					cincoffsetimm ct0, cfp, -16
+					lw.cap a0, 0(ct0)
+					cret
+		body.end:	.size		body, body.end-body
+					
+					.section	.tohost, "aw", @progbits
+					
+					.align		6
+					.global		tohost
+		tohost:		.dword		0
+					
+					.align		6
+					.global		fromhost
+		fromhost:	.dword		0
 		"""
 		
 		XCTAssertEqual(loweredProgram.body, expected)

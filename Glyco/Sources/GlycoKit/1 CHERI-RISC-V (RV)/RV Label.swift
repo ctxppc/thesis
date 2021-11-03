@@ -6,7 +6,7 @@ extension RV {
 	public struct Label : Codable, RawRepresentable {
 		
 		/// The entry point label.
-		public static let main = Self(rawValue: "main")
+		public static let entry = Self(rawValue: "entry")
 		
 		/// Allocates a new label, different from every other previously allocated label.
 		public static func allocate(context: inout Context) -> Self {
