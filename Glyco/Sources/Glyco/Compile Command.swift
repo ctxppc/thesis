@@ -22,9 +22,8 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, help: "The intermediate language (S, FL, FO, etc.) to emit. (Omit to build an ELF file.)")
 	var language: String?
 	
-	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(availableTargets).")
+	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(CompilationConfiguration.Target.sail) and \(CompilationConfiguration.Target.cheriBSD).")
 	var target: CompilationConfiguration.Target = .sail
-	private static let availableTargets = ListFormatter.localizedString(byJoining: CompilationConfiguration.Target.allCases.map { "“\($0.rawValue)”" })
 	
 	@Option(name: .shortAndLong, help: "The generated file (to be overwritten). (Omit to discard the ELF file after building it or to print the intermediate representation to standard out.)")
 	var output: URL?
