@@ -1,0 +1,16 @@
+{
+	// Launch configurations for VS Code; see also https://go.microsoft.com/fwlink/?linkid=830387
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug",
+			"program": "${workspaceFolder}/Glyco/.build/debug/Glyco",
+			"args": [/* Add source path, output path, and any other desired options here. */],
+			"cwd": "${workspaceFolder}/Glyco",
+            "preLaunchTask": "swift-build",
+			"env": {}
+		}
+	]
+}
