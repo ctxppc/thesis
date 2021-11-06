@@ -5,7 +5,7 @@ import Foundation
 public protocol Program : Codable {
 	
 	/// Returns a representation of `self` in a lower language.
-	func lowered(configuration: CompilationConfiguration) -> LowerProgram
+	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram
 	
 	/// A program in the lower language.
 	associatedtype LowerProgram : Program

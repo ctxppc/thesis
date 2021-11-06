@@ -5,7 +5,7 @@ public enum AL : Language {
 	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given effects.
+		/// Creates a program with given effect.
 		public init(effect: Effect) {
 			self.effect = effect
 		}

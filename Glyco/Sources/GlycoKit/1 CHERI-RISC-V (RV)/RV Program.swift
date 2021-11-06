@@ -24,7 +24,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-								\(instructions.lowered().joined(separator: "\n\t\t\t\t"))
+				\(instructions.lowered().joined(separator: "\n\t\t\t\t"))
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
 								

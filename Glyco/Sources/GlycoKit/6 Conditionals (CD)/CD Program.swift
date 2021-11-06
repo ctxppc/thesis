@@ -9,9 +9,9 @@ public enum CD : Language {
 		public var effect: Effect
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
-			return .init(blocks: effect.lowered(in: &context, entryLabel: .main, previousEffects: []))
+			return .init(blocks: try effect.lowered(in: &context, entryLabel: .main, previousEffects: [], exitLabel: nil))
 		}
 		
 	}

@@ -5,7 +5,7 @@ import XCTest
 
 final class ArithmeticTests : XCTestCase {
 	
-	func testSimpleSum() {
+	func testSimpleSum() throws {
 		
 		let location = AL.Location(rawValue: 0)
 		
@@ -24,7 +24,7 @@ final class ArithmeticTests : XCTestCase {
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
-		let loweredProgram = program.lowered(configuration: configuration)
+		let loweredProgram = try program.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)

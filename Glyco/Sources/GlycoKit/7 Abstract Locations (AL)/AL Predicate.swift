@@ -14,9 +14,6 @@ extension AL {
 		/// A predicate that evaluates to `affirmative` if `condition` holds, or to `negative` otherwise.
 		indirect case conditional(condition: Predicate, affirmative: Predicate, negative: Predicate)
 		
-		/// A predicate that performs `effect` then evaluates to `finally`.
-		indirect case effectful(effect: Effect, finally: Predicate)
-		
 		/// Returns a predicate that holds iff `negated` does not hold.
 		public static func not(_ negated: Self) -> Self {
 			switch negated {
@@ -29,9 +26,6 @@ extension AL {
 				
 				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
 				return .conditional(condition: condition, affirmative: negative, negative: affirmative)
-				
-				case .effectful(effect: let effect, finally: let finally):
-				return .effectful(effect: effect, finally: not(finally))
 				
 			}
 		}
@@ -52,9 +46,6 @@ extension AL {
 					affirmative:	affirmative.lowered(in: &context),
 					negative:		negative.lowered(in: &context)
 				)
-				
-				case .effectful(effect: let effect, finally: let finally):
-				return .effectful(effect: effect.lowered(in: &context), finally: finally.lowered(in: &context))
 				
 			}
 		}
