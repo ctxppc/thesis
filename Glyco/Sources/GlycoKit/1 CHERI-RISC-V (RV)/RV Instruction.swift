@@ -53,49 +53,57 @@ extension RV {
 		
 		// See protocol.
 		public func lowered(in context: inout ()) -> String {
+			let tabs = "\t\t\t\t"
 			switch self {
 				
 				case .copy(.word, destination: let destination, source: let source):
-				return "mv \(destination.x), \(source.x)"
+				return "\(tabs)mv \(destination.x), \(source.x)"
 				
 				case .copy(.capability, destination: let destination, source: let source):
-				return "cmove \(destination.c), \(source.c)"
+				return "\(tabs)cmove \(destination.c), \(source.c)"
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
-				return "\(operation) \(rd.x), \(rs1.x), \(rs2.x)"
+				return "\(tabs)\(operation) \(rd.x), \(rs1.x), \(rs2.x)"
 				
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
-				return "\(operation)i \(rd.x), \(rs1.x), \(imm)"
+				return "\(tabs)\(operation)i \(rd.x), \(rs1.x), \(imm)"
 				
 				case .loadWord(destination: let rd, address: let address):
-				return "lw.cap \(rd.x), 0(\(address.c))"
+				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
 				
 				case .loadCapability(destination: let cd, address: let address, offset: let offset):
-				return "clc \(cd.x), \(offset)(\(address.c))"
+				return "\(tabs)clc \(cd.x), \(offset)(\(address.c))"
 				
 				case .storeWord(source: let rs, address: let address):
-				return "sw.cap \(rs.x), 0(\(address.c))"
+				return "\(tabs)sw.cap \(rs.x), 0(\(address.c))"
 				
 				case .storeCapability(source: let cs, address: let address, offset: let offset):
-				return "clc \(cs.x), \(offset)(\(address.c))"
+				return "\(tabs)clc \(cs.x), \(offset)(\(address.c))"
 				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
-				return "cincoffsetimm \(destination.c), \(source.c), \(offset)"
+				return "\(tabs)cincoffsetimm \(destination.c), \(source.c), \(offset)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
-				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
+				return "\(tabs)b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
 				case .jump(target: let target):
-				return "j \(target.rawValue)"
+				return "\(tabs)j \(target.rawValue)"
 				
 				case .call(target: let target):
-				return "ccall \(target.rawValue)"
+				return "\(tabs)ccall \(target.rawValue)"
 				
 				case .return:
-				return "cret"
+				return "\(tabs)cret"
+				
+				case .labelled(let label, .labelled(let innerLabel, let instruction)):
+				let next = Self.labelled(innerLabel, instruction).lowered(in: &context)
+				return "\(label.rawValue):\n\(next)"
 				
 				case .labelled(let label, let instruction):
-				return "\(label.rawValue): \(instruction.lowered())"
+				let prefix = "\(label.rawValue):"
+				let tabsLength = (prefix.count / tabs.count).capped(to: 1...)
+				let tabs = String((1...tabsLength).map { _ in "\t" })
+				return "\(prefix)\(tabs)\(instruction.lowered())"
 				
 			}
 		}

@@ -7,7 +7,7 @@ public enum PR : Language {
 		
 		/// The program's blocks.
 		///
-		/// The first block in the array is the program's entry point.
+		/// Exactly one block must be labelled with `.entry`.
 		public var blocks: [Block]
 		
 		// See protocol.

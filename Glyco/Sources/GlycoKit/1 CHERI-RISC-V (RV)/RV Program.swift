@@ -35,30 +35,28 @@ public enum RV : Language {
 				
 				case .sail:
 				return .init(body: """
-							.text
-							
-							.align		4
-							.globl		main
-							.type		main, @function
-				main:		ccall		body
-							ecall
-				main.end:	.size		main, main.end-main
-							
-							.align		4
-							.globl		body
-							.type		body, @function
-				body:		\(instructions.lowered().joined(separator: "\n\t\t\t"))
-				body.end:	.size		body, body.end-body
-							
-							.section	.tohost, "aw", @progbits
-							
-							.align		6
-							.global		tohost
-				tohost:		.dword		0
-							
-							.align		6
-							.global		fromhost
-				fromhost:	.dword		0
+								.text
+								
+								.globl _start
+				_start:			la t0, _trap_vector
+								csrw mtvec, t0
+								la t0, main
+								csrw mepc, t0
+								mret
+								
+								.align 4
+				_trap_vector:	li gp, 3
+								j _exit
+								
+				_exit:			auipc t5, 0x1
+								sw gp, tohost, t5
+								j _exit
+								
+				\(instructions.lowered().joined(separator: "\n"))
+								
+								.align 6
+								.global tohost
+				tohost:			.dword 0
 				""")
 				
 			}
