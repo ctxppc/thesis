@@ -59,6 +59,79 @@ extension AL {
 			}
 		}
 		
+		/// Returns an undirected graph of locations connected iff they simultaneously hold a value that is possibly used by successors.
+		func conflicts() -> ConflictGraph {
+			livenessAtEntryAndConflicts().1
+		}
+		
+		/// Returns a tuple consisting of (1) a set partitioning locations whose current value is either possibly used or definitely not used at the point *right before* executing `self` and (2) an undirected graph of locations connected iff they simultaneously hold a value that is possibly used by successors.
+		private func livenessAtEntryAndConflicts() -> (LivenessSet, ConflictGraph) {
+			let livenessAtEntry: LivenessSet
+			let conflicts: ConflictGraph
+			switch self {
+				
+				case .none:
+				livenessAtEntry = .nothingUsed
+				conflicts = .conflictFree
+				
+				case .copy(destination: let destination, source: .location(let source), successor: let successor):
+				let (livenessAtExit, conflictsInSuccessor) = successor.livenessAtEntryAndConflicts()
+				livenessAtEntry = with(livenessAtExit) {
+					$0[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+					$0[source] = .possiblyUsedLater			// source value is *actually* used iff destination value is also *actually* used (but we can't know)
+				}
+				conflicts = with(conflictsInSuccessor) {
+					$0.insertConflict(destination, livenessAtExit.possiblyAliveLocations.subtracting([source]))	// source value equals destination value at this stage
+				}
+				
+				case .copy(destination: let destination, source: .immediate, successor: let successor):
+				let (livenessAtExit, conflictsInSuccessor) = successor.livenessAtEntryAndConflicts()
+				livenessAtEntry = with(livenessAtExit) {
+					$0[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+				}
+				conflicts = with(conflictsInSuccessor) {
+					$0.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				}
+				
+				case .compute(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs, successor: let successor):
+				let (livenessAtExit, conflictsInSuccessor) = successor.livenessAtEntryAndConflicts()
+				livenessAtEntry = with(livenessAtExit) {
+					$0[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+					if case .location(let lhs) = lhs {
+						$0[lhs] = .definitelyDiscarded		// lhs value is *actually* used iff destination value is also *actually* used (but we can't know)
+					}
+					if case .location(let rhs) = rhs {
+						$0[rhs] = .definitelyDiscarded		// rhs value is *actually* used iff destination value is also *actually* used (but we can't know)
+					}
+				}
+				conflicts = with(conflictsInSuccessor) {
+					$0.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				}
+				
+				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative, successor: let successor):
+				let (livenessAtSuccessorEntry, conflictsInSuccessor) = successor.livenessAtEntryAndConflicts()
+				let (livenessAtAffirmativeBranchEntry, conflictsInAffirmative) = affirmative.livenessAtEntryAndConflicts()
+				let (livenessAtNegativeBranchEntry, conflictsInNegative) = negative.livenessAtEntryAndConflicts()
+				livenessAtEntry = with(livenessAtSuccessorEntry) {
+					for location in predicate.usedLocations() {
+						$0[location] = .possiblyUsedLater
+					}
+					$0.formUnion(with: livenessAtAffirmativeBranchEntry)
+					$0.formUnion(with: livenessAtNegativeBranchEntry)
+				}
+				conflicts = with(conflictsInSuccessor) {
+					$0.formUnion(with: conflictsInAffirmative)
+					$0.formUnion(with: conflictsInNegative)
+				}
+				
+				case .return:
+				livenessAtEntry = .nothingUsed
+				conflicts = .conflictFree
+				
+			}
+			return (livenessAtEntry, conflicts)
+		}
+		
 		/// Returns a copy of `self` where `successor` is the successor.
 		///
 		/// This method returns `self` unchanged if `self` is a return effect.

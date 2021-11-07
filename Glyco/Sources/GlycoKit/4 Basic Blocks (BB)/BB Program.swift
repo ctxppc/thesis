@@ -21,5 +21,6 @@ public enum BB : Language {
 	public typealias Lower = FO
 	
 	public typealias Frame = Lower.Frame
+	public typealias Register = Lower.Register
 	
 }

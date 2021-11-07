@@ -20,8 +20,8 @@ extension FL {
 		/// A register for temporaries.
 		case t1, t2
 		
-		/// The saved pointer register.
-		case s0
+		/// The frame pointer register.
+		case fp
 		
 		/// A saved register.
 		case s1
@@ -47,7 +47,7 @@ extension FL {
 				case .tp:	return .tp
 				case .t1:	return .t1
 				case .t2:	return .t2
-				case .s0:	return .s0
+				case .fp:	return .fp
 				case .s1:	return .s1
 				case .a0:	return .a0
 				case .a1:	return .a1

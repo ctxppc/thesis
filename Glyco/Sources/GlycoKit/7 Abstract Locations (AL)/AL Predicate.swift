@@ -50,6 +50,22 @@ extension AL {
 			}
 		}
 		
+		/// Returns the locations that are used by the predicate.
+		func usedLocations() -> Set<Location> {
+			switch self {
+				
+				case .constant:
+				return []
+				
+				case .relation(lhs: let lhs, relation: _, rhs: let rhs):
+				return lhs.usedLocations().union(rhs.usedLocations())
+				
+				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				return condition.usedLocations().union(affirmative.usedLocations()).union(negative.usedLocations())
+				
+			}
+		}
+		
 	}
 	
 	public typealias BranchRelation = Lower.BranchRelation

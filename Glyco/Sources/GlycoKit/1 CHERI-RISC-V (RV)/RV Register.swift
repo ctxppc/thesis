@@ -23,9 +23,6 @@ extension RV {
 		/// A register for temporaries.
 		case t0, t1, t2
 		
-		/// The saved pointer register.
-		case s0
-		
 		/// The frame pointer register.
 		case fp
 		

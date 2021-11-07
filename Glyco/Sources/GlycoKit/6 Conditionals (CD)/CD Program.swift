@@ -20,6 +20,7 @@ public enum CD : Language {
 	public typealias Lower = PR
 	
 	public typealias Frame = Lower.Frame
+	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
 	
 }

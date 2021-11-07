@@ -81,7 +81,7 @@ extension FL {
 				return [.return]
 				
 				case .labelled(let label, let instruction):
-				guard let (first, tail) = instruction.lowered(in: &context).splittingFirst() else { TODO.unimplemented }
+				guard let (first, tail) = instruction.lowered(in: &context).splittingFirst() else { return [] /* should never happen — famous last words */ }
 				return [.labelled(label, first)].appending(contentsOf: tail)
 				
 			}

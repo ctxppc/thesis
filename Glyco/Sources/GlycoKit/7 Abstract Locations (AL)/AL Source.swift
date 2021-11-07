@@ -19,6 +19,14 @@ extension AL {
 			}
 		}
 		
+		/// Returns the locations that are used by the source.
+		func usedLocations() -> Set<Location> {
+			switch self {
+				case .location(let location):	return [location]
+				case .immediate:				return []
+			}
+		}
+		
 	}
 	
 }
