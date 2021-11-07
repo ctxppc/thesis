@@ -33,7 +33,10 @@ extension AL {
 			
 			/// Returns `location`'s assigned physical location.
 			subscript (location: Location) -> Lower.Location {
-				homesByLocation[location] !! "Expected assignment of \(location) to a physical location"
+				mutating get {
+					guard let home = homesByLocation[location] else { return addAssignment(for: location) }
+					return home
+				}
 			}
 			
 			/// The conflict graph.
@@ -48,14 +51,18 @@ extension AL {
 			/// The frame on which spilled data are stored.
 			private var frame = Lower.Frame()
 			
-			/// Adds an assignment for `location`.
-			private mutating func addAssignment(for location: Location) {
+			/// Adds an assignment for `location` and returns the assigned physical location.
+			@discardableResult
+			private mutating func addAssignment(for location: Location) -> Lower.Location {
+				let home: Lower.Location
 				if let register = assignableRegister(for: location) {
-					homesByLocation[location] = .register(register)
+					home = .register(register)
 					locationsByRegister[register, default: []].insert(location)
 				} else {
-					homesByLocation[location] = .frameCell(frame.allocate(.word))
+					home = .frameCell(frame.allocate(.word))
 				}
+				homesByLocation[location] = home
+				return home
 			}
 			
 			/// Returns a register that `location` can be assigned, or `nil` if no register is available.
@@ -74,6 +81,6 @@ extension AL {
 
 extension AL.Location : CustomStringConvertible {
 	public var description: String {
-		"\(rawValue)"
+		"aloc\(rawValue)"
 	}
 }
