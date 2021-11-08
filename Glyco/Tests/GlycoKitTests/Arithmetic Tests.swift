@@ -49,7 +49,7 @@ final class ArithmeticTests : XCTestCase {
 						sw gp, tohost, t5
 						j _exit
 						
-		main:					addi s1, zero, 1
+		main:			addi s1, zero, 1
 						addi t1, zero, 2
 						add s1, t1, s1
 						mv a0, s1

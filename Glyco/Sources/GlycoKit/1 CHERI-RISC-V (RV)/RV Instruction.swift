@@ -52,8 +52,8 @@ extension RV {
 		indirect case labelled(Label, Instruction)
 		
 		// See protocol.
-		public func lowered(in context: inout ()) -> String {
-			let tabs = "\t\t\t\t"
+		func lowered(in context: inout Context) -> String {
+			let tabs = String((0..<context.tabIndentation).map { _ in "\t" })
 			switch self {
 				
 				case .copy(.word, destination: let destination, source: let source):
@@ -101,9 +101,15 @@ extension RV {
 				
 				case .labelled(let label, let instruction):
 				let prefix = "\(label.rawValue):"
-				let tabsLength = (prefix.count / tabs.count).capped(to: 1...)
-				let tabs = String((1...tabsLength).map { _ in "\t" })
-				return "\(prefix)\(tabs)\(instruction.lowered())"
+				let spacingWidth = (context.tabIndentation * 4 / prefix.count).capped(to: 1...)
+				let spacing = String((0..<spacingWidth).map { _ in "\t" })
+				let next: String = {
+					let previousIndentation = context.tabIndentation
+					context.tabIndentation = 0
+					defer { context.tabIndentation = previousIndentation }
+					return instruction.lowered(in: &context)
+				}()
+				return "\(prefix)\(spacing)\(next)"
 				
 			}
 		}

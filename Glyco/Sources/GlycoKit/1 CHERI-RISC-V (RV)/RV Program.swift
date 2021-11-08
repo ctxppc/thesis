@@ -10,6 +10,7 @@ public enum RV : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
+			var context = Context(tabIndentation: 4)
 			switch configuration.target {
 				
 				case .cheriBSD:
@@ -24,7 +25,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-				\(instructions.lowered().joined(separator: "\n\t\t\t\t"))
+				\(instructions.lowered(in: &context).joined(separator: "\n"))
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
 								
@@ -52,7 +53,7 @@ public enum RV : Language {
 								sw gp, tohost, t5
 								j _exit
 								
-				\(instructions.lowered().joined(separator: "\n"))
+				\(instructions.lowered(in: &context).joined(separator: "\n"))
 								
 								.align 6
 								.global tohost

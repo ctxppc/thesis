@@ -2,16 +2,11 @@
 
 extension RV {
 	
-	/// A value encompassing information required across program elements.
-	///
-	/// One context should be created for every program; contexts should not be reused across programs.
-	public struct Context {
+	/// A value used during lowering.
+	struct Context {
 		
-		/// Creates a context for a new program.
-		public init() {}
-		
-		/// The number of labels that have been allocated.
-		var numberOfAllocatedLabels = 0
+		/// The number of tabs to indent instructions with.
+		var tabIndentation: Int
 		
 	}
 	
