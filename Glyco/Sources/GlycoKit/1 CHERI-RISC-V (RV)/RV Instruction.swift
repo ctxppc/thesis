@@ -65,6 +65,12 @@ extension RV {
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
 				return "\(tabs)\(operation.rawValue) \(rd.x), \(rs1.x), \(rs2.x)"
 				
+				case .registerImmediate(operation: .subtract, rd: let rd, rs1: let rs1, imm: let imm) where imm >= 0:
+				return "\(tabs)addi \(rd.x), \(rs1.x), -\(imm)"
+				
+				case .registerImmediate(operation: .subtract, rd: let rd, rs1: let rs1, imm: let imm):
+				return "\(tabs)addi \(rd.x), \(rs1.x), \(imm)"
+				
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(tabs)\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
