@@ -63,10 +63,10 @@ extension RV {
 				return "\(tabs)cmove \(destination.c), \(source.c)"
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
-				return "\(tabs)\(operation) \(rd.x), \(rs1.x), \(rs2.x)"
+				return "\(tabs)\(operation.rawValue) \(rd.x), \(rs1.x), \(rs2.x)"
 				
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
-				return "\(tabs)\(operation)i \(rd.x), \(rs1.x), \(imm)"
+				return "\(tabs)\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
 				case .loadWord(destination: let rd, address: let address):
 				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
