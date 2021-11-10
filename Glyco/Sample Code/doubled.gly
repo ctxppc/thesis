@@ -1,0 +1,6 @@
+/// Maps f(x) to 2*f(x).
+let doubled: (Int) -> (Int) -> (Int) = { f in
+	{ x in
+		
+	}
+}

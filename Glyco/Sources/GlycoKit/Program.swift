@@ -1,6 +1,7 @@
 // Glyco © 2021 Constantino Tsarouhas
 
 import Foundation
+import Yams
 
 public protocol Program : Codable {
 	
@@ -52,10 +53,16 @@ public struct CompilationConfiguration {
 }
 
 extension Program {
+	
 	public func elf(configuration: CompilationConfiguration) throws -> Data {
 		try lowered(configuration: configuration)
 			.elf(configuration: configuration)
 	}
+	
+	public func write(to url: URL) throws {
+		try YAMLEncoder().encode(self).write(to: url, atomically: false, encoding: .utf8)
+	}
+	
 }
 
 extension Never : Program {
