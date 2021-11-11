@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+import DepthKit
 import Foundation
 
 extension CD {
@@ -7,19 +8,19 @@ extension CD {
 	/// An effect on an CD machine.
 	public enum Effect : Codable {
 		
-		/// An effect that does nothing.
-		case none
+		/// An effect that performs `effects`.
+		case sequence(effects: [Effect])
 		
-		/// An effect that retrieves the value in `source` and puts it in `destination`, then performs `successor`.
-		indirect case copy(destination: Location, source: Source, successor: Effect)
+		/// An effect that retrieves the value in `source` and puts it in `destination`.
+		case copy(destination: Location, source: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`, then performs `successor`.
-		indirect case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source, successor: Effect)
+		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
+		case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
 		
-		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise (if not `nil`), then performs `successor`.
-		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect, successor: Effect)
+		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise.
+		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect)
 		
-		/// An effect that terminates with `result`.
+		/// An effect that terminates the program with `result`.
 		case `return`(result: Source)
 		
 		/// Returns a representation of `self` in a lower language.
@@ -31,99 +32,45 @@ extension CD {
 		///    - exitLabel: The label to jump to after executing `self` and any successors, or `nil` if `self` represents a program effect.
 		///
 		/// - Returns: A representation of `self` in a lower language.
-		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label?) throws -> [Lower.Block] {
+		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label) throws -> [Lower.Block] {
 			switch self {
 				
-				case .none:
-				guard let exitLabel = exitLabel else { throw LoweringError.missingReturn }
-				return [.intermediate(label: entryLabel, effects: previousEffects, successor: exitLabel)]
+				case .sequence(effects: let effects):
+				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .copy(destination: let destination, source: let source, successor: let successor):
-				return try successor.lowered(
-					in:					&context,
-					entryLabel:			entryLabel,
-					previousEffects:	previousEffects + [.copy(destination: destination, source: source)],
-					exitLabel:			exitLabel
-				)
+				case .copy, .compute, .conditional, .return:
+				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs, successor: let successor):
-				return try successor.lowered(
-					in:					&context,
-					entryLabel:			entryLabel,
-					previousEffects:	previousEffects + [.compute(destination: destination, lhs: lhs, operation: operation, rhs: rhs)],
-					exitLabel:			exitLabel
-				)
+			}
+		}
+		
+		/// A Boolean value indicating whether `self` is confirmed to have no effect.
+		///
+		/// - Returns: `true` if `self` has no effect; `false` if it cannot be determined that `self` has no effect.
+		var doesNothing: Bool {
+			switch self {
 				
-				// conditional without (redundant empty) successor block — optimisation
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative, successor: .none):
-				let affirmativeLabel = context.allocateBlockLabel()
-				let negativeLabel = context.allocateBlockLabel()
-				let conditionalBlocks = predicate.lowered(
-					in:					&context,
-					entryLabel:			entryLabel,
-					affirmativeTarget:	affirmativeLabel,
-					negativeTarget:		negativeLabel,
-					previousEffects:	previousEffects
-				)
-				let affirmativeBlocks = try affirmative.lowered(
-					in:					&context,
-					entryLabel:			affirmativeLabel,
-					previousEffects:	[],
-					exitLabel:			exitLabel
-				)
-				let negativeBlocks = try negative.lowered(
-					in:					&context,
-					entryLabel:			negativeLabel,
-					previousEffects:	[],
-					exitLabel:			exitLabel
-				)
-				return conditionalBlocks + affirmativeBlocks + negativeBlocks
+				case .sequence(effects: let effects):
+				return effects.allSatisfy(\.doesNothing)
 				
-				// conditional with successor block — general case
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative, successor: let successor):
-				let affirmativeLabel = context.allocateBlockLabel()
-				let negativeLabel = context.allocateBlockLabel()
-				let successorLabel = context.allocateBlockLabel()
-				let conditionalBlocks = predicate.lowered(
-					in:					&context,
-					entryLabel:			entryLabel,
-					affirmativeTarget:	affirmativeLabel,
-					negativeTarget:		negativeLabel,
-					previousEffects:	previousEffects
-				)
-				let affirmativeBlocks = try affirmative.lowered(
-					in:					&context,
-					entryLabel:			affirmativeLabel,
-					previousEffects:	[],
-					exitLabel:			successorLabel
-				)
-				let negativeBlocks = try negative.lowered(
-					in:					&context,
-					entryLabel:			negativeLabel,
-					previousEffects:	[],
-					exitLabel:			successorLabel
-				)
-				let successorBlocks = try successor.lowered(
-					in:					&context,
-					entryLabel:			successorLabel,
-					previousEffects:	[],
-					exitLabel:			exitLabel
-				)
-				return conditionalBlocks + affirmativeBlocks + negativeBlocks + successorBlocks
+				case .conditional(predicate: _, affirmative: let affirmative, negative: let negative):
+				return affirmative.doesNothing && negative.doesNothing
 				
-				case .return(result: let result):
-				return [.final(label: entryLabel, effects: previousEffects, result: result)]
+				default:
+				return false
 				
 			}
 		}
 		
 		enum LoweringError : LocalizedError {
 			
-			case missingReturn
+			/// An error indicating that some execution paths contain an intermediate return effect
+			case effectAfterReturn
 			
+			// See protocol.
 			var errorDescription: String? {
 				switch self {
-					case .missingReturn:	return "Some execution paths end without a return effect."
+					case .effectAfterReturn:	return "Some execution paths contain an intermediate return effect."
 				}
 			}
 			
@@ -133,5 +80,100 @@ extension CD {
 	
 	public typealias Location = Lower.Location
 	public typealias BinaryOperator = Lower.BinaryOperator
+	
+}
+
+private extension RandomAccessCollection where Element == CD.Effect {
+	
+	/// A Boolean value indicating whether the effects in `self` are confirmed to have no effect.
+	///
+	/// - Returns: `true` if the effects in `self` have no effect; `false` if it cannot be determined that the effects in `self` have no effect.
+	private var doesNothing: Bool {
+		allSatisfy(\.doesNothing)
+	}
+	
+	/// Lowers the sequence of effects to a lower language.
+	///
+	/// - Parameters:
+	///    - context: The context in which `self` is being lowered.
+	///    - entryLabel: The label of the lowered entry block.
+	///    - previousEffects: Effects to be executed before executing `self`.
+	///    - exitLabel: The label to jump to after executing `self`.
+	///
+	/// - Returns: A representation of `self` in a lower language.
+	func lowered(in context: inout CD.Context, entryLabel: CD.Lower.Label, previousEffects: [CD.Lower.Effect], exitLabel: CD.Lower.Label) throws -> [CD.Lower.Block] {
+		guard let (first, rest) = self.splittingFirst() else { return [.intermediate(label: entryLabel, effects: previousEffects, successor: exitLabel)] }
+		switch first {
+			
+			case .sequence(effects: let effects) where rest.doesNothing:
+			return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
+			
+			case .sequence(effects: let effects):
+			let restLabel = context.allocateBlockLabel()
+			return try effects.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	[],
+				exitLabel:			restLabel
+			) + rest.lowered(
+				in:					&context,
+				entryLabel:			restLabel,
+				previousEffects:	[],
+				exitLabel:			exitLabel
+			)
+			
+			case .copy(destination: let destination, source: let source):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.copy(destination: destination, source: source)],
+				exitLabel:			exitLabel
+			)
+			
+			case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.compute(destination: destination, lhs: lhs, operation: operation, rhs: rhs)],
+				exitLabel:			exitLabel
+			)
+			
+			case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+			let affirmativeLabel = context.allocateBlockLabel()
+			let negativeLabel = context.allocateBlockLabel()
+			let restLabel = rest.doesNothing ? exitLabel : context.allocateBlockLabel()
+			let conditionalBlocks = predicate.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects,
+				affirmativeTarget:	affirmative.doesNothing ? restLabel : affirmativeLabel,
+				negativeTarget:		negative.doesNothing ? restLabel : negativeLabel
+			)
+			let affirmativeBlocks = affirmative.doesNothing ? [] : try affirmative.lowered(
+				in:					&context,
+				entryLabel:			affirmativeLabel,
+				previousEffects:	[],
+				exitLabel:			restLabel
+			)
+			let negativeBlocks = negative.doesNothing ? [] : try negative.lowered(
+				in:					&context,
+				entryLabel:			negativeLabel,
+				previousEffects:	[],
+				exitLabel:			restLabel
+			)
+			let restBlocks = rest.doesNothing ? [] : try rest.lowered(
+				in:					&context,
+				entryLabel:			restLabel,
+				previousEffects:	[],
+				exitLabel:			exitLabel
+			)
+			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
+			
+			case .return(result: let result):
+			guard rest.doesNothing else { throw CD.Effect.LoweringError.effectAfterReturn }
+			return [.final(label: entryLabel, effects: previousEffects, result: result)]
+			
+		}
+	}
 	
 }

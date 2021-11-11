@@ -35,17 +35,17 @@ extension CD {
 		/// - Parameters:
 		///    - context: The context in which `self` is being lowered.
 		///    - entryLabel: The label of the entry block representing `self`.
+		///    - previousEffects: Effects to be executed in the entry block before evaluating the predicate.
 		///    - affirmativeTarget: The label of the block to jump to if `self` holds.
 		///    - negativeTarget: The label of the block to jump to if `self` doesn't hold.
-		///    - previousEffects: Effects to be executed in the entry block before evaluating the predicate.
 		///
 		/// - Returns: A representation of `self` in a lower language.
 		func lowered(
 			in context:			inout Context,
 			entryLabel:			Lower.Label,
+			previousEffects:	[Lower.Effect],
 			affirmativeTarget:	Lower.Label,
-			negativeTarget:		Lower.Label,
-			previousEffects:	[Lower.Effect]
+			negativeTarget:		Lower.Label
 		) -> [Lower.Block] {
 			switch self {
 				
@@ -75,23 +75,23 @@ extension CD {
 				let conditionBlocks = condition.lowered(
 					in:					&context,
 					entryLabel:			entryLabel,
+					previousEffects:	previousEffects,
 					affirmativeTarget:	intermediateAffirmative,
-					negativeTarget:		intermediateNegative,
-					previousEffects:	previousEffects
+					negativeTarget:		intermediateNegative
 				)
 				let affirmativeBlocks = affirmative.lowered(
 					in:					&context,
 					entryLabel:			intermediateAffirmative,
+					previousEffects:	[],
 					affirmativeTarget:	affirmativeTarget,
-					negativeTarget:		negativeTarget,
-					previousEffects:	[]
+					negativeTarget:		negativeTarget
 				)
 				let negativeBlocks = negative.lowered(
 					in:					&context,
 					entryLabel:			intermediateNegative,
+					previousEffects:	[],
 					affirmativeTarget:	affirmativeTarget,
-					negativeTarget:		negativeTarget,
-					previousEffects:	[]
+					negativeTarget:		negativeTarget
 				)
 				return conditionBlocks + affirmativeBlocks + negativeBlocks
 				

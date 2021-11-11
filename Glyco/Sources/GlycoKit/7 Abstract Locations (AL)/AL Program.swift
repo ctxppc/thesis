@@ -15,7 +15,8 @@ public enum AL : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			var context = Context(assignments: .init(conflicts: effect.conflicts()))
+			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
+			var context = Context(assignments: .init(conflicts: conflicts))
 			return .init(effect: effect.lowered(in: &context))
 		}
 		

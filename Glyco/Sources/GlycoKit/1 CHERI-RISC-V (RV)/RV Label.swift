@@ -3,10 +3,13 @@
 extension RV {
 	
 	/// An identifier that can be used to jump execution to.
-	public struct Label : Codable, RawRepresentable {
+	public struct Label : Codable, RawRepresentable, Hashable {
 		
-		/// The entry point label.
-		public static let main = Self(rawValue: "main")
+		/// The program entry label.
+		public static let programEntry = Self(rawValue: "main")
+		
+		/// The program exit label.
+		public static let programExit = Self(rawValue: "_exit")
 		
 		// See protocol.
 		public init(rawValue: String) {

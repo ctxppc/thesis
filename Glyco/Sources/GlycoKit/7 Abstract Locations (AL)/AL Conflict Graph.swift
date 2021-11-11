@@ -14,25 +14,19 @@ extension AL {
 		/// A conflict.
 		typealias Conflict = (Location, Location)
 		
-		/// Returns a Boolean value indicating whether the graph contains `conflict`.
+		/// Returns a Boolean value indicating whether the graph contains a conflict between `firstLocation` and any location in `otherLocations`.
 		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
 			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
 			return !conflictingLocations.isDisjoint(with: otherLocations)
 		}
 		
-		/// Adds given conflict to the graph.
-		///
-		/// This method does nothing if the conflict names the same location twice.
-		mutating func insert(_ conflict: Conflict) {
-			guard conflict.0 != conflict.1 else { return }
-			guard conflictingLocationsForLocation[conflict.0, default: []].insert(conflict.1).inserted else { return }	// optimisation
-			conflictingLocationsForLocation[conflict.1, default: []].insert(conflict.0)
-		}
-		
 		/// Adds conflicts between `firstLocation` and `otherLocations`.
+		///
+		/// This method does not add a conflict between a location and itself.
 		mutating func insertConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) {
-			for otherLocation in otherLocations {
-				insert((firstLocation, otherLocation))
+			for otherLocation in otherLocations.subtracting([firstLocation]) {
+				guard conflictingLocationsForLocation[firstLocation, default: []].insert(otherLocation).inserted else { continue }	// optimisation
+				conflictingLocationsForLocation[otherLocation, default: []].insert(firstLocation)
 			}
 		}
 		

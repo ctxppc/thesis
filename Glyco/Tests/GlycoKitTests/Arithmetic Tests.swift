@@ -10,17 +10,11 @@ final class ArithmeticTests : XCTestCase {
 		let location = AL.Location(rawValue: 0)
 		
 		let program = AL.Program(
-			effect:	.copy(
-				destination: location,
-				source: .immediate(1),
-				successor: .compute(
-					destination: location,
-					lhs: .immediate(2),
-					operation: .add,
-					rhs: .location(location),
-					successor: .return(result: .location(location))
-				)
-			)
+			effect: .sequence(effects: [
+				location <- .immediate(1),
+				.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
+				.return(result: .location(location))
+			])
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
@@ -70,18 +64,15 @@ final class ArithmeticTests : XCTestCase {
 		let isEven = AL.Location(rawValue: 0)
 		
 		let program = AL.Program(
-			effect:	.compute(
-				destination:	testedNumber,
-				lhs:			.immediate(12),
-				operation:		.subtract,
-				rhs:			.immediate(11),
-				successor: .conditional(
+			effect: .sequence(effects: [
+				.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
+				.conditional(
 					predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
-					affirmative:	.copy(destination: isEven, source: .immediate(1), successor: .none),
-					negative:		.copy(destination: isEven, source: .immediate(0), successor: .none),
-					successor:		.return(result: .location(isEven))
-				)
-			)
+					affirmative:	isEven <- .immediate(1),
+					negative:		isEven <- .immediate(0)
+				),
+				.return(result: .location(isEven))
+			])
 		)
 		
 		try program.write(to: .init(fileURLWithPath: "EqualsOne.al"))
@@ -113,7 +104,7 @@ final class ArithmeticTests : XCTestCase {
 						j _exit
 						
 		main:			addi t1, zero, 12
-						subtracti s1, t1, 11
+						addi s1, t1, -11
 						addi t2, zero, 1
 						beq s1, t2, BB0
 						j BB1
