@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable, SimplyLowerable {
+	public enum Predicate : Codable, Equatable, SimplyLowerable {
 		
 		/// A constant predicate.
 		case constant(Bool)

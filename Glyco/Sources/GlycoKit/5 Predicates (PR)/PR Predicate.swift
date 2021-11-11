@@ -3,7 +3,7 @@
 extension PR {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable {
+	public enum Predicate : Codable, Equatable {
 		
 		/// A constant predicate.
 		case constant(Bool)

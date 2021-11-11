@@ -6,7 +6,7 @@ import Foundation
 extension CD {
 	
 	/// An effect on an CD machine.
-	public enum Effect : Codable {
+	public enum Effect : Codable, Equatable {
 		
 		/// An effect that performs `effects`.
 		case sequence(effects: [Effect])
@@ -76,6 +76,33 @@ extension CD {
 			
 		}
 		
+		/// Returns a copy of `self` that may more optimised.
+		func optimised() -> Self {
+			switch self {
+				
+				case .copy(destination: let destination, source: .location(let source)) where source == destination,
+					.compute(destination: let destination, lhs: .location(let source), operation: .add, rhs: .immediate(0)) where source == destination,
+					.compute(destination: let destination, lhs: .immediate(0), operation: .add, rhs: .location(let source)) where source == destination,
+					.compute(destination: let destination, lhs: .location(let source), operation: .subtract, rhs: .immediate(0)) where source == destination,
+					.compute(destination: let destination, lhs: .immediate(0), operation: .subtract, rhs: .location(let source)) where source == destination:
+				return .sequence(effects: [])
+				
+				case .conditional(predicate: .constant(true), affirmative: let affirmative, negative: _):
+				return affirmative.optimised()
+				
+				case .conditional(predicate: .constant(false), affirmative: _, negative: let negative):
+				return negative.optimised()
+				
+				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+				let newPredicate = predicate.optimised()
+				let newConditional = Self.conditional(predicate: newPredicate, affirmative: affirmative.optimised(), negative: negative.optimised())
+				return newPredicate == predicate ? newConditional : newConditional.optimised()
+				
+				default:
+				return self
+				
+			}
+		}
 	}
 	
 	public typealias Location = Lower.Location

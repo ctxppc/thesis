@@ -3,7 +3,7 @@
 extension FO {
 	
 	/// A machine register.
-	public enum Register : String, Codable, CaseIterable, SimplyLowerable {
+	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {
 		
 		/// All registers that can be freely used for storing values.
 		static let assignableRegisters = allCases.filter(\.assignable)

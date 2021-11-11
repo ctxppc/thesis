@@ -3,7 +3,7 @@
 extension FL {
 	
 	/// A location to a register or frame cell on an FL machine.
-	public enum Location : Codable {
+	public enum Location : Codable, Equatable {
 		
 		/// A location to a register.
 		case register(Register)

@@ -5,7 +5,7 @@ import DepthKit
 extension AL {
 	
 	/// An effect on an AL machine.
-	public enum Effect : Codable, SimplyLowerable {
+	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
 		case sequence(effects: [Effect])

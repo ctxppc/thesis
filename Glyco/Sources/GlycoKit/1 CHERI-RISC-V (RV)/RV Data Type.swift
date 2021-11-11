@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// A value denoting the type of a datum.
-	public enum DataType : String, Codable {
+	public enum DataType : String, Equatable, Codable {
 		
 		/// A 4-byte integer.
 		case word

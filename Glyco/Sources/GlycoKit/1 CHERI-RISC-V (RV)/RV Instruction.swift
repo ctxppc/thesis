@@ -10,7 +10,7 @@ extension RV {
 	/// * a datum is *loaded from* or *stored in* memory;
 	/// * a datum is *retrieved from* or *put in* a register; and
 	/// * a datum is *copied from* a register *to* a register.
-	public enum Instruction : Codable, SimplyLowerable {
+	public enum Instruction : Codable, Equatable, SimplyLowerable {
 		
 		/// An instruction that copies the datum from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)

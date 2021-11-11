@@ -2,7 +2,7 @@
 
 extension FL {
 	
-	public enum BinaryExpression : Codable {
+	public enum BinaryExpression : Codable, Equatable {
 		
 		/// Performs *x* `operation` *y* where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case registerRegister(rs1: Register, operation: BinaryOperator, rs2: Register)

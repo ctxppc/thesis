@@ -3,7 +3,7 @@
 extension BB {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public enum Block : Codable, MultiplyLowerable {
+	public enum Block : Codable, Equatable, MultiplyLowerable {
 		
 		/// A block labelled `label` that executes `effects`, then jumps to the block labelled `successor`.
 		case intermediate(label: Label, effects: [Effect], successor: Label)

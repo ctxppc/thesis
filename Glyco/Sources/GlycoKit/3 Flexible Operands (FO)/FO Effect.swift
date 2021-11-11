@@ -8,7 +8,7 @@ extension FO {
 	/// * a datum is *retrieved from* a source or location;
 	/// * a datum is *put in* a location;
 	/// * a datum is *copied from* a source or location *to* a location.
-	public enum Effect : Codable, MultiplyLowerable {
+	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that copies the datum from `source` to `destination`.
 		case copy(destination: Location, source: Source)

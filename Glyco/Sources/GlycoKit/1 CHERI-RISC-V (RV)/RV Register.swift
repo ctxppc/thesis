@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// A machine register.
-	public enum Register : String, Codable {
+	public enum Register : String, Codable, Equatable {
 		
 		/// The always-zero register.
 		case zero

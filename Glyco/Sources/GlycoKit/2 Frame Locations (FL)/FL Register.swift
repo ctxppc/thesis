@@ -3,7 +3,7 @@
 extension FL {
 	
 	/// A machine register.
-	public enum Register : String, Codable, SimplyLowerable {
+	public enum Register : String, Codable, Equatable, SimplyLowerable {
 		
 		/// The always-zero register.
 		case zero

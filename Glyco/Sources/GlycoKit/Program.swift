@@ -3,7 +3,7 @@
 import Foundation
 import Yams
 
-public protocol Program : Codable {
+public protocol Program : Codable, Equatable {
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram

@@ -3,7 +3,7 @@
 extension CD {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable {
+	public enum Predicate : Codable, Equatable {
 		
 		/// A constant predicate.
 		case constant(Bool)
@@ -26,6 +26,39 @@ extension CD {
 				
 				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
 				return .conditional(condition: condition, affirmative: negative, negative: affirmative)
+				
+			}
+		}
+		
+		/// Returns a copy of `self` that may more optimised.
+		func optimised() -> Self {
+			switch self {
+				
+				case .constant:
+				return self
+				
+				case .relation(lhs: .immediate(let lhs), relation: let relation, rhs: .immediate(let rhs)):
+				return .constant(relation.holds(lhs, rhs))
+				
+				case .relation(lhs: let lhs, relation: let relation, rhs: let rhs) where lhs == rhs:
+				return .constant(relation.reflexive)
+				
+				case .conditional(condition: .constant(true), affirmative: let affirmative, negative: _):
+				return affirmative.optimised()
+				
+				case .conditional(condition: .constant(false), affirmative: _, negative: let negative):
+				return negative.optimised()
+				
+				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				let newCondition = condition.optimised()
+				if condition != newCondition {
+					return .conditional(condition: newCondition, affirmative: affirmative.optimised(), negative: negative.optimised()).optimised()
+				} else {
+					return .conditional(condition: condition, affirmative: affirmative.optimised(), negative: negative.optimised())
+				}
+				
+				default:
+				return self
 				
 			}
 		}

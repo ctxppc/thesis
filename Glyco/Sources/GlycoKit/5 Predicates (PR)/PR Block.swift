@@ -3,7 +3,7 @@
 extension PR {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public enum Block : Codable, SimplyLowerable {
+	public enum Block : Codable, Equatable, SimplyLowerable {
 		
 		/// A block labelled `label` that executes `effects`, then jumps to the block labelled `successor`.
 		case intermediate(label: Label, effects: [Effect], successor: Label)

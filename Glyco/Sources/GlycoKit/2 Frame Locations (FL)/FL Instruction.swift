@@ -5,7 +5,7 @@ extension FL {
 	/// A CHERI-RISC-V instruction.
 	///
 	/// These instructions map one to one to assembly instructions.
-	public enum Instruction : Codable, MultiplyLowerable {
+	public enum Instruction : Codable, Equatable, MultiplyLowerable {
 		
 		/// An instruction that copies the contents from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)

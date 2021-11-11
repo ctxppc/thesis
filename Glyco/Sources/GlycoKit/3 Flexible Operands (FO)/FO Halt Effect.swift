@@ -3,7 +3,7 @@
 extension FO {
 	
 	/// An FO effect where the machine halts execution of the program.
-	public struct HaltEffect : Codable, SimplyLowerable {
+	public struct HaltEffect : Codable, Equatable, SimplyLowerable {
 		
 		/// The source of the result value.
 		public var result: Source
