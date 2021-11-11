@@ -108,11 +108,11 @@ final class ArithmeticTests : XCTestCase {
 						addi t2, zero, 1
 						beq s1, t2, BB0
 						j BB1
-		BB0:				addi s1, zero, 1
+		BB0:			addi s1, zero, 1
 						j BB2
-		BB1:				addi s1, zero, 0
+		BB1:			addi s1, zero, 0
 						j BB2
-		BB2:				mv a0, s1
+		BB2:			mv a0, s1
 						cret
 						
 						.align 6

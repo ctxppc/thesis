@@ -107,7 +107,7 @@ extension RV {
 				
 				case .labelled(let label, let instruction):
 				let prefix = "\(label.rawValue):"
-				let spacingWidth = (context.tabIndentation * 4 / prefix.count).capped(to: 1...)
+				let spacingWidth = (context.tabIndentation - prefix.count / 4).capped(to: 1...)
 				let spacing = String((0..<spacingWidth).map { _ in "\t" })
 				let next: String = {
 					let previousIndentation = context.tabIndentation
