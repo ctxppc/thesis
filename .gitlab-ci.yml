@@ -15,7 +15,8 @@ build: &build
     - cd Glyco
     - swift build -c release -Xswiftc -static-executable
     - cd ..
-    - cp -pRL Glyco/.build/release/Glyco Glyco_release_Ubuntu20.04/Glyco
+    - mkdir Glyco_release_Ubuntu20.04
+    - cp Glyco/.build/release/Glyco Glyco_release_Ubuntu20.04/Glyco
   artifacts:
     paths:
       - Glyco_release_Ubuntu20.04
