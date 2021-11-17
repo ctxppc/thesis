@@ -41,7 +41,7 @@ public enum RV : Language {
 								.globl _start
 				_start:			la t0, _trap_vector
 								csrw mtvec, t0
-								la t0, main
+								la t0, _main
 								csrw mepc, t0
 								mret
 								
@@ -51,6 +51,11 @@ public enum RV : Language {
 								
 				_exit:			auipc t5, 0x1
 								sw gp, tohost, t5
+								j _exit
+								
+				_main:			la ra, main
+								jalr ra, ra
+								li gp, 1
 								j _exit
 								
 				\(instructions.lowered(in: &context).joined(separator: "\n"))

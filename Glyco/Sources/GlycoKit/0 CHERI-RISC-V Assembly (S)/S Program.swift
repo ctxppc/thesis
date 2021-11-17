@@ -19,54 +19,12 @@ public enum S : Language {
 		// See protocol.
 		public func elf(configuration: CompilationConfiguration) throws -> Data {
 			
-			let linkerCommands = """
-				OUTPUT_ARCH("riscv")
-				ENTRY(main)
-				SECTIONS {
-				  . = 0x80000000;
-				  .text.init : { *(.text.init) }
-				  . = ALIGN(0x1000);
-				  .tohost : { *(.tohost) }
-				  . = ALIGN(0x1000);
-				  .text : { *(.text) }
-				  . = ALIGN(0x1000);
-				  .data : { *(.data) }
-				  .bss : { *(.bss) }
-				  _end = .;
-				}
-				"""
-			
-			var clangArguments = [
-				"-O2",
-				"-target", "riscv64-unknown-freebsd",
-				"--sysroot=\(configuration.systemURL.path)",
-				"-fuse-ld=lld",
-				"-mno-relax",
-				"-march=rv64gcxcheri",
-				"-mabi=l64pc128d",
-				"-Wall", "-Wcheri",
-			]
-			if configuration.target == .sail {
-				clangArguments += ["-nostartfiles", "-nostdlib", "-static"]
-			}
-			
 			let tmpURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: configuration.toolchainURL, create: true)
 			defer { try? FileManager.default.removeItem(at: tmpURL) }
 			
 			let assemblyURL = tmpURL.appendingPathComponent("asm.S")
-			let linkerCommandsURL = tmpURL.appendingPathComponent("linkage.ld")
 			let elfURL = tmpURL.appendingPathComponent("elf")
-			
 			try body.write(to: assemblyURL, atomically: false, encoding: .utf8)
-			try linkerCommands.write(to: linkerCommandsURL, atomically: false, encoding: .utf8)
-			
-			if configuration.target == .sail {
-				clangArguments.append(linkerCommandsURL.path)
-			}
-			
-			clangArguments += [
-				assemblyURL.path, "-o", elfURL.path
-			]
 			
 			let clang = Process()
 			clang.executableURL = configuration.toolchainURL
@@ -74,7 +32,34 @@ public enum S : Language {
 				.appendingPathComponent("sdk")
 				.appendingPathComponent("bin")
 				.appendingPathComponent("clang", isDirectory: false)
-			clang.arguments = clangArguments
+			
+			clang.arguments = {
+				switch configuration.target {
+					
+					case .cheriBSD:
+					return [
+						"-target", "riscv64-unknown-freebsd",
+						"--sysroot=\(configuration.systemURL.path)",
+						"-fuse-ld=lld",
+						"-mabi=l64pc128d",
+					]
+					
+					case .sail:
+					return [
+						"-target", "riscv64-unknown-elf-64",
+						"-nostdlib",
+						"-march=rv64gcxcheri",
+						"-Ttext", "0x0000000080000000",
+					]
+					
+				}
+			}() + [
+				"-O2",
+				"-march=rv64gcxcheri",
+				"-mno-relax",
+				"-Wall", "-Wcheri",
+				assemblyURL.path, "-o", elfURL.path,
+			]
 			
 			try clang.run()
 			clang.waitUntilExit()

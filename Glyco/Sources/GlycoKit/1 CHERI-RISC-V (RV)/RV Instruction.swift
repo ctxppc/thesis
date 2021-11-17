@@ -99,7 +99,7 @@ extension RV {
 				return "\(tabs)ccall \(target.rawValue)"
 				
 				case .return:
-				return "\(tabs)cret"
+				return "\(tabs)ret"
 				
 				case .labelled(let label, .labelled(let innerLabel, let instruction)):
 				let next = Self.labelled(innerLabel, instruction).lowered(in: &context)
