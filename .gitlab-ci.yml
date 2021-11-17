@@ -16,7 +16,7 @@ build: &build
     - swift build -c release
   artifacts:
     paths:
-      - Glyco/.build/release
+      - "Glyco/.build/release/"
 
 test: &test
   stage: test
