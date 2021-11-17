@@ -1,5 +1,5 @@
 default:
-  image: swift:5.5
+  image: swift:5.5.1-focal
   cache:
     key: "shared cache"
     paths:
@@ -13,10 +13,11 @@ build: &build
   stage: build
   script:
     - cd Glyco
-    - swift build
+    - swift build -c release
+    - cp .build/release ../Glyco_release_Ubuntu20.04
   artifacts:
     paths:
-      - "Glyco/.build/debug/Glyco"
+      - Glyco_release_Ubuntu20.04
 
 test: &test
   stage: test
