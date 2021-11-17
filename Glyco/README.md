@@ -68,6 +68,11 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td>Expressions</td>
 		<td>Introduces structural value expressions, thereby abstracting over simple computation effects.</td>
 	</tr>
+	<tr>
+		<td><code>PR</code></td>
+		<td>Expressions</td>
+		<td>Introduces procedures.</td>
+	</tr>
 </table>
 
 Glyco focusses on a single high-level language *Gly* and thus this list can be seen as a linked list, but the nanopass approach allows for a tree of intermediate languages to be defined with `S` as the root, or even a directed (possibly acyclic) graph of languages from numerous low-level (machine) languages to high-level (programmer-optimised) languages.

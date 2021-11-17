@@ -133,6 +133,4 @@ extension CD {
 		
 	}
 	
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }

@@ -1,32 +1,36 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A language that introduces structural value expressions, thereby abstracting over simple computation effects.
-public enum EX : Language {
+/// A language that introduces procedures.
+public enum PC : Language {
 	
-	/// A program on an EX machine.
+	/// A program on an PC machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given body.
-		public init(body: Statement) {
+		/// Creates a program with given body and procedures.
+		public init(body: Statement, procedures: [Procedure]) {
 			self.body = body
+			self.procedures = procedures
 		}
 		
 		/// The program's body.
 		public var body: Statement
 		
+		/// The program's procedures.
+		public var procedures: [Procedure]
+		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			var context = Context()
-			return .init(effect: body.lowered(in: &context))
+			TODO.unimplemented
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = AL
+	public typealias Lower = EX
 	
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Predicate = Lower.Predicate
+	public typealias Statement = Lower.Statement
 	
 }

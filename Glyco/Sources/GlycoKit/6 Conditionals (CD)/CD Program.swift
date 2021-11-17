@@ -24,7 +24,11 @@ public enum CD : Language {
 	// See protocol.
 	public typealias Lower = PR
 	
+	public typealias BinaryOperator = Lower.BinaryOperator
+	public typealias BranchRelation = Lower.BranchRelation
 	public typealias Frame = Lower.Frame
+	public typealias Label = Lower.Label
+	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
 	

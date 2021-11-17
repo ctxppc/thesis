@@ -59,7 +59,4 @@ extension PR {
 		
 	}
 	
-	public typealias Label = Lower.Label
-	public typealias Effect = Lower.Effect
-	
 }

@@ -22,8 +22,12 @@ public enum PR : Language {
 	public typealias Lower = BB
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
+	public typealias BranchRelation = Lower.BranchRelation
+	public typealias Effect = Lower.Effect
 	public typealias Frame = Lower.Frame
+	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
+	public typealias Source = Lower.Source
 	
 }

@@ -105,9 +105,6 @@ extension CD {
 		}
 	}
 	
-	public typealias Location = Lower.Location
-	public typealias BinaryOperator = Lower.BinaryOperator
-	
 }
 
 private extension RandomAccessCollection where Element == CD.Effect {

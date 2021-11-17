@@ -26,4 +26,6 @@ public enum AL : Language {
 	// See protocol.
 	public typealias Lower = CD
 	
+	public typealias Label = Lower.Label
+	
 }

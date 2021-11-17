@@ -16,7 +16,4 @@ extension PR {
 		
 	}
 	
-	public typealias Source = Lower.Source
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }
