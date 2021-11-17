@@ -13,12 +13,12 @@ build: &build
   stage: build
   script:
     - cd Glyco
-    - swift build -c release
+    - swift build -c release -Xswiftc -static-executable
     - cd ..
-    - cp -pRL Glyco/.build/release/ Glyco_release_Ubuntu20-04
+    - cp -pRL Glyco/.build/release/Glyco Glyco_release_Ubuntu20.04/Glyco
   artifacts:
     paths:
-      - "Glyco_release_Ubuntu20-04"
+      - Glyco_release_Ubuntu20.04
 
 test: &test
   stage: test
