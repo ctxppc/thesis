@@ -3,6 +3,7 @@
 import DepthKit
 import Foundation
 
+/// The ground language as provided to Clang for assembly and linking.
 public enum S : Language {
 	
 	/// A program in the S language.

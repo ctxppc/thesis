@@ -36,7 +36,7 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 	<tr>
 		<td><code>FL</code></td>
 		<td>Frame Locations</td>
-		<td>Introduces frame locations, i.e., memory locations relative to the frame pointer <code>fp</code>.</td>
+		<td>Introduces frame locations, i.e., memory locations relative to the frame capability <code>cfp</code>.</td>
 	</tr>
 	<tr>
 		<td><code>FO</code></td>
@@ -62,6 +62,11 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td><code>AL</code></td>
 		<td>Abstract Locations</td>
 		<td>Introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.</td>
+	</tr>
+	<tr>
+		<td><code>EX</code></td>
+		<td>Expressions</td>
+		<td>Introduces structural value expressions, thereby abstracting over simple computation effects.</td>
 	</tr>
 </table>
 

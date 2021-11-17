@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+/// A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`.
 public enum FL : Language {
 	
 	/// A program in the base language.

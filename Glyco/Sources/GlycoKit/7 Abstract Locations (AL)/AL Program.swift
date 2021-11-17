@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+/// A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 public enum AL : Language {
 	
 	/// A program on an AL machine.

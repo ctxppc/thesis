@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+/// A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
 public enum RV : Language {
 	
 	/// A program in the RV language.

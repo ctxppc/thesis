@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+/// A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
 public enum CD : Language {
 	
 	/// A program on an CD machine.
