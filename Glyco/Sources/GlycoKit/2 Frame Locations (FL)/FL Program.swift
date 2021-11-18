@@ -10,9 +10,9 @@ public enum FL : Language {
 		public var instructions: [Instruction] = []
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var frame = Frame()
-			return .init(instructions: instructions.lowered(in: &frame))
+			return .init(instructions: try instructions.lowered(in: &frame))
 		}
 		
 	}

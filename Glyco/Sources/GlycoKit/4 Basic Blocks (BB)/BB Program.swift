@@ -12,8 +12,8 @@ public enum BB : Language {
 		public var blocks: [Block]
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			.init(effects: blocks.lowered())
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
+			.init(effects: try blocks.lowered())
 		}
 		
 	}

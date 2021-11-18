@@ -9,10 +9,10 @@ extension FO {
 		public var result: Source
 		
 		// See protocol.
-		public func lowered(in context: inout ()) -> Lower.Instruction {
+		public func lowered(in context: inout ()) throws -> Lower.Instruction {
 			switch result {
 				case .immediate(let imm):				return .a0 <- imm
-				case .location(.register(let result)):	return .a0 <- result.lowered()
+				case .location(.register(let result)):	return try .a0 <- result.lowered()
 				case .location(.frameCell(let result)):	return .a0 <- result
 			}
 		}

@@ -15,9 +15,9 @@ public enum EX : Language {
 		public var body: Statement
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
-			return .init(effect: body.lowered(in: &context))
+			return .init(effect: try body.lowered(in: &context))
 		}
 		
 	}

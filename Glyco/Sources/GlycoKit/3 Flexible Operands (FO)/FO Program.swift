@@ -10,8 +10,8 @@ public enum FO : Language {
 		public var effects: [Effect]
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			.init(instructions: effects.lowered())
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
+			.init(instructions: try effects.lowered())
 		}
 		
 	}

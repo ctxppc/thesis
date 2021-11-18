@@ -23,11 +23,11 @@ extension AL {
 		case `return`(result: Source)
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Effect {
+		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 
 				case .sequence(effects: let effects):
-				return .sequence(effects: effects.lowered(in: &context))
+				return .sequence(effects: try effects.lowered(in: &context))
 
 				case .copy(destination: let destination, source: let source):
 				return .copy(destination: destination.lowered(in: &context), source: source.lowered(in: &context))
@@ -43,8 +43,8 @@ extension AL {
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
 				return .conditional(
 					predicate:		predicate.lowered(in: &context),
-					affirmative:	affirmative.lowered(in: &context),
-					negative:		negative.lowered(in: &context)
+					affirmative:	try affirmative.lowered(in: &context),
+					negative:		try negative.lowered(in: &context)
 				)
 
 				case .return(result: let result):

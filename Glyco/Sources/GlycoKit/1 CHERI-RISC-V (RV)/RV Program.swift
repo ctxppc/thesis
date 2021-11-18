@@ -10,7 +10,7 @@ public enum RV : Language {
 		public var instructions: [Instruction] = []
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(tabIndentation: 4)
 			switch configuration.target {
 				
@@ -26,7 +26,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-				\(instructions.lowered(in: &context).joined(separator: "\n"))
+				\(try instructions.lowered(in: &context).joined(separator: "\n"))
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
 								
@@ -59,7 +59,7 @@ public enum RV : Language {
 								li gp, 1
 								j _exit
 								
-				\(instructions.lowered(in: &context).joined(separator: "\n"))
+				\(try instructions.lowered(in: &context).joined(separator: "\n"))
 								
 								.align 6
 								.global tohost

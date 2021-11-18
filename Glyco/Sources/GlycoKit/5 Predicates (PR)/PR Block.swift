@@ -15,7 +15,7 @@ extension PR {
 		case final(label: Label, effects: [Effect], result: Source)
 		
 		// See protocol.
-		public func lowered(in context: inout ()) -> Lower.Block {
+		public func lowered(in context: inout ()) throws -> Lower.Block {
 			switch self {
 				
 				case .intermediate(label: let label, effects: let effects, successor: let successor):
@@ -34,7 +34,7 @@ extension PR {
 				case .branch(label: let label, effects: let effects,
 							 predicate: .not(let predicate),
 							 affirmative: let affirmative, negative: let negative):
-				return Self.branch(label: label, effects: effects, predicate: predicate, affirmative: negative, negative: affirmative)
+				return try Self.branch(label: label, effects: effects, predicate: predicate, affirmative: negative, negative: affirmative)
 						.lowered()
 				
 				case .branch(label: let label, effects: let effects,

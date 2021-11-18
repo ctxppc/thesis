@@ -29,7 +29,7 @@ extension CD {
 		///    - context: The context in which `self` is being lowered.
 		///    - entryLabel: The label of the entry block representing `self`.
 		///    - previousEffects: Effects to be executed before executing `self`.
-		///    - exitLabel: The label to jump to after executing `self` and any successors, or `nil` if `self` represents a program effect.
+		///    - exitLabel: The label to jump to after executing `self` and any successors.
 		///
 		/// - Returns: A representation of `self` in a lower language.
 		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label) throws -> [Lower.Block] {
@@ -76,7 +76,7 @@ extension CD {
 			
 		}
 		
-		/// Returns a copy of `self` that may more optimised.
+		/// Returns a copy of `self` that may be more optimised.
 		func optimised() -> Self {
 			switch self {
 				

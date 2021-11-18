@@ -15,7 +15,7 @@ protocol SimplyLowerable {
 	/// - Parameter context: The context in which `self` is being lowered.
 	///
 	/// - Returns: A representation of `self` in a lower language.
-	func lowered(in context: inout Context) -> Lowered
+	func lowered(in context: inout Context) throws -> Lowered
 	
 }
 
@@ -24,9 +24,9 @@ extension SimplyLowerable where Context == () {
 	/// Returns a representation of `self` in a lower language.
 	///
 	/// - Returns: A representation of `self` in a lower language.
-	func lowered() -> Lowered {
+	func lowered() throws -> Lowered {
 		var context: () = ()
-		return lowered(in: &context)
+		return try lowered(in: &context)
 	}
 	
 }
@@ -44,7 +44,7 @@ protocol MultiplyLowerable {
 	/// - Parameter context: The context in which `self` is being lowered.
 	///
 	/// - Returns: A representation of `self` in a lower language.
-	func lowered(in context: inout Context) -> LoweredElements
+	func lowered(in context: inout Context) throws -> LoweredElements
 	
 }
 
@@ -53,33 +53,33 @@ extension MultiplyLowerable where Context == () {
 	/// Returns a representation of `self` in a lower language.
 	///
 	/// - Returns: A representation of `self` in a lower language.
-	func lowered() -> LoweredElements {
+	func lowered() throws -> LoweredElements {
 		var context: () = ()
-		return lowered(in: &context)
+		return try lowered(in: &context)
 	}
 	
 }
 
 extension Sequence where Element : SimplyLowerable {
-	func lowered(in context: inout Element.Context) -> [Element.Lowered] {
-		self.map { $0.lowered(in: &context) }
+	func lowered(in context: inout Element.Context) throws -> [Element.Lowered] {
+		try self.map { try $0.lowered(in: &context) }
 	}
 }
 
 extension Sequence where Element : SimplyLowerable, Element.Context == () {
-	func lowered() -> [Element.Lowered] {
-		self.map { $0.lowered() }
+	func lowered() throws -> [Element.Lowered] {
+		try self.map { try $0.lowered() }
 	}
 }
 
 extension Sequence where Element : MultiplyLowerable {
-	func lowered(in context: inout Element.Context) -> [Element.LoweredElements.Element] {
-		self.flatMap { $0.lowered(in: &context) }
+	func lowered(in context: inout Element.Context) throws -> [Element.LoweredElements.Element] {
+		try self.flatMap { try $0.lowered(in: &context) }
 	}
 }
 
 extension Sequence where Element : MultiplyLowerable, Element.Context == () {
-	func lowered() -> [Element.LoweredElements.Element] {
-		self.flatMap { $0.lowered() }
+	func lowered() throws -> [Element.LoweredElements.Element] {
+		try self.flatMap { try $0.lowered() }
 	}
 }

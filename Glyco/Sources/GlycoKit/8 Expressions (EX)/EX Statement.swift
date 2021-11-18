@@ -18,20 +18,20 @@ extension EX {
 		case `return`(result: Expression)
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Effect {
+		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .assign(destination: let destination, value: let value):
 				return value.lowered(destination: destination, context: &context)
 				
 				case .compound(statements: let statements):
-				return .sequence(effects: statements.lowered(in: &context))
+				return .sequence(effects: try statements.lowered(in: &context))
 				
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
 				return .conditional(
 					predicate:		predicate,
-					affirmative:	affirmative.lowered(in: &context),
-					negative:		negative.lowered(in: &context)
+					affirmative:	try affirmative.lowered(in: &context),
+					negative:		try negative.lowered(in: &context)
 				)
 				
 				case .return(result: let result):

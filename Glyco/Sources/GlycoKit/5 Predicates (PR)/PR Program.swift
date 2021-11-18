@@ -8,12 +8,12 @@ public enum PR : Language {
 		
 		/// The program's blocks.
 		///
-		/// Exactly one block must be labelled with `.entry`.
+		/// Exactly one block must be labelled with `.programEntry`.
 		public var blocks: [Block]
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			.init(blocks: blocks.lowered())
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
+			.init(blocks: try blocks.lowered())
 		}
 		
 	}

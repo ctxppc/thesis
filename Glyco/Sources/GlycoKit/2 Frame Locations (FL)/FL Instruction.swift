@@ -38,38 +38,38 @@ extension FL {
 		static var nop: Self { .zero <- Register.zero + .zero }
 		
 		// See protocol.
-		func lowered(in context: inout Frame) -> [Lower.Instruction] {
+		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
 			switch self {
 				
 				case .copy(let type, destination: let destination, source: let source):
-				return [.copy(type, destination: destination.lowered(), source: source.lowered())]
+				return try [.copy(type, destination: destination.lowered(), source: source.lowered())]
 				
 				case .compute(destination: let destination, value: .registerRegister(rs1: let rs1, operation: let operation, rs2: let rs2)):
-				return [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
+				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
 				case .compute(destination: let destination, value: .registerImmediate(rs1: let rs1, operation: let operation, imm: let imm)):
-				return [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
+				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
 				case .load(.word, destination: let destination, source: let source):
 				return [
 					.offsetCapability(destination: .t0, source: .fp, offset: source.offset),
-					.loadWord(destination: destination.lowered(), address: .t0)
+					.loadWord(destination: try destination.lowered(), address: .t0)
 				]
 				
 				case .load(.capability, destination: let destination, source: let source):
-				return [.loadCapability(destination: destination.lowered(), address: .fp, offset: source.offset)]
+				return [.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)]
 				
 				case .store(.word, destination: let destination, source: let source):
 				return [
 					.offsetCapability(destination: .t0, source: .fp, offset: destination.offset),
-					.storeWord(source: source.lowered(), address: .t0)
+					.storeWord(source: try source.lowered(), address: .t0)
 				]
 				
 				case .store(.capability, destination: let destination, source: let source):
-				return [.storeCapability(source: source.lowered(), address: .fp, offset: destination.offset)]
+				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
 				
 				case .branch(target: let target, rs1: let rs1, relation: let relation, rs2: let rs2):
-				return [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
+				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
 				
 				case .jump(target: let target):
 				return [.jump(target: target)]
@@ -81,7 +81,7 @@ extension FL {
 				return [.return]
 				
 				case .labelled(let label, let instruction):
-				guard let (first, tail) = instruction.lowered(in: &context).splittingFirst() else { return [] /* should never happen — famous last words */ }
+				guard let (first, tail) = try instruction.lowered(in: &context).splittingFirst() else { return [] /* should never happen — famous last words */ }
 				return [.labelled(label, first)].appending(contentsOf: tail)
 				
 			}
