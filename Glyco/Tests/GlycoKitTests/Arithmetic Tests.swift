@@ -10,11 +10,12 @@ final class ArithmeticTests : XCTestCase {
 		let location = AL.Location(rawValue: 0)
 		
 		let program = AL.Program(
-			effect: .sequence(effects: [
-				location <- .immediate(1),
-				.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
-				.return(result: .location(location))
-			])
+			effect:		.sequence(effects: [
+							location <- .immediate(1),
+							.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
+							.return(result: .location(location))
+						]),
+			procedures: []
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
@@ -69,15 +70,16 @@ final class ArithmeticTests : XCTestCase {
 		let isEven = AL.Location(rawValue: 0)
 		
 		let program = AL.Program(
-			effect: .sequence(effects: [
-				.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
-				.conditional(
-					predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
-					affirmative:	isEven <- .immediate(1),
-					negative:		isEven <- .immediate(0)
-				),
-				.return(result: .location(isEven))
-			])
+			effect:		.sequence(effects: [
+							.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
+							.conditional(
+								predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
+								affirmative:	isEven <- .immediate(1),
+								negative:		isEven <- .immediate(0)
+							),
+							.return(result: .location(isEven))
+						]),
+			procedures:	[]
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)

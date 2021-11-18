@@ -14,6 +14,9 @@ extension EX {
 		/// A statement that performs `affirmative` if `predicate` holds, or `negative` otherwise.
 		indirect case conditional(predicate: Predicate, affirmative: Statement, negative: Statement)
 		
+		/// A statement that invokes the procedure named `procedure`.
+		case invoke(procedure: Label)
+		
 		/// A statement that terminates the program with `result`.
 		case `return`(result: Expression)
 		
@@ -33,6 +36,9 @@ extension EX {
 					affirmative:	try affirmative.lowered(in: &context),
 					negative:		try negative.lowered(in: &context)
 				)
+				
+				case .invoke(procedure: let procedure):
+				return .invoke(procedure: procedure)
 				
 				case .return(result: let result):
 				let resultLocation = context.allocateLocation()

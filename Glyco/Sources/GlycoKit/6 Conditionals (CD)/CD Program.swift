@@ -1,5 +1,7 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+import Foundation
+
 /// A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
 public enum CD : Language {
 	
@@ -9,14 +11,28 @@ public enum CD : Language {
 		/// The program's effect.
 		public var effect: Effect
 		
+		/// The program's procedures.
+		public var procedures: [Procedure]
+		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
+			guard effect.allExecutionPathsTerminate else { throw LoweringError.someExecutionPathsDoNotTerminate }
 			var context = Context()
-			return .init(
-				blocks: try effect
-					.optimised()
-					.lowered(in: &context, entryLabel: .programEntry, previousEffects: [], exitLabel: .programExit)
-			)
+			return .init(blocks: try (procedures + [.init(name: .programEntry, effect: effect)]).lowered(in: &context))
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating that some execution paths do not terminate.
+			case someExecutionPathsDoNotTerminate
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					case .someExecutionPathsDoNotTerminate:	return "Some execution paths do not terminate."
+				}
+			}
+			
 		}
 		
 	}

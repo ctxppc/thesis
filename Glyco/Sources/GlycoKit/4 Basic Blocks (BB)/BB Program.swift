@@ -6,6 +6,11 @@ public enum BB : Language {
 	/// A program on an BB machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given blocks
+		public init(blocks: [BB.Block]) {
+			self.blocks = blocks
+		}
+		
 		/// The program's blocks.
 		///
 		/// Exactly one block must be labelled with `.entry`.

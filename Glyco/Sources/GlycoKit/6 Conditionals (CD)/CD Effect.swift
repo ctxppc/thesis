@@ -20,6 +20,11 @@ extension CD {
 		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise.
 		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect)
 		
+		/// An effect that invokes the procedure labelled `procedure`.
+		///
+		/// This effect assumes the calling convention is respected by the rest of the program.
+		case invoke(procedure: Label)
+		
 		/// An effect that terminates the program with `result`.
 		case `return`(result: Source)
 		
@@ -37,6 +42,10 @@ extension CD {
 				
 				case .sequence(effects: let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
+				
+				case .invoke(procedure: let procedure):
+				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
+				return [.intermediate(label: entryLabel, effects: previousEffects, successor: procedure)]
 				
 				case .copy, .compute, .conditional, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
@@ -62,15 +71,42 @@ extension CD {
 			}
 		}
 		
+		/// A Boolean value indicating whether `self` always terminates the program or procedure.
+		///
+		/// - Returns: `true` if `self` always terminates the program or procedure; `false` otherwise.
+		var allExecutionPathsTerminate: Bool {
+			switch self {
+				
+				case .sequence(effects: let effects):
+				return effects
+						.reversed()	// optimisation: it's most likely at the end
+						.contains(where: \.allExecutionPathsTerminate)
+				
+				case .copy, .compute:	// TODO: Add .invoke to this case when it becomes applicable.
+				return false
+				
+				case .conditional(predicate: _, affirmative: let affirmative, negative: let negative):
+				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
+				
+				case .invoke, .return:	// TODO: Remove .invoke from this case when no longer applicable.
+				return true
+				
+			}
+		}
+		
 		enum LoweringError : LocalizedError {
 			
-			/// An error indicating that some execution paths contain an intermediate return effect
+			/// An error indicating that some execution paths contain an intermediate invocation effect.
+			case effectAfterInvocation
+			
+			/// An error indicating that some execution paths contain an intermediate return effect.
 			case effectAfterReturn
 			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
-					case .effectAfterReturn:	return "Some execution paths contain an intermediate return effect."
+					case .effectAfterInvocation:	return "Some execution paths contain an intermediate invocation effect."
+					case .effectAfterReturn:		return "Some execution paths contain an intermediate return effect."
 				}
 			}
 			
@@ -192,6 +228,10 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
+			
+			case .invoke(procedure: let procedure):
+			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
+			return [.intermediate(label: entryLabel, effects: previousEffects, successor: procedure)]
 			
 			case .return(result: let result):
 			guard rest.doesNothing else { throw CD.Effect.LoweringError.effectAfterReturn }

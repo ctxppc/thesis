@@ -6,18 +6,22 @@ public enum EX : Language {
 	/// A program on an EX machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given body.
-		public init(body: Statement) {
+		/// Creates a program with given body and procedures.
+		public init(body: Statement, procedures: [Procedure]) {
 			self.body = body
+			self.procedures = procedures
 		}
 		
 		/// The program's body.
 		public var body: Statement
 		
+		/// The program's procedures.
+		public var procedures: [Procedure]
+		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
-			return .init(effect: try body.lowered(in: &context))
+			return try .init(effect: body.lowered(in: &context), procedures: procedures.lowered(in: &context))
 		}
 		
 	}

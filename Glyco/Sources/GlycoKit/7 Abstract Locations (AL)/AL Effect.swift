@@ -19,19 +19,24 @@ extension AL {
 		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise.
 		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect)
 		
+		/// An effect that invokes the procedure labelled `procedure`.
+		///
+		/// This effect assumes the calling convention is respected by the rest of the program.
+		case invoke(procedure: Label)
+		
 		/// An effect that terminates the program with `result`.
 		case `return`(result: Source)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
-
+				
 				case .sequence(effects: let effects):
 				return .sequence(effects: try effects.lowered(in: &context))
-
+				
 				case .copy(destination: let destination, source: let source):
 				return .copy(destination: destination.lowered(in: &context), source: source.lowered(in: &context))
-
+				
 				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
 				return .compute(
 					destination:	destination.lowered(in: &context),
@@ -39,17 +44,20 @@ extension AL {
 					operation:		operation,
 					rhs:			rhs.lowered(in: &context)
 				)
-
+				
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
 				return .conditional(
 					predicate:		predicate.lowered(in: &context),
 					affirmative:	try affirmative.lowered(in: &context),
 					negative:		try negative.lowered(in: &context)
 				)
-
+				
+				case .invoke(procedure: let procedure):
+				return .invoke(procedure: procedure)
+				
 				case .return(result: let result):
 				return .return(result: result.lowered(in: &context))
-
+				
 			}
 		}
 		
@@ -102,7 +110,7 @@ extension AL {
 				case .return(result: .location(let source)):
 				livenessAtEntry[source] = .possiblyUsedLater
 				
-				case .return(result: .immediate):
+				case .return(result: .immediate), .invoke:	// TODO: Handle .invoke in a different case when normal calls are supported.
 				break
 				
 			}

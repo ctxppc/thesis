@@ -6,19 +6,23 @@ public enum AL : Language {
 	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given effect.
-		public init(effect: Effect) {
+		/// Creates a program with given effect and procedures.
+		public init(effect: Effect, procedures: [Procedure]) {
 			self.effect = effect
+			self.procedures = procedures
 		}
 		
 		/// The program's effect.
 		public var effect: Effect
 		
+		/// The program's procedures.
+		public var procedures: [Procedure]
+		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
 			var context = Context(assignments: .init(conflicts: conflicts))
-			return .init(effect: effect.lowered(in: &context))
+			return try .init(effect: effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		
 	}
