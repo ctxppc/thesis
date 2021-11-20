@@ -113,6 +113,8 @@ extension CD {
 		}
 		
 		/// Returns a copy of `self` that may be more optimised.
+		///
+		/// This method is more effective on flattened effects.
 		func optimised() -> Self {
 			switch self {
 				
@@ -139,6 +141,28 @@ extension CD {
 				
 			}
 		}
+		
+		/// Flattens nested sequence in `self`.
+		func flattened() -> Self {
+			switch self {
+				
+				case .sequence(effects: let effects):
+				return .sequence(effects: effects.flatMap { subeffect -> [Effect] in
+					switch subeffect.flattened() {
+						case .sequence(let nested):	return nested
+						case let flattened:			return [flattened]
+					}
+				})
+				
+				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+				return .conditional(predicate: predicate, affirmative: affirmative.flattened(), negative: negative.flattened())
+				
+				default:
+				return self
+				
+			}
+		}
+		
 	}
 	
 }
