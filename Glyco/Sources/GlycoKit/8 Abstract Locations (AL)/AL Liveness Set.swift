@@ -11,24 +11,14 @@ extension AL {
 		/// The locations whose values are possibly used by a successor.
 		private(set) var possiblyAliveLocations: Set<Location> = []
 		
-		subscript (location: Location) -> Usage {
-			get { possiblyAliveLocations.contains(location) ? .possiblyUsedLater : .definitelyDiscarded }
-			set {
-				switch newValue {
-					case .possiblyUsedLater:	possiblyAliveLocations.insert(location)
-					case .definitelyDiscarded:	possiblyAliveLocations.remove(location)
-				}
-			}
+		/// Marks `locations` as being possibly used by a successor.
+		mutating func markAsPossiblyUsedLater<Locations : Sequence>(_ locations: Locations) where Locations.Element == Location {
+			possiblyAliveLocations.formUnion(locations)
 		}
 		
-		enum Usage {
-			
-			/// The value is possibly used later.
-			case possiblyUsedLater
-			
-			/// The value is definitely discarded.
-			case definitelyDiscarded
-			
+		/// Marks `locations` as being definitely discarded by a successor.
+		mutating func markAsDefinitelyDiscarded<Locations : Sequence>(_ locations: Locations) where Locations.Element == Location {
+			possiblyAliveLocations.subtract(locations)
 		}
 		
 		/// Marks the possibly alive locations in `other` as possibly alive in `self`.

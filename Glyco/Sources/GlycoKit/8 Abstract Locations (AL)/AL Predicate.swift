@@ -54,11 +54,15 @@ extension AL {
 		func usedLocations() -> Set<Location> {
 			switch self {
 				
-				case .constant:
+				case .constant, .relation(lhs: .immediate, relation: _, rhs: .immediate):
 				return []
 				
-				case .relation(lhs: let lhs, relation: _, rhs: let rhs):
-				return lhs.usedLocations().union(rhs.usedLocations())
+				case .relation(lhs: .immediate, relation: _, rhs: .location(let location)),
+						.relation(lhs: .location(let location), relation: _, rhs: .immediate):
+				return [location]
+				
+				case .relation(lhs: .location(let lhs), relation: _, rhs: .location(let rhs)):
+				return [lhs, rhs]
 				
 				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
 				return condition.usedLocations().union(affirmative.usedLocations()).union(negative.usedLocations())

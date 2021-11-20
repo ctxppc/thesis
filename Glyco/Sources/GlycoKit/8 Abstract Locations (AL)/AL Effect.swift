@@ -63,9 +63,18 @@ extension AL {
 		///
 		/// - Parameter livenessAtExit: The liveness set right after executing `self`.
 		/// - Parameter conflictsAtExit: The conflict graph right after executing `self`.
-		func livenessAndConflictsAtEntry(livenessAtExit: LivenessSet, conflictsAtExit: ConflictGraph) -> (LivenessSet, ConflictGraph) {	// TODO: Rewrite this
+		func livenessAndConflictsAtEntry(livenessAtExit: LivenessSet, conflictsAtExit: ConflictGraph) -> (LivenessSet, ConflictGraph) {
+			
 			var livenessAtEntry = livenessAtExit
+			let definedLocations = definedLocations()
+			livenessAtEntry.markAsDefinitelyDiscarded(definedLocations)			// with this ordering,
+			livenessAtEntry.markAsPossiblyUsedLater(possiblyUsedLocations())	// copy to self or compute in-place becomes possibly-used-later
+			
 			var conflictsAtEntry = conflictsAtExit
+			for definedLocation in definedLocations {
+				conflictsAtEntry.insertConflict(definedLocation, livenessAtExit.possiblyAliveLocations)
+			}
+			
 			switch self {
 				
 				case .sequence(effects: let effects):
@@ -73,53 +82,69 @@ extension AL {
 					$1.livenessAndConflictsAtEntry(livenessAtExit: $0.0, conflictsAtExit: $0.1)
 				}
 				
-				case .copy(destination: let destination, source: .location(let source)):
-				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				livenessAtEntry[source] = .possiblyUsedLater		// source value is used if (it turns out that) the destination value is also used
-				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				case .copy, .compute, .invoke, .return:
+				break	// already dealt with defined & used locations above
 				
-				case .copy(destination: let destination, source: .immediate):
-				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
-				
-				case .compute(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs):
-				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				if case .location(let lhs) = lhs {
-					livenessAtEntry[lhs] = .possiblyUsedLater		// lhs value is used if (it turns out that) the destination value is also used
-				}
-				if case .location(let rhs) = rhs {
-					livenessAtEntry[rhs] = .possiblyUsedLater		// rhs value is used if (it turns out that) the destination value is also used
-				}
-				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
-				
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+				case .conditional(predicate: _ /* already dealt with */, affirmative: let affirmative, negative: let negative):
 				let (livenessAtAffirmativeEntry, conflictsAtAffirmativeEntry) =
 					affirmative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
 				let (livenessAtNegativeEntry, conflictsAtNegativeEntry) =
 					negative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
-				for location in predicate.usedLocations() {
-					livenessAtEntry[location] = .possiblyUsedLater
-				}
 				livenessAtEntry.formUnion(with: livenessAtAffirmativeEntry)
 				livenessAtEntry.formUnion(with: livenessAtNegativeEntry)
 				conflictsAtEntry.formUnion(with: conflictsAtAffirmativeEntry)
 				conflictsAtEntry.formUnion(with: conflictsAtNegativeEntry)
 				
-				case .invoke(procedure: _, arguments: let arguments):
-				for argument in arguments {
-					guard case .location(let location) = argument else { continue }
-					livenessAtEntry[location] = .possiblyUsedLater
-					conflictsAtEntry.insertConflict(location, livenessAtExit.possiblyAliveLocations)
-				}
+			}
+			
+			return (livenessAtEntry, conflictsAtEntry)
+			
+		}
+		
+		/// Returns the locations defined by `self`.
+		private func definedLocations() -> Set<Location> {
+			switch self {
 				
-				case .return(result: .location(let source)):
-				livenessAtEntry[source] = .possiblyUsedLater
+				case .sequence, .conditional, .invoke, .return:
+				return []
 				
-				case .return(result: .immediate):
-				break
+				case .copy(destination: let destination, source: _), .compute(destination: let destination, lhs: _, operation: _, rhs: _):
+				return [destination]
 				
 			}
-			return (livenessAtEntry, conflictsAtEntry)
+		}
+		
+		/// Returns the locations possibly used by `self`.
+		private func possiblyUsedLocations() -> Set<Location> {
+			switch self {
+				
+				case .sequence,
+						.copy(destination: _, source: .immediate),
+						.compute(destination: _, lhs: .immediate, operation: _, rhs: .immediate),
+						.return(result: .immediate):
+				return []
+				
+				case .copy(destination: _, source: .location(let source)),
+						.compute(destination: _, lhs: .immediate, operation: _, rhs: .location(let source)),
+						.compute(destination: _, lhs: .location(let source), operation: _, rhs: .immediate),
+						.return(result: .location(let source)):
+				return [source]
+				
+				case .compute(destination: _, lhs: .location(let lhs), operation: _, rhs: .location(let rhs)):
+				return [lhs, rhs]
+				
+				case .conditional(predicate: let predicate, affirmative: _, negative: _):
+				return predicate.usedLocations()
+				
+				case .invoke(procedure: _, arguments: let arguments):
+				return .init(arguments.compactMap { argument in
+					switch argument {
+						case .immediate:				return nil
+						case .location(let location):	return location
+					}
+				})
+				
+			}
 		}
 		
 	}

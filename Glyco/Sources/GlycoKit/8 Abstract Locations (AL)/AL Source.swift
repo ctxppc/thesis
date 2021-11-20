@@ -5,25 +5,17 @@ extension AL {
 	/// A datum source.
 	public enum Source : Codable, Equatable, SimplyLowerable {
 		
-		/// The operand is to be retrieved from a given location.
-		case location(Location)
-		
 		/// The operand is a given value.
 		case immediate(Int)
+		
+		/// The operand is to be retrieved from a given location.
+		case location(Location)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
-				case .location(let location):	return .location(location.lowered(in: &context))
 				case .immediate(let imm):		return .immediate(imm)
-			}
-		}
-		
-		/// Returns the locations that are used by the source.
-		func usedLocations() -> Set<Location> {
-			switch self {
-				case .location(let location):	return [location]
-				case .immediate:				return []
+				case .location(let location):	return .location(location.lowered(in: &context))
 			}
 		}
 		

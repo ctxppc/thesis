@@ -30,7 +30,7 @@ extension CD {
 			}
 		}
 		
-		/// Returns a copy of `self` that may more optimised.
+		/// Returns a copy of `self` that may be more optimised.
 		func optimised() -> Self {
 			switch self {
 				
