@@ -2,16 +2,16 @@
 
 extension AL {
 	
-	/// A partition of locations into either possibly alive or definitely dead between the execution of an effect and its successor.
+	/// A partition of abstract locations into either possibly alive or definitely dead between the execution of an effect and its successor.
 	struct LivenessSet : Codable {
 		
 		/// A liveness set where every location's value is definitely not used by a successor.
 		static let nothingUsed = Self()
 		
 		/// The locations whose values are possibly used by a successor.
-		private(set) var possiblyAliveLocations: Set<Location> = []
+		private(set) var possiblyAliveLocations: Set<AbstractLocation> = []
 		
-		subscript (location: Location) -> Usage {
+		subscript (location: AbstractLocation) -> Usage {
 			get { possiblyAliveLocations.contains(location) ? .possiblyUsedLater : .definitelyDiscarded }
 			set {
 				switch newValue {

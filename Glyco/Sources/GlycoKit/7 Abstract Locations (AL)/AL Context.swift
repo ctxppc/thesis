@@ -6,7 +6,7 @@ extension AL {
 	struct Context {
 		
 		/// The assignment of abstract locations to physical locations.
-		var assignments: Location.Assignments
+		var assignments: AbstractLocation.Assignments
 		
 	}
 	

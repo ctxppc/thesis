@@ -18,7 +18,7 @@ extension FL {
 		}
 		
 		/// A location to a datum on a frame.
-		public struct Location : Codable, Equatable {
+		public struct Location : Codable, Hashable {
 			
 			/// Creates a location with given offset (in bytes) from the frame pointer.
 			fileprivate init(offset: Int) {

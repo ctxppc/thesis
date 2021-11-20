@@ -20,4 +20,9 @@ public enum FL : Language {
 	// See protocol.
 	public typealias Lower = RV
 	
+	public typealias BinaryOperator = Lower.BinaryOperator
+	public typealias BranchRelation = Lower.BranchRelation
+	public typealias DataType = Lower.DataType
+	public typealias Label = Lower.Label
+	
 }

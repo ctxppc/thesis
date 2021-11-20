@@ -12,9 +12,6 @@ extension FL {
 		
 	}
 	
-	/// An operation between two operands.
-	public typealias BinaryOperator = Lower.BinaryOperator
-	
 }
 
 public func + (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {

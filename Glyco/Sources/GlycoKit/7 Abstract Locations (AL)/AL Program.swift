@@ -30,6 +30,8 @@ public enum AL : Language {
 	// See protocol.
 	public typealias Lower = CD
 	
+	public typealias DataType = Lower.DataType
+	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	
 }

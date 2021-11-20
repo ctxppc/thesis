@@ -89,10 +89,6 @@ extension FL {
 		
 	}
 	
-	public typealias DataType = Lower.DataType
-	public typealias Label = Lower.Label
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }
 
 public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Instruction {

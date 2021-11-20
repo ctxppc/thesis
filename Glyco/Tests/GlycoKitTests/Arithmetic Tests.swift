@@ -7,7 +7,7 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testSimpleSum() throws {
 		
-		let location = AL.Location(rawValue: 0)
+		let location = AL.Location.abstract(.init(rawValue: 0))
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [
@@ -66,8 +66,8 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testEqualsOne() throws {
 		
-		let testedNumber = AL.Location(rawValue: 0)
-		let isEven = AL.Location(rawValue: 0)
+		let testedNumber = AL.Location.abstract(.init(rawValue: 0))
+		let isEven = AL.Location.abstract(.init(rawValue: 1))
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [
@@ -118,11 +118,11 @@ final class ArithmeticTests : XCTestCase {
 						addi t2, zero, 1
 						beq s1, t2, BB0
 						j BB1
-		BB0:			addi s1, zero, 1
+		BB0:			addi s2, zero, 1
 						j BB2
-		BB1:			addi s1, zero, 0
+		BB1:			addi s2, zero, 0
 						j BB2
-		BB2:			mv a0, s1
+		BB2:			mv a0, s2
 						ret
 						
 						.align 6

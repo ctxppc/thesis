@@ -116,10 +116,4 @@ extension FO {
 	
 	}
 	
-	/// An integral operation.
-	public typealias BinaryOperator = Lower.BinaryOperator
-	
-	public typealias Label = Lower.Label
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }

@@ -76,23 +76,32 @@ extension AL {
 				}
 				
 				case .copy(destination: let destination, source: .location(let source)):
+				if case .abstract(let destination) = destination {
+					livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+					conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				}
+				if case .abstract(let source) = source {
+					livenessAtEntry[source] = .possiblyUsedLater		// source value is used if (it turns out that) the destination value is also used
+				}
+				
+				case .copy(destination: .abstract(let destination), source: .immediate):
 				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				livenessAtEntry[source] = .possiblyUsedLater		// source value is used if (it turns out that) the destination value is also used
 				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
 				
-				case .copy(destination: let destination, source: .immediate):
-				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				case .copy(destination: _, source: _):
+				break
 				
 				case .compute(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs):
-				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-				if case .location(let lhs) = lhs {
-					livenessAtEntry[lhs] = .possiblyUsedLater		// lhs value is used if (it turns out that) the destination value is also used
+				if case .abstract(let destination) = destination {
+					livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+					conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
 				}
-				if case .location(let rhs) = rhs {
-					livenessAtEntry[rhs] = .possiblyUsedLater		// rhs value is used if (it turns out that) the destination value is also used
+				if case .location(.abstract(let lhs)) = lhs {
+					livenessAtEntry[lhs] = .possiblyUsedLater			// lhs value is used if (it turns out that) the destination value is also used
 				}
-				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				if case .location(.abstract(let rhs)) = rhs {
+					livenessAtEntry[rhs] = .possiblyUsedLater			// rhs value is used if (it turns out that) the destination value is also used
+				}
 				
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
 				let (livenessAtAffirmativeEntry, conflictsAtAffirmativeEntry) =
@@ -100,6 +109,7 @@ extension AL {
 				let (livenessAtNegativeEntry, conflictsAtNegativeEntry) =
 					negative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
 				for location in predicate.usedLocations() {
+					guard case .abstract(let location) = location else { continue }
 					livenessAtEntry[location] = .possiblyUsedLater
 				}
 				livenessAtEntry.formUnion(with: livenessAtAffirmativeEntry)
@@ -107,10 +117,10 @@ extension AL {
 				conflictsAtEntry.formUnion(with: conflictsAtAffirmativeEntry)
 				conflictsAtEntry.formUnion(with: conflictsAtNegativeEntry)
 				
-				case .return(result: .location(let source)):
+				case .return(result: .location(.abstract(let source))):
 				livenessAtEntry[source] = .possiblyUsedLater
 				
-				case .return(result: .immediate), .invoke:	// TODO: Handle .invoke in a different case when normal calls are supported.
+				case .return(result: .immediate), .return(result: .location), .invoke:	// TODO: Handle .invoke in a different case when normal calls are supported.
 				break
 				
 			}

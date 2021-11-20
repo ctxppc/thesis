@@ -48,7 +48,4 @@ extension BB {
 		
 	}
 	
-	public typealias Label = Lower.Label
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }
