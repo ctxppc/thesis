@@ -1,9 +1,9 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-/// A language that introduces procedures.
-public enum PC : Language {
+/// A language that introduces procedure parameters using the PA calling convention.
+public enum PA : Language {
 	
-	/// A program on an PC machine.
+	/// A program on a PA machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given body and procedures.
@@ -19,8 +19,9 @@ public enum PC : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Lower.Program {
-			TODO.unimplemented
+		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
+			var context = Context(procedures: procedures)
+			return try .init(body: body.lowered(in: &context), procedures: procedures.lowered(in: &context))
 		}
 		
 	}
@@ -28,9 +29,10 @@ public enum PC : Language {
 	// See protocol.
 	public typealias Lower = EX
 	
+	public typealias DataType = Lower.DataType
+	public typealias Expression = Lower.Expression
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Predicate = Lower.Predicate
-	public typealias Statement = Lower.Statement
 	
 }
