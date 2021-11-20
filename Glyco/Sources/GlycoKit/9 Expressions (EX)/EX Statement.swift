@@ -14,8 +14,8 @@ extension EX {
 		/// A statement that performs `affirmative` if `predicate` holds, or `negative` otherwise.
 		indirect case conditional(predicate: Predicate, affirmative: Statement, negative: Statement)
 		
-		/// A statement that invokes the procedure named `procedure`.
-		case invoke(procedure: Label)
+		/// A statement that invokes the procedure named `procedure` passing `arguments` as arguments to it.
+		case invoke(procedure: Label, arguments: [Expression])
 		
 		/// A statement that terminates the program with `result`.
 		case `return`(result: Expression)
@@ -37,8 +37,32 @@ extension EX {
 					negative:		try negative.lowered(in: &context)
 				)
 				
-				case .invoke(procedure: let procedure):
-				return .invoke(procedure: procedure)
+				case .invoke(procedure: let procedure, arguments: let arguments):
+				var loweredArguments = [Lower.Source]()
+				var copyEffects = [Lower.Effect]()
+				for argument in arguments {
+					switch argument {
+						
+						case .constant(value: let value):
+						loweredArguments.append(.immediate(value))
+						
+						case .location(location: let location):
+						loweredArguments.append(.location(location))
+						
+						default:
+						let temporary = context.allocateLocation()
+						loweredArguments.append(.location(temporary))
+						copyEffects.append(argument.lowered(destination: temporary, context: &context))
+						
+					}
+				}
+				return .sequence(effects: copyEffects + [.invoke(procedure: procedure, arguments: loweredArguments)])
+				
+				case .return(result: .constant(value: let value)):
+				return .return(result: .immediate(value))
+				
+				case .return(result: .location(location: let location)):
+				return .return(result: .location(location))
 				
 				case .return(result: let result):
 				let resultLocation = context.allocateLocation()

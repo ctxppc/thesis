@@ -241,3 +241,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 	}
 	
 }
+
+public func <- (destination: CD.Location, source: CD.Source) -> CD.Effect {
+	.copy(destination: destination, source: source)
+}

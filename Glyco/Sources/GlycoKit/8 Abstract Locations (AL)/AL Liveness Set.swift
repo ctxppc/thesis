@@ -9,9 +9,9 @@ extension AL {
 		static let nothingUsed = Self()
 		
 		/// The locations whose values are possibly used by a successor.
-		private(set) var possiblyAliveLocations: Set<AbstractLocation> = []
+		private(set) var possiblyAliveLocations: Set<Location> = []
 		
-		subscript (location: AbstractLocation) -> Usage {
+		subscript (location: Location) -> Usage {
 			get { possiblyAliveLocations.contains(location) ? .possiblyUsedLater : .definitelyDiscarded }
 			set {
 				switch newValue {

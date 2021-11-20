@@ -4,8 +4,8 @@ import DepthKit
 
 extension AL {
 	
-	/// A location that is to be assigned a physical location.
-	public struct AbstractLocation : Codable, Hashable, RawRepresentable {
+	/// An abstract storage location on an AL machine.
+	public struct Location : Codable, Hashable, RawRepresentable, SimplyLowerable {
 		
 		/// Creates a location.
 		public init(rawValue: Int) {
@@ -15,7 +15,12 @@ extension AL {
 		// See protocol.
 		public let rawValue: Int
 		
-		/// A value that assigns abstract locations to physical locations.
+		// See protocol.
+		func lowered(in context: inout Context) -> Lower.Location {
+			context.assignments[self]
+		}
+		
+		/// A value that assigns locations to homes.
 		struct Assignments {
 			
 			/// Determines an assignment using given conflict graph.
@@ -27,7 +32,7 @@ extension AL {
 			}
 			
 			/// Returns `location`'s assigned physical location.
-			subscript (location: AbstractLocation) -> Lower.Location {
+			subscript (location: Location) -> Lower.Location {
 				mutating get {
 					guard let home = homesByLocation[location] else { return addAssignment(for: location) }
 					return home
@@ -38,17 +43,17 @@ extension AL {
 			private let conflicts: ConflictGraph
 			
 			/// A mapping from abstract locations to physical locations.
-			private var homesByLocation = [AbstractLocation : Lower.Location]()
+			private var homesByLocation = [Location : Lower.Location]()
 			
 			/// A mapping from registers to locations assigned to that register.
-			private var locationsByRegister = [Lower.Register : Set<AbstractLocation>]()
+			private var locationsByRegister = [Lower.Register : Set<Location>]()
 			
 			/// The frame on which spilled data are stored.
 			private var frame = Lower.Frame()
 			
 			/// Adds an assignment for `location` and returns the assigned physical location.
 			@discardableResult
-			private mutating func addAssignment(for location: AbstractLocation) -> Lower.Location {
+			private mutating func addAssignment(for location: Location) -> Lower.Location {
 				let home: Lower.Location
 				if let register = assignableRegister(for: location) {
 					home = .register(register)
@@ -61,7 +66,7 @@ extension AL {
 			}
 			
 			/// Returns a register that `location` can be assigned, or `nil` if no register is available.
-			private func assignableRegister(for location: AbstractLocation) -> Lower.Register? {
+			private func assignableRegister(for location: Location) -> Lower.Register? {
 				Lower.Register.assignableRegisters.first { register in
 					guard let assignedLocations = locationsByRegister[register] else { return true }
 					return !conflicts.containsConflict(location, assignedLocations)
@@ -74,7 +79,7 @@ extension AL {
 	
 }
 
-extension AL.AbstractLocation : CustomStringConvertible {
+extension AL.Location : CustomStringConvertible {
 	public var description: String {
 		"aloc\(rawValue)"
 	}

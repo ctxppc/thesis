@@ -7,7 +7,7 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testSimpleSum() throws {
 		
-		let location = AL.Location.abstract(.init(rawValue: 0))
+		let location = AL.Location(rawValue: 0)
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [
@@ -20,6 +20,7 @@ final class ArithmeticTests : XCTestCase {
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -66,8 +67,8 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testEqualsOne() throws {
 		
-		let testedNumber = AL.Location.abstract(.init(rawValue: 0))
-		let isEven = AL.Location.abstract(.init(rawValue: 1))
+		let testedNumber = AL.Location(rawValue: 0)
+		let isEven = AL.Location(rawValue: 1)
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [
@@ -84,6 +85,7 @@ final class ArithmeticTests : XCTestCase {
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)

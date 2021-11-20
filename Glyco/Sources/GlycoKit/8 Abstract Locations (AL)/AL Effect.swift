@@ -19,10 +19,8 @@ extension AL {
 		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise.
 		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect)
 		
-		/// An effect that invokes the procedure labelled `procedure`.
-		///
-		/// This effect assumes the calling convention is respected by the rest of the program.
-		case invoke(procedure: Label)
+		/// An effect that invokes the procedure labelled `procedure` passing `arguments` as the invocation's arguments.
+		case invoke(procedure: Label, arguments: [Source])
 		
 		/// An effect that terminates the program with `result`.
 		case `return`(result: Source)
@@ -35,10 +33,10 @@ extension AL {
 				return .sequence(effects: try effects.lowered(in: &context))
 				
 				case .copy(destination: let destination, source: let source):
-				return .copy(destination: destination.lowered(in: &context), source: source.lowered(in: &context))
+				return .copy(destination: destination.lowered(in: &context), source: try source.lowered(in: &context))
 				
 				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
-				return .compute(
+				return try .compute(
 					destination:	destination.lowered(in: &context),
 					lhs:			lhs.lowered(in: &context),
 					operation:		operation,
@@ -46,17 +44,17 @@ extension AL {
 				)
 				
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
-				return .conditional(
+				return try .conditional(
 					predicate:		predicate.lowered(in: &context),
-					affirmative:	try affirmative.lowered(in: &context),
-					negative:		try negative.lowered(in: &context)
+					affirmative:	affirmative.lowered(in: &context),
+					negative:		negative.lowered(in: &context)
 				)
 				
-				case .invoke(procedure: let procedure):
-				return .invoke(procedure: procedure)
+				case .invoke(procedure: let procedure, arguments: let arguments):
+				return .invoke(procedure: procedure, arguments: try arguments.lowered(in: &context))
 				
 				case .return(result: let result):
-				return .return(result: result.lowered(in: &context))
+				return .return(result: try result.lowered(in: &context))
 				
 			}
 		}
@@ -65,7 +63,7 @@ extension AL {
 		///
 		/// - Parameter livenessAtExit: The liveness set right after executing `self`.
 		/// - Parameter conflictsAtExit: The conflict graph right after executing `self`.
-		func livenessAndConflictsAtEntry(livenessAtExit: LivenessSet, conflictsAtExit: ConflictGraph) -> (LivenessSet, ConflictGraph) {
+		func livenessAndConflictsAtEntry(livenessAtExit: LivenessSet, conflictsAtExit: ConflictGraph) -> (LivenessSet, ConflictGraph) {	// TODO: Rewrite this
 			var livenessAtEntry = livenessAtExit
 			var conflictsAtEntry = conflictsAtExit
 			switch self {
@@ -76,32 +74,23 @@ extension AL {
 				}
 				
 				case .copy(destination: let destination, source: .location(let source)):
-				if case .abstract(let destination) = destination {
-					livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-					conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
-				}
-				if case .abstract(let source) = source {
-					livenessAtEntry[source] = .possiblyUsedLater		// source value is used if (it turns out that) the destination value is also used
-				}
+				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+				livenessAtEntry[source] = .possiblyUsedLater		// source value is used if (it turns out that) the destination value is also used
+				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
 				
-				case .copy(destination: .abstract(let destination), source: .immediate):
+				case .copy(destination: let destination, source: .immediate):
 				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
 				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
 				
-				case .copy(destination: _, source: _):
-				break
-				
 				case .compute(destination: let destination, lhs: let lhs, operation: _, rhs: let rhs):
-				if case .abstract(let destination) = destination {
-					livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
-					conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
+				livenessAtEntry[destination] = .definitelyDiscarded	// value from predecessors is being overwritten and thus cannot possibly be used by successors
+				if case .location(let lhs) = lhs {
+					livenessAtEntry[lhs] = .possiblyUsedLater		// lhs value is used if (it turns out that) the destination value is also used
 				}
-				if case .location(.abstract(let lhs)) = lhs {
-					livenessAtEntry[lhs] = .possiblyUsedLater			// lhs value is used if (it turns out that) the destination value is also used
+				if case .location(let rhs) = rhs {
+					livenessAtEntry[rhs] = .possiblyUsedLater		// rhs value is used if (it turns out that) the destination value is also used
 				}
-				if case .location(.abstract(let rhs)) = rhs {
-					livenessAtEntry[rhs] = .possiblyUsedLater			// rhs value is used if (it turns out that) the destination value is also used
-				}
+				conflictsAtEntry.insertConflict(destination, livenessAtExit.possiblyAliveLocations)
 				
 				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
 				let (livenessAtAffirmativeEntry, conflictsAtAffirmativeEntry) =
@@ -109,7 +98,6 @@ extension AL {
 				let (livenessAtNegativeEntry, conflictsAtNegativeEntry) =
 					negative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
 				for location in predicate.usedLocations() {
-					guard case .abstract(let location) = location else { continue }
 					livenessAtEntry[location] = .possiblyUsedLater
 				}
 				livenessAtEntry.formUnion(with: livenessAtAffirmativeEntry)
@@ -117,10 +105,17 @@ extension AL {
 				conflictsAtEntry.formUnion(with: conflictsAtAffirmativeEntry)
 				conflictsAtEntry.formUnion(with: conflictsAtNegativeEntry)
 				
-				case .return(result: .location(.abstract(let source))):
+				case .invoke(procedure: _, arguments: let arguments):
+				for argument in arguments {
+					guard case .location(let location) = argument else { continue }
+					livenessAtEntry[location] = .possiblyUsedLater
+					conflictsAtEntry.insertConflict(location, livenessAtExit.possiblyAliveLocations)
+				}
+				
+				case .return(result: .location(let source)):
 				livenessAtEntry[source] = .possiblyUsedLater
 				
-				case .return(result: .immediate), .return(result: .location), .invoke:	// TODO: Handle .invoke in a different case when normal calls are supported.
+				case .return(result: .immediate):
 				break
 				
 			}

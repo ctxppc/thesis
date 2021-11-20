@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// A datum source.
-	public enum Source : Codable, Equatable {
+	public enum Source : Codable, Equatable, SimplyLowerable {
 		
 		/// The operand is to be retrieved from a given location.
 		case location(Location)
@@ -12,7 +12,7 @@ extension AL {
 		case immediate(Int)
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Source {
+		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .location(let location):	return .location(location.lowered(in: &context))
 				case .immediate(let imm):		return .immediate(imm)

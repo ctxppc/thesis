@@ -1,12 +1,22 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+import Collections
+
 extension FO {
 	
 	/// A machine register.
 	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {
 		
-		/// All registers that can be freely used for storing values.
-		static let assignableRegisters = allCases.filter(\.assignable)
+		/// Registers that can be used for storing values.
+		///
+		/// The order is semantically insignificant but it's fixed to make assignment more deterministic.
+		static let assignableRegisters: OrderedSet = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6]
+		
+		/// Registers that can be used for passing arguments to procedures, in argument order.
+		static let argumentRegisters: OrderedSet = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
+		
+		/// Registers that can be used for passing results from procedures, in result value order.
+		static let resultRegisters: OrderedSet = [Self.a0, .a1]
 		
 		/// The always-zero register.
 		case zero
@@ -68,14 +78,6 @@ extension FO {
 				case .t4:	return .t4
 				case .t5:	return .t5
 				case .t6:	return .t6
-			}
-		}
-		
-		/// A Boolean value indicating whether `self` can be freely used for storing values.
-		var assignable: Bool {
-			switch self {
-				case .s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6:	return true
-				default:																		return false
 			}
 		}
 		

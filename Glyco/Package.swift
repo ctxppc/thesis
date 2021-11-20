@@ -20,16 +20,14 @@ let package = Package(
 		.executableTarget(name: "Glyco", dependencies: [
 			"GlycoKit",
 			.product(name: "ArgumentParser", package: "swift-argument-parser"),
-			.product(name: "Collections", package: "swift-collections"),
-			.product(name: "DepthKit", package: "DepthKit"),
 		]),
 		.target(name: "GlycoKit", dependencies: [
+			.product(name: "Collections", package: "swift-collections"),
 			.product(name: "DepthKit", package: "DepthKit"),
 			"Yams",
 		]),
 		.testTarget(name: "GlycoKitTests", dependencies: [
 			"GlycoKit",
-			.product(name: "DepthKit", package: "DepthKit"),
 		]),
 	]
 )

@@ -9,14 +9,15 @@ final class ProcedureTests : XCTestCase {
 		
 		let fortyTwo = EX.Label(rawValue: "fortytwo")
 		let source = EX.Program(
-			body:		.invoke(procedure: fortyTwo),
+			body:		.invoke(procedure: fortyTwo, arguments: []),
 			procedures:	[
-				.init(name: fortyTwo, body: .return(result: .constant(value: 42)))
+				.init(name: fortyTwo, body: .return(result: .constant(value: 42)), parameters: [])
 			]
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try source
+			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -49,8 +50,7 @@ final class ProcedureTests : XCTestCase {
 						li gp, 1
 						j _exit
 						
-		fortytwo:		addi s1, zero, 42
-						mv a0, s1
+		fortytwo:		addi a0, zero, 42
 						ret
 		main:			j fortytwo
 						

@@ -31,17 +31,17 @@ extension AL {
 		}
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Predicate {
+		func lowered(in context: inout Context) throws -> Lower.Predicate {
 			switch self {
 				
 				case .constant(let holds):
 				return .constant(holds)
 				
 				case .relation(lhs: let lhs, relation: let relation, rhs: let rhs):
-				return .relation(lhs: lhs.lowered(in: &context), relation: relation, rhs: rhs.lowered(in: &context))
+				return try .relation(lhs: lhs.lowered(in: &context), relation: relation, rhs: rhs.lowered(in: &context))
 				
 				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
-				return .conditional(
+				return try .conditional(
 					condition:		condition.lowered(in: &context),
 					affirmative:	affirmative.lowered(in: &context),
 					negative:		negative.lowered(in: &context)

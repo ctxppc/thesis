@@ -30,10 +30,8 @@ public enum EX : Language {
 	public typealias Lower = AL
 	
 	public typealias DataType = Lower.DataType
-	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
-	public typealias ParameterRegister = Lower.ParameterRegister
 	public typealias Predicate = Lower.Predicate
 	
 }
