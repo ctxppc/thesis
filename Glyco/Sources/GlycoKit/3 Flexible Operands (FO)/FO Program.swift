@@ -6,6 +6,11 @@ public enum FO : Language {
 	/// An FO program.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given effects.
+		public init(effects: [Effect]) {
+			self.effects = effects
+		}
+		
 		/// The effects of the program.
 		public var effects: [Effect]
 		

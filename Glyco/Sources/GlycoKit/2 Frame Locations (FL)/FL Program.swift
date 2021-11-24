@@ -6,6 +6,11 @@ public enum FL : Language {
 	/// A program in the base language.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given instructions.
+		public init(instructions: [Instruction] = []) {
+			self.instructions = instructions
+		}
+		
 		/// The program's instructions.
 		public var instructions: [Instruction] = []
 		
