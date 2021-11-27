@@ -21,6 +21,7 @@ final class FlexibleOperandsTests : XCTestCase {
 			)
 		])
 		
+		let actual = try source.lowered(configuration: .init(target: .sail))
 		let expected = FL.Program(instructions: [
 			.load(.word, destination: .t1, source: .location(offset: -4)),
 			.load(.word, destination: .t2, source: .location(offset: -8)),
@@ -28,7 +29,7 @@ final class FlexibleOperandsTests : XCTestCase {
 			.store(.word, destination: .location(offset: -12), source: .t3),
 		])
 		
-		XCTAssertEqual(try source.lowered(configuration: .init(target: .sail)), expected)
+		XCTAssertEqual(actual, expected)
 		
 	}
 	

@@ -59,6 +59,11 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td>Introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).</td>
 	</tr>
 	<tr>
+		<td><code>PA</code></td>
+		<td>Parameters</td>
+		<td>Introduces procedure parameters using the PA calling convention.</td>
+	</tr>
+	<tr>
 		<td><code>AL</code></td>
 		<td>Abstract Locations</td>
 		<td>Introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.</td>
@@ -67,11 +72,6 @@ Glyco is implemented as a sequence of intermediate languages, i.e., data structu
 		<td><code>EX</code></td>
 		<td>Expressions</td>
 		<td>Introduces structural value expressions, thereby abstracting over simple computation effects.</td>
-	</tr>
-	<tr>
-		<td><code>PR</code></td>
-		<td>Expressions</td>
-		<td>Introduces procedures.</td>
 	</tr>
 </table>
 

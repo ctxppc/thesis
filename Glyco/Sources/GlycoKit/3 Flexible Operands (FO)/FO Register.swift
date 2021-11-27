@@ -21,6 +21,9 @@ extension FO {
 		/// The always-zero register.
 		case zero
 		
+		/// The return address register.
+		case ra
+		
 		/// The stack pointer register.
 		case sp
 		
@@ -52,6 +55,7 @@ extension FO {
 		func lowered(in context: inout ()) -> Lower.Register {
 			switch self {
 				case .zero:	return .zero
+				case .ra:	return .ra
 				case .sp:	return .sp
 				case .gp:	return .gp
 				case .tp:	return .tp
@@ -85,6 +89,7 @@ extension FO {
 		var saver: Saver {
 			switch self {
 				case .zero, .sp, .gp:										return .nobody
+				case .ra:													return .caller
 				case .tp, .fp, .s1:											return .callee
 				case .a0, .a1, .a2, .a3, .a4, .a5, .a6, .a7:				return .caller
 				case .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11:	return .callee

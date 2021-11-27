@@ -6,8 +6,13 @@ public enum RV : Language {
 	/// A program in the RV language.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given instructions.
+		public init(instructions: [Instruction]) {
+			self.instructions = instructions
+		}
+		
 		/// The program's instructions.
-		public var instructions: [Instruction] = []
+		public var instructions: [Instruction]
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
