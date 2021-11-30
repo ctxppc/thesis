@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "PatternKit",
+        "repositoryURL": "https://github.com/ctxppc/PatternKit.git",
+        "state": {
+          "branch": null,
+          "revision": "339076d47a87bd164a00e33dcdc2ad1336bd4f0a",
+          "version": "0.4.0"
+        }
+      },
+      {
         "package": "swift-argument-parser",
         "repositoryURL": "https://github.com/apple/swift-argument-parser",
         "state": {
