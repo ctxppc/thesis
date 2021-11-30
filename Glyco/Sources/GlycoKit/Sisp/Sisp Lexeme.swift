@@ -1,10 +1,11 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-import PatternKit
+import DepthKit
 import Foundation
+import PatternKit
 
 /// A lexeme in a Sisp.
-enum SispLexeme {
+enum SispLexeme : Equatable {
 	
 	/// A leading parenthesis lexeme, i.e., `(`.
 	case leadingParenthesis
@@ -26,23 +27,45 @@ enum SispLexeme {
 	///
 	/// - Parameter 1: The attribute name (excluding terminator).
 	case attributeLabel(String)
-	private static let attributeLabelPattern = Token(identifierPattern) • ":"
+	private static let attributeLabelPattern = attributeLabelToken • ":"
+	private static let attributeLabelToken = Token(identifierPattern)
 	
 	/// A lexeme specifying a type name, e.g., `sequence`.
 	///
 	/// - Parameter 1: The type name.
 	case typeName(String)
-	private static let typeNamePattern = Token(identifierPattern)
+	private static let typeNamePattern = identifierPattern
 	
 	/// A pattern matching identifiers.
 	private static let identifierPattern = CharacterSet.letters • CharacterSet.alphanumerics+
 	
-	/// Extracts the first lexeme from `stream`.
-	///
-	/// This initialiser truncates `stream` when a lexeme has been succesfully truncated.
+	/// Extracts all lexemes from `stream`.
 	///
 	/// - Parameter stream: The string from which to extract the first lexeme.
-	init(from stream: inout Substring) throws {
+	///
+	/// - Returns: The lexemes extracted from `stream`.
+	static func lexemes(from stream: String) throws -> [Self] {
+		var stream = stream[...]
+		var lexemes = [Self]()
+		while let lexeme = try Self(from: &stream) {	// sequence(state:next:) doesn't support throwing successor function
+			lexemes.append(lexeme)
+		}
+		return lexemes
+	}
+	
+	/// Extracts the first lexeme from `stream`, skipping over any whitespace.
+	///
+	/// This initialiser removes any leading whitespace from `stream`. If a lexeme is extracted successfully, it is also removed from `stream`.
+	///
+	/// - Parameter stream: The string from which to extract the first lexeme.
+	///
+	/// - Returns: `nil` if `stream` is empty or contains only whitespace.
+	init?(from stream: inout Substring) throws {
+		
+		stream = stream.drop(while: \.isWhitespace)
+		
+		guard !stream.isEmpty else { return nil }
+		let streamPosition = stream.startIndex
 		
 		func extractMatch<P : Pattern>(using pattern: P, lexeme: (Match<Substring>) throws -> Self) rethrows -> Self? where P.Subject == Substring {
 			let match = pattern
@@ -59,23 +82,35 @@ enum SispLexeme {
 			?? extractMatch(using: Self.separatorPattern) { _ in .separator }
 			?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
-				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(string) }
+				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, position: streamPosition) }
 				return .integer(integer)
-			}
+			} ?? extractMatch(using: Self.attributeLabelPattern) { match in
+				let label = match.captures(for: Self.attributeLabelToken).first !! "Expected capture"
+				return .attributeLabel(.init(label))
+			} ?? extractMatch(using: Self.typeNamePattern) { .typeName(.init($0.matchedElements(direction: .forward))) }
 		
-		TODO.unimplemented
+		guard let lexeme = lexeme else { throw LexingError.invalidCharacter(position: streamPosition) }
+		self = lexeme
 		
 	}
 	
 	enum LexingError : LocalizedError {
 		
 		/// An error indicating that an integer literal cannot be represented as an integer.
-		case unrepresentableIntegerLiteral(Substring)
+		case unrepresentableIntegerLiteral(literal: Substring, position: String.Index)
 		
+		/// An error indicating that the stream contains an invalid character.
+		case invalidCharacter(position: String.Index)
+		
+		// See protocol.
 		var errorDescription: String? {
 			switch self {
-				case .unrepresentableIntegerLiteral(let literal):
-				return "The integer literal “\(literal)” cannot be represented as an integer."
+				
+				case .unrepresentableIntegerLiteral(literal: let literal, position: let position):
+				return "The integer literal “\(literal)” at \(position) cannot be represented as an integer."
+					
+				case .invalidCharacter(position: let position):
+				return "Invalid character found at \(position)"
 			}
 		}
 		
