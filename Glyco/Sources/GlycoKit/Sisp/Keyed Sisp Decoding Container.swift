@@ -4,6 +4,10 @@ import Foundation
 
 struct KeyedSispDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
+	init(codingPath: [CodingKey]) {
+		self.codingPath = codingPath
+	}
+	
 	// See protocol.
 	let codingPath: [CodingKey]
 	

@@ -23,21 +23,29 @@ enum SispLexeme : Equatable {
 	case integer(Int)
 	private static let integerPattern = "-"/? • ("0"..."9")+
 	
-	/// A lexeme specifying an attribute label and terminating with the label terminator `:`, e.g., `destination:`.
+	/// A lexeme specifying a label for a child, e.g., `destination:`.
 	///
-	/// - Parameter 1: The attribute name (excluding terminator).
-	case attributeLabel(String)
-	private static let attributeLabelPattern = attributeLabelToken • ":"
-	private static let attributeLabelToken = Token(identifierPattern)
+	/// - Parameter 1: The label, excluding `:` marker.
+	case label(String)
+	private static let labelPattern = labelToken • ":"
+	private static let labelToken = Token(identifierPattern)
 	
-	/// A lexeme specifying a type name, e.g., `sequence`.
+	/// A lexeme specifying a word, e.g., `sequence`.
 	///
-	/// - Parameter 1: The type name.
-	case typeName(String)
-	private static let typeNamePattern = identifierPattern
+	/// - Parameter 1: The word.
+	case word(String)
+	private static let wordPattern = identifierPattern
+	
+	/// A lexeme specifying a quoted string, e.g., `"Five Guys"`.
+	///
+	/// - Parameter 1: The string, excluding quotation marks.
+	case quotedString(String)
+	private static let quotedStringPattern = #"""# • quotedStringToken • #"""#
+	private static let quotedStringToken = Token(quotedStringCharacters*)
+	private static let quotedStringCharacters = CharacterSet.illegalCharacters.union(.controlCharacters).union(.init(charactersIn: "\"")).inverted
 	
 	/// A pattern matching identifiers.
-	private static let identifierPattern = CharacterSet.letters • CharacterSet.alphanumerics+
+	private static let identifierPattern = (CharacterSet.letters | "_") • (CharacterSet.alphanumerics | "_")*
 	
 	/// Extracts all lexemes from `stream`.
 	///
@@ -65,7 +73,6 @@ enum SispLexeme : Equatable {
 		stream = stream.drop(while: \.isWhitespace)
 		
 		guard !stream.isEmpty else { return nil }
-		let streamPosition = stream.startIndex
 		
 		func extractMatch<P : Pattern>(using pattern: P, lexeme: (Match<Substring>) throws -> Self) rethrows -> Self? where P.Subject == Substring {
 			let match = pattern
@@ -80,16 +87,21 @@ enum SispLexeme : Equatable {
 		let lexeme = try extractMatch(using: Self.leadingParenthesisPattern) { _ in .leadingParenthesis }
 			?? extractMatch(using: Self.trailingParenthesisPattern) { _ in .trailingParenthesis }
 			?? extractMatch(using: Self.separatorPattern) { _ in .separator }
-			?? extractMatch(using: Self.integerPattern) { match in
+			?? extractMatch(using: Self.quotedStringPattern) { match in
+				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
+				return .quotedString(.init(value))
+			} ?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
-				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, position: streamPosition) }
+				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, unlexedPortion: stream) }
 				return .integer(integer)
-			} ?? extractMatch(using: Self.attributeLabelPattern) { match in
-				let label = match.captures(for: Self.attributeLabelToken).first !! "Expected capture"
-				return .attributeLabel(.init(label))
-			} ?? extractMatch(using: Self.typeNamePattern) { .typeName(.init($0.matchedElements(direction: .forward))) }
+			} ?? extractMatch(using: Self.labelPattern) { match in
+				let label = match.captures(for: Self.labelToken).first !! "Expected capture"
+				return .label(.init(label))
+			} ?? extractMatch(using: Self.wordPattern) { .word(.init($0.matchedElements(direction: .forward))) }
 		
-		guard let lexeme = lexeme else { throw LexingError.invalidCharacter(position: streamPosition) }
+		guard let lexeme = lexeme else {
+			throw LexingError.invalidCharacter(unlexedPortion: stream)
+		}
 		self = lexeme
 		
 	}
@@ -97,23 +109,37 @@ enum SispLexeme : Equatable {
 	enum LexingError : LocalizedError {
 		
 		/// An error indicating that an integer literal cannot be represented as an integer.
-		case unrepresentableIntegerLiteral(literal: Substring, position: String.Index)
+		case unrepresentableIntegerLiteral(literal: Substring, unlexedPortion: Substring)
 		
 		/// An error indicating that the stream contains an invalid character.
-		case invalidCharacter(position: String.Index)
+		case invalidCharacter(unlexedPortion: Substring)
 		
 		// See protocol.
 		var errorDescription: String? {
 			switch self {
 				
-				case .unrepresentableIntegerLiteral(literal: let literal, position: let position):
-				return "The integer literal “\(literal)” at \(position) cannot be represented as an integer."
+				case .unrepresentableIntegerLiteral(literal: let literal, unlexedPortion: let unlexedPortion):
+				return "The integer literal “\(literal)” cannot be represented as an integer. Remaining portion: “\(unlexedPortion)”."
 					
-				case .invalidCharacter(position: let position):
-				return "Invalid character found at \(position)"
+				case .invalidCharacter(unlexedPortion: let unlexedPortion):
+				return "Invalid character found, starting from “\(unlexedPortion)”."
 			}
 		}
 		
 	}
 	
+}
+
+extension SispLexeme : CustomStringConvertible {
+	var description: String {
+		switch self {
+			case .leadingParenthesis:		return "("
+			case .trailingParenthesis:		return ")"
+			case .separator:				return ","
+			case .integer(let value):		return "\(value)"
+			case .label(let name):			return "\(name):"
+			case .quotedString(let string):	return "\"\(string)\""	// TODO: Escape chars
+			case .word(let value):			return value
+		}
+	}
 }
