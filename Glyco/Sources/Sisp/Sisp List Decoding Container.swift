@@ -30,8 +30,8 @@ struct SispListDecodingContainer : UnkeyedDecodingContainer {
 	var currentIndex: Int { children.startIndex }
 	
 	// See protocol.
-	mutating func decodeNil() throws -> Bool {
-		try singleValueContainerForNextValue().decodeNil()
+	mutating func decodeNil() -> Bool {
+		singleValueContainerForNextValue().decodeNil()
 	}
 	
 	// See protocol.
@@ -111,12 +111,12 @@ struct SispListDecodingContainer : UnkeyedDecodingContainer {
 	
 	// See protocol.
 	mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-		TODO.unimplemented
+		.init(try SispStructureDecodingContainer(decoder: decoderForNextValue()))
 	}
 	
 	// See protocol.
 	mutating func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-		TODO.unimplemented
+		Self(decoder: decoderForNextValue())
 	}
 	
 	// See protocol.
@@ -124,13 +124,15 @@ struct SispListDecodingContainer : UnkeyedDecodingContainer {
 		TODO.unimplemented
 	}
 	
-	private mutating func singleValueContainerForNextValue() throws -> SingleValueSispDecodingContainer {
+	private mutating func singleValueContainerForNextValue() -> SingleValueSispDecodingContainer {
+		.init(decoder: decoderForNextValue())
+	}
+	
+	private mutating func decoderForNextValue() -> SispDecoder {
 		.init(
-			decoder: .init(
-				sisp:		children.removeFirst(),
-				userInfo:	decoder.userInfo,
-				codingPath:	decoder.codingPath.appending(IndexCodingKey(intValue: currentIndex))
-			)
+			sisp:		children.removeFirst(),
+			userInfo:	decoder.userInfo,
+			codingPath:	decoder.codingPath.appending(IndexCodingKey(intValue: currentIndex))
 		)
 	}
 	

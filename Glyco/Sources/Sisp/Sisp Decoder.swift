@@ -52,7 +52,7 @@ public struct SispDecoder : Decoder {
 	public var userInfo: [CodingUserInfoKey : Any]
 	
 	// See protocol.
-	public let codingPath: [CodingKey]
+	public internal(set) var codingPath: [CodingKey]
 	
 	// See protocol.
 	public func container<Key : CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {

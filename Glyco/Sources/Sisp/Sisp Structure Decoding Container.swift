@@ -5,9 +5,12 @@ import Foundation
 /// A decoding container over a Sisp structure.
 struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
-	/// Creates a decoding container over a structure with given name and children.
-	init(structureType: String, childrenByLabel: [String : Sisp], decoder: SispDecoder) {
-		self.structureType = structureType
+	/// Creates a decoding container.
+	init(decoder: SispDecoder) throws {
+		guard case .structure(type: let type, children: let childrenByLabel) = decoder.sisp else {
+			throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Expected to decode structure", underlyingError: nil))
+		}
+		self.structureType = type
 		self.childrenByLabel = childrenByLabel
 		self.decoder = decoder
 	}
@@ -38,7 +41,7 @@ struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	// See protocol.
 	func decodeNil(forKey key: Key) throws -> Bool {
 		try check(key)
-		TODO.unimplemented
+		return false	// nil cannot be represented (yet)
 	}
 	
 	// See protocol.
@@ -118,12 +121,15 @@ struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	
 	// See protocol.
 	func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-		TODO.unimplemented
+		try check(key)
+		var deeperDecoder = decoder
+		deeperDecoder.codingPath.append(key)
+		return .init(SispStructureBodyDecodingContainer(childrenByLabel: childrenByLabel, decoder: deeperDecoder))
 	}
 	
 	// See protocol.
 	func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-		TODO.unimplemented
+		TODO.unimplemented	// unlabelled child list?
 	}
 	
 	// See protocol.
@@ -137,7 +143,16 @@ struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	}
 	
 	private func check(_ key: Key) throws {
-		guard contains(key) else { throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "Can only decode structure of type “\(structureType)”, not “\(key.stringValue)”", underlyingError: nil)) }
+		guard contains(key) else {
+			throw DecodingError.keyNotFound(
+				key,
+				.init(
+					codingPath: codingPath,
+					debugDescription: "Can only decode structure of type “\(structureType)”, not “\(key.stringValue)”",
+					underlyingError: nil
+				)
+			)
+		}
 	}
 	
 }
