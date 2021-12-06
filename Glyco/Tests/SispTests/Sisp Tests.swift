@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-@testable import GlycoKit
+@testable import Sisp
 import XCTest
 
 final class SispTests : XCTestCase {

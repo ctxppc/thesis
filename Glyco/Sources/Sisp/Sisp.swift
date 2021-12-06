@@ -17,4 +17,13 @@ enum Sisp : Hashable {
 	/// A structure of type `type` containing labelled children `children`.
 	case structure(type: String, children: [String : Sisp])
 	
+	var typeDescription: String {
+		switch self {
+			case .integer:									return "Integer"
+			case .string:									return "String"
+			case .list:										return "List"
+			case .structure(type: let type, children: _):	return "Structure of type “\(type)”"
+		}
+	}
+	
 }

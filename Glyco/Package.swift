@@ -9,6 +9,7 @@ let package = Package(
 	products:		[
 		.executable(name: "Glyco", targets: ["Glyco"]),
 		.library(name: "GlycoKit", targets: ["GlycoKit"]),
+		.library(name: "Sisp", targets: ["Sisp"]),
 	],
 	dependencies:	[
 		.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.1"),
@@ -23,13 +24,15 @@ let package = Package(
 			.product(name: "ArgumentParser", package: "swift-argument-parser"),
 		]),
 		.target(name: "GlycoKit", dependencies: [
+			"Sisp", "Yams",
 			.product(name: "Collections", package: "swift-collections"),
 			.product(name: "DepthKit", package: "DepthKit"),
+		]),
+		.testTarget(name: "GlycoKitTests", dependencies: ["GlycoKit"]),
+		.target(name: "Sisp", dependencies: [
+			.product(name: "DepthKit", package: "DepthKit"),
 			.product(name: "PatternKit", package: "PatternKit"),
-			"Yams",
 		]),
-		.testTarget(name: "GlycoKitTests", dependencies: [
-			"GlycoKit",
-		]),
+		.testTarget(name: "SispTests", dependencies: ["Sisp"]),
 	]
 )
