@@ -32,10 +32,10 @@ enum SispLexeme : Equatable {
 	
 	/// A lexeme specifying a quoted label for a child, e.g., `"the destination":`.
 	///
-	/// - Parameter 1: The label, excluding `:` marker.
+	/// - Parameter 1: The label, excluding the `:` marker, bounding quotation marks, and escape characters.
 	case quotedLabel(String)
-	private static let quotedLabelPattern = labelToken • ":"
-	private static let quotedLabelToken = Token(quotedStringPattern)
+	private static let quotedLabelPattern = #"""# • quotedLabelToken • #"""# • ":"
+	private static let quotedLabelToken = Token(literalCharacterPattern*)
 	
 	/// A lexeme specifying a word, e.g., `sequence`.
 	///
@@ -45,14 +45,22 @@ enum SispLexeme : Equatable {
 	
 	/// A lexeme specifying a quoted string, e.g., `"Five Guys"`.
 	///
-	/// - Parameter 1: The string, excluding quotation marks.
+	/// - Parameter 1: The string, excluding bounding quotation marks and escape characters.
 	case quotedString(String)
 	private static let quotedStringPattern = #"""# • quotedStringToken • #"""#
-	private static let quotedStringToken = Token(quotedStringCharacters*)
-	private static let quotedStringCharacters = CharacterSet.illegalCharacters.union(.controlCharacters).union(.init(charactersIn: "\"")).inverted
+	private static let quotedStringToken = Token(literalCharacterPattern*)
 	
 	/// A pattern matching identifiers.
 	private static let identifierPattern = (CharacterSet.letters | "_") • (CharacterSet.alphanumerics | "_")*
+	
+	/// The characters that cannot appear in a string literal.
+	private static let illegalLiteralCharacters = CharacterSet.illegalCharacters | .controlCharacters
+	
+	/// The characters that can appear in a string literal with no need for escaping.
+	private static let literalCharactersNotRequiringEscape = (illegalLiteralCharacters | #"""#).inverted
+	
+	/// A pattern matching an escaped or valid nonescaped character in a literal.
+	private static let literalCharacterPattern = literalCharactersNotRequiringEscape | Literal(#""""#)
 	
 	/// Extracts all lexemes from `stream`.
 	///
@@ -96,10 +104,10 @@ enum SispLexeme : Equatable {
 			?? extractMatch(using: Self.separatorPattern) { _ in .separator }
 			?? extractMatch(using: Self.quotedStringPattern) { match in
 				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
-				return .quotedString(.init(value))
-			} ?? extractMatch(using: Self.quotedLabelPattern) { match in
+				return .quotedString(.init(value).nonescaped)
+			} ?? extractMatch(using:Self.quotedLabelPattern) { match in
 				let value = match.captures(for: Self.quotedLabelToken).first !! "Expected capture"
-				return .quotedLabel(.init(value))
+				return .quotedLabel(.init(value).nonescaped)
 			} ?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
 				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, unlexedPortion: stream) }
@@ -148,9 +156,23 @@ extension SispLexeme : CustomStringConvertible {
 			case .separator:				return ","
 			case .integer(let value):		return "\(value)"
 			case .label(let name):			return "\(name):"
-			case .quotedLabel(let name):	return "\"\(name)\":"
+			case .quotedLabel(let name):	return #""\#(name.escaped)":"#
 			case .word(let value):			return value
-			case .quotedString(let string):	return "\"\(string)\""	// TODO: Escape chars
+			case .quotedString(let string):	return #""\#(string.escaped)""#
 		}
 	}
+}
+
+extension String {
+	
+	/// `self`, but with quotation marks replaced by escaped quotation marks.
+	var escaped: Self {
+		replacingOccurrences(of: #"""#, with: #""""#)
+	}
+	
+	/// `self`, but with escaped quotation marks replaced by nonescaped quotation marks.
+	var nonescaped: Self {
+		replacingOccurrences(of: #""""#, with: #"""#)
+	}
+	
 }
