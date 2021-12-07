@@ -30,6 +30,7 @@ let package = Package(
 		]),
 		.testTarget(name: "GlycoKitTests", dependencies: ["GlycoKit"]),
 		.target(name: "Sisp", dependencies: [
+			.product(name: "Collections", package: "swift-collections"),
 			.product(name: "DepthKit", package: "DepthKit"),
 			.product(name: "PatternKit", package: "PatternKit"),
 		]),

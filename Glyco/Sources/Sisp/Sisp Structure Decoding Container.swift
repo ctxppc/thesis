@@ -19,7 +19,7 @@ struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	private let structureType: String
 	
 	/// The structure's children, keyed by label.
-	private let childrenByLabel: [String : Sisp]
+	private let childrenByLabel: Sisp.LabelledChildren
 	
 	/// The decoder.
 	let decoder: SispDecoder

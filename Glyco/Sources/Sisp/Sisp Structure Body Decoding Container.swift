@@ -6,14 +6,14 @@ import Foundation
 struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
 	/// Creates a decoding container over the body of a structure with given children.
-	init(childrenByLabel: [String : Sisp], decoder: SispDecoder) {
+	init(childrenByLabel: Sisp.LabelledChildren, decoder: SispDecoder) {
 		self.childrenByLabel = childrenByLabel
 		self.decoder = decoder
 		self.allKeys = childrenByLabel.keys.compactMap { .init(stringValue: $0) }
 	}
 	
 	/// The structure's children, keyed by label.
-	private let childrenByLabel: [String : Sisp]
+	private let childrenByLabel: Sisp.LabelledChildren
 	
 	/// The decoder.
 	let decoder: SispDecoder

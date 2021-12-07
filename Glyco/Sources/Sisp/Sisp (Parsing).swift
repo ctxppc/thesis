@@ -69,12 +69,12 @@ extension Sisp {
 	/// Any successfully parsed children are removed from `lexemes`.
 	///
 	/// - Returns: The parsed children, keyed by label, or `nil` if `lexemes` doesn't start with a leading parenthesis.
-	private static func parseLabelledChildren<C>(from lexemes: inout Lexemes<C>) throws -> [String : Self]? {
+	private static func parseLabelledChildren<C>(from lexemes: inout Lexemes<C>) throws -> LabelledChildren? {
 		
 		guard lexemes.first == .leadingParenthesis else { return nil }
 		lexemes.removeFirst()
 		
-		var labelledChildren = [String : Sisp]()
+		var labelledChildren = LabelledChildren()
 		while let (name, child) = try parseLabelledChild(from: &lexemes) {
 			let previous = labelledChildren.updateValue(child, forKey: name)
 			guard previous == nil else { throw ParsingError.duplicateLabel(name) }

@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+import Collections
 import Foundation
 import PatternKit
 
@@ -24,7 +25,8 @@ public enum Sisp : Hashable {
 	/// A structure of type `type` containing labelled children `children`.
 	///
 	/// A structure is serialised as its `type` using a `word` (if possible) or `quotedString` lexeme (otherwise); a leading parenthesis lexeme; its labelled children, each separated by a separator lexeme; and finally a trailing parenthesis. Each labelled child is serialised using a label lexeme (if possible) or quoted label lexeme (otherwise) for the label followed by the child's serialisation. For example, `car(colour: blue, size: "very large")`.
-	case structure(type: String, children: [String : Self])
+	case structure(type: String, children: LabelledChildren)
+	public typealias LabelledChildren = OrderedDictionary<String, Self>
 	
 	/// A value describing the type of value contained in `self`.
 	var typeDescription: String {
@@ -36,4 +38,22 @@ public enum Sisp : Hashable {
 		}
 	}
 	
+}
+
+extension Sisp : ExpressibleByIntegerLiteral {
+	public init(integerLiteral value: Int) {
+		self = .integer(value)
+	}
+}
+
+extension Sisp : ExpressibleByStringLiteral {
+	public init(stringLiteral value: String) {
+		self = .string(value)
+	}
+}
+
+extension Sisp : ExpressibleByArrayLiteral {
+	public init(arrayLiteral elements: Sisp...) {
+		self = .list(elements)
+	}
 }

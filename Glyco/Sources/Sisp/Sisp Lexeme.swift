@@ -146,6 +146,20 @@ enum SispLexeme : Equatable {
 		
 	}
 	
+	/// Returns a lexeme that can represent the literal `string`.
+	static func lexeme(forLiteral string: String) -> Self {
+		wordPattern.hasMatches(over: string[...])
+			? .word(string)
+			: .quotedString(string.escaped)
+	}
+	
+	/// Returns a lexeme that can represent the label `label`.
+	static func lexeme(forLabel label: String) -> Self {
+		wordPattern.hasMatches(over: label[...])
+			? .label(label)
+			: .quotedLabel(label.escaped)
+	}
+	
 }
 
 extension SispLexeme : CustomStringConvertible {
