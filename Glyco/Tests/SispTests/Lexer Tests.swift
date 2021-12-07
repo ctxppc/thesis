@@ -51,4 +51,24 @@ final class LexerTests : XCTestCase {
 		
 	}
 	
+	func testEscaped() throws {
+		
+		let input = #"value(attr1: "test text", "at tr2": "more""text")"#
+		
+		let actual = try SispLexeme.lexemes(from: input)
+		let expected: [SispLexeme] = [
+			.word("value"),
+			.leadingParenthesis,
+			.label("attr1"),
+			.quotedString("test text"),
+			.separator,
+			.quotedLabel("at tr2"),
+			.quotedString(#"more"text"#),
+			.trailingParenthesis,
+		]
+		
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }

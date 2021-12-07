@@ -102,12 +102,12 @@ enum SispLexeme : Equatable {
 		let lexeme = try extractMatch(using: Self.leadingParenthesisPattern) { _ in .leadingParenthesis }
 			?? extractMatch(using: Self.trailingParenthesisPattern) { _ in .trailingParenthesis }
 			?? extractMatch(using: Self.separatorPattern) { _ in .separator }
-			?? extractMatch(using: Self.quotedStringPattern) { match in
-				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
-				return .quotedString(.init(value).nonescaped)
-			} ?? extractMatch(using:Self.quotedLabelPattern) { match in
+			?? extractMatch(using:Self.quotedLabelPattern) { match in
 				let value = match.captures(for: Self.quotedLabelToken).first !! "Expected capture"
 				return .quotedLabel(.init(value).nonescaped)
+			} ?? extractMatch(using: Self.quotedStringPattern) { match in
+				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
+				return .quotedString(.init(value).nonescaped)
 			} ?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
 				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, unlexedPortion: stream) }
