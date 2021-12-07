@@ -39,6 +39,10 @@ import Foundation
 /// 	)
 public struct SispDecoder : Decoder {
 	
+	public init(from serialised: String) throws {
+		self.init(sisp: try .init(from: serialised), userInfo: [:], codingPath: [])
+	}
+	
 	init(sisp: Sisp, userInfo: [CodingUserInfoKey : Any], codingPath: [CodingKey]) {
 		self.sisp = sisp
 		self.userInfo = userInfo
@@ -56,17 +60,21 @@ public struct SispDecoder : Decoder {
 	
 	// See protocol.
 	public func container<Key : CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
-		TODO.unimplemented
+		.init(try SispStructureDecodingContainer(decoder: self))
 	}
 	
 	// See protocol.
-	public func unkeyedContainer() throws -> UnkeyedDecodingContainer {
-		TODO.unimplemented
+	public func unkeyedContainer() -> UnkeyedDecodingContainer {
+		SispListDecodingContainer(decoder: self)
 	}
 	
 	// See protocol.
-	public func singleValueContainer() throws -> SingleValueDecodingContainer {
+	public func singleValueContainer() -> SingleValueDecodingContainer {
 		SingleValueSispDecodingContainer(decoder: self)
+	}
+	
+	public func decode<T : Decodable>(type: T.Type) throws -> T {
+		try .init(from: self)
 	}
 	
 }
