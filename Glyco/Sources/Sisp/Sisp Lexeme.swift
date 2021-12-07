@@ -30,6 +30,13 @@ enum SispLexeme : Equatable {
 	private static let labelPattern = labelToken • ":"
 	private static let labelToken = Token(identifierPattern)
 	
+	/// A lexeme specifying a quoted label for a child, e.g., `"the destination":`.
+	///
+	/// - Parameter 1: The label, excluding `:` marker.
+	case quotedLabel(String)
+	private static let quotedLabelPattern = labelToken • ":"
+	private static let quotedLabelToken = Token(quotedStringPattern)
+	
 	/// A lexeme specifying a word, e.g., `sequence`.
 	///
 	/// - Parameter 1: The word.
@@ -90,6 +97,9 @@ enum SispLexeme : Equatable {
 			?? extractMatch(using: Self.quotedStringPattern) { match in
 				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
 				return .quotedString(.init(value))
+			} ?? extractMatch(using: Self.quotedLabelPattern) { match in
+				let value = match.captures(for: Self.quotedLabelToken).first !! "Expected capture"
+				return .quotedLabel(.init(value))
 			} ?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
 				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, unlexedPortion: stream) }
@@ -138,8 +148,9 @@ extension SispLexeme : CustomStringConvertible {
 			case .separator:				return ","
 			case .integer(let value):		return "\(value)"
 			case .label(let name):			return "\(name):"
-			case .quotedString(let string):	return "\"\(string)\""	// TODO: Escape chars
+			case .quotedLabel(let name):	return "\"\(name)\":"
 			case .word(let value):			return value
+			case .quotedString(let string):	return "\"\(string)\""	// TODO: Escape chars
 		}
 	}
 }

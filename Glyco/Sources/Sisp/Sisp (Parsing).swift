@@ -23,7 +23,7 @@ extension Sisp {
 	/// Any succesfully parsed values are removed from `lexemes`.
 	///
 	/// - Returns: If exactly one value is parsed, the parsed value. Otherwise, a list of zero, two, or more values.
-	private static func parseValueOrList<C>(from lexemes: inout Lexemes<C>) throws -> Sisp {
+	private static func parseValueOrList<C>(from lexemes: inout Lexemes<C>) throws -> Self {
 		
 		var values = [Sisp]()
 		while let value = try parseValue(from: &lexemes) {
@@ -43,7 +43,7 @@ extension Sisp {
 	/// If a value is successfully parsed, it is removed from `lexemes`, otherwise `lexemes` remains unchanged.
 	///
 	/// - Returns: The parsed value, or `nil` if the leading lexeme doesn't indicate the begin of a value.
-	private static func parseValue<C>(from lexemes: inout Lexemes<C>) throws -> Sisp? {
+	private static func parseValue<C>(from lexemes: inout Lexemes<C>) throws -> Self? {
 		let originalLexemes = lexemes
 		switch lexemes.popFirst() {
 			
@@ -57,7 +57,7 @@ extension Sisp {
 				return .string(value)
 			}
 			
-			case nil, .leadingParenthesis?, .trailingParenthesis?, .separator?, .label?:
+			case nil, .leadingParenthesis?, .trailingParenthesis?, .separator?, .label?, .quotedLabel?:
 			lexemes = originalLexemes	// undo lexeme consumption
 			return nil
 			
@@ -69,7 +69,7 @@ extension Sisp {
 	/// Any successfully parsed children are removed from `lexemes`.
 	///
 	/// - Returns: The parsed children, keyed by label, or `nil` if `lexemes` doesn't start with a leading parenthesis.
-	private static func parseLabelledChildren<C>(from lexemes: inout Lexemes<C>) throws -> [String : Sisp]? {
+	private static func parseLabelledChildren<C>(from lexemes: inout Lexemes<C>) throws -> [String : Self]? {
 		
 		guard lexemes.first == .leadingParenthesis else { return nil }
 		lexemes.removeFirst()
@@ -93,7 +93,11 @@ extension Sisp {
 	/// - Returns: The label and the child value, or `nil` if the leading lexeme doesn't start with a label.
 	private static func parseLabelledChild<C>(from lexemes: inout Lexemes<C>) throws -> (name: String, child: Self)? {
 		
-		guard case .label(let name)? = lexemes.first else { return nil }
+		let name: String
+		switch lexemes.first {
+			case .label(let n)?, .quotedLabel(let n)?:	name = n
+			default:									return nil
+		}
 		lexemes.removeFirst()
 		
 		let child = try Self.parseValueOrList(from: &lexemes)
