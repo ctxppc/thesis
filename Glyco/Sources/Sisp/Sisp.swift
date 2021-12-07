@@ -3,7 +3,7 @@
 /// A Sisp value, which can be an integer, a string, a list of Sisp values, or a typed structure with named children.
 ///
 /// Lists are encoded in Sisp by juxtaposition, separated by whitespace. This causes an ambiguity in the grammar where lists of one element are always encoded as the value itself and not as an element of a `list` value. This is an intentional decision to simplify notation. Decoders must take care to accomodate for this.
-enum Sisp : Hashable {
+public enum Sisp : Hashable {
 	
 	/// An integer.
 	case integer(Int)

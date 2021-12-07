@@ -8,7 +8,7 @@ final class ProcedureTests : XCTestCase {
 	func testSimpleInvoke() throws {
 		
 		let fortyTwo = EX.Label(rawValue: "fortytwo")
-		let source = EX.Program(
+		let source = EX.Program.program(
 			body:		.invoke(procedure: fortyTwo, arguments: []),
 			procedures:	[
 				.init(name: fortyTwo, body: .return(result: .constant(value: 42)), parameters: [])

@@ -6,7 +6,7 @@ extension AL {
 	public enum Predicate : Codable, Equatable, SimplyLowerable {
 		
 		/// A constant predicate.
-		case constant(Bool)
+		case constant(value: Bool)
 		
 		/// A predicate that holds iff *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case relation(lhs: Source, relation: BranchRelation, rhs: Source)
@@ -18,8 +18,8 @@ extension AL {
 		public static func not(_ negated: Self) -> Self {
 			switch negated {
 				
-				case .constant(let holds):
-				return .constant(!holds)
+				case .constant(value: let holds):
+				return .constant(value: !holds)
 				
 				case .relation(let lhs, let relation, let rhs):
 				return .relation(lhs: lhs, relation: relation.negated, rhs: rhs)
@@ -34,7 +34,7 @@ extension AL {
 		func lowered(in context: inout Context) throws -> Lower.Predicate {
 			switch self {
 				
-				case .constant(let holds):
+				case .constant(value: let holds):
 				return .constant(holds)
 				
 				case .relation(lhs: let lhs, relation: let relation, rhs: let rhs):

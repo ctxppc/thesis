@@ -26,7 +26,13 @@ struct SingleValueSispDecodingContainer : SingleValueDecodingContainer {
 	
 	// See protocol.
 	func decode(_ type: Bool.Type) throws -> Bool {
-		throw DecodingError.typeMismatch(Bool.self, .init(codingPath: codingPath, debugDescription: "Cannot decode Bool; found \(sisp.typeDescription) instead", underlyingError: nil))
+		guard case .string(let rawValue) = sisp, let value = Bool(rawValue) else {
+			throw DecodingError.typeMismatch(
+				Bool.self,
+				.init(codingPath: codingPath, debugDescription: "Cannot decode Bool; found \(sisp.typeDescription) instead", underlyingError: nil)
+			)
+		}
+		return value
 	}
 	
 	// See protocol.

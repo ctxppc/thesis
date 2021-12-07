@@ -7,7 +7,7 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testSimpleSum() throws {
 		
-		let location = AL.Location(rawValue: 0)
+		let location = AL.Location.location(id: 0)
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [
@@ -67,8 +67,8 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testEqualsOne() throws {
 		
-		let testedNumber = AL.Location(rawValue: 0)
-		let isEven = AL.Location(rawValue: 1)
+		let testedNumber = AL.Location.location(id: 0)
+		let isEven = AL.Location.location(id: 1)
 		
 		let program = AL.Program(
 			effect:		.sequence(effects: [

@@ -5,7 +5,7 @@ import Foundation
 extension Sisp {
 	
 	/// Parses a Sisp value from given lexemes.
-	init(from serialised: String) throws {
+	public init(from serialised: String) throws {
 		try self.init(from: SispLexeme.lexemes(from: serialised)[...])
 	}
 	

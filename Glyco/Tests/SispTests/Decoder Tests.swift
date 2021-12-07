@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-@testable import Sisp
+import Sisp
 import XCTest
 
 final class DecoderTests : XCTestCase {

@@ -5,15 +5,10 @@ import DepthKit
 extension AL {
 	
 	/// An abstract storage location on an AL machine.
-	public struct Location : Codable, Hashable, RawRepresentable, SimplyLowerable {
+	public enum Location : Codable, Hashable, SimplyLowerable {
 		
-		/// Creates a location.
-		public init(rawValue: Int) {
-			self.rawValue = rawValue
-		}
-		
-		// See protocol.
-		public let rawValue: Int
+		/// A location with given procedure-wide identifier.
+		case location(id: Int)
 		
 		// See protocol.
 		func lowered(in context: inout Context) -> Lower.Location {
@@ -81,6 +76,8 @@ extension AL {
 
 extension AL.Location : CustomStringConvertible {
 	public var description: String {
-		"aloc\(rawValue)"
+		switch self {
+			case .location(id: let id):	return "aloc\(id)"
+		}
 	}
 }

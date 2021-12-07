@@ -5,7 +5,7 @@ import Foundation
 extension Sisp {
 	
 	/// Returns a serialised representation of `self`.
-	func serialised() -> String {
+	public func serialised() -> String {
 		TODO.unimplemented
 	}
 	
