@@ -9,8 +9,8 @@ final class LexerTests : XCTestCase {
 		
 		let input = " )( ())( attr:1234 type\n\nattr: "
 		
-		let actual = try SispLexeme.lexemes(from: input)
-		let expected: [SispLexeme] = [
+		let actual = try Lexeme.lexemes(from: input)
+		let expected: [Lexeme] = [
 			.trailingParenthesis,
 			.leadingParenthesis,
 			.leadingParenthesis,
@@ -28,15 +28,15 @@ final class LexerTests : XCTestCase {
 	}
 	
 	func testEmptyLabel() {
-		XCTAssertThrowsError(try SispLexeme.lexemes(from: "(attr1::)"))
+		XCTAssertThrowsError(try Lexeme.lexemes(from: "(attr1::)"))
 	}
 	
 	func testQuoted() throws {
 		
 		let input = #"value(attr1: "test text", attr2: "more text")"#
 		
-		let actual = try SispLexeme.lexemes(from: input)
-		let expected: [SispLexeme] = [
+		let actual = try Lexeme.lexemes(from: input)
+		let expected: [Lexeme] = [
 			.word("value"),
 			.leadingParenthesis,
 			.label("attr1"),
@@ -55,8 +55,8 @@ final class LexerTests : XCTestCase {
 		
 		let input = #"value(attr1: "test text", "at tr2": "more""text")"#
 		
-		let actual = try SispLexeme.lexemes(from: input)
-		let expected: [SispLexeme] = [
+		let actual = try Lexeme.lexemes(from: input)
+		let expected: [Lexeme] = [
 			.word("value"),
 			.leadingParenthesis,
 			.label("attr1"),

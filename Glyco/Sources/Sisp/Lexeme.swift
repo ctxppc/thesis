@@ -5,7 +5,7 @@ import Foundation
 import PatternKit
 
 /// A lexeme in a Sisp.
-enum SispLexeme : Equatable {
+enum Lexeme : Equatable {
 	
 	/// A leading parenthesis lexeme, i.e., `(`.
 	case leadingParenthesis
@@ -162,7 +162,7 @@ enum SispLexeme : Equatable {
 	
 }
 
-extension SispLexeme : CustomStringConvertible {
+extension Lexeme : CustomStringConvertible {
 	var description: String {
 		switch self {
 			case .leadingParenthesis:		return "("

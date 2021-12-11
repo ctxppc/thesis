@@ -1,6 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
-struct SispListDecodingContainer : UnkeyedDecodingContainer {
+struct ListDecodingContainer : UnkeyedDecodingContainer {
 	
 	/// Creates a decoding container.
 	init(decoder: SispDecoder) {
@@ -111,7 +111,7 @@ struct SispListDecodingContainer : UnkeyedDecodingContainer {
 	
 	// See protocol.
 	mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-		.init(try SispStructureDecodingContainer(decoder: decoderForNextValue()))
+		.init(try StructureDecodingContainer(decoder: decoderForNextValue()))
 	}
 	
 	// See protocol.
@@ -124,7 +124,7 @@ struct SispListDecodingContainer : UnkeyedDecodingContainer {
 		TODO.unimplemented
 	}
 	
-	private mutating func singleValueContainerForNextValue() -> SingleValueSispDecodingContainer {
+	private mutating func singleValueContainerForNextValue() -> SingleValueDecodingContainer {
 		.init(decoder: decoderForNextValue())
 	}
 	

@@ -60,17 +60,17 @@ public struct SispDecoder : Decoder {
 	
 	// See protocol.
 	public func container<Key : CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
-		.init(try SispStructureDecodingContainer(decoder: self))
+		.init(try StructureDecodingContainer(decoder: self))
 	}
 	
 	// See protocol.
 	public func unkeyedContainer() -> UnkeyedDecodingContainer {
-		SispListDecodingContainer(decoder: self)
+		ListDecodingContainer(decoder: self)
 	}
 	
 	// See protocol.
-	public func singleValueContainer() -> SingleValueDecodingContainer {
-		SingleValueSispDecodingContainer(decoder: self)
+	public func singleValueContainer() -> Swift.SingleValueDecodingContainer {
+		SingleValueDecodingContainer(decoder: self)
 	}
 	
 	public func decode<T : Decodable>(type: T.Type) throws -> T {

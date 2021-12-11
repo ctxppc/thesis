@@ -110,7 +110,7 @@ extension Sisp {
 		/// - Parameters:
 		///   - lexeme: The lexeme to write.
 		///   - trailingWhitespace: The kind of whitespace that is required after the lexeme, or `nil` if no whitespace is required.
-		mutating func write(_ lexeme: SispLexeme, then trailingWhitespace: Whitespace?) {
+		mutating func write(_ lexeme: Lexeme, then trailingWhitespace: Whitespace?) {
 			
 			switch requiredTrailingWhitespace {
 				

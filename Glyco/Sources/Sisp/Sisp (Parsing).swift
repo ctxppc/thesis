@@ -6,11 +6,11 @@ extension Sisp {
 	
 	/// Parses a Sisp value from given lexemes.
 	public init(from serialised: String) throws {
-		try self.init(from: SispLexeme.lexemes(from: serialised)[...])
+		try self.init(from: Lexeme.lexemes(from: serialised)[...])
 	}
 	
 	/// Parses a Sisp value from given lexemes.
-	init<Lexemes : RandomAccessCollection>(from lexemes: Lexemes) throws where Lexemes.Element == SispLexeme, Lexemes.SubSequence == Lexemes {
+	init<Lexemes : RandomAccessCollection>(from lexemes: Lexemes) throws where Lexemes.Element == Lexeme, Lexemes.SubSequence == Lexemes {
 		var lexemes = lexemes
 		self = try Self.parseValueOrList(from: &lexemes)
 		if let remainingLexeme = lexemes.first {	// ensure we've reached end of stream
@@ -110,12 +110,12 @@ extension Sisp {
 		
 	}
 	
-	private typealias Lexemes<C : RandomAccessCollection> = C where C.Element == SispLexeme, C.SubSequence == C
+	private typealias Lexemes<C : RandomAccessCollection> = C where C.Element == Lexeme, C.SubSequence == C
 	
 	enum ParsingError : LocalizedError {
 		
 		/// An error indicating that given lexeme is not expected.
-		case unexpectedLexeme(SispLexeme)
+		case unexpectedLexeme(Lexeme)
 		
 		/// An error indicating that a structure contains two children with the same label.
 		case duplicateLabel(Label)

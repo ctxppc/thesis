@@ -2,8 +2,8 @@
 
 import Foundation
 
-/// A decoding container over a Sisp value.
-struct SingleValueSispDecodingContainer : SingleValueDecodingContainer {
+/// A container over a single decodable value.
+struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 	
 	/// Creates a decoding container.
 	init(decoder: SispDecoder) {

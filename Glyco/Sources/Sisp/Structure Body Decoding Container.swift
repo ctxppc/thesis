@@ -3,7 +3,7 @@
 import Foundation
 
 /// A decoding container over a Sisp structure's body.
-struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
+struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
 	/// Creates a decoding container over the body of a structure with given children.
 	init(childrenByLabel: Sisp.LabelledChildren, decoder: SispDecoder) {
@@ -116,7 +116,7 @@ struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContai
 	
 	// See protocol.
 	func nestedUnkeyedContainer(forKey key: Key) throws -> UnkeyedDecodingContainer {
-		SispListDecodingContainer(decoder: .init(sisp: try child(forKey: key), userInfo: decoder.userInfo, codingPath: decoder.codingPath.appending(key)))
+		ListDecodingContainer(decoder: .init(sisp: try child(forKey: key), userInfo: decoder.userInfo, codingPath: decoder.codingPath.appending(key)))
 	}
 	
 	// See protocol.
@@ -136,7 +136,7 @@ struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContai
 		return child
 	}
 	
-	private func singleValueContainer(forKey key: Key) throws -> SingleValueSispDecodingContainer {
+	private func singleValueContainer(forKey key: Key) throws -> SingleValueDecodingContainer {
 		.init(decoder: .init(sisp: try child(forKey: key), userInfo: decoder.userInfo, codingPath: decoder.codingPath.appending(key)))
 	}
 	

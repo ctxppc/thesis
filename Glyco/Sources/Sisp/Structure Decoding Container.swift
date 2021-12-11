@@ -3,7 +3,7 @@
 import Foundation
 
 /// A decoding container over a Sisp structure.
-struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
+struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
 	/// Creates a decoding container.
 	init(decoder: SispDecoder) throws {
@@ -124,7 +124,7 @@ struct SispStructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 		try check(key)
 		var deeperDecoder = decoder
 		deeperDecoder.codingPath.append(key)
-		return .init(SispStructureBodyDecodingContainer(childrenByLabel: childrenByLabel, decoder: deeperDecoder))
+		return .init(StructureBodyDecodingContainer(childrenByLabel: childrenByLabel, decoder: deeperDecoder))
 	}
 	
 	// See protocol.
