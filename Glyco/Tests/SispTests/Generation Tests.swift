@@ -18,7 +18,11 @@ final class GenerationTests : XCTestCase {
 		)
 		
 		let actual = sisp.serialised()
-		let expected = "car ( size: large , contents: person ( name: John , ) , )"
+		let expected = """
+			car(size: large, contents:
+				person(name: John)
+			)
+			"""
 		
 		XCTAssertEqual(actual, expected)
 		
