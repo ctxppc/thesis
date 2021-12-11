@@ -6,14 +6,14 @@ import Foundation
 struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
 	/// Creates a decoding container over the body of a structure with given children.
-	init(childrenByLabel: Sisp.LabelledChildren, decoder: SispDecoder) {
-		self.childrenByLabel = childrenByLabel
+	init(children: Sisp.StructureChildren, decoder: SispDecoder) {
+		self.children = children
 		self.decoder = decoder
-		self.allKeys = childrenByLabel.keys.compactMap { .init(stringValue: $0.rawValue) }
+		self.allKeys = children.keys.compactMap { .init(stringValue: $0.rawValue) }
 	}
 	
-	/// The structure's children, keyed by label.
-	private let childrenByLabel: Sisp.LabelledChildren
+	/// The structure's children.
+	let children: Sisp.StructureChildren
 	
 	/// The decoder.
 	let decoder: SispDecoder
@@ -130,7 +130,7 @@ struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	}
 	
 	private func child(forKey key: Key) throws -> Sisp {
-		guard let child = childrenByLabel[.init(rawValue: key.stringValue)] else {
+		guard let child = children[.init(rawValue: key.stringValue)] else {
 			throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "No child labelled “\(key.stringValue)”", underlyingError: nil))
 		}
 		return child

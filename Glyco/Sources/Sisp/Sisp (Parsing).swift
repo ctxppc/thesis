@@ -51,7 +51,7 @@ extension Sisp {
 			return .integer(value)
 			
 			case .word(let value)?, .quotedString(let value)?:
-			if let children = try parseLabelledChildren(from: &lexemes) {
+			if let children = try parseStructureChildren(from: &lexemes) {
 				return .structure(type: value, children: children)
 			} else {
 				return .string(value)
@@ -64,20 +64,22 @@ extension Sisp {
 		}
 	}
 	
-	/// Parses the labelled children of a structure encoded in `lexemes` between a leading and a trailing parenthesis, returning `nil` if `lexemes` doesn't start with a leading parenthesis.
+	/// Parses the children of a structure encoded in `lexemes` between a leading and a trailing parenthesis, returning `nil` if `lexemes` doesn't start with a leading parenthesis.
 	///
 	/// Any successfully parsed children are removed from `lexemes`.
 	///
 	/// - Returns: The parsed children, keyed by label, or `nil` if `lexemes` doesn't start with a leading parenthesis.
-	private static func parseLabelledChildren<C>(from lexemes: inout Lexemes<C>) throws -> LabelledChildren? {
+	private static func parseStructureChildren<C>(from lexemes: inout Lexemes<C>) throws -> StructureChildren? {
 		
 		guard lexemes.first == .leadingParenthesis else { return nil }
 		lexemes.removeFirst()
 		
-		var labelledChildren = LabelledChildren()
-		while let (name, child) = try parseLabelledChild(from: &lexemes) {
+		var labelledChildren = StructureChildren()
+		var index = 0
+		while let (name, child) = try parseStructureChild(from: &lexemes, childIndex: index) {
 			let previous = labelledChildren.updateValue(child, forKey: name)
 			guard previous == nil else { throw ParsingError.duplicateLabel(name) }
+			index += 1
 		}
 		
 		guard lexemes.popFirst() == .trailingParenthesis else { throw ParsingError.expectedTrailingParenthesis }
@@ -86,19 +88,27 @@ extension Sisp {
 		
 	}
 	
-	/// Parses a labelled child of a structure encoded in `lexemes`, returning `nil` if `lexemes` doesn't start with a label.
+	/// Parses a child of a structure encoded in `lexemes`, returning `nil` if `lexemes` starts with a trailing parenthesis.
 	///
-	/// If a labelled child is successfully parsed, it is removed from `lexemes` as well as up to one trailing separator; otherwise, `lexemes` remains unchanged.
+	/// If a child is successfully parsed, it is removed from `lexemes` as well as up to one trailing separator; otherwise, `lexemes` remains unchanged.
 	///
-	/// - Returns: The label and the child value, or `nil` if the leading lexeme doesn't start with a label.
-	private static func parseLabelledChild<C>(from lexemes: inout Lexemes<C>) throws -> LabelledChild? {
+	/// - Returns: The structure child, or `nil` if the leading lexeme starts with a trailing parenthesis.
+	private static func parseStructureChild<C>(from lexemes: inout Lexemes<C>, childIndex: Int) throws -> StructureChild? {
 		
 		let label: Label
 		switch lexemes.first {
-			case .label(let l)?, .quotedLabel(let l)?:	label = l
-			default:									return nil
+			
+			case .label(let l)?, .quotedLabel(let l)?:
+			label = l
+			lexemes.removeFirst()
+			
+			case .trailingParenthesis:
+			return nil
+			
+			default:
+			label = .numbered(childIndex)
+			
 		}
-		lexemes.removeFirst()
 		
 		let child = try Self.parseValueOrList(from: &lexemes)
 		

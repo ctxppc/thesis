@@ -44,7 +44,7 @@ extension Sisp {
 			}
 		}
 		
-		func serialiseLabelledChildren(_ children: LabelledChildren, isMultilineStructure: Bool) {
+		func serialiseStructureChildren(_ children: StructureChildren, isMultilineStructure: Bool) {
 			guard let (children, (label, child)) = children.elements.splittingLast() else { return }
 			for (label, child) in children {
 				serialise(label: label, child: child, isMultilineStructure: isMultilineStructure, isLast: false)
@@ -72,14 +72,14 @@ extension Sisp {
 				serialisation.write(.lexeme(for: type), then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
 			serialisation.write(.indentedNewline)
-			serialiseLabelledChildren(children, isMultilineStructure: true)
+			serialiseStructureChildren(children, isMultilineStructure: true)
 			serialisation.write(.outdentedNewline)
 			serialisation.write(.trailingParenthesis, then: nil)
 			
 			case .structure(type: let type, children: let children):
 				serialisation.write(.lexeme(for: type), then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
-			serialiseLabelledChildren(children, isMultilineStructure: false)
+			serialiseStructureChildren(children, isMultilineStructure: false)
 			serialisation.write(.trailingParenthesis, then: nil)
 			
 		}
@@ -108,9 +108,9 @@ extension Sisp {
 		/// Writes a lexeme in the serialisation.
 		///
 		/// - Parameters:
-		///   - lexeme: The lexeme to write.
+		///   - lexeme: The lexeme to write, or `nil` to write no lexeme.
 		///   - trailingWhitespace: The kind of whitespace that is required after the lexeme, or `nil` if no whitespace is required.
-		mutating func write(_ lexeme: Lexeme, then trailingWhitespace: Whitespace?) {
+		mutating func write(_ lexeme: Lexeme?, then trailingWhitespace: Whitespace?) {
 			
 			switch requiredTrailingWhitespace {
 				
@@ -128,7 +128,10 @@ extension Sisp {
 				
 			}
 			
-			serialised += "\(lexeme)"
+			if let lexeme = lexeme {
+				serialised += "\(lexeme)"
+			}
+			
 			if let whitespace = trailingWhitespace {
 				write(whitespace)
 			}

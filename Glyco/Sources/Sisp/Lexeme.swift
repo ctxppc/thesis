@@ -153,11 +153,19 @@ enum Lexeme : Equatable {
 			: .quotedString(string)
 	}
 	
-	/// Returns a lexeme that can represent `label`.
-	static func lexeme(for label: Label) -> Self {
-		wordPattern.hasMatches(over: label.rawValue[...])
-			? .label(label)
-			: .quotedLabel(label)
+	/// Returns a lexeme that can represent `label`, or `nil` if `label` isn't represented by a lexeme.
+	static func lexeme(for label: Label) -> Self? {
+		switch label {
+			
+			case .named(let name):
+			return wordPattern.hasMatches(over: name[...])
+				? .label(label)
+				: .quotedLabel(label)
+			
+			case .numbered:
+			return nil
+			
+		}
 	}
 	
 }

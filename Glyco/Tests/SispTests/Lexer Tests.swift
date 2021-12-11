@@ -71,4 +71,25 @@ final class LexerTests : XCTestCase {
 		
 	}
 	
+	func testUnlabelledStructure() throws {
+		
+		let serialised = "person(John, age: 21, big)"
+		
+		let actual = try Lexeme.lexemes(from: serialised)
+		let expected: [Lexeme] = [
+			.word("person"),
+			.leadingParenthesis,
+			.word("John"),
+			.separator,
+			.label("age"),
+			.integer(21),
+			.separator,
+			.word("big"),
+			.trailingParenthesis,
+		]
+		
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }

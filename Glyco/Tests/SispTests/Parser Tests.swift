@@ -33,4 +33,19 @@ final class ParserTests : XCTestCase {
 		
 	}
 	
+	func testUnlabelledStructure() throws {
+		
+		let serialised = "person(John, age: 21, big)"
+		
+		let actual = try Sisp(from: serialised)
+		let expected = Sisp.structure(type: "person", children: [
+			.numbered(0):	"John",
+			"age":			21,
+			"_2":			"big",
+		])
+		
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }

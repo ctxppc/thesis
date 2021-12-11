@@ -11,15 +11,18 @@ struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProto
 			throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Expected to decode structure", underlyingError: nil))
 		}
 		self.structureType = type
-		self.childrenByLabel = childrenByLabel
+		self.structureChildren = childrenByLabel
 		self.decoder = decoder
 	}
+	
+	/// The structure.
+	var sisp: Sisp { decoder.sisp }
 	
 	/// The structure's type.
 	private let structureType: String
 	
-	/// The structure's children, keyed by label.
-	private let childrenByLabel: Sisp.LabelledChildren
+	/// The structure's children.
+	private let structureChildren: Sisp.StructureChildren
 	
 	/// The decoder.
 	let decoder: SispDecoder
@@ -124,7 +127,7 @@ struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProto
 		try check(key)
 		var deeperDecoder = decoder
 		deeperDecoder.codingPath.append(key)
-		return .init(StructureBodyDecodingContainer(childrenByLabel: childrenByLabel, decoder: deeperDecoder))
+		return .init(StructureBodyDecodingContainer(children: structureChildren, decoder: deeperDecoder))
 	}
 	
 	// See protocol.

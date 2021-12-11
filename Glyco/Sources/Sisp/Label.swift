@@ -2,7 +2,10 @@
 
 public enum Label : Hashable {
 	
+	/// A named label.
 	case named(String)
+	
+	/// An unnamed label at given zero-based position.
 	case numbered(Int)
 	
 	public init<S : StringProtocol>(rawValue: S) {

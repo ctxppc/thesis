@@ -19,15 +19,25 @@ public enum Sisp : Hashable {
 	
 	/// A list of values.
 	///
-	/// A list is serialised as its elements' serialisations, separated by whitespace. Since there is no additional syntax, a list of zero elements is serialised as zero lexemes, and a list of one element is serialised using the child's serialisation only. This is an intentional decision to simplify notation. Decoders must take care to accommodate for this.
+	/// A list is serialised as:
+	///
+	///     child_1 child_2 … child_n
+	///
+	/// Since there is no additional syntax associated with the list construct, a list of zero elements is serialised as zero lexemes, and a list of one element is serialised using the child's serialisation only. This is an intentional decision to simplify notation. Decoders must take care to accommodate for this.
 	case list([Self])
 	
-	/// A structure of type `type` containing labelled children `children`.
+	/// A structure of type `type` containing children `children`.
 	///
-	/// A structure is serialised as its `type` using a `word` (if possible) or `quotedString` lexeme (otherwise); a leading parenthesis lexeme; its labelled children, each separated by a separator lexeme; and finally a trailing parenthesis. Each labelled child is serialised using a label lexeme (if possible) or quoted label lexeme (otherwise) for the label followed by the child's serialisation. For example, `car(colour: blue, size: "very large")`.
-	case structure(type: String, children: LabelledChildren)
-	public typealias LabelledChildren = OrderedDictionary<Label, Self>
-	public typealias LabelledChild = (Label, Self)
+	/// A structure is serialised as:
+	///
+	///     type ( label_1: child_1 , label_2: child_2 … , label_n: child_n )
+	///
+	/// for each `label_i`–`child_i` pair in `children`. Each `label_i:` is either omitted (if `.numbered`), a label (if representable), or a quoted label (otherwise). For example:
+	///
+	///     car(colour: blue, size: "quite small", 2007)
+	case structure(type: String, children: StructureChildren)
+	public typealias StructureChildren = OrderedDictionary<Label, Self>
+	public typealias StructureChild = (Label, Self)
 	
 	/// A value describing the type of value contained in `self`.
 	var typeDescription: String {
