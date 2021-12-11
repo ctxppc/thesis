@@ -8,18 +8,18 @@ extension AL {
 		/// The name with which the procedure can be invoked.
 		public var name: Label
 		
-		/// The procedure's effect when invoked.
-		public var effect: Effect
-		
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
 		public typealias Parameter = Lower.Procedure.Parameter
+		
+		/// The procedure's effect when invoked.
+		public var effect: Effect
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {	// does not support AL.Context
 			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
 			var context = AL.Context(assignments: .init(conflicts: conflicts))
-			return .init(name: name, effect: try effect.lowered(in: &context), parameters: parameters)
+			return .init(name: name, parameters: parameters, effect: try effect.lowered(in: &context))
 		}
 		
 	}

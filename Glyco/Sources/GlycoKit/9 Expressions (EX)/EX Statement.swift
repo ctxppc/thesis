@@ -5,39 +5,39 @@ extension EX {
 	/// A description of an action.
 	public enum Statement : Codable, Equatable, SimplyLowerable {
 		
-		/// A statement that computes `value` and puts it in `destination`.
-		case assign(destination: Location, value: Expression)
+		/// A statement that assigns given location the value evaluated by given expression.
+		case assign(Location, to: Expression)
 		
-		/// A statement that performs `statements`.
-		case compound(statements: [Statement])
+		/// A statement that a sequence of statements.
+		case sequence([Statement] = [])
 		
-		/// A statement that performs `affirmative` if `predicate` holds, or `negative` otherwise.
-		indirect case conditional(predicate: Predicate, affirmative: Statement, negative: Statement)
+		/// A statement that performs `then` if the predicate holds, or `else` otherwise.
+		indirect case `if`(Predicate, then: Statement, else: Statement = .sequence())
 		
-		/// A statement that invokes the procedure named `procedure` passing `arguments` as arguments to it.
-		case invoke(procedure: Label, arguments: [Expression])
+		/// A statement that invokes the named procedure with given arguments.
+		case invoke(Label, [Expression])
 		
-		/// A statement that terminates the program with `result`.
-		case `return`(result: Expression)
+		/// A statement that terminates the program with a result value.
+		case `return`(Expression)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
-				case .assign(destination: let destination, value: let value):
+				case .assign(let destination, to: let value):
 				return value.lowered(destination: destination, context: &context)
 				
-				case .compound(statements: let statements):
+				case .sequence(let statements):
 				return .sequence(effects: try statements.lowered(in: &context))
 				
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+				case .if(let predicate, then: let affirmative, else: let negative):
 				return .conditional(
 					predicate:		predicate,
 					affirmative:	try affirmative.lowered(in: &context),
 					negative:		try negative.lowered(in: &context)
 				)
 				
-				case .invoke(procedure: let procedure, arguments: let arguments):
+				case .invoke(let procedure, let arguments):
 				var loweredArguments = [Lower.Source]()
 				var copyEffects = [Lower.Effect]()
 				for argument in arguments {
@@ -79,5 +79,5 @@ extension EX {
 }
 
 public func <- (destination: EX.Location, source: EX.Expression) -> EX.Statement {
-	.assign(destination: destination, value: source)
+	.assign(destination, to: source)
 }

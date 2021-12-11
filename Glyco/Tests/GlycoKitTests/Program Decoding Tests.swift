@@ -10,13 +10,13 @@ final class DecodingTests : XCTestCase {
 		
 		let actual = try SispDecoder(from: """
 			program(
-				body: compound(statements:
-					conditional(
-						predicate:		constant(value: true),
-						affirmative:	assign(destination: location(id: 1), value: constant(value: 1)),
-						negative:		compound(statements:)
+				body: sequence(
+					if(
+						constant(value: true),
+						then:	assign(location(id: 1), to: constant(value: 1)),
+						else:	sequence()
 					)
-					return(result: location(location: location(id: 1)))
+					return(location(location: location(id: 1)))
 				),
 				procedures:
 			)
@@ -24,13 +24,12 @@ final class DecodingTests : XCTestCase {
 		
 		let location = EX.Location.location(id: 1)
 		let expected = EX.Program.program(
-			body: .compound(statements: [
-				.conditional(
-					predicate:		.constant(value: true),
-					affirmative:	.assign(destination: location, value: .constant(value: 1)),
-					negative:		.compound(statements: [])
+			body: .sequence([
+				.if(
+					.constant(value: true),
+					then:	.assign(location, to: .constant(value: 1))
 				),
-				.return(result: .location(location: location)),
+				.return(.location(location: location)),
 			]),
 			procedures:	[]
 		)

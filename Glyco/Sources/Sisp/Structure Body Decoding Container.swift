@@ -24,9 +24,17 @@ struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	// See protocol.
 	let allKeys: [Key]
 	
+	/// The numbered label representing the implied list child beyond the last child.
+	///
+	/// This special label is necessary because an unlabelled empty list at the last position in a structure body has no syntax. When this label is requested during decoding, we must assume that the requested child is an empty list.
+	private var labelBeyondLast: Label { .numbered(children.count) }
+	
 	// See protocol.
 	func contains(_ key: Key) -> Bool {
-		TODO.unimplemented
+		switch Label(rawValue: key.stringValue) {
+			case labelBeyondLast:	return true
+			case let label:			return children.keys.contains(label)
+		}
 	}
 	
 	// See protocol.
@@ -130,10 +138,13 @@ struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	}
 	
 	private func child(forKey key: Key) throws -> Sisp {
-		guard let child = children[.init(rawValue: key.stringValue)] else {
+		if let child = children[.init(rawValue: key.stringValue)] {
+			return child
+		} else if key.stringValue == labelBeyondLast.rawValue {
+			return .list([])
+		} else {
 			throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "No child labelled “\(key.stringValue)”", underlyingError: nil))
 		}
-		return child
 	}
 	
 	private func singleValueContainer(forKey key: Key) throws -> SingleValueDecodingContainer {

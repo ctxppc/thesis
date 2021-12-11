@@ -8,9 +8,6 @@ extension PA {
 		/// The name with which the procedure can be invoked.
 		var name: Label
 		
-		/// The procedure's effect when invoked.
-		var effect: Effect
-		
 		/// The procedure's parameters.
 		var parameters: [Parameter]
 		public struct Parameter : Codable, Equatable {
@@ -19,6 +16,9 @@ extension PA {
 			public let dataType: DataType
 			
 		}
+		
+		/// The procedure's effect when invoked.
+		var effect: Effect
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
