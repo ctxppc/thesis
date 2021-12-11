@@ -5,7 +5,7 @@ import DepthKit
 extension AL {
 	
 	/// An abstract storage location on an AL machine.
-	public enum Location : Codable, Hashable, SimplyLowerable {
+	public enum Location : Codable, Hashable, Comparable, SimplyLowerable {
 		
 		/// A location with given procedure-wide identifier.
 		case location(id: Int)

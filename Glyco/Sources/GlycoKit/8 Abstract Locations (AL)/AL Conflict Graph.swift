@@ -40,7 +40,7 @@ extension AL {
 		/// Returns the locations in the graph, ordered by increasing number of conflicts.
 		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
 			conflictingLocationsForLocation
-				.sorted { $0.value.count < $1.value.count }
+				.sorted { ($0.value.count, $0.key) < ($1.value.count, $1.key) }	// also order by location for deterministic ordering
 				.map(\.key)
 		}
 		
