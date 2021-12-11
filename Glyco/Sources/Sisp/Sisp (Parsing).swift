@@ -91,11 +91,11 @@ extension Sisp {
 	/// If a labelled child is successfully parsed, it is removed from `lexemes` as well as up to one trailing separator; otherwise, `lexemes` remains unchanged.
 	///
 	/// - Returns: The label and the child value, or `nil` if the leading lexeme doesn't start with a label.
-	private static func parseLabelledChild<C>(from lexemes: inout Lexemes<C>) throws -> (name: String, child: Self)? {
+	private static func parseLabelledChild<C>(from lexemes: inout Lexemes<C>) throws -> LabelledChild? {
 		
-		let name: String
+		let label: Label
 		switch lexemes.first {
-			case .label(let n)?, .quotedLabel(let n)?:	name = n
+			case .label(let l)?, .quotedLabel(let l)?:	label = l
 			default:									return nil
 		}
 		lexemes.removeFirst()
@@ -106,7 +106,7 @@ extension Sisp {
 			lexemes.removeFirst()
 		}
 		
-		return (name, child)
+		return (label, child)
 		
 	}
 	
@@ -118,7 +118,7 @@ extension Sisp {
 		case unexpectedLexeme(SispLexeme)
 		
 		/// An error indicating that a structure contains two children with the same label.
-		case duplicateLabel(String)
+		case duplicateLabel(Label)
 		
 		/// An error indicating that a trailing parenthesis is expected.
 		case expectedTrailingParenthesis

@@ -9,7 +9,7 @@ struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContai
 	init(childrenByLabel: Sisp.LabelledChildren, decoder: SispDecoder) {
 		self.childrenByLabel = childrenByLabel
 		self.decoder = decoder
-		self.allKeys = childrenByLabel.keys.compactMap { .init(stringValue: $0) }
+		self.allKeys = childrenByLabel.keys.compactMap { .init(stringValue: $0.rawValue) }
 	}
 	
 	/// The structure's children, keyed by label.
@@ -130,7 +130,7 @@ struct SispStructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContai
 	}
 	
 	private func child(forKey key: Key) throws -> Sisp {
-		guard let child = childrenByLabel[key.stringValue] else {
+		guard let child = childrenByLabel[.init(rawValue: key.stringValue)] else {
 			throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "No child labelled “\(key.stringValue)”", underlyingError: nil))
 		}
 		return child

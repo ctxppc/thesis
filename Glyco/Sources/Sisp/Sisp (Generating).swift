@@ -16,10 +16,10 @@ extension Sisp {
 	/// Serialises `self` to `serialisation`.
 	private func serialise(into serialisation: inout Serialisation) {
 		
-		func serialise(label: String, child: Self, isMultilineStructure: Bool, isLast: Bool) {
+		func serialise(label: Label, child: Self, isMultilineStructure: Bool, isLast: Bool) {
 			if isMultilineStructure {
 				if child.hasMultilineSerialisation() {
-					serialisation.write(.lexeme(forLabel: label), then: .indentedNewline)
+					serialisation.write(.lexeme(for: label), then: .indentedNewline)
 					child.serialise(into: &serialisation)
 					if isLast {
 						serialisation.write(.outdentedNewline)
@@ -27,7 +27,7 @@ extension Sisp {
 						serialisation.write(.separator, then: .outdentedNewline)
 					}
 				} else {
-					serialisation.write(.lexeme(forLabel: label), then: .spaceOrNewline)
+					serialisation.write(.lexeme(for: label), then: .spaceOrNewline)
 					child.serialise(into: &serialisation)
 					if isLast {
 						serialisation.write(.newline())
@@ -36,7 +36,7 @@ extension Sisp {
 					}
 				}
 			} else {
-				serialisation.write(.lexeme(forLabel: label), then: .spaceOrNewline)
+				serialisation.write(.lexeme(for: label), then: .spaceOrNewline)
 				child.serialise(into: &serialisation)
 				if !isLast {
 					serialisation.write(.separator, then: .spaceOrNewline)
@@ -58,7 +58,7 @@ extension Sisp {
 			serialisation.write(.integer(value), then: nil)
 			
 			case .string(let value):
-			serialisation.write(.lexeme(forLiteral: value), then: nil)
+				serialisation.write(.lexeme(for: value), then: nil)
 			
 			case .list(let elements):
 			guard let (elements, last) = elements.splittingLast() else { return }
@@ -69,7 +69,7 @@ extension Sisp {
 			last.serialise(into: &serialisation)
 			
 			case .structure(type: let type, children: let children) where hasMultilineSerialisation():
-			serialisation.write(.lexeme(forLiteral: type), then: nil)
+				serialisation.write(.lexeme(for: type), then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
 			serialisation.write(.indentedNewline)
 			serialiseLabelledChildren(children, isMultilineStructure: true)
@@ -77,7 +77,7 @@ extension Sisp {
 			serialisation.write(.trailingParenthesis, then: nil)
 			
 			case .structure(type: let type, children: let children):
-			serialisation.write(.lexeme(forLiteral: type), then: nil)
+				serialisation.write(.lexeme(for: type), then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
 			serialiseLabelledChildren(children, isMultilineStructure: false)
 			serialisation.write(.trailingParenthesis, then: nil)

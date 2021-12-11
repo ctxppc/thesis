@@ -26,14 +26,14 @@ enum SispLexeme : Equatable {
 	/// A lexeme specifying a label for a child, e.g., `destination:`.
 	///
 	/// - Parameter 1: The label, excluding `:` marker.
-	case label(String)
+	case label(Label)
 	private static let labelPattern = labelToken • ":"
 	private static let labelToken = Token(identifierPattern)
 	
 	/// A lexeme specifying a quoted label for a child, e.g., `"the destination":`.
 	///
-	/// - Parameter 1: The label, excluding the `:` marker, bounding quotation marks, and escape characters.
-	case quotedLabel(String)
+	/// - Parameter 1: The label, *excluding* the `:` marker, bounding quotation marks, and escape characters.
+	case quotedLabel(Label)
 	private static let quotedLabelPattern = #"""# • quotedLabelToken • #"""# • ":"
 	private static let quotedLabelToken = Token(literalCharacterPattern*)
 	
@@ -45,7 +45,7 @@ enum SispLexeme : Equatable {
 	
 	/// A lexeme specifying a quoted string, e.g., `"Five Guys"`.
 	///
-	/// - Parameter 1: The string, excluding bounding quotation marks and escape characters.
+	/// - Parameter 1: The string, *excluding* bounding quotation marks and escape characters.
 	case quotedString(String)
 	private static let quotedStringPattern = #"""# • quotedStringToken • #"""#
 	private static let quotedStringToken = Token(literalCharacterPattern*)
@@ -104,17 +104,17 @@ enum SispLexeme : Equatable {
 			?? extractMatch(using: Self.separatorPattern) { _ in .separator }
 			?? extractMatch(using:Self.quotedLabelPattern) { match in
 				let value = match.captures(for: Self.quotedLabelToken).first !! "Expected capture"
-				return .quotedLabel(.init(value).nonescaped)
+				return .quotedLabel(.init(fromEscapedRawValue: value))
 			} ?? extractMatch(using: Self.quotedStringPattern) { match in
 				let value = match.captures(for: Self.quotedStringToken).first !! "Expected capture"
-				return .quotedString(.init(value).nonescaped)
+				return .quotedString(.init(fromEscaped: value))
 			} ?? extractMatch(using: Self.integerPattern) { match in
 				let string = match.matchedElements(direction: .forward)
 				guard let integer = Int(string) else { throw LexingError.unrepresentableIntegerLiteral(literal: string, unlexedPortion: stream) }
 				return .integer(integer)
 			} ?? extractMatch(using: Self.labelPattern) { match in
 				let label = match.captures(for: Self.labelToken).first !! "Expected capture"
-				return .label(.init(label))
+				return .label(.init(rawValue: label))
 			} ?? extractMatch(using: Self.wordPattern) { .word(.init($0.matchedElements(direction: .forward))) }
 		
 		guard let lexeme = lexeme else {
@@ -146,18 +146,18 @@ enum SispLexeme : Equatable {
 		
 	}
 	
-	/// Returns a lexeme that can represent the literal `string`.
-	static func lexeme(forLiteral string: String) -> Self {
+	/// Returns a lexeme that can represent `string`.
+	static func lexeme(for string: String) -> Self {
 		wordPattern.hasMatches(over: string[...])
 			? .word(string)
-			: .quotedString(string.escaped)
+			: .quotedString(string)
 	}
 	
-	/// Returns a lexeme that can represent the label `label`.
-	static func lexeme(forLabel label: String) -> Self {
-		wordPattern.hasMatches(over: label[...])
+	/// Returns a lexeme that can represent `label`.
+	static func lexeme(for label: Label) -> Self {
+		wordPattern.hasMatches(over: label.rawValue[...])
 			? .label(label)
-			: .quotedLabel(label.escaped)
+			: .quotedLabel(label)
 	}
 	
 }
@@ -169,24 +169,40 @@ extension SispLexeme : CustomStringConvertible {
 			case .trailingParenthesis:		return ")"
 			case .separator:				return ","
 			case .integer(let value):		return "\(value)"
-			case .label(let name):			return "\(name):"
-			case .quotedLabel(let name):	return #""\#(name.escaped)":"#
+			case .label(let label):			return "\(label):"
+			case .quotedLabel(let label):	return #""\#(label.escapedRawValue)":"#
 			case .word(let value):			return value
 			case .quotedString(let string):	return #""\#(string.escaped)""#
 		}
 	}
 }
 
-extension String {
+private extension String {
+	
+	/// Copies `escaped` but with escaped quotation marks replaced by nonescaped quotation marks.
+	init<S : StringProtocol>(fromEscaped escaped: S) {
+		self = escaped.replacingOccurrences(of: #""""#, with: #"""#)
+	}
+	
+}
+
+private extension StringProtocol {
 	
 	/// `self`, but with quotation marks replaced by escaped quotation marks.
-	var escaped: Self {
+	var escaped: String {
 		replacingOccurrences(of: #"""#, with: #""""#)
 	}
 	
-	/// `self`, but with escaped quotation marks replaced by nonescaped quotation marks.
-	var nonescaped: Self {
-		replacingOccurrences(of: #""""#, with: #"""#)
+}
+
+private extension Label {
+	
+	init<S : StringProtocol>(fromEscapedRawValue escapedRawValue: S) {
+		self.init(rawValue: .init(fromEscaped: escapedRawValue))
+	}
+	
+	var escapedRawValue: String {
+		rawValue.escaped
 	}
 	
 }

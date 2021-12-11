@@ -26,7 +26,8 @@ public enum Sisp : Hashable {
 	///
 	/// A structure is serialised as its `type` using a `word` (if possible) or `quotedString` lexeme (otherwise); a leading parenthesis lexeme; its labelled children, each separated by a separator lexeme; and finally a trailing parenthesis. Each labelled child is serialised using a label lexeme (if possible) or quoted label lexeme (otherwise) for the label followed by the child's serialisation. For example, `car(colour: blue, size: "very large")`.
 	case structure(type: String, children: LabelledChildren)
-	public typealias LabelledChildren = OrderedDictionary<String, Self>
+	public typealias LabelledChildren = OrderedDictionary<Label, Self>
+	public typealias LabelledChild = (Label, Self)
 	
 	/// A value describing the type of value contained in `self`.
 	var typeDescription: String {
