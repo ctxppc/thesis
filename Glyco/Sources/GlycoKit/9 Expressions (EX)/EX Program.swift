@@ -6,13 +6,13 @@ public enum EX : Language {
 	/// A program on an EX machine.
 	public enum Program : Codable, GlycoKit.Program {
 		
-		/// A program with given body and procedures.
-		case program(body: Statement, procedures: [Procedure])
+		/// A program with given main body and procedures.
+		case program(Statement, procedures: [Procedure])
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			switch self {
-				case .program(let body, let procedures):
+				case .program(let body, procedures: let procedures):
 				var context = Context()
 				return try .init(effect: body.lowered(in: &context), procedures: procedures.lowered(in: &context))
 			}

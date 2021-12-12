@@ -100,4 +100,32 @@ final class GenerationTests : XCTestCase {
 		
 	}
 	
+	func testUnlabelledList() {
+		
+		let sisp = Sisp.structure(type: "fruit", children: [
+			.numbered(0):	[
+				"apples",
+				"bananas",
+				"cherries",
+				.structure(type: "grapes", children: [
+					"colour": "green"
+				])
+			],
+		])
+		
+		let actual = sisp.serialised()
+		let expected = """
+			fruit(
+				
+					apples
+					bananas
+					cherries
+					grapes(colour: green)
+			)
+			"""
+		
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }

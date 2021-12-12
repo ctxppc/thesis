@@ -6,7 +6,7 @@ extension AL {
 	public enum Predicate : Codable, Equatable, SimplyLowerable {
 		
 		/// A constant predicate.
-		case constant(value: Bool)
+		case constant(Bool)
 		
 		/// A predicate that holds iff *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case relation(lhs: Source, relation: BranchRelation, rhs: Source)
@@ -19,7 +19,7 @@ extension AL {
 			switch negated {
 				
 				case .constant(value: let holds):
-				return .constant(value: !holds)
+				return .constant(!holds)
 				
 				case .relation(let lhs, let relation, let rhs):
 				return .relation(lhs: lhs, relation: relation.negated, rhs: rhs)

@@ -4,7 +4,6 @@ import ArgumentParser
 import DepthKit
 import Foundation
 import GlycoKit
-import Yams
 
 @main
 struct CompileCommand : ParsableCommand {
@@ -42,11 +41,11 @@ struct CompileCommand : ParsableCommand {
 		let configuration = CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL)
 		
 		let sourceLanguage = source.pathExtension.uppercased()
-		let sourceData = try Data(contentsOf: source)
+		let sourceString = try String(contentsOf: source)
 		
 		if let language = language {
 			let ir = try HighestSupportedLanguage.loweredProgramRepresentation(
-				fromData:		sourceData,
+				fromSispString:	sourceString,
 				sourceLanguage:	sourceLanguage,
 				targetLanguage:	language.uppercased(),
 				configuration:	configuration
@@ -59,7 +58,7 @@ struct CompileCommand : ParsableCommand {
 			}
 		} else {
 			let elf = try HighestSupportedLanguage.elfFromProgram(
-				fromData:		sourceData,
+				fromSispString:	sourceString,
 				sourceLanguage:	sourceLanguage,
 				configuration:	configuration
 			)

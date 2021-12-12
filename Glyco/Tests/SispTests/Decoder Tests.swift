@@ -11,7 +11,7 @@ final class DecoderTests : XCTestCase {
 			case value
 		}
 		
-		let actual = try SispDecoder(from: "value").decode(type: Value.self)
+		let actual = try SispDecoder(from: "value").decode(Value.self)
 		let expected = Value.value
 		
 		XCTAssertEqual(actual, expected)
@@ -24,7 +24,7 @@ final class DecoderTests : XCTestCase {
 			case value(number: Int)
 		}
 		
-		let actual = try SispDecoder(from: "value(number: 5)").decode(type: Value.self)
+		let actual = try SispDecoder(from: "value(number: 5)").decode(Value.self)
 		let expected = Value.value(number: 5)
 		
 		XCTAssertEqual(actual, expected)
@@ -38,11 +38,11 @@ final class DecoderTests : XCTestCase {
 			case string(string: String)
 		}
 		
-		let actual1 = try SispDecoder(from: "number(number: 5)").decode(type: Value.self)
+		let actual1 = try SispDecoder(from: "number(number: 5)").decode(Value.self)
 		let expected1 = Value.number(number: 5)
 		XCTAssertEqual(actual1, expected1)
 		
-		let actual2 = try SispDecoder(from: "string(string: test)").decode(type: Value.self)
+		let actual2 = try SispDecoder(from: "string(string: test)").decode(Value.self)
 		let expected2 = Value.string(string: "test")
 		XCTAssertEqual(actual2, expected2)
 		
@@ -59,12 +59,12 @@ final class DecoderTests : XCTestCase {
 			case that(v: Value)
 		}
 		
-		let actual = try SispDecoder(from: "this(value: value(number: 5))").decode(type: Thing.self)
+		let actual = try SispDecoder(from: "this(value: value(number: 5))").decode(Thing.self)
 		let expected = Thing.this(value: .value(number: 5))
 		XCTAssertEqual(actual, expected)
 		
 		let wrongLabel = try SispDecoder(from: "that(value: value(number: 5))")
-		XCTAssertThrowsError(try wrongLabel.decode(type: Thing.self))
+		XCTAssertThrowsError(try wrongLabel.decode(Thing.self))
 		
 	}
 	

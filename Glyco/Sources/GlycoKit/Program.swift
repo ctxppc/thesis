@@ -1,7 +1,7 @@
 // Glyco © 2021 Constantino Tsarouhas
 
 import Foundation
-import Yams
+import Sisp
 
 public protocol Program : Codable, Equatable {
 	
@@ -60,7 +60,10 @@ extension Program {
 	}
 	
 	public func write(to url: URL) throws {
-		try YAMLEncoder().encode(self).write(to: url, atomically: false, encoding: .utf8)
+		try SispEncoder()
+			.encode(self)
+			.serialised()
+			.write(to: url, atomically: false, encoding: .utf8)
 	}
 	
 }

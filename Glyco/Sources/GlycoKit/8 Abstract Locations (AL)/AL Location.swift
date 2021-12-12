@@ -8,7 +8,7 @@ extension AL {
 	public enum Location : Codable, Hashable, Comparable, SimplyLowerable {
 		
 		/// A location with given procedure-wide identifier.
-		case location(id: Int)
+		case location(Int)
 		
 		// See protocol.
 		func lowered(in context: inout Context) -> Lower.Location {

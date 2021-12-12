@@ -17,7 +17,6 @@ let package = Package(
 		.package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
 		.package(url: "https://github.com/ctxppc/DepthKit.git", .upToNextMinor(from: "0.10.0")),
 		.package(url: "https://github.com/ctxppc/PatternKit.git", .upToNextMinor(from: "0.4.0")),
-		.package(url: "https://github.com/jpsim/Yams.git", from: "4.0.6"),	// TODO: Remove when no longer needed.
 	],
 	targets:		[
 		
@@ -27,7 +26,7 @@ let package = Package(
 		]),
 		
 		.target(name: "GlycoKit", dependencies: [
-			"Sisp", "Yams",
+			"Sisp",
 			.product(name: "Collections", package: "swift-collections"),
 			.product(name: "DepthKit", package: "DepthKit"),
 		]),

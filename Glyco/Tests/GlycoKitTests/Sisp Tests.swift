@@ -8,14 +8,14 @@ final class SispCodingTests : XCTestCase {
 	
 	func testEncodingEX() throws {
 		
-		let location = EX.Location.location(id: 1)
+		let location = EX.Location.location(1)
 		let program = EX.Program.program(
-			body: .sequence([
+			.sequence([
 				.if(
-					.constant(value: true),
-					then:	.assign(location, to: .constant(value: 1))
+					.constant(true),
+					then:	.assign(location, to: .constant(1))
 				),
-				.return(.location(location: location)),
+				.return(.location(location)),
 			]),
 			procedures:	[]
 		)
@@ -23,11 +23,11 @@ final class SispCodingTests : XCTestCase {
 		let actual = try SispEncoder().encode(program).serialised()
 		let expected = """
 			program(
-				body:
+				
 					sequence(
 						
-							if( constant(value: true), then: assign( location(id: 1), to: constant(value: 1)), else: sequence())
-							return( location(location: location(id: 1)))
+							if( constant( true), then: assign( location( 1), to: constant( 1)), else: sequence())
+							return( location( location( 1)))
 					)
 			)
 			"""
@@ -40,26 +40,26 @@ final class SispCodingTests : XCTestCase {
 		
 		let actual = try SispDecoder(from: """
 			program(
-				body: sequence(
+				sequence(
 					if(
-						constant(value: true),
-						then:	assign(location(id: 1), to: constant(value: 1)),
+						constant(true),
+						then:	assign(location( 1), to: constant(1)),
 						else:	sequence()
 					)
-					return(location(location: location(id: 1)))
+					return(location(location( 1)))
 				),
 				procedures:
 			)
-			""").decode(type: EX.Program.self)
+			""").decode(EX.Program.self)
 		
-		let location = EX.Location.location(id: 1)
+		let location = EX.Location.location(1)
 		let expected = EX.Program.program(
-			body: .sequence([
+			.sequence([
 				.if(
-					.constant(value: true),
-					then:	.assign(location, to: .constant(value: 1))
+					.constant(true),
+					then:	.assign(location, to: .constant(1))
 				),
-				.return(.location(location: location)),
+				.return(.location(location)),
 			]),
 			procedures:	[]
 		)

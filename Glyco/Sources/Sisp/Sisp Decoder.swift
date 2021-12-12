@@ -73,7 +73,7 @@ public struct SispDecoder : Decoder {
 		SingleValueDecodingContainer(decoder: self)
 	}
 	
-	public func decode<T : Decodable>(type: T.Type) throws -> T {
+	public func decode<T : Decodable>(_: T.Type) throws -> T {
 		try .init(from: self)
 	}
 	
