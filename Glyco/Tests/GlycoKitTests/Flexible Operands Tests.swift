@@ -13,19 +13,14 @@ final class FlexibleOperandsTests : XCTestCase {
 		let c = frame.allocate(.word)
 		
 		let source = FO.Program(effects: [
-			.compute(
-				destination:	.frameCell(c),
-				lhs:			.location(.frameCell(a)),
-				operation:		.add,
-				rhs:			.location(.frameCell(b))
-			)
+			.compute(destination: .frameCell(c), .location(.frameCell(a)), .add, .location(.frameCell(b)))
 		])
 		
 		let actual = try source.lowered(configuration: .init(target: .sail))
 		let expected = FL.Program(instructions: [
 			.load(.word, destination: .t1, source: .location(offset: -4)),
 			.load(.word, destination: .t2, source: .location(offset: -8)),
-			.compute(destination: .t3, value: .registerRegister(rs1: .t1, operation: .add, rs2: .t2)),
+			.compute(destination: .t3, value: .registerRegister(.t1, .add, .t2)),
 			.store(.word, destination: .location(offset: -12), source: .t3),
 		])
 		
