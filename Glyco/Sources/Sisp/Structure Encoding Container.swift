@@ -93,11 +93,10 @@ struct StructureEncodingContainer<Key : CodingKey> : KeyedEncodingContainerProto
 	
 	// See protocol.
 	mutating func nestedContainer<NestedKey : CodingKey>(keyedBy keyType: NestedKey.Type, forKey key: Key) -> KeyedEncodingContainer<NestedKey> {
-		let deeperIndexPath = indexPath + [.label(.init(rawValue: key.stringValue))]
-		encoder.sisp[deeperIndexPath] = .structure(type: key.stringValue, children: [:])
+		encoder.sisp[indexPath] = .structure(type: key.stringValue, children: [:])
 		return .init(StructureBodyEncodingContainer(
 			encoder:	encoder,
-			indexPath:	deeperIndexPath,
+			indexPath:	indexPath,
 			codingPath:	codingPath + [key]
 		))
 	}
