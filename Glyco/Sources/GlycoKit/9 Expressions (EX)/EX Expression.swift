@@ -28,16 +28,16 @@ extension EX {
 				return .copy(destination: destination, source: .location(location))
 				
 				case .binary(.constant(value: let first), let op, .constant(value: let second)):
-				return .compute(destination: destination, lhs: .immediate(first), operation: op, rhs: .immediate(second))
+				return .compute(destination: destination, .immediate(first), op, .immediate(second))
 				
 				case .binary(.constant(value: let first), let op, .location(location: let second)):
-				return .compute(destination: destination, lhs: .immediate(first), operation: op, rhs: .location(second))
+				return .compute(destination: destination, .immediate(first), op, .location(second))
 				
 				case .binary(.location(location: let first), let op, .constant(value: let second)):
-				return .compute(destination: destination, lhs: .location(first), operation: op, rhs: .immediate(second))
+				return .compute(destination: destination, .location(first), op, .immediate(second))
 				
 				case .binary(.location(location: let first), let op, .location(location: let second)):
-				return .compute(destination: destination, lhs: .location(first), operation: op, rhs: .location(second))
+				return .compute(destination: destination, .location(first), op, .location(second))
 				
 				case .binary(let first, let op, let second):
 				let firstLocation = context.allocateLocation()
@@ -50,10 +50,10 @@ extension EX {
 				])
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return .conditional(
-					predicate:		predicate,
-					affirmative:	affirmative.lowered(destination: destination, context: &context),
-					negative:		negative.lowered(destination: destination, context: &context)
+				return .if(
+					predicate,
+					then:	affirmative.lowered(destination: destination, context: &context),
+					else:	negative.lowered(destination: destination, context: &context)
 				)
 				
 			}

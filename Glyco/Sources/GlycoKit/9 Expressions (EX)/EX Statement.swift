@@ -31,10 +31,10 @@ extension EX {
 				return .sequence(try statements.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return .conditional(
-					predicate:		predicate,
-					affirmative:	try affirmative.lowered(in: &context),
-					negative:		try negative.lowered(in: &context)
+				return .if(
+					predicate,
+					then:	try affirmative.lowered(in: &context),
+					else:	try negative.lowered(in: &context)
 				)
 				
 				case .invoke(let procedure, let arguments):
@@ -56,19 +56,19 @@ extension EX {
 						
 					}
 				}
-				return .sequence(copyEffects + [.invoke(procedure: procedure, arguments: loweredArguments)])
+				return .sequence(copyEffects + [.invoke(procedure, loweredArguments)])
 				
 				case .return(result: .constant(value: let value)):
-				return .return(result: .immediate(value))
+				return .return(.immediate(value))
 				
 				case .return(result: .location(location: let location)):
-				return .return(result: .location(location))
+				return .return(.location(location))
 				
 				case .return(result: let result):
 				let resultLocation = context.allocateLocation()
 				return .sequence([
 					result.lowered(destination: resultLocation, context: &context),
-					.return(result: .location(resultLocation)),
+					.return(.location(resultLocation)),
 				])
 				
 			}

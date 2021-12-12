@@ -10,10 +10,10 @@ final class ArithmeticTests : XCTestCase {
 		let location = AL.Location.location(0)
 		
 		let program = AL.Program.program(
-			.sequence(effects: [
+			.sequence([
 				location <- .immediate(1),
-				.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
-				.return(result: .location(location))
+				.compute(destination: location, .immediate(2), .add, .location(location)),
+				.return(.location(location))
 			]),
 			procedures: []
 		)
@@ -71,14 +71,14 @@ final class ArithmeticTests : XCTestCase {
 		let isEven = AL.Location.location(1)
 		
 		let program = AL.Program.program(
-			.sequence(effects: [
-				.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
-				.conditional(
-					predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
-					affirmative:	isEven <- .immediate(1),
-					negative:		isEven <- .immediate(0)
+			.sequence([
+				.compute(destination: testedNumber, .immediate(12), .subtract, .immediate(11)),
+				.if(
+					.relation(.location(testedNumber), .equal, .immediate(1)),
+					then:	isEven <- .immediate(1),
+					else:	isEven <- .immediate(0)
 				),
-				.return(result: .location(isEven))
+				.return(.location(isEven))
 			]),
 			procedures:	[]
 		)

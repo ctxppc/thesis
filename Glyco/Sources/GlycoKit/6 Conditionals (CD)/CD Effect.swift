@@ -15,18 +15,18 @@ extension CD {
 		case copy(destination: Location, source: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
+		case compute(destination: Location, Source, BinaryOperator, Source)
 		
-		/// An effect that performs `affirmative` if `predicate` holds, or `negative` otherwise.
-		indirect case conditional(predicate: Predicate, affirmative: Effect, negative: Effect)
+		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
+		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
-		/// An effect that invokes the procedure labelled `procedure`.
+		/// An effect that invokes the labelled procedure.
 		///
 		/// This effect assumes the calling convention is respected by the rest of the program.
-		case invoke(procedure: Label)
+		case invoke(Label)
 		
-		/// An effect that terminates the program with `result`.
-		case `return`(result: Source)
+		/// An effect that terminates the program with given result.
+		case `return`(Source)
 		
 		/// Returns a representation of `self` in a lower language.
 		///
@@ -40,14 +40,14 @@ extension CD {
 		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label) throws -> [Lower.Block] {
 			switch self {
 				
-				case .sequence(effects: let effects):
+				case .sequence(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .invoke(procedure: let procedure):
+				case .invoke(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.intermediate(label: entryLabel, effects: previousEffects, successor: procedure)]
 				
-				case .copy, .compute, .conditional, .return:
+				case .copy, .compute, .if, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -59,10 +59,10 @@ extension CD {
 		var doesNothing: Bool {
 			switch self {
 				
-				case .sequence(effects: let effects):
+				case .sequence(let effects):
 				return effects.allSatisfy(\.doesNothing)
 				
-				case .conditional(predicate: _, affirmative: let affirmative, negative: let negative):
+				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.doesNothing && negative.doesNothing
 				
 				default:
@@ -85,7 +85,7 @@ extension CD {
 				case .copy, .compute:	// TODO: Add .invoke to this case when it becomes applicable.
 				return false
 				
-				case .conditional(predicate: _, affirmative: let affirmative, negative: let negative):
+				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
 				
 				case .invoke, .return:	// TODO: Remove .invoke from this case when no longer applicable.
@@ -119,21 +119,21 @@ extension CD {
 			switch self {
 				
 				case .copy(destination: let destination, source: .location(let source)) where source == destination,
-					.compute(destination: let destination, lhs: .location(let source), operation: .add, rhs: .immediate(0)) where source == destination,
-					.compute(destination: let destination, lhs: .immediate(0), operation: .add, rhs: .location(let source)) where source == destination,
-					.compute(destination: let destination, lhs: .location(let source), operation: .subtract, rhs: .immediate(0)) where source == destination,
-					.compute(destination: let destination, lhs: .immediate(0), operation: .subtract, rhs: .location(let source)) where source == destination:
+					.compute(destination: let destination, .location(let source), .add, .immediate(0)) where source == destination,
+					.compute(destination: let destination, .immediate(0), .add, .location(let source)) where source == destination,
+					.compute(destination: let destination, .location(let source), .subtract, .immediate(0)) where source == destination,
+					.compute(destination: let destination, .immediate(0), .subtract, .location(let source)) where source == destination:
 				return .sequence([])
 				
-				case .conditional(predicate: .constant(true), affirmative: let affirmative, negative: _):
+				case .if(.constant(true), then: let affirmative, else: _):
 				return affirmative.optimised()
 				
-				case .conditional(predicate: .constant(false), affirmative: _, negative: let negative):
+				case .if(.constant(false), then: _, else: let negative):
 				return negative.optimised()
 				
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+				case .if(let predicate, then: let affirmative, else: let negative):
 				let newPredicate = predicate.optimised()
-				let newConditional = Self.conditional(predicate: newPredicate, affirmative: affirmative.optimised(), negative: negative.optimised())
+				let newConditional = Self.if(newPredicate, then: affirmative.optimised(), else: negative.optimised())
 				return newPredicate == predicate ? newConditional : newConditional.optimised()
 				
 				default:
@@ -154,8 +154,8 @@ extension CD {
 					}
 				})
 				
-				case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
-				return .conditional(predicate: predicate, affirmative: affirmative.flattened(), negative: negative.flattened())
+				case .if(let predicate, then: let affirmative, else: let negative):
+				return .if(predicate, then: affirmative.flattened(), else: negative.flattened())
 				
 				default:
 				return self
@@ -214,7 +214,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
+			case .compute(destination: let destination, let lhs, let operation, let rhs):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
@@ -222,7 +222,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .conditional(predicate: let predicate, affirmative: let affirmative, negative: let negative):
+			case .if(let predicate, then: let affirmative, else: let negative):
 			let affirmativeLabel = context.allocateBlockLabel()
 			let negativeLabel = context.allocateBlockLabel()
 			let restLabel = rest.doesNothing ? exitLabel : context.allocateBlockLabel()
