@@ -10,7 +10,7 @@ struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 		self.decoder = decoder
 	}
 	
-	/// The Sisp value from which to decode.
+	/// The Sisp value from which to decode a value.
 	private var sisp: Sisp { decoder.sisp }
 	
 	// See protocol.
@@ -21,7 +21,10 @@ struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 	
 	// See protocol.
 	func decodeNil() -> Bool {
-		false	// nil cannot be represented (yet)
+		switch sisp {
+			case .list([]):	return true
+			default:		return false
+		}
 	}
 	
 	// See protocol.
@@ -107,7 +110,7 @@ struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 	}
 	
 	// See protocol.
-	func decode<T>(_ type: T.Type) throws -> T where T : Decodable {
+	func decode<T : Decodable>(_ type: T.Type) throws -> T {
 		try T(from: decoder)
 	}
 	

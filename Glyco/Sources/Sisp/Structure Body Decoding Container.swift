@@ -113,12 +113,12 @@ struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	}
 	
 	// See protocol.
-	func decode<T>(_ type: T.Type, forKey key: Key) throws -> T where T : Decodable {
+	func decode<T : Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
 		try singleValueContainer(forKey: key).decode(type)
 	}
 	
 	// See protocol.
-	func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
+	func nestedContainer<NestedKey : CodingKey>(keyedBy type: NestedKey.Type, forKey key: Key) throws -> KeyedDecodingContainer<NestedKey> {
 		TODO.unimplemented
 	}
 	

@@ -136,22 +136,22 @@ struct ListDecodingContainer : UnkeyedDecodingContainer {
 		)
 	}
 	
-	private struct IndexCodingKey : CodingKey {
-		
-		init?(stringValue: String) {
-			guard let intValue = Int(stringValue) else { return nil }
-			self.intValue = intValue
-			self.stringValue = stringValue
-		}
-		
-		init(intValue: Int) {
-			self.intValue = intValue
-			self.stringValue = "\(intValue)"
-		}
-		
-		var intValue: Int?
-		var stringValue: String
-		
+}
+
+struct IndexCodingKey : CodingKey {
+	
+	init?(stringValue: String) {
+		guard let intValue = Int(stringValue) else { return nil }
+		self.intValue = intValue
+		self.stringValue = stringValue
 	}
+	
+	init(intValue: Int) {
+		self.intValue = intValue
+		self.stringValue = "\(intValue)"
+	}
+	
+	var intValue: Int?
+	var stringValue: String
 	
 }
