@@ -20,9 +20,9 @@ extension BB {
 				
 				case .intermediate(label: let label, effects: let effects, successor: let successor):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.jump(target: successor)]
+					return [.labelled(label, first)] + tail + [.jump(to: successor)]
 				} else {
-					return [.labelled(label, .jump(target: successor))]
+					return [.labelled(label, .jump(to: successor))]
 				}
 				
 				case .branch(label: let label, effects: let effects,
@@ -31,9 +31,9 @@ extension BB {
 				if let (first, tail) = try effects.lowered().splittingFirst() {
 					return [.labelled(label, first)]
 						+ tail
-						+ [.branch(target: affirmative, lhs: lhs, relation: relation, rhs: rhs), .jump(target: negative)]
+						+ [.branch(to: affirmative, lhs, relation, rhs), .jump(to: negative)]
 				} else {
-					return [.labelled(label, .branch(target: affirmative, lhs: lhs, relation: relation, rhs: rhs)), .jump(target: negative)]
+					return [.labelled(label, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
 				}
 				
 				case .final(let label, let effects, let result):

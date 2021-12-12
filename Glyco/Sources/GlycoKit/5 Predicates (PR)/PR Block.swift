@@ -38,7 +38,7 @@ extension PR {
 						.lowered()
 				
 				case .branch(label: let label, effects: let effects,
-							 predicate: .relation(lhs: let lhs, relation: let relation, rhs: let rhs),
+							 predicate: .relation(let lhs, let relation, let rhs),
 							 affirmative: let affirmative, negative: let negative):
 				return .branch(label: label, effects: effects, lhs: lhs, relation: relation, rhs: rhs, affirmative: affirmative, negative: negative)
 				

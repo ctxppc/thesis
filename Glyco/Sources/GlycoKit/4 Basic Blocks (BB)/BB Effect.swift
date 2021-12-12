@@ -9,7 +9,7 @@ extension BB {
 		case copy(destination: Location, source: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
+		case compute(destination: Location, Source, BinaryOperator, Source)
 		
 		// See protocol.
 		public func lowered(in context: inout ()) -> [Lower.Effect] {
@@ -18,8 +18,8 @@ extension BB {
 				case .copy(destination: let destination, source: let source):
 				return [.copy(destination: destination, source: source)]
 				
-				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
-				return [.compute(destination: destination, lhs: lhs, operation: operation, rhs: rhs)]
+				case .compute(destination: let destination, let lhs, let operation, let rhs):
+				return [.compute(destination: destination, lhs, operation, rhs)]
 				
 			}
 		}

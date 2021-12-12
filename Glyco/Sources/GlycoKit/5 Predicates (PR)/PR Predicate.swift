@@ -12,7 +12,7 @@ extension PR {
 		indirect case not(Predicate)
 		
 		/// A predicate that holds iff *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
-		case relation(lhs: Source, relation: BranchRelation, rhs: Source)
+		case relation(Source, BranchRelation, Source)
 		
 	}
 	

@@ -14,16 +14,16 @@ extension FO {
 		case copy(destination: Location, source: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, lhs: Source, operation: BinaryOperator, rhs: Source)
+		case compute(destination: Location, Source, BinaryOperator, Source)
 		
-		/// An effect that jumps to `target` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
-		case branch(target: Label, lhs: Source, relation: BranchRelation, rhs: Source)
+		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
+		case branch(to: Label, Source, BranchRelation, Source)
 		
-		/// An effect that jumps to `target`.
-		case jump(target: Label)
+		/// An effect that jumps to `to`.
+		case jump(to: Label)
 		
 		/// An effect that links the return address then jumps to `target`.
-		case call(target: Label)
+		case call(Label)
 		
 		/// An effect that jumps to the previously linked return address.
 		case `return`
@@ -32,7 +32,7 @@ extension FO {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		public static var nop: Self { .compute(destination: .register(.zero), lhs: .location(.register(.zero)), operation: .add, rhs: .location(.register(.zero))) }
+		public static var nop: Self { .compute(destination: .register(.zero), .location(.register(.zero)), .add, .location(.register(.zero))) }
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> [Lower.Instruction] {
@@ -78,12 +78,12 @@ extension FO {
 				case .copy(destination: .frameCell(let dest), source: .location(.frameCell(let src))):
 				return [.t1 <- src, dest <- .t1]
 				
-				case .compute(destination: let dest, lhs: let lhs, operation: let operation, rhs: .immediate(let rhs)):
+				case .compute(destination: let dest, let lhs, let operation, .immediate(let rhs)):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (resFinalise, resReg) = try finalise(destination: dest, using: .t2)
 				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(rs1: lhsReg, operation: operation, imm: rhs)] + resFinalise
 				
-				case .compute(destination: let destination, lhs: let lhs, operation: let operation, rhs: let rhs):
+				case .compute(destination: let destination, let lhs, let operation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
@@ -92,15 +92,15 @@ extension FO {
 					+ [resReg <- .registerRegister(rs1: lhsReg, operation: operation, rs2: rhsReg)]
 					+ resFinalise
 				
-				case .branch(target: let target, lhs: let lhs, relation: let relation, rhs: let rhs):
+				case .branch(to: let target, let lhs, let relation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
 				return lhsPrep + rhsPrep + [.branch(target: target, rs1: lhsReg, relation: relation, rs2: rhsReg)]
 				
-				case .jump(target: let target):
+				case .jump(to: let target):
 				return [.jump(target: target)]
 				
-				case .call(target: let label):
+				case .call(let label):
 				return [.call(target: label)]
 				
 				case .return:

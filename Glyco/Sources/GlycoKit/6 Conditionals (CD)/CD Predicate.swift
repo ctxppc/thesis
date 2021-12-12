@@ -96,7 +96,7 @@ extension CD {
 					.branch(
 						label:			entryLabel,
 						effects:		previousEffects,
-						predicate:		.relation(lhs: lhs, relation: relation, rhs: rhs),
+						predicate:		.relation(lhs, relation, rhs),
 						affirmative:	affirmativeTarget,
 						negative:		negativeTarget
 					)
