@@ -8,7 +8,7 @@ public enum Label : Hashable {
 	/// An unnamed label at given zero-based position.
 	case numbered(Int)
 	
-	public init<S : StringProtocol>(rawValue: S) {
+	public init(rawValue: Substring) {
 		if case ("_", let tail)? = rawValue.splittingFirst(), let n = Int(tail) {
 			self = .numbered(n)
 		} else {
