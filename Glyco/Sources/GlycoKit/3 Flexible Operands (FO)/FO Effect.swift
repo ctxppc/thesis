@@ -81,7 +81,7 @@ extension FO {
 				case .compute(destination: let dest, let lhs, let operation, .immediate(let rhs)):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (resFinalise, resReg) = try finalise(destination: dest, using: .t2)
-				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(rs1: lhsReg, operation: operation, imm: rhs)] + resFinalise
+				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(lhsReg, operation, rhs)] + resFinalise
 				
 				case .compute(destination: let destination, let lhs, let operation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
@@ -89,19 +89,19 @@ extension FO {
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
 				return lhsPrep
 					+ rhsPrep
-					+ [resReg <- .registerRegister(rs1: lhsReg, operation: operation, rs2: rhsReg)]
+					+ [resReg <- .registerRegister(lhsReg, operation, rhsReg)]
 					+ resFinalise
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
-				return lhsPrep + rhsPrep + [.branch(target: target, rs1: lhsReg, relation: relation, rs2: rhsReg)]
+				return lhsPrep + rhsPrep + [.branch(to: target, lhsReg, relation, rhsReg)]
 				
 				case .jump(to: let target):
-				return [.jump(target: target)]
+				return [.jump(to: target)]
 				
 				case .call(let label):
-				return [.call(target: label)]
+				return [.call(label)]
 				
 				case .return:
 				return [.return]

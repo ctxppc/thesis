@@ -19,14 +19,14 @@ extension FL {
 		/// An instruction that retrieves the datum from `source` and stores it in `destination`.
 		case store(DataType, destination: Frame.Location, source: Register)
 		
-		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case branch(target: Label, rs1: Register, relation: BranchRelation, rs2: Register)
+		/// An instruction that jumps to `to` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		case branch(to: Label, Register, BranchRelation, Register)
 		
-		/// An instruction that jumps to `target`.
-		case jump(target: Label)
+		/// An instruction that jumps to `to`.
+		case jump(to: Label)
 		
-		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
-		case call(target: Label)
+		/// An instruction that puts the next PCC in `cra`, then jumps to given label.
+		case call(Label)
 		
 		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
@@ -44,10 +44,10 @@ extension FL {
 				case .copy(let type, destination: let destination, source: let source):
 				return try [.copy(type, destination: destination.lowered(), source: source.lowered())]
 				
-				case .compute(destination: let destination, value: .registerRegister(rs1: let rs1, operation: let operation, rs2: let rs2)):
+				case .compute(destination: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
 				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
-				case .compute(destination: let destination, value: .registerImmediate(rs1: let rs1, operation: let operation, imm: let imm)):
+				case .compute(destination: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
 				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
 				case .load(.word, destination: let destination, source: let source):
@@ -68,13 +68,13 @@ extension FL {
 				case .store(.capability, destination: let destination, source: let source):
 				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
 				
-				case .branch(target: let target, rs1: let rs1, relation: let relation, rs2: let rs2):
+				case .branch(to: let target, let rs1, let relation, let rs2):
 				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
 				
-				case .jump(target: let target):
+				case .jump(to: let target):
 				return [.jump(target: target)]
 				
-				case .call(target: let label):
+				case .call(let label):
 				return [.call(target: label)]
 				
 				case .return:

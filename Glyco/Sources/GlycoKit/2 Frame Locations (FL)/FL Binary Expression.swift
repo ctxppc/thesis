@@ -5,51 +5,51 @@ extension FL {
 	public enum BinaryExpression : Codable, Equatable {
 		
 		/// Performs *x* `operation` *y* where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case registerRegister(rs1: Register, operation: BinaryOperator, rs2: Register)
+		case registerRegister(Register, BinaryOperator, Register)
 		
 		/// Performs *x* `operation` `imm` where *x* is the value in `rs1`.
-		case registerImmediate(rs1: Register, operation: BinaryOperator, imm: Int)
+		case registerImmediate(Register, BinaryOperator, Int)
 		
 	}
 	
 }
 
 public func + (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(rs1: lhs, operation: .add, rs2: rhs)
+	.registerRegister(lhs, .add, rhs)
 }
 
 public func + (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(rs1: lhs, operation: .add, imm: rhs)
+	.registerImmediate(lhs, .add, rhs)
 }
 
 public func - (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(rs1: lhs, operation: .subtract, rs2: rhs)
+	.registerRegister(lhs, .subtract, rhs)
 }
 
 public func - (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(rs1: lhs, operation: .subtract, imm: rhs)
+	.registerImmediate(lhs, .subtract, rhs)
 }
 
 public func & (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(rs1: lhs, operation: .and, rs2: rhs)
+	.registerRegister(lhs, .and, rhs)
 }
 
 public func & (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(rs1: lhs, operation: .and, imm: rhs)
+	.registerImmediate(lhs, .and, rhs)
 }
 
 public func | (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(rs1: lhs, operation: .or, rs2: rhs)
+	.registerRegister(lhs, .or, rhs)
 }
 
 public func | (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(rs1: lhs, operation: .or, imm: rhs)
+	.registerImmediate(lhs, .or, rhs)
 }
 
 public func ^ (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(rs1: lhs, operation: .xor, rs2: rhs)
+	.registerRegister(lhs, .xor, rhs)
 }
 
 public func ^ (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(rs1: lhs, operation: .xor, imm: rhs)
+	.registerImmediate(lhs, .xor, rhs)
 }
