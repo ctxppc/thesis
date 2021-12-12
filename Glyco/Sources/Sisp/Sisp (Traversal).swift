@@ -64,7 +64,12 @@ extension Sisp {
 			guard case .list(let elements) = self else {
 				preconditionFailure("Positional indexing not supported on values of type \(typeDescription)")
 			}
-			return elements[position]
+			if position == elements.endIndex {
+				return []
+			} else {
+				return elements[position]
+			}
+			
 		}
 		
 		set {
