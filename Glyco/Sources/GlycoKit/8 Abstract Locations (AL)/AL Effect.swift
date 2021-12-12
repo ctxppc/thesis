@@ -8,7 +8,7 @@ extension AL {
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
-		case sequence(effects: [Effect])
+		case sequence([Effect])
 		
 		/// An effect that retrieves the value in `source` and puts it in `destination`.
 		case copy(destination: Location, source: Source)
@@ -29,7 +29,7 @@ extension AL {
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
-				case .sequence(effects: let effects):
+				case .sequence(let effects):
 				return .sequence(effects: try effects.lowered(in: &context))
 				
 				case .copy(destination: let destination, source: let source):

@@ -7,14 +7,14 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testSimpleSum() throws {
 		
-		let location = AL.Location.location(id: 0)
+		let location = AL.Location.location(0)
 		
-		let program = AL.Program(
-			effect:		.sequence(effects: [
-							location <- .immediate(1),
-							.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
-							.return(result: .location(location))
-						]),
+		let program = AL.Program.program(
+			.sequence(effects: [
+				location <- .immediate(1),
+				.compute(destination: location, lhs: .immediate(2), operation: .add, rhs: .location(location)),
+				.return(result: .location(location))
+			]),
 			procedures: []
 		)
 		
@@ -67,19 +67,19 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testEqualsOne() throws {
 		
-		let testedNumber = AL.Location.location(id: 0)
-		let isEven = AL.Location.location(id: 1)
+		let testedNumber = AL.Location.location(0)
+		let isEven = AL.Location.location(1)
 		
-		let program = AL.Program(
-			effect:		.sequence(effects: [
-							.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
-							.conditional(
-								predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
-								affirmative:	isEven <- .immediate(1),
-								negative:		isEven <- .immediate(0)
-							),
-							.return(result: .location(isEven))
-						]),
+		let program = AL.Program.program(
+			.sequence(effects: [
+				.compute(destination: testedNumber, lhs: .immediate(12), operation: .subtract, rhs: .immediate(11)),
+				.conditional(
+					predicate:		.relation(lhs: .location(testedNumber), relation: .equal, rhs: .immediate(1)),
+					affirmative:	isEven <- .immediate(1),
+					negative:		isEven <- .immediate(0)
+				),
+				.return(result: .location(isEven))
+			]),
 			procedures:	[]
 		)
 		

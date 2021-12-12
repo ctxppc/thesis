@@ -34,7 +34,7 @@ extension PA {
 			switch self {
 				
 				case .sequence(effects: let effects):
-				return .sequence(effects: try effects.lowered(in: &context))
+				return .sequence(try effects.lowered(in: &context))
 				
 				case .copy(destination: let destination, source: let source):
 				return .copy(destination: destination, source: source)
@@ -73,7 +73,7 @@ extension PA {
 				if let r = overwrittenArgumentRegistersUsedAsSource.first {
 					throw LoweringError.overwrittenArgumentRegisterUsedAsArgument(invocation: self, argumentRegister: r)
 				}
-				return .sequence(effects: assignments.map { $0.destination <- $0.argument } + [.invoke(procedure: name)])
+				return .sequence(assignments.map { $0.destination <- $0.argument } + [.invoke(procedure: name)])
 				
 				case .return(result: let result):
 				return .return(result: result)

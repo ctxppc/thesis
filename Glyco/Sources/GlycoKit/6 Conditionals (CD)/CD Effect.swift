@@ -9,7 +9,7 @@ extension CD {
 	public enum Effect : Codable, Equatable {
 		
 		/// An effect that performs `effects`.
-		case sequence(effects: [Effect])
+		case sequence([Effect])
 		
 		/// An effect that retrieves the value in `source` and puts it in `destination`.
 		case copy(destination: Location, source: Source)
@@ -123,7 +123,7 @@ extension CD {
 					.compute(destination: let destination, lhs: .immediate(0), operation: .add, rhs: .location(let source)) where source == destination,
 					.compute(destination: let destination, lhs: .location(let source), operation: .subtract, rhs: .immediate(0)) where source == destination,
 					.compute(destination: let destination, lhs: .immediate(0), operation: .subtract, rhs: .location(let source)) where source == destination:
-				return .sequence(effects: [])
+				return .sequence([])
 				
 				case .conditional(predicate: .constant(true), affirmative: let affirmative, negative: _):
 				return affirmative.optimised()
@@ -147,7 +147,7 @@ extension CD {
 			switch self {
 				
 				case .sequence(effects: let effects):
-				return .sequence(effects: effects.flatMap { subeffect -> [Effect] in
+				return .sequence(effects.flatMap { subeffect -> [Effect] in
 					switch subeffect.flattened() {
 						case .sequence(let nested):	return nested
 						case let flattened:			return [flattened]

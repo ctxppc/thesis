@@ -14,7 +14,7 @@ public enum EX : Language {
 			switch self {
 				case .program(let body, procedures: let procedures):
 				var context = Context()
-				return try .init(effect: body.lowered(in: &context), procedures: procedures.lowered(in: &context))
+				return try .program(body.lowered(in: &context), procedures: procedures.lowered(in: &context))
 			}
 		}
 		

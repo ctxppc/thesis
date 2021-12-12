@@ -8,11 +8,11 @@ extension AL {
 		/// A constant predicate.
 		case constant(Bool)
 		
-		/// A predicate that holds iff *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
-		case relation(lhs: Source, relation: BranchRelation, rhs: Source)
+		/// A predicate that holds iff *x* *R* *y*, where *x* is the value of the first source, *y* is the value of the second source, and *R* is the branch relation.
+		case relation(Source, BranchRelation, Source)
 		
-		/// A predicate that evaluates to `affirmative` if `condition` holds, or to `negative` otherwise.
-		indirect case conditional(condition: Predicate, affirmative: Predicate, negative: Predicate)
+		/// A predicate that evaluates to `then` if the predicate holds, or to `else` otherwise.
+		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
 		/// Returns a predicate that holds iff `negated` does not hold.
 		public static func not(_ negated: Self) -> Self {
@@ -22,10 +22,10 @@ extension AL {
 				return .constant(!holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs: lhs, relation: relation.negated, rhs: rhs)
+				return .relation(lhs, relation.negated, rhs)
 				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
-				return .conditional(condition: condition, affirmative: negative, negative: affirmative)
+				case .if(let condition, then: let affirmative, else: let negative):
+				return .if(condition, then: negative, else: affirmative)
 				
 			}
 		}
@@ -37,10 +37,10 @@ extension AL {
 				case .constant(value: let holds):
 				return .constant(holds)
 				
-				case .relation(lhs: let lhs, relation: let relation, rhs: let rhs):
+				case .relation(let lhs, let relation, let rhs):
 				return try .relation(lhs: lhs.lowered(in: &context), relation: relation, rhs: rhs.lowered(in: &context))
 				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				case .if(let condition, then: let affirmative, else: let negative):
 				return try .conditional(
 					condition:		condition.lowered(in: &context),
 					affirmative:	affirmative.lowered(in: &context),
@@ -54,17 +54,17 @@ extension AL {
 		func usedLocations() -> Set<Location> {
 			switch self {
 				
-				case .constant, .relation(lhs: .immediate, relation: _, rhs: .immediate):
+				case .constant, .relation(.immediate, _, .immediate):
 				return []
 				
-				case .relation(lhs: .immediate, relation: _, rhs: .location(let location)),
-						.relation(lhs: .location(let location), relation: _, rhs: .immediate):
+				case .relation(.immediate, _, .location(let location)),
+						.relation(.location(let location), _, .immediate):
 				return [location]
 				
-				case .relation(lhs: .location(let lhs), relation: _, rhs: .location(let rhs)):
+				case .relation(.location(let lhs), _, .location(let rhs)):
 				return [lhs, rhs]
 				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				case .if(let condition, then: let affirmative, else: let negative):
 				return condition.usedLocations().union(affirmative.usedLocations()).union(negative.usedLocations())
 				
 			}

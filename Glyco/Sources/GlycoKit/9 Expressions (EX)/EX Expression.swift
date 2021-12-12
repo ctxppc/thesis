@@ -42,7 +42,7 @@ extension EX {
 				case .binary(let first, let op, let second):
 				let firstLocation = context.allocateLocation()
 				let secondLocation = context.allocateLocation()
-				return .sequence(effects: [
+				return .sequence([
 					first.lowered(destination: firstLocation, context: &context),
 					second.lowered(destination: secondLocation, context: &context),
 					Self.binary(.location(firstLocation), op, .location(secondLocation))
