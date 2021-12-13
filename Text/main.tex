@@ -1,0 +1,41 @@
+% © 2021–2022 Constantino Tsarouhas
+\documentclass[master=cws,  oneside, english, extralanguage=dutch]{kulemt}	% TODO: twoside for print
+\setup{
+	masteroption=vs,
+	title={A CHERI-RISC-V nanopass compiler for iterating quickly on secure calling conventions},
+	author={Constantino Tsarouhas},
+	promotor={(…) Dominique Devriese},							% TODO: Title
+	assistant={(…) Sander Huyghebaert \and (…) Steven Keuchel},	% TODO: Titles
+	assessor=,	% TODO
+	inputenc=utf8,
+	font=utopia
+}
+
+\usepackage{hyperref}	% Hyperlinking and PDF metadata.
+\usepackage{babel}
+\usepackage{lipsum}		% Fake lorem ipsum text
+
+\begin{document}
+
+\begin{preface}
+	\lipsum[5]
+\end{preface}
+
+\tableofcontents*
+
+\begin{abstract}
+	\lipsum[5]
+\end{abstract}
+
+\begin{abstract*}
+	\lipsum[5]
+\end{abstract*}
+
+\mainmatter
+\lipsum
+
+\backmatter
+\bibliographystyle{abbrv}
+\bibliography{references}
+
+\end{document}
