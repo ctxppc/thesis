@@ -10,16 +10,32 @@ extension AL {
 		
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
-		public typealias Parameter = Lower.Procedure.Parameter
+		public enum Parameter : Codable, Equatable, SimplyLowerable {
+			
+			/// A parameter of given data type with argument accessible at given location.
+			case parameter(Location, type: DataType)
+			
+			// See protocol.
+			func lowered(in context: inout Context) -> Lower.Procedure.Parameter {
+				switch self {
+					case .parameter(_, type: let type):	return .parameter(type: type)
+				}
+			}
+			
+		}
 		
 		/// The procedure's effect when invoked.
 		public var effect: Effect
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.Procedure {	// does not support AL.Context
+		func lowered(in context: inout ()) throws -> Lower.Procedure {	// new AL.Context for each procedure
 			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
-			var context = AL.Context(assignments: .init(conflicts: conflicts))
-			return .init(name: name, parameters: parameters, effect: try effect.lowered(in: &context))
+			var context = AL.Context(assignments: .init(parameters: parameters, conflicts: conflicts))
+			return .init(
+				name:		name,
+				parameters:	try parameters.lowered(in: &context),
+				effect:		try effect.lowered(in: &context)
+			)
 		}
 		
 	}

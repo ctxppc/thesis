@@ -1,5 +1,6 @@
 // Glyco © 2021 Constantino Tsarouhas
 
+import Algorithms
 import DepthKit
 
 extension AL {
@@ -18,12 +19,32 @@ extension AL {
 		/// A value that assigns locations to homes.
 		struct Assignments {
 			
-			/// Determines an assignment using given conflict graph.
-			init(conflicts: ConflictGraph) {
+			/// Determines an assignment using given procedure parameters and conflict graph.
+			///
+			/// The initialiser first assigns homes for each parameter, according to the active calling convention, then assigns homes to all used locations, by increasing degree of conflict.
+			init(parameters: [Procedure.Parameter], conflicts: ConflictGraph) {
+				
 				self.conflicts = conflicts
+				
+				let argumentRegisters = chain(Lower.Register.argumentRegisters.lazy.map { $0 }, [nil].cycled())
+				for (parameter, register) in zip(parameters, argumentRegisters) {
+					switch parameter {
+						case .parameter(let location, type: let type):
+						let home: Lower.Location
+						if let register = register {
+							home = .register(register)
+							locationsByRegister[register, default: []].insert(location)
+						} else {
+							home = .frameCell(frame.allocate(type))
+						}
+						homesByLocation[location] = home
+					}
+				}
+				
 				for location in conflicts.locationsOrderedByIncreasingNumberOfConflicts() {
 					addAssignment(for: location)
 				}
+				
 			}
 			
 			/// Returns `location`'s assigned physical location.
@@ -60,7 +81,7 @@ extension AL {
 				return home
 			}
 			
-			/// Returns a register that `location` can be assigned, or `nil` if no register is available.
+			/// Returns a register that `location` can be assigned to, or `nil` if no register is available.
 			private func assignableRegister(for location: Location) -> Lower.Register? {
 				Lower.Register.assignableRegisters.first { register in
 					guard let assignedLocations = locationsByRegister[register] else { return true }

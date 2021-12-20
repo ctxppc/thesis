@@ -14,7 +14,7 @@ public enum AL : Language {
 			switch self {
 				case .program(let effect, let procedures):
 				let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
-				var context = Context(assignments: .init(conflicts: conflicts))
+				var context = Context(assignments: .init(parameters: [], conflicts: conflicts))
 				return try .init(effect: effect.lowered(in: &context), procedures: procedures.lowered())
 			}
 		}
