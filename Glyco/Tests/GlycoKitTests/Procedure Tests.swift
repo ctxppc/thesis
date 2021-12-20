@@ -11,7 +11,7 @@ final class ProcedureTests : XCTestCase {
 		let source = EX.Program.program(
 			.invoke(fortyTwo, []),
 			procedures:	[
-				.init(name: fortyTwo, parameters: [], body: .return(.constant(42)))
+				.procedure(fortyTwo, .return(.constant(42)))
 			]
 		)
 		

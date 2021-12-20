@@ -10,10 +10,17 @@ extension PA {
 		
 		/// The procedure's parameters.
 		var parameters: [Parameter]
-		public struct Parameter : Codable, Equatable {
+		public enum Parameter : Codable, Equatable {
+			
+			/// A parameter of given data type.
+			case parameter(type: DataType)
 			
 			/// The data type of the parameter.
-			public let dataType: DataType
+			public var type: DataType {
+				switch self {
+					case .parameter(type: let type):	return type
+				}
+			}
 			
 		}
 		

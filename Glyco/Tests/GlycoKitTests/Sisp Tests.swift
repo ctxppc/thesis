@@ -8,7 +8,7 @@ final class SispCodingTests : XCTestCase {
 	
 	func testEncodingEX() throws {
 		
-		let location = EX.Location.location(1)
+		let location = EX.Location.local("a")
 		let program = EX.Program.program(
 			.sequence([
 				.if(
@@ -26,8 +26,8 @@ final class SispCodingTests : XCTestCase {
 				
 					sequence(
 						
-							if( constant( true), then: assign( location( 1), to: constant( 1)), else: sequence())
-							return( location( location( 1)))
+							if( constant( true), then: assign( a, to: constant( 1)), else: sequence())
+							return( location( a))
 					)
 			)
 			"""
@@ -43,16 +43,16 @@ final class SispCodingTests : XCTestCase {
 				sequence(
 					if(
 						constant(true),
-						then:	assign(location( 1), to: constant(1)),
+						then:	assign( a, to: constant(1)),
 						else:	sequence()
 					)
-					return(location(location( 1)))
+					return(location( a))
 				),
 				procedures:
 			)
 			""").decode(EX.Program.self)
 		
-		let location = EX.Location.location(1)
+		let location = EX.Location.local("a")
 		let expected = EX.Program.program(
 			.sequence([
 				.if(

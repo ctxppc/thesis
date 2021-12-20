@@ -123,7 +123,7 @@ extension PA {
 				availableRegisters = remainingRegisters
 				destination = .register(assignableRegister)
 			} else {
-				destination = .frameCell(frame.allocate(parameter.dataType))
+				destination = .frameCell(frame.allocate(parameter.type))
 			}
 		}
 		

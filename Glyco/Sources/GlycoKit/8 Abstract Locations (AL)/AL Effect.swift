@@ -47,7 +47,7 @@ extension AL {
 				return try .if(
 					predicate.lowered(in: &context),
 					then:	affirmative.lowered(in: &context),
-					else:		negative.lowered(in: &context)
+					else:	negative.lowered(in: &context)
 				)
 				
 				case .invoke(let procedure, let arguments):
