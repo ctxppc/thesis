@@ -69,7 +69,7 @@ extension Sisp {
 			last.serialise(into: &serialisation)
 			
 			case .structure(type: let type, children: let children) where hasMultilineSerialisation():
-				serialisation.write(.lexeme(for: type), then: nil)
+			serialisation.write(type.map { .lexeme(for: $0) }, then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
 			serialisation.write(.indentedNewline)
 			serialiseStructureChildren(children, isMultilineStructure: true)
@@ -77,7 +77,7 @@ extension Sisp {
 			serialisation.write(.trailingParenthesis, then: nil)
 			
 			case .structure(type: let type, children: let children):
-				serialisation.write(.lexeme(for: type), then: nil)
+			serialisation.write(type.map { .lexeme(for: $0) }, then: nil)
 			serialisation.write(.leadingParenthesis, then: nil)
 			serialiseStructureChildren(children, isMultilineStructure: false)
 			serialisation.write(.trailingParenthesis, then: nil)

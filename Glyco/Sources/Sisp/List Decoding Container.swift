@@ -110,13 +110,13 @@ struct ListDecodingContainer : UnkeyedDecodingContainer {
 	}
 	
 	// See protocol.
-	mutating func nestedContainer<NestedKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> where NestedKey : CodingKey {
-		.init(try StructureDecodingContainer(decoder: decoderForNextValue()))
+	mutating func nestedContainer<NestedKey : CodingKey>(keyedBy type: NestedKey.Type) throws -> KeyedDecodingContainer<NestedKey> {
+		try decoderForNextValue().container(keyedBy: type)
 	}
 	
 	// See protocol.
 	mutating func nestedUnkeyedContainer() throws -> UnkeyedDecodingContainer {
-		Self(decoder: decoderForNextValue())
+		decoderForNextValue().unkeyedContainer()
 	}
 	
 	// See protocol.

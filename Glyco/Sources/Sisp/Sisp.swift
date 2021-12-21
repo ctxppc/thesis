@@ -35,7 +35,7 @@ public enum Sisp : Hashable {
 	/// for each `label_i`–`child_i` pair in `children`. Each `label_i:` is either omitted (if `.numbered`), a label (if representable), or a quoted label (otherwise). For example:
 	///
 	///     car(colour: blue, size: "quite small", 2007)
-	case structure(type: String, children: StructureChildren)
+	case structure(type: String?, children: StructureChildren)
 	public typealias StructureChildren = OrderedDictionary<Label, Self>
 	public typealias StructureChild = (Label, Self)
 	
@@ -45,7 +45,8 @@ public enum Sisp : Hashable {
 			case .integer:									return "Integer"
 			case .string:									return "String"
 			case .list:										return "List"
-			case .structure(type: let type, children: _):	return "Structure of type “\(type)”"
+			case .structure(type: let type?, children: _):	return "Structure of type “\(type)”"
+			case .structure(type: nil, children: _):		return "Structure of unnamed type"
 		}
 	}
 	

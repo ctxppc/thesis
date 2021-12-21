@@ -57,7 +57,12 @@ extension Sisp {
 				return .string(value)
 			}
 			
-			case nil, .leadingParenthesis?, .trailingParenthesis?, .separator?, .label?, .quotedLabel?:
+			case .leadingParenthesis?:
+			lexemes = originalLexemes	// undo lexeme consumption
+			return try parseStructureChildren(from: &lexemes)
+				.map { .structure(type: nil, children: $0) }
+			
+			case nil, .trailingParenthesis?, .separator?, .label?, .quotedLabel?:
 			lexemes = originalLexemes	// undo lexeme consumption
 			return nil
 			

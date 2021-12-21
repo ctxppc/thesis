@@ -6,12 +6,9 @@ import Foundation
 struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProtocol {
 	
 	/// Creates a decoding container.
-	init(decoder: SispDecoder) throws {
-		guard case .structure(type: let type, children: let childrenByLabel) = decoder.sisp else {
-			throw DecodingError.dataCorrupted(.init(codingPath: decoder.codingPath, debugDescription: "Expected to decode structure", underlyingError: nil))
-		}
-		self.structureType = type
-		self.structureChildren = childrenByLabel
+	init(structureType: String, structureChildren: Sisp.StructureChildren, decoder: SispDecoder) {
+		self.structureType = structureType
+		self.structureChildren = structureChildren
 		self.decoder = decoder
 	}
 	
