@@ -47,7 +47,7 @@ extension PA {
 				
 				case .invoke(let name, let arguments):
 				guard let procedure = context.procedures.first(where: { $0.name == name }) else { throw LoweringError.unrecognisedProcedure(name: name) }
-				var availableRegisters = Register.argumentRegisters[...]
+				var availableRegisters = context.configuration.argumentRegisters[...]
 				var frame = Frame()
 				let assignments = zip(procedure.parameters, arguments).map { (parameter, argument) in
 					ArgumentAssignment(parameter: parameter, argument: argument, availableRegisters: &availableRegisters, frame: &frame)

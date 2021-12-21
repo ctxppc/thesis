@@ -21,7 +21,12 @@ public protocol Program : Codable, Equatable {
 public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
-	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil) {
+	public init(
+		target:				Target,
+		toolchainURL:		URL? = nil,
+		systemURL:			URL? = nil,
+		argumentRegisters:	[FO.Register] = FO.Register.defaultArgumentRegisters
+	) {
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
 			.default
@@ -30,6 +35,7 @@ public struct CompilationConfiguration {
 		self.systemURL = systemURL ?? self.toolchainURL
 			.appendingPathComponent("output")
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
+		self.argumentRegisters = argumentRegisters
 	}
 	
 	/// The program's target platform.
@@ -49,6 +55,9 @@ public struct CompilationConfiguration {
 	
 	/// A URL to a CheriBSD system root.
 	public var systemURL: URL
+	
+	/// The registers used for passing arguments, in argument order.
+	public var argumentRegisters: [FO.Register]
 	
 }
 

@@ -26,7 +26,7 @@ extension AL {
 		case `return`(Source)
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Effect {
+		func lowered(in context: inout LocalContext) throws -> Lower.Effect {
 			switch self {
 				
 				case .sequence(let effects):

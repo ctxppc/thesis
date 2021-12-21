@@ -31,7 +31,7 @@ extension AL {
 		}
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Predicate {
+		func lowered(in context: inout LocalContext) throws -> Lower.Predicate {
 			switch self {
 				
 				case .constant(value: let holds):

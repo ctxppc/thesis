@@ -8,6 +8,9 @@ extension PA {
 		/// The program's procedures.
 		let procedures: [Procedure]
 		
+		/// The compilation configuration.
+		let configuration: CompilationConfiguration
+		
 	}
 	
 }

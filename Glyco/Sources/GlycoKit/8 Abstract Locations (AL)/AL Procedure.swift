@@ -16,7 +16,7 @@ extension AL {
 			case parameter(Location, type: DataType)
 			
 			// See protocol.
-			func lowered(in context: inout Context) -> Lower.Procedure.Parameter {
+			func lowered(in context: inout LocalContext) -> Lower.Procedure.Parameter {
 				switch self {
 					case .parameter(_, type: let type):	return .parameter(type: type)
 				}
@@ -28,9 +28,15 @@ extension AL {
 		public var effect: Effect
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.Procedure {	// new AL.Context for each procedure
+		func lowered(in context: inout GlobalContext) throws -> Lower.Procedure {
 			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
-			var context = AL.Context(assignments: .init(parameters: parameters, conflicts: conflicts))
+			var context = AL.LocalContext(
+				assignments: .init(
+					parameters:			parameters,
+					conflicts:			conflicts,
+					argumentRegisters:	context.configuration.argumentRegisters
+				)
+			)
 			return .init(
 				name:		name,
 				parameters:	try parameters.lowered(in: &context),

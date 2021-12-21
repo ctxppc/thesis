@@ -12,8 +12,8 @@ extension FO {
 		/// The order is semantically insignificant but it's fixed to make assignment more deterministic.
 		static let assignableRegisters: OrderedSet = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6]
 		
-		/// Registers that can be used for passing arguments to procedures, in argument order.
-		static let argumentRegisters: OrderedSet = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
+		/// Registers that are by default used for passing arguments to procedures, in argument order.
+		public static let defaultArgumentRegisters = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
 		
 		/// Registers that can be used for passing results from procedures, in result value order.
 		static let resultRegisters: OrderedSet = [Self.a0, .a1]

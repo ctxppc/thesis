@@ -12,7 +12,7 @@ extension AL {
 		case local(String)
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Location {
+		func lowered(in context: inout LocalContext) -> Lower.Location {
 			context.assignments[self]
 		}
 		
@@ -22,11 +22,11 @@ extension AL {
 			/// Determines an assignment using given procedure parameters and conflict graph.
 			///
 			/// The initialiser first assigns homes for each parameter, according to the active calling convention, then assigns homes to all used locations, by increasing degree of conflict.
-			init(parameters: [Procedure.Parameter], conflicts: ConflictGraph) {
+			init(parameters: [Procedure.Parameter], conflicts: ConflictGraph, argumentRegisters: [Lower.Register]) {
 				
 				self.conflicts = conflicts
 				
-				let argumentRegisters = chain(Lower.Register.argumentRegisters.lazy.map { $0 }, [nil].cycled())
+				let argumentRegisters = chain(argumentRegisters.lazy.map { $0 }, [nil].cycled())
 				for (parameter, register) in zip(parameters, argumentRegisters) {
 					switch parameter {
 						case .parameter(let location, type: let type):

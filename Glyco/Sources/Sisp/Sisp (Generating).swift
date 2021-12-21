@@ -91,9 +91,12 @@ extension Sisp {
 		/// The serialised representation.
 		private var serialised = ""
 		
+		/// The indentation to use per level.
+		private let indentation = "\t"
+		
 		/// The level of indentation.
-		private var indentation = 0 {
-			willSet { precondition(indentation >= 0, "Indentation must be nonnegative") }
+		private var indentationLevel = 0 {
+			willSet { precondition(indentationLevel >= 0, "Indentation level must be nonnegative") }
 		}
 		
 		/// A value indicating what kind of whitespace is required after the last lexeme.
@@ -122,8 +125,8 @@ extension Sisp {
 				requiredTrailingWhitespace = nil
 				
 				case .newline(indentationChange: let change)?:
-				indentation += change
-				serialised += "\n" + "\t".cycled(times: indentation)
+				indentationLevel += change
+				serialised += "\n" + indentation.cycled(times: indentationLevel)
 				requiredTrailingWhitespace = nil
 				
 			}
@@ -160,7 +163,7 @@ extension Sisp {
 		///
 		/// - Requires: Every `indent()` is balanced with an `outdent()`.
 		mutating func serialisation() -> String {
-			precondition(indentation == 0, "Cannot finalise serialisation with indentation")
+			precondition(indentationLevel == 0, "Cannot finalise serialisation with indentation")
 			return serialised
 		}
 		

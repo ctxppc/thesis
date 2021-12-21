@@ -27,6 +27,9 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, help: "The generated file (to be overwritten). (Omit to discard the ELF file after building it or to print the intermediate representation to standard out.)")
 	var output: URL?
 	
+	@Option(name: .shortAndLong, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
+	var argumentRegisters: [FO.Register] = FO.Register.defaultArgumentRegisters
+	
 	/// The highest intermediate language supported by Glyco.
 	///
 	/// Update this typealias whenever a higher language is added.
@@ -38,7 +41,12 @@ struct CompileCommand : ParsableCommand {
 		let environment = ProcessInfo.processInfo.environment
 		let toolchainURL = environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:))
 		let systemURL = environment["CHERISYSROOT"].map(URL.init(fileURLWithPath:))
-		let configuration = CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL)
+		let configuration = CompilationConfiguration(
+			target:				target,
+			toolchainURL:		toolchainURL,
+			systemURL:			systemURL,
+			argumentRegisters:	argumentRegisters
+		)
 		
 		let sourceLanguage = source.pathExtension.uppercased()
 		let sourceString = try String(contentsOf: source)
@@ -75,3 +83,9 @@ struct CompileCommand : ParsableCommand {
 }
 
 extension CompilationConfiguration.Target : ExpressibleByArgument {}
+
+extension FO.Register : ExpressibleByArgument {
+	public init?(argument: String) {
+		self.init(rawValue: argument)
+	}
+}
