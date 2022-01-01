@@ -27,7 +27,7 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, help: "The generated file (to be overwritten). (Omit to discard the ELF file after building it or to print the intermediate representation to standard out.)")
 	var output: URL?
 	
-	@Option(name: .shortAndLong, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
 	var argumentRegisters: [FO.Register] = FO.Register.defaultArgumentRegisters
 	
 	/// The highest intermediate language supported by Glyco.

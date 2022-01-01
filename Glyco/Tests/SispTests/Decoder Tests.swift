@@ -68,4 +68,75 @@ final class DecoderTests : XCTestCase {
 		
 	}
 	
+	func testUnnamedStructure() throws {
+		
+		struct Toy : Codable, Equatable {
+			var colour: String
+			var price: Int
+		}
+		
+		let actual = try SispDecoder(from: "(colour: black, price: 5)").decode(Toy.self)
+		let expected = Toy(colour: "black", price: 5)
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
+	func testComplexUnnamedStructure() throws {
+		
+		struct Toy : Codable, Equatable {
+			
+			var price: Int
+			
+			var audience: Audience
+			enum Audience : Codable, Equatable {
+				case babies
+				case children(maxAge: Int)
+				case adults(minAge: Int)
+			}
+			
+			var colour: Colour
+			enum Colour : String, Codable, Equatable {
+				case black
+				case orange
+			}
+			
+		}
+		
+		let actual = try SispDecoder(from: "(price: 5, audience: children(maxAge: 16), colour: black)").decode(Toy.self)
+		let expected = Toy(price: 5, audience: .children(maxAge: 16), colour: .black)
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
+	func testUnnamedStructureInsideNamedStructure() throws {
+		
+		enum Toy : Codable, Equatable {
+			
+			case vehicle(Vehicle)
+			enum Vehicle : String, Codable, Equatable {
+				case car
+				case truck
+			}
+			
+			case house(House, price: Int)
+			struct House : Codable, Equatable {
+				
+				var address: String
+				
+				var colour: Colour
+				enum Colour : String, Codable, Equatable {
+					case black
+					case orange
+				}
+				
+			}
+			
+		}
+		
+		let actual = try SispDecoder(from: #"house((address: "55, Honey Str.", colour: orange), price: 60)"#).decode(Toy.self)
+		let expected = Toy.house(.init(address: "55, Honey Str.", colour: .orange), price: 60)
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }
