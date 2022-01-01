@@ -33,17 +33,14 @@ extension AL {
 				
 				let argumentRegisters = chain(argumentRegisters.lazy.map { $0 }, [nil].cycled())
 				for (parameter, register) in zip(parameters, argumentRegisters) {
-					switch parameter {
-						case .parameter(let location, type: let type):
-						let home: Lower.Location
-						if let register = register {
-							home = .register(register)
-							locationsByRegister[register, default: []].insert(location)
-						} else {
-							home = .frameCell(frame.allocate(type))
-						}
-						homesByLocation[location] = home
+					let home: Lower.Location
+					if let register = register {
+						home = .register(register)
+						locationsByRegister[register, default: []].insert(parameter.location)
+					} else {
+						home = .frameCell(frame.allocate(parameter.type))
 					}
+					homesByLocation[parameter.location] = home
 				}
 				
 				for location in conflicts.locationsOrderedByIncreasingNumberOfConflicts() {

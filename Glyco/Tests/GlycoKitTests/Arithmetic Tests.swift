@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import GlycoKit
+@testable import GlycoKit
 import XCTest
 
 final class ArithmeticTests : XCTestCase {
@@ -9,8 +9,8 @@ final class ArithmeticTests : XCTestCase {
 		
 		let location = AL.Location(rawValue: "a")
 		
-		let program = AL.Program.program(
-			.sequence([
+		let program = AL.Program(
+			effect: .sequence([
 				location <- .immediate(1),
 				.compute(destination: location, .immediate(2), .add, .location(location)),
 				.return(.location(location))
@@ -70,8 +70,8 @@ final class ArithmeticTests : XCTestCase {
 		let testedNumber = AL.Location(rawValue: "a")
 		let isEven = AL.Location(rawValue: "b")
 		
-		let program = AL.Program.program(
-			.sequence([
+		let program = AL.Program(
+			effect: .sequence([
 				.compute(destination: testedNumber, .immediate(12), .subtract, .immediate(11)),
 				.if(
 					.relation(.location(testedNumber), .equal, .immediate(1)),
