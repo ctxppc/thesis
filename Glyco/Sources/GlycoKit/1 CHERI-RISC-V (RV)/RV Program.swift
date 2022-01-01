@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
 /// A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
 public enum RV : Language {

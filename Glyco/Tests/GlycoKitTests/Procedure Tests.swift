@@ -1,6 +1,6 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
-import GlycoKit
+@testable import GlycoKit
 import XCTest
 
 final class ProcedureTests : XCTestCase {
@@ -8,10 +8,10 @@ final class ProcedureTests : XCTestCase {
 	func testSimpleInvoke() throws {
 		
 		let fortyTwo = EX.Label(rawValue: "fortytwo")
-		let source = EX.Program.program(
-			.invoke(fortyTwo, []),
+		let source = EX.Program(
+			body: .invoke(fortyTwo, []),
 			procedures:	[
-				.procedure(fortyTwo, .return(.constant(42)))
+				.init(name: fortyTwo, body: .return(.constant(42)))
 			]
 		)
 		

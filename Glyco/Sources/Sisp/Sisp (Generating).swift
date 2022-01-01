@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Sisp © 2021–2022 Constantino Tsarouhas
 
 import Algorithms
 import DepthKit

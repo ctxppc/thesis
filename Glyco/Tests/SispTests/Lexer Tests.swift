@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Sisp © 2021–2022 Constantino Tsarouhas
 
 @testable import Sisp
 import XCTest

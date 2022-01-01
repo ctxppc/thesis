@@ -1,5 +1,5 @@
 // swift-tools-version:5.5
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
 import PackageDescription
 

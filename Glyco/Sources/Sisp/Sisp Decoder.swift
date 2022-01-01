@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Sisp © 2021–2022 Constantino Tsarouhas
 
 import Foundation
 
@@ -71,7 +71,7 @@ public struct SispDecoder : Decoder {
 			default:
 			throw DecodingError.dataCorrupted(.init(
 				codingPath:			codingPath,
-				debugDescription:	"Expected to decode structure",
+				debugDescription:	"Expected to decode structure; found \(sisp.typeDescription) instead",
 				underlyingError:	nil
 			))
 			

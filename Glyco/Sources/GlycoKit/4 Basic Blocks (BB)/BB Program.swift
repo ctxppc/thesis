@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
 /// A language that groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.
 public enum BB : Language {

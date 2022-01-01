@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
 /// A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 public enum AL : Language {

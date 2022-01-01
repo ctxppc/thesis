@@ -1,4 +1,4 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
 /// A language that introduces procedure parameters using the PA calling convention.
 public enum PA : Language {

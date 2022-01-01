@@ -1,6 +1,6 @@
-// Glyco © 2021 Constantino Tsarouhas
+// Glyco © 2021–2022 Constantino Tsarouhas
 
-import GlycoKit
+@testable import GlycoKit
 import Sisp
 import XCTest
 
@@ -9,8 +9,8 @@ final class SispCodingTests : XCTestCase {
 	func testEncodingEX() throws {
 		
 		let location = EX.Location.local("a")
-		let program = EX.Program.program(
-			.sequence([
+		let program = EX.Program(
+			body: .sequence([
 				.if(
 					.constant(true),
 					then:	.assign(location, to: .constant(1))
@@ -53,8 +53,8 @@ final class SispCodingTests : XCTestCase {
 			""").decode(EX.Program.self)
 		
 		let location = EX.Location.local("a")
-		let expected = EX.Program.program(
-			.sequence([
+		let expected = EX.Program(
+			body: .sequence([
 				.if(
 					.constant(true),
 					then:	.assign(location, to: .constant(1))
