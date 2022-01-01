@@ -22,7 +22,7 @@ final class SispCodingTests : XCTestCase {
 		
 		let actual = try SispEncoder().encode(program).serialised()
 		let expected = """
-			program(
+			(
 				
 					sequence(
 						
@@ -39,7 +39,7 @@ final class SispCodingTests : XCTestCase {
 	func testDecodingEX() throws {
 		
 		let actual = try SispDecoder(from: """
-			program(
+			(
 				sequence(
 					if(
 						constant(true),

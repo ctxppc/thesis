@@ -1,5 +1,6 @@
 // Sisp © 2021–2022 Constantino Tsarouhas
 
+/// An encoding container for encoding to a Sisp structure's body.
 struct StructureBodyEncodingContainer<Key : CodingKey> : KeyedEncodingContainerProtocol {
 	
 	/// The encoder.

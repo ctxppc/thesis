@@ -1,5 +1,8 @@
 // Sisp © 2021–2022 Constantino Tsarouhas
 
+/// An encoding container for encoding to a Sisp structure.
+///
+/// Encoding a basic value using a structure encoding container causes an untyped structure to be created, as is expected when encoding an object or a value of a struct type. Requesting a nested keyed container causes a typed structure to be created with the keyed container's key as the type name, as is expected when encoding a value of enum type with payloads.
 struct StructureEncodingContainer<Key : CodingKey> : KeyedEncodingContainerProtocol {
 	
 	/// Creates a container for encoding to a structure.
@@ -132,7 +135,7 @@ struct StructureEncodingContainer<Key : CodingKey> : KeyedEncodingContainerProto
 	
 	/// Returns a single value container for encoding a value at `key`.
 	private mutating func singleValueContainer(forKey key: Key) -> SingleValueEncodingContainer {
-		encodeEmptyStructureIfNeeded(type: key.stringValue)
+		encodeEmptyStructureIfNeeded(type: nil)
 		return .init(
 			encoder:	encoder,
 			indexPath:	indexPath + [.label(.init(rawValue: key.stringValue))],

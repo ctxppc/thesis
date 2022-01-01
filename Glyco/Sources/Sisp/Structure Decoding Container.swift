@@ -116,7 +116,14 @@ struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProto
 	
 	// See protocol.
 	func decode<T : Decodable>(_ type: T.Type, forKey key: Key) throws -> T {
-		TODO.unimplemented
+		throw DecodingError.typeMismatch(
+			type,
+			.init(
+				codingPath:			codingPath,
+				debugDescription:	"Cannot decode a value of type \(type) using a structure (of type “\(structureType)”)",
+				underlyingError:	nil
+			)
+		)
 	}
 	
 	// See protocol.
@@ -147,9 +154,9 @@ struct StructureDecodingContainer<Key : CodingKey> : KeyedDecodingContainerProto
 			throw DecodingError.keyNotFound(
 				key,
 				.init(
-					codingPath: codingPath,
-					debugDescription: "Can only decode structure of type “\(structureType)”, not “\(key.stringValue)”",
-					underlyingError: nil
+					codingPath:			codingPath,
+					debugDescription:	"Structure is of type “\(structureType)”, not “\(key.stringValue)”",
+					underlyingError:	nil
 				)
 			)
 		}
