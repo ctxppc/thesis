@@ -19,6 +19,11 @@ public enum FO : Language {
 			.init(instructions: try effects.lowered())
 		}
 		
+		// See protocol.
+		public enum CodingKeys : String, CodingKey {
+			case effects = "_0"
+		}
+		
 	}
 	
 	// See protocol.

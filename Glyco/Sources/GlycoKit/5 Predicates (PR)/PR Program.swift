@@ -16,6 +16,11 @@ public enum PR : Language {
 			.init(blocks: try blocks.lowered())
 		}
 		
+		// See protocol.
+		public enum CodingKeys : String, CodingKey {
+			case blocks = "_0"
+		}
+		
 	}
 	
 	// See protocol.

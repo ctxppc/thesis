@@ -8,7 +8,7 @@ extension EX {
 		/// Allocates a location.
 		mutating func allocateLocation() -> Lower.Location {
 			defer { numberOfAllocatedLocations += 1}
-			return .local("_\(numberOfAllocatedLocations)")
+			return .init(rawValue: "_\(numberOfAllocatedLocations)")
 		}
 		
 		/// The number of allocated locations.

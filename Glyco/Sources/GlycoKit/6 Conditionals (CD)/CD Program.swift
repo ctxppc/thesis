@@ -35,6 +35,12 @@ public enum CD : Language {
 			
 		}
 		
+		// See protocol.
+		public enum CodingKeys : String, CodingKey {
+			case effect = "_0"
+			case procedures
+		}
+		
 	}
 	
 	// See protocol.

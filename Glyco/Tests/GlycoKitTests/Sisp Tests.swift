@@ -8,7 +8,7 @@ final class SispCodingTests : XCTestCase {
 	
 	func testEncodingEX() throws {
 		
-		let location = EX.Location.local("a")
+		let location = EX.Location(rawValue: "a")
 		let program = EX.Program(
 			body: .sequence([
 				.if(
@@ -52,7 +52,7 @@ final class SispCodingTests : XCTestCase {
 			)
 			""").decode(EX.Program.self)
 		
-		let location = EX.Location.local("a")
+		let location = EX.Location(rawValue: "a")
 		let expected = EX.Program(
 			body: .sequence([
 				.if(

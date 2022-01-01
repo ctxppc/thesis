@@ -6,10 +6,15 @@ import DepthKit
 extension AL {
 	
 	/// An abstract storage location on an AL machine.
-	public enum Location : Hashable, Comparable, SimplyLowerable {
+	public struct Location : RawCodable, Hashable, SimplyLowerable {
 		
-		/// A location local to the procedure.
-		case local(String)
+		// See protocol.
+		public init(rawValue: String) {
+			self.rawValue = rawValue
+		}
+		
+		/// The identifier.
+		public var rawValue: String
 		
 		// See protocol.
 		func lowered(in context: inout LocalContext) -> Lower.Location {
@@ -95,26 +100,8 @@ extension AL {
 	
 }
 
-extension AL.Location : Codable {
-	
-	public init(from decoder: Decoder) throws {
-		self = .local(try decoder.singleValueContainer().decode(String.self))
-	}
-	
-	public func encode(to encoder: Encoder) throws {
-		switch self {
-			case .local(let id):
-			var container = encoder.singleValueContainer()
-			try container.encode(id)
-		}
-	}
-	
-}
-
-extension AL.Location : CustomStringConvertible {
-	public var description: String {
-		switch self {
-			case .local(let name):	return name
-		}
+extension AL.Location : Comparable {
+	public static func <(earlier: Self, later: Self) -> Bool {
+		earlier.rawValue < later.rawValue
 	}
 }

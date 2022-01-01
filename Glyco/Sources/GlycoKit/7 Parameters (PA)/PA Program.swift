@@ -18,6 +18,12 @@ public enum PA : Language {
 			return try .init(effect: effect.lowered(in: &context), procedures: procedures.lowered(in: &context))
 		}
 		
+		// See protocol.
+		public enum CodingKeys : String, CodingKey {
+			case effect = "_0"
+			case procedures
+		}
+		
 	}
 	
 	// See protocol.
