@@ -1,0 +1,22 @@
+# Summary
+
+{% for languageType in types.enums|implements:"Language" %}
+## Language `{{languageType.name}}`
+{% for codableType in types.based.Codable %}
+{% if codableType.name|hasPrefix:languageType.name %}
+### `{{codableType.name}}`
+{% if codableType.kind == "enum" %}
+{% for case in codableType.cases %}
+* `{{case.name|replace:"`",""}}({% for par in case.associatedValues %}{{par.externalName}}: {{par.typeName}}, {% endfor %})`
+{% endfor %}
+{% elif codableType.kind == "struct" %}
+{% for initialiser in codableType.initializers %}
+* `({% for par in initialiser.parameters %}{{par.argumentLabel}}: {{par.typeName}}, {% endfor %})`
+{% endfor %}
+{% endif %}
+
+{% endif %}
+{% endfor %}
+
+-------
+{% endfor %}

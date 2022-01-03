@@ -35,7 +35,7 @@ struct CompileCommand : ParsableCommand {
 	/// Update this typealias whenever a higher language is added.
 	private typealias HighestSupportedLanguage = EX
 	
-	/// Executes the command.
+	// See protocol.
 	mutating func run() throws {
 		
 		let environment = ProcessInfo.processInfo.environment
