@@ -1,6 +1,11 @@
-sources:
-  - Sources/GlycoKit
-templates:
-  - Documentation/Languages.stencil
-output:
-  Documentation/Languages.md
+configurations:
+- sources:
+    - Sources/GlycoKit
+  templates:
+    - Documentation/Languages.stencil
+  output: Documentation/Languages.md
+- sources:
+    - Sources/GlycoKit
+  templates:
+    - Sourcery/Codable.stencil
+  output: Sources/GlycoKit/Generated

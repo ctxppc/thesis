@@ -80,7 +80,7 @@ From high-level to low-level:
 </dl>
 <dl>
 <dt><code>BB.Program</code></dt>
-<dd><code>(<strong>blocks:</strong> [BB.Block])</code></dd>
+<dd><code>([BB.Block])</code></dd>
 </dl>
 
 ## Grammar for CD (Conditionals)

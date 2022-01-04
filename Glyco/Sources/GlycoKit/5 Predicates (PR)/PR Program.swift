@@ -17,12 +17,7 @@ public enum PR : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			.init(blocks: try blocks.lowered())
-		}
-		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case blocks = "_0"
+			.init(try blocks.lowered())
 		}
 		
 	}

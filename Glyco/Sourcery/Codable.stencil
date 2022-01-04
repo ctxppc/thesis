@@ -1,0 +1,14 @@
+{% for lang in types.enums|public|implements: "Language" %}
+	{% for type in lang.containedTypes %}
+		{% for initialiser in type.initializers|public where initialiser.parameters.count > 0 %}
+extension {{type.globalName}} {
+	public enum CodingKeys : String, CodingKey {
+		{% for par in initialiser.parameters %}
+		case {{par.name}} = {% if par.argumentLabel %}"{{par.argumentLabel}}"{% else %}"_{{ forloop.counter0 }}"{% endif %}
+		{% endfor %}
+	}
+}
+
+		{% endfor %}
+	{% endfor %}
+{% endfor %}

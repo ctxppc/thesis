@@ -8,7 +8,7 @@ public enum BB : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given blocks
-		public init(blocks: [BB.Block]) {
+		public init(_ blocks: [BB.Block]) {
 			self.blocks = blocks
 		}
 		
@@ -20,11 +20,6 @@ public enum BB : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			.init(effects: try blocks.lowered())
-		}
-		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case blocks = "_0"
 		}
 		
 	}

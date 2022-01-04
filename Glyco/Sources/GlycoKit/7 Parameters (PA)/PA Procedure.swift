@@ -35,13 +35,6 @@ extension PA {
 			.init(name, try effect.lowered(in: &context))
 		}
 		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case name = "_0"
-			case parameters = "_1"
-			case effect = "_2"
-		}
-		
 	}
 	
 }

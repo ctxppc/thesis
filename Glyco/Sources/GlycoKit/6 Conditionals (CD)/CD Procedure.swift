@@ -24,12 +24,6 @@ extension CD {
 				.lowered(in: &context, entryLabel: name, previousEffects: [], exitLabel: .programExit)
 		}
 		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case name = "_0"
-			case effect = "_1"
-		}
-		
 	}
 	
 }

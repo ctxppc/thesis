@@ -24,12 +24,6 @@ public enum EX : Language {
 			return try .init(body.lowered(in: &context), procedures: procedures.lowered(in: &context))
 		}
 		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case body = "_0"
-			case procedures
-		}
-		
 	}
 	
 	// See protocol.

@@ -32,12 +32,6 @@ public enum AL : Language {
 			return try .init(effect.lowered(in: &mainLocalContext), procedures: procedures.lowered(in: &globalContext))
 		}
 		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case effect = "_0"
-			case procedures
-		}
-		
 	}
 	
 	// See protocol.

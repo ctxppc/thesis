@@ -21,10 +21,6 @@ public enum FL : Language {
 			return .init(instructions: try instructions.lowered(in: &frame))
 		}
 		
-		public enum CodingKeys : String, CodingKey {
-			case instructions = "_0"
-		}
-		
 	}
 	
 	// See protocol.

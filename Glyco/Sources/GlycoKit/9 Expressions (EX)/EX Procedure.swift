@@ -26,13 +26,6 @@ extension EX {
 			.init(name, parameters, try body.lowered(in: &context))
 		}
 		
-		// See protocol.
-		public enum CodingKeys : String, CodingKey {
-			case name = "_0"
-			case parameters = "_1"
-			case body = "_2"
-		}
-		
 	}
 	
 }
