@@ -8,7 +8,7 @@ public enum FL : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given instructions.
-		public init(instructions: [Instruction] = []) {
+		public init(_ instructions: [Instruction] = []) {
 			self.instructions = instructions
 		}
 		
@@ -19,6 +19,10 @@ public enum FL : Language {
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var frame = Frame()
 			return .init(instructions: try instructions.lowered(in: &frame))
+		}
+		
+		public enum CodingKeys : String, CodingKey {
+			case instructions = "_0"
 		}
 		
 	}

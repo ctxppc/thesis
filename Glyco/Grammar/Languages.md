@@ -169,7 +169,7 @@ From high-level to low-level:
 </dl>
 <dl>
 <dt><code>FL.Frame.Location</code></dt>
-<dd><code><strong>location</strong>(<strong>offset:</strong> Int)</code></dd>
+<dd><code>(<strong>offset:</strong> Int)</code></dd>
 </dl>
 <dl>
 <dt><code>FL.Instruction</code></dt>
@@ -190,7 +190,7 @@ From high-level to low-level:
 </dl>
 <dl>
 <dt><code>FL.Program</code></dt>
-<dd><code>(<strong>instructions:</strong> [Instruction])</code></dd>
+<dd><code>([Instruction])</code></dd>
 </dl>
 <dl>
 <dt><code>FL.Register</code></dt>
@@ -248,6 +248,7 @@ From high-level to low-level:
 </dl>
 <dl>
 <dt><code>FO.HaltEffect</code></dt>
+<dd><code>(<strong>result:</strong> Source)</code></dd>
 </dl>
 <dl>
 <dt><code>FO.Location</code></dt>
@@ -359,6 +360,7 @@ From high-level to low-level:
 </dl>
 <dl>
 <dt><code>PR.Program</code></dt>
+<dd><code>([Block])</code></dd>
 </dl>
 
 ## Grammar for RV (CHERI-RISC-V)
@@ -460,5 +462,6 @@ N/A
 ### New or redefined
 <dl>
 <dt><code>S.Program</code></dt>
+<dd><code>(<strong>assembly:</strong> String)</code></dd>
 </dl>
 

@@ -10,8 +10,12 @@ public enum S : Language {
 	/// A program in the S language.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		public init(assembly: String) {
+			self.assembly = body
+		}
+		
 		/// The program's assembly representation.
-		public let body: String
+		public let assembly: String
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) -> Never {
@@ -26,7 +30,7 @@ public enum S : Language {
 			
 			let assemblyURL = tmpURL.appendingPathComponent("asm.S")
 			let elfURL = tmpURL.appendingPathComponent("elf")
-			try body.write(to: assemblyURL, atomically: false, encoding: .utf8)
+			try assembly.write(to: assemblyURL, atomically: false, encoding: .utf8)
 			
 			let clang = Process()
 			clang.executableURL = configuration.toolchainURL
@@ -96,7 +100,7 @@ public enum S : Language {
 	// See protocol.
 	public static func loweredProgramRepresentation(_ program: Program, targetLanguage: String, configuration: CompilationConfiguration) throws -> String {
 		guard isNamed(targetLanguage) else { throw LoweringError.unknownLanguage(targetLanguage) }
-		return program.body
+		return program.assembly
 	}
 	
 	// See protocol.

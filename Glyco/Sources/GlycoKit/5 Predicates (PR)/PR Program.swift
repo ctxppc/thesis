@@ -6,6 +6,10 @@ public enum PR : Language {
 	/// A program on a PR machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		public init(_ blocks: [Block]) {
+			self.blocks = blocks
+		}
+		
 		/// The program's blocks.
 		///
 		/// Exactly one block must be labelled with `.programEntry`.

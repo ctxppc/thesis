@@ -17,11 +17,11 @@ final class FlexibleOperandsTests : XCTestCase {
 		])
 		
 		let actual = try source.lowered(configuration: .init(target: .sail))
-		let expected = FL.Program(instructions: [
-			.load(.word, destination: .t1, source: .location(offset: -4)),
-			.load(.word, destination: .t2, source: .location(offset: -8)),
+		let expected = FL.Program([
+			.load(.word, destination: .t1, source: .init(offset: -4)),
+			.load(.word, destination: .t2, source: .init(offset: -8)),
 			.compute(destination: .t3, value: .registerRegister(.t1, .add, .t2)),
-			.store(.word, destination: .location(offset: -12), source: .t3),
+			.store(.word, destination: .init(offset: -12), source: .t3),
 		])
 		
 		XCTAssertEqual(actual, expected)

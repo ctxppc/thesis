@@ -32,7 +32,7 @@ extension PA {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			.init(name: name, effect: try effect.lowered(in: &context))
+			.init(name, try effect.lowered(in: &context))
 		}
 		
 		// See protocol.

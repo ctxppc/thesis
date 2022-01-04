@@ -14,21 +14,19 @@ extension FL {
 		/// Allocates space for a datum of type `type` and returns its location.
 		public mutating func allocate(_ type: DataType) -> Location {
 			allocatedBytes += type.byteSize
-			return .location(offset: -allocatedBytes)
+			return .init(offset: -allocatedBytes)
 		}
 		
 		/// A location to a datum on a frame.
-		public enum Location : Codable, Hashable {
+		public struct Location : Codable, Hashable {
 			
-			/// A location that is located `offset` bytes from the frame pointer.
-			case location(offset: Int)
+			/// Creates a location that is located `offset` bytes from the frame pointer.
+			public init(offset: Int) {
+				self.offset = offset
+			}
 			
 			/// The location's offset from the frame pointer, in bytes.
-			var offset: Int {
-				switch self {
-					case .location(offset: let offset):	return offset
-				}
-			}
+			public var offset: Int
 			
 		}
 		

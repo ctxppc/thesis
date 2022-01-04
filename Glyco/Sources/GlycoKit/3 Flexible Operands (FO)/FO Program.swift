@@ -17,7 +17,7 @@ public enum FO : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			.init(instructions: try effects.lowered())
+			.init(try effects.lowered())
 		}
 		
 		// See protocol.

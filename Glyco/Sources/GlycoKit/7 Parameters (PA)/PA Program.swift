@@ -21,7 +21,7 @@ public enum PA : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(procedures: procedures, configuration: configuration)
-			return try .init(effect: effect.lowered(in: &context), procedures: procedures.lowered(in: &context))
+			return try .init(effect.lowered(in: &context), procedures: procedures.lowered(in: &context))
 		}
 		
 		// See protocol.

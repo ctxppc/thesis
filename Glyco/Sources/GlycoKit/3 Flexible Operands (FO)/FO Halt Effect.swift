@@ -5,6 +5,10 @@ extension FO {
 	/// An FO effect where the machine halts execution of the program.
 	public struct HaltEffect : Codable, Equatable, SimplyLowerable {
 		
+		public init(result: Source) {
+			self.result = result
+		}
+		
 		/// The source of the result value.
 		public var result: Source
 		
