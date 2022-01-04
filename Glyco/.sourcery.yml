@@ -1,0 +1,6 @@
+sources:
+  - Sources/GlycoKit
+templates:
+  - Documentation/Languages.stencil
+output:
+  Documentation/Languages.md
