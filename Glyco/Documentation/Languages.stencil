@@ -1,17 +1,17 @@
 # Intermediate Languages Supported by Glyco
+**Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
-## Pipeline (High-Level to Low-Level)
-From high-level to low-level:
-{% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}<code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
-{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+The pipeline, from high-level to low-level is:
+{% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}[`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ [`{{lang.type.name}}`](#{{lang.type.name}})
 {% endfor %}
 {% endfor %}
 {% endfor %}
@@ -21,19 +21,31 @@ From high-level to low-level:
 {% endfor %}
 {% endfor %}
 {% endfor %}
-{% endfor %}
+{% endfor %}.
 
-{% for languageType in types.enums|implements:"Language" %}
-## Grammar for {{languageType.name}}{% if languageType.annotations["longname"] %} ({{languageType.annotations["longname"]}}){%endif%}
+This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project's root directory (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to continuously update.
 
-### Inherited from {{languageType.typealiases["Lower"].type.name|default: "nothing"}}
+## How to Use
+Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.
+
+A rule mentioning a nonterminal in square brackets like `[Effect]` is satisfied with a sequence of zero or more productions of that nonterminal, with each such production separated by whitespace.
+
+The nonterminal `String` is satisfied with a string such as `string` or `"long string"`. Quotation is required for strings that don't start with a letter (Unicode General Category L* and M*) or underscore (`_`), incl. the empty string. The nonterminal `Int` is satisfied with an integer literal such as `500` or `-12`. The nonterminal `Bool` is satisfied with either string literals `true` or `false`, optionally quoted.
+
+A program written in some language `XY` should be stored in a file with extension `.xy` (case-insensitive) since Glyco uses the extension to determine the source language.
+
+{% for languageType in types.enums|implements: "Language" %}
+<h2 id="{{languageType.name}}">Grammar for {{languageType.name}}{% if languageType.annotations["longname"] %} ({{languageType.annotations["longname"]}}){%endif%}</h2>
+
+{% if languageType.typealiases["Lower"].type.name %}
+**Inherited from {{languageType.typealiases["Lower"].type.name|default: "nothing"}}:**
 {% for name, typealias in languageType.typealiases where name != "Lower" %}
 <code>{{name}}</code>{% if not forloop.last %}, {% endif %}
 {% empty %}
 N/A
 {% endfor %}
+{% endif %}
 
-### New or redefined
 {% for codableType in types.based.Codable where codableType.name|hasPrefix:languageType.name %}
 <dl>
 <dt><code>{{codableType.name}}</code></dt>

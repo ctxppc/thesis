@@ -1,26 +1,37 @@
 
 # Intermediate Languages Supported by Glyco
+**Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
-## Pipeline (High-Level to Low-Level)
-From high-level to low-level:
-<code>EX</code>
-→ <code>AL</code>
-→ <code>PA</code>
-→ <code>CD</code>
-→ <code>PR</code>
-→ <code>BB</code>
-→ <code>FO</code>
-→ <code>FL</code>
-→ <code>RV</code>
-→ <code>S</code>
+The pipeline, from high-level to low-level is:
+[`EX`](#EX)
+→ [`AL`](#AL)
+→ [`PA`](#PA)
+→ [`CD`](#CD)
+→ [`PR`](#PR)
+→ [`BB`](#BB)
+→ [`FO`](#FO)
+→ [`FL`](#FL)
+→ [`RV`](#RV)
+→ [`S`](#S)
+.
 
-## Grammar for AL (Abstract Locations)
+This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project's root directory (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to continuously update.
 
-### Inherited from PA
+## How to Use
+Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.
+
+A rule mentioning a nonterminal in square brackets like `[Effect]` is satisfied with a sequence of zero or more productions of that nonterminal, with each such production separated by whitespace.
+
+The nonterminal `String` is satisfied with a string such as `string` or `"long string"`. Quotation is required for strings that don't start with a letter (Unicode General Category L* and M*) or underscore (`_`), incl. the empty string. The nonterminal `Int` is satisfied with an integer literal such as `500` or `-12`. The nonterminal `Bool` is satisfied with either string literals `true` or `false`, optionally quoted.
+
+A program written in some language `XY` should be stored in a file with extension `.xy` (case-insensitive) since Glyco uses the extension to determine the source language.
+
+<h2 id="AL">Grammar for AL (Abstract Locations)</h2>
+
+**Inherited from PA:**
 <code>DataType</code>, 
 <code>Label</code>
 
-### New or redefined
 <dl>
 <dt><code>AL.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
@@ -54,9 +65,9 @@ From high-level to low-level:
 <dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 
-## Grammar for BB (Basic Blocks)
+<h2 id="BB">Grammar for BB (Basic Blocks)</h2>
 
-### Inherited from FO
+**Inherited from FO:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -66,7 +77,6 @@ From high-level to low-level:
 <code>Register</code>, 
 <code>Source</code>
 
-### New or redefined
 <dl>
 <dt><code>BB.Block</code></dt>
 <dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
@@ -83,9 +93,9 @@ From high-level to low-level:
 <dd><code>([BB.Block])</code></dd>
 </dl>
 
-## Grammar for CD (Conditionals)
+<h2 id="CD">Grammar for CD (Conditionals)</h2>
 
-### Inherited from PR
+**Inherited from PR:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -95,7 +105,6 @@ From high-level to low-level:
 <code>Register</code>, 
 <code>Source</code>
 
-### New or redefined
 <dl>
 <dt><code>CD.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
@@ -120,15 +129,14 @@ From high-level to low-level:
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 
-## Grammar for EX (Expressions)
+<h2 id="EX">Grammar for EX (Expressions)</h2>
 
-### Inherited from AL
+**Inherited from AL:**
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Predicate</code>
 
-### New or redefined
 <dl>
 <dt><code>EX.Expression</code></dt>
 <dd><code><strong>constant</strong>(Int)</code></dd>
@@ -153,15 +161,14 @@ From high-level to low-level:
 <dd><code><strong>return</strong>(Expression)</code></dd>
 </dl>
 
-## Grammar for FL (Frame Locations)
+<h2 id="FL">Grammar for FL (Frame Locations)</h2>
 
-### Inherited from RV
+**Inherited from RV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
 
-### New or redefined
 <dl>
 <dt><code>FL.BinaryExpression</code></dt>
 <dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
@@ -227,15 +234,14 @@ From high-level to low-level:
 <dd><code><strong>t6</strong></code></dd>
 </dl>
 
-## Grammar for FO (Frame Operands)
+<h2 id="FO">Grammar for FO (Frame Operands)</h2>
 
-### Inherited from FL
+**Inherited from FL:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
 
-### New or redefined
 <dl>
 <dt><code>FO.Effect</code></dt>
 <dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
@@ -296,9 +302,9 @@ From high-level to low-level:
 <dd><code><strong>immediate</strong>(Int)</code></dd>
 </dl>
 
-## Grammar for PA (Parameters)
+<h2 id="PA">Grammar for PA (Parameters)</h2>
 
-### Inherited from CD
+**Inherited from CD:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -309,7 +315,6 @@ From high-level to low-level:
 <code>Register</code>, 
 <code>Source</code>
 
-### New or redefined
 <dl>
 <dt><code>PA.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
@@ -332,9 +337,9 @@ From high-level to low-level:
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 
-## Grammar for PR
+<h2 id="PR">Grammar for PR</h2>
 
-### Inherited from BB
+**Inherited from BB:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -345,7 +350,6 @@ From high-level to low-level:
 <code>Register</code>, 
 <code>Source</code>
 
-### New or redefined
 <dl>
 <dt><code>PR.Block</code></dt>
 <dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
@@ -363,12 +367,11 @@ From high-level to low-level:
 <dd><code>([Block])</code></dd>
 </dl>
 
-## Grammar for RV (CHERI-RISC-V)
+<h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
 
-### Inherited from S
+**Inherited from S:**
 N/A
 
-### New or redefined
 <dl>
 <dt><code>RV.BinaryOperator</code></dt>
 <dd><code><strong>add</strong></code></dd>
@@ -454,12 +457,9 @@ N/A
 <dd><code><strong>t6</strong></code></dd>
 </dl>
 
-## Grammar for S (CHERI-RISC-V Assembly)
+<h2 id="S">Grammar for S (CHERI-RISC-V Assembly)</h2>
 
-### Inherited from nothing
-N/A
 
-### New or redefined
 <dl>
 <dt><code>S.Program</code></dt>
 <dd><code>(<strong>assembly:</strong> String)</code></dd>
