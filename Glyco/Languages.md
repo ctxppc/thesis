@@ -3,19 +3,19 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
-[`EX`](#EX)
-→ [`AL`](#AL)
-→ [`PA`](#PA)
-→ [`CD`](#CD)
-→ [`PR`](#PR)
-→ [`BB`](#BB)
-→ [`FO`](#FO)
-→ [`FL`](#FL)
-→ [`RV`](#RV)
-→ [`S`](#S)
-.
+[`EX`](#EX) →
+[`AL`](#AL) →
+[`PA`](#PA) →
+[`CD`](#CD) →
+[`PR`](#PR) →
+[`BB`](#BB) →
+[`FO`](#FO) →
+[`FL`](#FL) →
+[`RV`](#RV) →
+[`S`](#S) →
+ ELF.
 
-This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project's root directory (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to continuously update.
+This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to `/Glyco/Sourcery` and invoke `sourcery --config Languages.yaml`. Pass the `--watch` flag to enable continuous updates.
 
 ## How to Use
 Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.
@@ -25,6 +25,40 @@ A rule mentioning a nonterminal in square brackets like `[Effect]` is satisfied 
 The nonterminal `String` is satisfied with a string such as `string` or `"long string"`. Quotation is required for strings that don't start with a letter (Unicode General Category L* and M*) or underscore (`_`), incl. the empty string. The nonterminal `Int` is satisfied with an integer literal such as `500` or `-12`. The nonterminal `Bool` is satisfied with either string literals `true` or `false`, optionally quoted.
 
 A program written in some language `XY` should be stored in a file with extension `.xy` (case-insensitive) since Glyco uses the extension to determine the source language.
+
+
+<h2 id="EX">Grammar for EX (Expressions)</h2>
+
+**Inherited from AL:**
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Predicate</code>
+
+<dl>
+<dt><code>EX.Expression</code></dt>
+<dd><code><strong>constant</strong>(Int)</code></dd>
+<dd><code><strong>location</strong>(Location)</code></dd>
+<dd><code><strong>binary</strong>(Expression, BinaryOperator, Expression)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Expression, <strong>else:</strong> Expression)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Statement)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Program</code></dt>
+<dd><code>(Statement, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Statement</code></dt>
+<dd><code><strong>assign</strong>(Location, <strong>to:</strong> Expression)</code></dd>
+<dd><code><strong>sequence</strong>([Statement])</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code></dd>
+<dd><code><strong>invoke</strong>(Label, [Expression])</code></dd>
+<dd><code><strong>return</strong>(Expression)</code></dd>
+</dl>
+
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
 
@@ -65,33 +99,42 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 
-<h2 id="BB">Grammar for BB (Basic Blocks)</h2>
 
-**Inherited from FO:**
+<h2 id="PA">Grammar for PA (Parameters)</h2>
+
+**Inherited from CD:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
+<code>Predicate</code>, 
 <code>Register</code>, 
 <code>Source</code>
 
 <dl>
-<dt><code>BB.Block</code></dt>
-<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
-</dl>
-<dl>
-<dt><code>BB.Effect</code></dt>
+<dt><code>PA.Effect</code></dt>
+<dd><code><strong>sequence</strong>([Effect])</code></dd>
 <dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+<dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
+<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>BB.Program</code></dt>
-<dd><code>([BB.Block])</code></dd>
+<dt><code>PA.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
+<dl>
+<dt><code>PA.Procedure.Parameter</code></dt>
+<dd><code>(<strong>type:</strong> DataType)</code></dd>
+</dl>
+<dl>
+<dt><code>PA.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+
 
 <h2 id="CD">Grammar for CD (Conditionals)</h2>
 
@@ -129,37 +172,135 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 
-<h2 id="EX">Grammar for EX (Expressions)</h2>
 
-**Inherited from AL:**
+<h2 id="PR">Grammar for PR</h2>
+
+**Inherited from BB:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
 <code>DataType</code>, 
+<code>Effect</code>, 
+<code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>Predicate</code>
+<code>Register</code>, 
+<code>Source</code>
 
 <dl>
-<dt><code>EX.Expression</code></dt>
-<dd><code><strong>constant</strong>(Int)</code></dd>
+<dt><code>PR.Block</code></dt>
+<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
+<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>predicate:</strong> Predicate, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
+<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
+</dl>
+<dl>
+<dt><code>PR.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>not</strong>(Predicate)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+</dl>
+<dl>
+<dt><code>PR.Program</code></dt>
+<dd><code>([Block])</code></dd>
+</dl>
+
+
+<h2 id="BB">Grammar for BB (Basic Blocks)</h2>
+
+**Inherited from FO:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Frame</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Register</code>, 
+<code>Source</code>
+
+<dl>
+<dt><code>BB.Block</code></dt>
+<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
+<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
+<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
+</dl>
+<dl>
+<dt><code>BB.Effect</code></dt>
+<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
+<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+</dl>
+<dl>
+<dt><code>BB.Program</code></dt>
+<dd><code>([BB.Block])</code></dd>
+</dl>
+
+
+<h2 id="FO">Grammar for FO (Frame Operands)</h2>
+
+**Inherited from FL:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Label</code>
+
+<dl>
+<dt><code>FO.Effect</code></dt>
+<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
+<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
+<dd><code><strong>call</strong>(Label)</code></dd>
+<dd><code><strong>return</strong></code></dd>
+<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>FO.HaltEffect</code></dt>
+<dd><code>(<strong>result:</strong> Source)</code></dd>
+</dl>
+<dl>
+<dt><code>FO.Location</code></dt>
+<dd><code><strong>register</strong>(Register)</code></dd>
+<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
+</dl>
+<dl>
+<dt><code>FO.Program</code></dt>
+<dd><code>(<strong>effects:</strong> [Effect])</code></dd>
+</dl>
+<dl>
+<dt><code>FO.Register</code></dt>
+<dd><code><strong>zero</strong></code></dd>
+<dd><code><strong>ra</strong></code></dd>
+<dd><code><strong>sp</strong></code></dd>
+<dd><code><strong>gp</strong></code></dd>
+<dd><code><strong>tp</strong></code></dd>
+<dd><code><strong>fp</strong></code></dd>
+<dd><code><strong>s1</strong></code></dd>
+<dd><code><strong>a0</strong></code></dd>
+<dd><code><strong>a1</strong></code></dd>
+<dd><code><strong>a2</strong></code></dd>
+<dd><code><strong>a3</strong></code></dd>
+<dd><code><strong>a4</strong></code></dd>
+<dd><code><strong>a5</strong></code></dd>
+<dd><code><strong>a6</strong></code></dd>
+<dd><code><strong>a7</strong></code></dd>
+<dd><code><strong>s2</strong></code></dd>
+<dd><code><strong>s3</strong></code></dd>
+<dd><code><strong>s4</strong></code></dd>
+<dd><code><strong>s5</strong></code></dd>
+<dd><code><strong>s6</strong></code></dd>
+<dd><code><strong>s7</strong></code></dd>
+<dd><code><strong>s8</strong></code></dd>
+<dd><code><strong>s9</strong></code></dd>
+<dd><code><strong>s10</strong></code></dd>
+<dd><code><strong>s11</strong></code></dd>
+<dd><code><strong>t4</strong></code></dd>
+<dd><code><strong>t5</strong></code></dd>
+<dd><code><strong>t6</strong></code></dd>
+</dl>
+<dl>
+<dt><code>FO.Source</code></dt>
 <dd><code><strong>location</strong>(Location)</code></dd>
-<dd><code><strong>binary</strong>(Expression, BinaryOperator, Expression)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Expression, <strong>else:</strong> Expression)</code></dd>
+<dd><code><strong>immediate</strong>(Int)</code></dd>
 </dl>
-<dl>
-<dt><code>EX.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Statement)</code></dd>
-</dl>
-<dl>
-<dt><code>EX.Program</code></dt>
-<dd><code>(Statement, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-<dt><code>EX.Statement</code></dt>
-<dd><code><strong>assign</strong>(Location, <strong>to:</strong> Expression)</code></dd>
-<dd><code><strong>sequence</strong>([Statement])</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [Expression])</code></dd>
-<dd><code><strong>return</strong>(Expression)</code></dd>
-</dl>
+
 
 <h2 id="FL">Grammar for FL (Frame Locations)</h2>
 
@@ -234,138 +375,6 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code><strong>t6</strong></code></dd>
 </dl>
 
-<h2 id="FO">Grammar for FO (Frame Operands)</h2>
-
-**Inherited from FL:**
-<code>BinaryOperator</code>, 
-<code>BranchRelation</code>, 
-<code>DataType</code>, 
-<code>Label</code>
-
-<dl>
-<dt><code>FO.Effect</code></dt>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
-<dd><code><strong>call</strong>(Label)</code></dd>
-<dd><code><strong>return</strong></code></dd>
-<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
-</dl>
-<dl>
-<dt><code>FO.HaltEffect</code></dt>
-<dd><code>(<strong>result:</strong> Source)</code></dd>
-</dl>
-<dl>
-<dt><code>FO.Location</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
-</dl>
-<dl>
-<dt><code>FO.Program</code></dt>
-<dd><code>(<strong>effects:</strong> [Effect])</code></dd>
-</dl>
-<dl>
-<dt><code>FO.Register</code></dt>
-<dd><code><strong>zero</strong></code></dd>
-<dd><code><strong>ra</strong></code></dd>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>gp</strong></code></dd>
-<dd><code><strong>tp</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>s1</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
-<dd><code><strong>s2</strong></code></dd>
-<dd><code><strong>s3</strong></code></dd>
-<dd><code><strong>s4</strong></code></dd>
-<dd><code><strong>s5</strong></code></dd>
-<dd><code><strong>s6</strong></code></dd>
-<dd><code><strong>s7</strong></code></dd>
-<dd><code><strong>s8</strong></code></dd>
-<dd><code><strong>s9</strong></code></dd>
-<dd><code><strong>s10</strong></code></dd>
-<dd><code><strong>s11</strong></code></dd>
-<dd><code><strong>t4</strong></code></dd>
-<dd><code><strong>t5</strong></code></dd>
-<dd><code><strong>t6</strong></code></dd>
-</dl>
-<dl>
-<dt><code>FO.Source</code></dt>
-<dd><code><strong>location</strong>(Location)</code></dd>
-<dd><code><strong>immediate</strong>(Int)</code></dd>
-</dl>
-
-<h2 id="PA">Grammar for PA (Parameters)</h2>
-
-**Inherited from CD:**
-<code>BinaryOperator</code>, 
-<code>BranchRelation</code>, 
-<code>DataType</code>, 
-<code>Frame</code>, 
-<code>Label</code>, 
-<code>Location</code>, 
-<code>Predicate</code>, 
-<code>Register</code>, 
-<code>Source</code>
-
-<dl>
-<dt><code>PA.Effect</code></dt>
-<dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Procedure.Parameter</code></dt>
-<dd><code>(<strong>type:</strong> DataType)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-
-<h2 id="PR">Grammar for PR</h2>
-
-**Inherited from BB:**
-<code>BinaryOperator</code>, 
-<code>BranchRelation</code>, 
-<code>DataType</code>, 
-<code>Effect</code>, 
-<code>Frame</code>, 
-<code>Label</code>, 
-<code>Location</code>, 
-<code>Register</code>, 
-<code>Source</code>
-
-<dl>
-<dt><code>PR.Block</code></dt>
-<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>predicate:</strong> Predicate, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
-</dl>
-<dl>
-<dt><code>PR.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>not</strong>(Predicate)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-</dl>
-<dl>
-<dt><code>PR.Program</code></dt>
-<dd><code>([Block])</code></dd>
-</dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
 
@@ -456,6 +465,7 @@ N/A
 <dd><code><strong>t5</strong></code></dd>
 <dd><code><strong>t6</strong></code></dd>
 </dl>
+
 
 <h2 id="S">Grammar for S (CHERI-RISC-V Assembly)</h2>
 

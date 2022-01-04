@@ -1,0 +1,6 @@
+{% if lang.type %}
+[`{{lang.type.name}}`](#{{lang.type.name}}) →
+{% for name, lang in lang.type.typealiases where name == "Lower" %}
+{% include "Pipeline.stencil" %}
+{% endfor %}
+{% endif %}
