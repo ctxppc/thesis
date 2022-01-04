@@ -5,318 +5,309 @@
 ### `AL.ConflictGraph`
 
 ### `AL.Effect`
-* `sequence(: [Effect], )`
-* `copy(destination: Location, source: Source, )`
-* `compute(destination: Location, 1: Source, 2: BinaryOperator, 3: Source, )`
-* `if(0: Predicate, then: Effect, else: Effect, )`
-* `invoke(0: Label, 1: [Source], )`
-* `return(: Source, )`
+* <code><strong>sequence</strong>([Effect])</code>
+* <code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code>
+* <code><strong>invoke</strong>(Label, [Source])</code>
+* <code><strong>return</strong>(Source)</code>
 
 ### `AL.LivenessSet`
 
 ### `AL.Predicate`
-* `constant(: Bool, )`
-* `relation(0: Source, 1: BranchRelation, 2: Source, )`
-* `if(0: Predicate, then: Predicate, else: Predicate, )`
+* <code><strong>constant</strong>(Bool)</code>
+* <code><strong>relation</strong>(Source, BranchRelation, Source)</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code>
 
 ### `AL.Procedure`
 
 ### `AL.Procedure.Parameter`
 
 ### `AL.Program`
+* <code><strong>Program</strong>(AL.Effect, <strong>procedures:</strong> [AL.Procedure])</code>
 
 ### `AL.Source`
-* `immediate(: Int, )`
-* `location(: Location, )`
-
+* <code><strong>immediate</strong>(Int)</code>
+* <code><strong>location</strong>(Location)</code>
 
 -------
 ## Language `BB`
 ### `BB.Block`
-* `intermediate(label: Label, effects: [Effect], successor: Label, )`
-* `branch(label: Label, effects: [Effect], lhs: Source, relation: BranchRelation, rhs: Source, affirmative: Label, negative: Label, )`
-* `final(label: Label, effects: [Effect], result: Source, )`
+* <code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code>
+* <code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code>
+* <code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code>
 
 ### `BB.Effect`
-* `copy(destination: Location, source: Source, )`
-* `compute(destination: Location, 1: Source, 2: BinaryOperator, 3: Source, )`
+* <code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code>
 
 ### `BB.Program`
-* `(blocks: [BB.Block], )`
-
+* <code><strong>Program</strong>(<strong>blocks:</strong> [BB.Block])</code>
 
 -------
 ## Language `CD`
 ### `CD.Effect`
-* `sequence(: [Effect], )`
-* `copy(destination: Location, source: Source, )`
-* `compute(destination: Location, 1: Source, 2: BinaryOperator, 3: Source, )`
-* `if(0: Predicate, then: Effect, else: Effect, )`
-* `invoke(: Label, )`
-* `return(: Source, )`
+* <code><strong>sequence</strong>([Effect])</code>
+* <code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code>
+* <code><strong>invoke</strong>(Label)</code>
+* <code><strong>return</strong>(Source)</code>
 
 ### `CD.Predicate`
-* `constant(: Bool, )`
-* `relation(lhs: Source, relation: BranchRelation, rhs: Source, )`
-* `conditional(condition: Predicate, affirmative: Predicate, negative: Predicate, )`
+* <code><strong>constant</strong>(Bool)</code>
+* <code><strong>relation</strong>(<strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source)</code>
+* <code><strong>conditional</strong>(<strong>condition:</strong> Predicate, <strong>affirmative:</strong> Predicate, <strong>negative:</strong> Predicate)</code>
 
 ### `CD.Procedure`
 
 ### `CD.Program`
 
-
 -------
 ## Language `EX`
 ### `EX.Expression`
-* `constant(: Int, )`
-* `location(: Location, )`
-* `binary(0: Expression, 1: BinaryOperator, 2: Expression, )`
-* `if(0: Predicate, then: Expression, else: Expression, )`
+* <code><strong>constant</strong>(Int)</code>
+* <code><strong>location</strong>(Location)</code>
+* <code><strong>binary</strong>(Expression, BinaryOperator, Expression)</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Expression, <strong>else:</strong> Expression)</code>
 
 ### `EX.Procedure`
 
 ### `EX.Program`
 
 ### `EX.Statement`
-* `assign(0: Location, to: Expression, )`
-* `sequence(: [Statement], )`
-* `if(0: Predicate, then: Statement, else: Statement, )`
-* `invoke(0: Label, 1: [Expression], )`
-* `return(: Expression, )`
-
+* <code><strong>assign</strong>(Location, <strong>to:</strong> Expression)</code>
+* <code><strong>sequence</strong>([Statement])</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code>
+* <code><strong>invoke</strong>(Label, [Expression])</code>
+* <code><strong>return</strong>(Expression)</code>
 
 -------
 ## Language `FL`
 ### `FL.BinaryExpression`
-* `registerRegister(0: Register, 1: BinaryOperator, 2: Register, )`
-* `registerImmediate(0: Register, 1: BinaryOperator, 2: Int, )`
+* <code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code>
+* <code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code>
 
 ### `FL.Frame.Location`
-* `location(: Int, )`
+* <code><strong>location</strong>(<strong>offset:</strong> Int)</code>
 
 ### `FL.Instruction`
-* `copy(0: DataType, destination: Register, source: Register, )`
-* `compute(destination: Register, value: BinaryExpression, )`
-* `load(0: DataType, destination: Register, source: Frame.Location, )`
-* `store(0: DataType, destination: Frame.Location, source: Register, )`
-* `branch(to: Label, 1: Register, 2: BranchRelation, 3: Register, )`
-* `jump(: Label, )`
-* `call(: Label, )`
-* `return()`
-* `labelled(0: Label, 1: Instruction, )`
+* <code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Register, <strong>value:</strong> BinaryExpression)</code>
+* <code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Frame.Location)</code>
+* <code><strong>store</strong>(DataType, <strong>destination:</strong> Frame.Location, <strong>source:</strong> Register)</code>
+* <code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code>
+* <code><strong>jump</strong>(<strong>to:</strong> Label)</code>
+* <code><strong>call</strong>(Label)</code>
+* <code><strong>return</strong></code>
+* <code><strong>labelled</strong>(Label, Instruction)</code>
 
 ### `FL.Location`
-* `register(: Register, )`
-* `frameCell(: Frame.Location, )`
+* <code><strong>register</strong>(Register)</code>
+* <code><strong>frameCell</strong>(Frame.Location)</code>
 
 ### `FL.Program`
-* `(instructions: [Instruction], )`
+* <code><strong>Program</strong>(<strong>instructions:</strong> [Instruction])</code>
 
 ### `FL.Register`
-* `zero()`
-* `ra()`
-* `sp()`
-* `gp()`
-* `tp()`
-* `t1()`
-* `t2()`
-* `fp()`
-* `s1()`
-* `a0()`
-* `a1()`
-* `a2()`
-* `a3()`
-* `a4()`
-* `a5()`
-* `a6()`
-* `a7()`
-* `s2()`
-* `s3()`
-* `s4()`
-* `s5()`
-* `s6()`
-* `s7()`
-* `s8()`
-* `s9()`
-* `s10()`
-* `s11()`
-* `t3()`
-* `t4()`
-* `t5()`
-* `t6()`
-
+* <code><strong>zero</strong></code>
+* <code><strong>ra</strong></code>
+* <code><strong>sp</strong></code>
+* <code><strong>gp</strong></code>
+* <code><strong>tp</strong></code>
+* <code><strong>t1</strong></code>
+* <code><strong>t2</strong></code>
+* <code><strong>fp</strong></code>
+* <code><strong>s1</strong></code>
+* <code><strong>a0</strong></code>
+* <code><strong>a1</strong></code>
+* <code><strong>a2</strong></code>
+* <code><strong>a3</strong></code>
+* <code><strong>a4</strong></code>
+* <code><strong>a5</strong></code>
+* <code><strong>a6</strong></code>
+* <code><strong>a7</strong></code>
+* <code><strong>s2</strong></code>
+* <code><strong>s3</strong></code>
+* <code><strong>s4</strong></code>
+* <code><strong>s5</strong></code>
+* <code><strong>s6</strong></code>
+* <code><strong>s7</strong></code>
+* <code><strong>s8</strong></code>
+* <code><strong>s9</strong></code>
+* <code><strong>s10</strong></code>
+* <code><strong>s11</strong></code>
+* <code><strong>t3</strong></code>
+* <code><strong>t4</strong></code>
+* <code><strong>t5</strong></code>
+* <code><strong>t6</strong></code>
 
 -------
 ## Language `FO`
 ### `FO.Effect`
-* `copy(destination: Location, source: Source, )`
-* `compute(destination: Location, 1: Source, 2: BinaryOperator, 3: Source, )`
-* `branch(to: Label, 1: Source, 2: BranchRelation, 3: Source, )`
-* `jump(: Label, )`
-* `call(: Label, )`
-* `return()`
-* `labelled(0: Label, 1: Effect, )`
+* <code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code>
+* <code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code>
+* <code><strong>jump</strong>(<strong>to:</strong> Label)</code>
+* <code><strong>call</strong>(Label)</code>
+* <code><strong>return</strong></code>
+* <code><strong>labelled</strong>(Label, Effect)</code>
 
 ### `FO.HaltEffect`
 
 ### `FO.Location`
-* `register(: Register, )`
-* `frameCell(: Frame.Location, )`
+* <code><strong>register</strong>(Register)</code>
+* <code><strong>frameCell</strong>(Frame.Location)</code>
 
 ### `FO.Program`
-* `(effects: [Effect], )`
+* <code><strong>Program</strong>(<strong>effects:</strong> [Effect])</code>
 
 ### `FO.Register`
-* `zero()`
-* `ra()`
-* `sp()`
-* `gp()`
-* `tp()`
-* `fp()`
-* `s1()`
-* `a0()`
-* `a1()`
-* `a2()`
-* `a3()`
-* `a4()`
-* `a5()`
-* `a6()`
-* `a7()`
-* `s2()`
-* `s3()`
-* `s4()`
-* `s5()`
-* `s6()`
-* `s7()`
-* `s8()`
-* `s9()`
-* `s10()`
-* `s11()`
-* `t4()`
-* `t5()`
-* `t6()`
+* <code><strong>zero</strong></code>
+* <code><strong>ra</strong></code>
+* <code><strong>sp</strong></code>
+* <code><strong>gp</strong></code>
+* <code><strong>tp</strong></code>
+* <code><strong>fp</strong></code>
+* <code><strong>s1</strong></code>
+* <code><strong>a0</strong></code>
+* <code><strong>a1</strong></code>
+* <code><strong>a2</strong></code>
+* <code><strong>a3</strong></code>
+* <code><strong>a4</strong></code>
+* <code><strong>a5</strong></code>
+* <code><strong>a6</strong></code>
+* <code><strong>a7</strong></code>
+* <code><strong>s2</strong></code>
+* <code><strong>s3</strong></code>
+* <code><strong>s4</strong></code>
+* <code><strong>s5</strong></code>
+* <code><strong>s6</strong></code>
+* <code><strong>s7</strong></code>
+* <code><strong>s8</strong></code>
+* <code><strong>s9</strong></code>
+* <code><strong>s10</strong></code>
+* <code><strong>s11</strong></code>
+* <code><strong>t4</strong></code>
+* <code><strong>t5</strong></code>
+* <code><strong>t6</strong></code>
 
 ### `FO.Source`
-* `location(: Location, )`
-* `immediate(: Int, )`
-
+* <code><strong>location</strong>(Location)</code>
+* <code><strong>immediate</strong>(Int)</code>
 
 -------
 ## Language `PA`
 ### `PA.Effect`
-* `sequence(: [Effect], )`
-* `copy(destination: Location, source: Source, )`
-* `compute(destination: Location, 1: Source, 2: BinaryOperator, 3: Source, )`
-* `if(0: Predicate, then: Effect, else: Effect, )`
-* `invoke(0: Label, 1: [Source], )`
-* `return(: Source, )`
+* <code><strong>sequence</strong>([Effect])</code>
+* <code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code>
+* <code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code>
+* <code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code>
+* <code><strong>invoke</strong>(Label, [Source])</code>
+* <code><strong>return</strong>(Source)</code>
 
 ### `PA.Procedure`
 
 ### `PA.Procedure.Parameter`
-* `parameter(: DataType, )`
+* <code><strong>parameter</strong>(<strong>type:</strong> DataType)</code>
 
 ### `PA.Program`
-
 
 -------
 ## Language `PR`
 ### `PR.Block`
-* `intermediate(label: Label, effects: [Effect], successor: Label, )`
-* `branch(label: Label, effects: [Effect], predicate: Predicate, affirmative: Label, negative: Label, )`
-* `final(label: Label, effects: [Effect], result: Source, )`
+* <code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code>
+* <code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>predicate:</strong> Predicate, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code>
+* <code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code>
 
 ### `PR.Predicate`
-* `constant(: Bool, )`
-* `not(: Predicate, )`
-* `relation(0: Source, 1: BranchRelation, 2: Source, )`
+* <code><strong>constant</strong>(Bool)</code>
+* <code><strong>not</strong>(Predicate)</code>
+* <code><strong>relation</strong>(Source, BranchRelation, Source)</code>
 
 ### `PR.Program`
-
 
 -------
 ## Language `RV`
 ### `RV.BinaryOperator`
-* `add()`
-* `subtract()`
-* `and()`
-* `or()`
-* `xor()`
-* `leftShift()`
-* `zeroExtendingRightShift()`
-* `msbExtendingRightShift()`
+* <code><strong>add</strong></code>
+* <code><strong>subtract</strong></code>
+* <code><strong>and</strong></code>
+* <code><strong>or</strong></code>
+* <code><strong>xor</strong></code>
+* <code><strong>leftShift</strong></code>
+* <code><strong>zeroExtendingRightShift</strong></code>
+* <code><strong>msbExtendingRightShift</strong></code>
 
 ### `RV.BranchRelation`
-* `equal()`
-* `unequal()`
-* `less()`
-* `lessOrEqual()`
-* `greater()`
-* `greaterOrEqual()`
+* <code><strong>equal</strong></code>
+* <code><strong>unequal</strong></code>
+* <code><strong>less</strong></code>
+* <code><strong>lessOrEqual</strong></code>
+* <code><strong>greater</strong></code>
+* <code><strong>greaterOrEqual</strong></code>
 
 ### `RV.DataType`
-* `word()`
-* `capability()`
+* <code><strong>word</strong></code>
+* <code><strong>capability</strong></code>
 
 ### `RV.Instruction`
-* `copy(0: DataType, destination: Register, source: Register, )`
-* `registerRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register, )`
-* `registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int, )`
-* `loadWord(destination: Register, address: Register, )`
-* `loadCapability(destination: Register, address: Register, offset: Int, )`
-* `storeWord(source: Register, address: Register, )`
-* `storeCapability(source: Register, address: Register, offset: Int, )`
-* `offsetCapability(destination: Register, source: Register, offset: Int, )`
-* `branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label, )`
-* `jump(: Label, )`
-* `call(: Label, )`
-* `return()`
-* `labelled(0: Label, 1: Instruction, )`
+* <code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code>
+* <code><strong>registerRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code>
+* <code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code>
+* <code><strong>loadWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code>
+* <code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code>
+* <code><strong>storeWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code>
+* <code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code>
+* <code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code>
+* <code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code>
+* <code><strong>jump</strong>(<strong>target:</strong> Label)</code>
+* <code><strong>call</strong>(<strong>target:</strong> Label)</code>
+* <code><strong>return</strong></code>
+* <code><strong>labelled</strong>(Label, Instruction)</code>
 
 ### `RV.Label`
-* `(rawValue: String, )`
+* <code><strong>Label</strong>(<strong>rawValue:</strong> String)</code>
 
 ### `RV.Program`
-* `(instructions: [Instruction], )`
+* <code><strong>Program</strong>(<strong>instructions:</strong> [Instruction])</code>
 
 ### `RV.Register`
-* `zero()`
-* `ra()`
-* `sp()`
-* `gp()`
-* `tp()`
-* `t0()`
-* `t1()`
-* `t2()`
-* `fp()`
-* `s1()`
-* `a0()`
-* `a1()`
-* `a2()`
-* `a3()`
-* `a4()`
-* `a5()`
-* `a6()`
-* `a7()`
-* `s2()`
-* `s3()`
-* `s4()`
-* `s5()`
-* `s6()`
-* `s7()`
-* `s8()`
-* `s9()`
-* `s10()`
-* `s11()`
-* `t3()`
-* `t4()`
-* `t5()`
-* `t6()`
-
+* <code><strong>zero</strong></code>
+* <code><strong>ra</strong></code>
+* <code><strong>sp</strong></code>
+* <code><strong>gp</strong></code>
+* <code><strong>tp</strong></code>
+* <code><strong>t0</strong></code>
+* <code><strong>t1</strong></code>
+* <code><strong>t2</strong></code>
+* <code><strong>fp</strong></code>
+* <code><strong>s1</strong></code>
+* <code><strong>a0</strong></code>
+* <code><strong>a1</strong></code>
+* <code><strong>a2</strong></code>
+* <code><strong>a3</strong></code>
+* <code><strong>a4</strong></code>
+* <code><strong>a5</strong></code>
+* <code><strong>a6</strong></code>
+* <code><strong>a7</strong></code>
+* <code><strong>s2</strong></code>
+* <code><strong>s3</strong></code>
+* <code><strong>s4</strong></code>
+* <code><strong>s5</strong></code>
+* <code><strong>s6</strong></code>
+* <code><strong>s7</strong></code>
+* <code><strong>s8</strong></code>
+* <code><strong>s9</strong></code>
+* <code><strong>s10</strong></code>
+* <code><strong>s11</strong></code>
+* <code><strong>t3</strong></code>
+* <code><strong>t4</strong></code>
+* <code><strong>t5</strong></code>
+* <code><strong>t6</strong></code>
 
 -------
 ## Language `S`
 ### `S.Program`
-
 
 -------

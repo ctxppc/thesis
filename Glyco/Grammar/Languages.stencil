@@ -2,21 +2,15 @@
 
 {% for languageType in types.enums|implements:"Language" %}
 ## Language `{{languageType.name}}`
-{% for codableType in types.based.Codable %}
-{% if codableType.name|hasPrefix:languageType.name %}
+{% for codableType in types.based.Codable where codableType.name|hasPrefix:languageType.name %}
 ### `{{codableType.name}}`
-{% if codableType.kind == "enum" %}
-{% for case in codableType.cases %}
-* `{{case.name|replace:"`",""}}({% for par in case.associatedValues %}{{par.externalName}}: {{par.typeName}}, {% endfor %})`
-{% endfor %}
-{% elif codableType.kind == "struct" %}
 {% for initialiser in codableType.initializers %}
-* `({% for par in initialiser.parameters %}{{par.argumentLabel}}: {{par.typeName}}, {% endfor %})`
+* <code><strong>{{codableType.localName}}</strong>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code>
 {% endfor %}
-{% endif %}
-
-{% endif %}
+{% for case in codableType.cases %}
+* <code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code>
 {% endfor %}
 
+{% endfor %}
 -------
 {% endfor %}
