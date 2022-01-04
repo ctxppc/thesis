@@ -11,7 +11,7 @@ public enum S : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(assembly: String) {
-			self.assembly = body
+			self.assembly = assembly
 		}
 		
 		/// The program's assembly representation.
@@ -107,7 +107,7 @@ public enum S : Language {
 	public static func elfFromProgram(fromData data: Data, sourceLanguage: String, configuration: CompilationConfiguration) throws -> Data {
 		guard isNamed(sourceLanguage) else { throw LoweringError.unknownLanguage(sourceLanguage) }
 		guard let assembly = String(data: data, encoding: .utf8) else { throw LoweringError.invalidEncoding }
-		return try Program(body: assembly).elf(configuration: configuration)
+		return try Program(assembly: assembly).elf(configuration: configuration)
 	}
 	
 	enum LoweringError : LocalizedError {

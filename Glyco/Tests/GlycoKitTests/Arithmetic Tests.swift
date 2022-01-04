@@ -61,7 +61,7 @@ final class ArithmeticTests : XCTestCase {
 		tohost:			.dword 0
 		"""
 		
-		XCTAssertEqual(loweredProgram.body, expected)
+		XCTAssertEqual(loweredProgram.assembly, expected)
 		
 	}
 	
@@ -93,7 +93,7 @@ final class ArithmeticTests : XCTestCase {
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 		
-		let actual = loweredProgram.body
+		let actual = loweredProgram.assembly
 		let expected = """
 						.text
 						

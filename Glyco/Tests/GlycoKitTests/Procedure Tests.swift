@@ -59,7 +59,7 @@ final class ProcedureTests : XCTestCase {
 		tohost:			.dword 0
 		"""
 		
-		XCTAssertEqual(loweredProgram.body, expected)
+		XCTAssertEqual(loweredProgram.assembly, expected)
 		
 	}
 	
