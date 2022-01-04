@@ -5,6 +5,12 @@ extension AL {
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
+		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
+			self.name = name
+			self.parameters = parameters
+			self.effect = effect
+		}
+		
 		/// The name with which the procedure can be invoked.
 		public var name: Label
 		
@@ -12,15 +18,20 @@ extension AL {
 		public var parameters: [Parameter]
 		public struct Parameter : Codable, Equatable, SimplyLowerable {
 			
+			public init(_ location: Location, _ type: DataType) {
+				self.location = location
+				self.type = type
+			}
+			
 			/// The location where the argument is stored and accessible from within the procedure.
-			let location: Location
+			public let location: Location
 			
 			/// The data type of the argument.
-			let type: DataType
+			public let type: DataType
 			
 			// See protocol.
 			func lowered(in context: inout LocalContext) -> Lower.Procedure.Parameter {
-				.parameter(type: type)
+				.init(type: type)
 			}
 			
 			// See protocol.
@@ -44,11 +55,7 @@ extension AL {
 					argumentRegisters:	context.configuration.argumentRegisters
 				)
 			)
-			return .init(
-				name:		name,
-				parameters:	try parameters.lowered(in: &context),
-				effect:		try effect.lowered(in: &context)
-			)
+			return .init(name, try parameters.lowered(in: &context), try effect.lowered(in: &context))
 		}
 		
 		// See protocol.

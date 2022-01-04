@@ -1,16 +1,49 @@
-# Summary
+# Intermediate Languages Supported by Glyco
+
+## Pipeline (High-Level to Low-Level)
+From high-level to low-level:
+{% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}<code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% for name, lang in lang.type.typealiases where name == "Lower" %}→ <code>{{lang.type.name}}</code>
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
+{% endfor %}
 
 {% for languageType in types.enums|implements:"Language" %}
-## Language `{{languageType.name}}`
-{% for codableType in types.based.Codable where codableType.name|hasPrefix:languageType.name %}
-### `{{codableType.name}}`
-{% for initialiser in codableType.initializers %}
-* <code><strong>{{codableType.localName}}</strong>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code>
-{% endfor %}
-{% for case in codableType.cases %}
-* <code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code>
+## Grammar for {{languageType.name}}{% if languageType.annotations["longname"] %} ({{languageType.annotations["longname"]}}){%endif%}
+
+### Inherited from {{languageType.typealiases["Lower"].type.name|default: "nothing"}}
+{% for name, typealias in languageType.typealiases where name != "Lower" %}
+<code>{{name}}</code>{% if not forloop.last %}, {% endif %}
+{% empty %}
+N/A
 {% endfor %}
 
+### New or redefined
+{% for codableType in types.based.Codable where codableType.name|hasPrefix:languageType.name %}
+<dl>
+<dt><code>{{codableType.name}}</code></dt>
+{% for initialiser in codableType.initializers|public %}
+<dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
 {% endfor %}
--------
+{% for case in codableType.cases %}
+<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
+{% endfor %}
+</dl>
+{% endfor %}
+
 {% endfor %}

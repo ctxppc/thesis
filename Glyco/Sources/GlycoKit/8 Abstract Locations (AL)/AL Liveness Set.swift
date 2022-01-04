@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// A partition of abstract locations into either possibly alive or definitely dead between the execution of an effect and its successor.
-	struct LivenessSet : Codable {
+	struct LivenessSet {
 		
 		/// A liveness set where every location's value is definitely not used by a successor.
 		static let nothingUsed = Self()

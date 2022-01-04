@@ -5,22 +5,25 @@ extension PA {
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
+		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
+			self.name = name
+			self.parameters = parameters
+			self.effect = effect
+		}
+		
 		/// The name with which the procedure can be invoked.
-		var name: Label
+		public var name: Label
 		
 		/// The procedure's parameters.
-		var parameters: [Parameter]
-		public enum Parameter : Codable, Equatable {
+		public var parameters: [Parameter]
+		public struct Parameter : Codable, Equatable {
 			
-			/// A parameter of given data type.
-			case parameter(type: DataType)
+			public init(type: DataType) {
+				self.type = type
+			}
 			
 			/// The data type of the parameter.
-			public var type: DataType {
-				switch self {
-					case .parameter(type: let type):	return type
-				}
-			}
+			public var type: DataType
 			
 		}
 		

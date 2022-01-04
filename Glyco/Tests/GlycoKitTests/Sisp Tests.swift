@@ -10,7 +10,7 @@ final class SispCodingTests : XCTestCase {
 		
 		let location = EX.Location(rawValue: "a")
 		let program = EX.Program(
-			body: .sequence([
+			.sequence([
 				.if(
 					.constant(true),
 					then:	.assign(location, to: .constant(1))
@@ -54,7 +54,7 @@ final class SispCodingTests : XCTestCase {
 		
 		let location = EX.Location(rawValue: "a")
 		let expected = EX.Program(
-			body: .sequence([
+			.sequence([
 				.if(
 					.constant(true),
 					then:	.assign(location, to: .constant(1))

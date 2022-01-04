@@ -1,12 +1,13 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+//sourcery: longname = Abstract Locations
 /// A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 public enum AL : Language {
 	
 	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ effect: AL.Effect, procedures: [AL.Procedure]) {
+		public init(_ effect: Effect, procedures: [Procedure]) {
 			self.effect = effect
 			self.procedures = procedures
 		}
@@ -28,7 +29,7 @@ public enum AL : Language {
 					argumentRegisters:	configuration.argumentRegisters
 				)
 			)
-			return try .init(effect: effect.lowered(in: &mainLocalContext), procedures: procedures.lowered(in: &globalContext))
+			return try .init(effect.lowered(in: &mainLocalContext), procedures: procedures.lowered(in: &globalContext))
 		}
 		
 		// See protocol.

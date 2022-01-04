@@ -2,11 +2,17 @@
 
 import Foundation
 
+//sourcery: longname = Conditionals
 /// A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
 public enum CD : Language {
 	
 	/// A program on an CD machine.
 	public struct Program : Codable, GlycoKit.Program {
+		
+		public init(_ effect: Effect, procedures: [Procedure]) {
+			self.effect = effect
+			self.procedures = procedures
+		}
 		
 		/// The program's effect.
 		public var effect: Effect

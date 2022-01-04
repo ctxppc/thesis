@@ -9,9 +9,9 @@ final class ProcedureTests : XCTestCase {
 		
 		let fortyTwo = EX.Label(rawValue: "fortytwo")
 		let source = EX.Program(
-			body: .invoke(fortyTwo, []),
+			.invoke(fortyTwo, []),
 			procedures:	[
-				.init(name: fortyTwo, body: .return(.constant(42)))
+				.init(fortyTwo, [], .return(.constant(42)))
 			]
 		)
 		

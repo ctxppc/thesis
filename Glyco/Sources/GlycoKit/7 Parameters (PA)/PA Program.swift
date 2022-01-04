@@ -1,10 +1,16 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+//sourcery: longname = Parameters
 /// A language that introduces procedure parameters using the PA calling convention.
 public enum PA : Language {
 	
 	/// A program on a PA machine.
 	public struct Program : Codable, GlycoKit.Program {
+		
+		public init(_ effect: Effect, procedures: [Procedure]) {
+			self.effect = effect
+			self.procedures = procedures
+		}
 		
 		/// The program's effect.
 		public var effect: Effect

@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+//sourcery: longname = Frame Operands
 /// A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 public enum FO : Language {
 	

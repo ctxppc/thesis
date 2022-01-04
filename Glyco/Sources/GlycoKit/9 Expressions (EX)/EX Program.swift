@@ -1,16 +1,22 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+//sourcery: longname = Expressions
 /// A language that introduces structural value expressions, thereby abstracting over simple computation effects.
 public enum EX : Language {
 	
 	/// A program on an EX machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		public init(_ body: Statement, procedures: [Procedure]) {
+			self.body = body
+			self.procedures = procedures
+		}
+		
 		/// The program's main body.
-		var body: Statement
+		public var body: Statement
 		
 		/// The program's procedures.
-		var procedures: [Procedure]
+		public var procedures: [Procedure]
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

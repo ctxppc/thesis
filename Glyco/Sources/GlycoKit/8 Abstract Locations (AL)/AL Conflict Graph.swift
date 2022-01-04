@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// An undirected graph of locations, with each pair of locations connected when they're (possibly) in conflict, i.e., may simultaneously hold a value that is needed later.
-	struct ConflictGraph : Codable {
+	struct ConflictGraph {
 		
 		/// A graph where no location conflicts with another location.
 		static let conflictFree = Self()
