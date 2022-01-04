@@ -10,7 +10,7 @@ final class ArithmeticTests : XCTestCase {
 		let location = AL.Location(rawValue: "a")
 		
 		let program = AL.Program(
-			effect: .sequence([
+			.sequence([
 				location <- .immediate(1),
 				.compute(destination: location, .immediate(2), .add, .location(location)),
 				.return(.location(location))
@@ -71,7 +71,7 @@ final class ArithmeticTests : XCTestCase {
 		let isEven = AL.Location(rawValue: "b")
 		
 		let program = AL.Program(
-			effect: .sequence([
+			.sequence([
 				.compute(destination: testedNumber, .immediate(12), .subtract, .immediate(11)),
 				.if(
 					.relation(.location(testedNumber), .equal, .immediate(1)),

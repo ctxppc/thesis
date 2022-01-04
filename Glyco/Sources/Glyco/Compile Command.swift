@@ -30,11 +30,6 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
 	var argumentRegisters: [FO.Register] = FO.Register.defaultArgumentRegisters
 	
-	/// The highest intermediate language supported by Glyco.
-	///
-	/// Update this typealias whenever a higher language is added.
-	private typealias HighestSupportedLanguage = EX
-	
 	// See protocol.
 	mutating func run() throws {
 		
