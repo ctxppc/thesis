@@ -140,8 +140,6 @@ extension AL {
 		
 	}
 	
-	public typealias BinaryOperator = Lower.BinaryOperator
-	
 }
 
 public func <- (destination: AL.Location, source: AL.Source) -> AL.Effect {

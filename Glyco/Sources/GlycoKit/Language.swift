@@ -27,6 +27,7 @@ public protocol Language {
 	
 }
 
+// Never is a bottom type so this conformance grounds Language.
 extension Never : Language {
 	public typealias Program = Self
 	public typealias Lower = Self

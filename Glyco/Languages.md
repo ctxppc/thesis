@@ -15,7 +15,7 @@ The pipeline, from high-level to low-level is:
 [`S`](#S) →
  ELF.
 
-This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to `/Glyco/Sourcery` and invoke `sourcery --config Languages.yaml`. Pass the `--watch` flag to enable continuous updates.
+This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project root (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to enable continuous updates.
 
 ## How to Use
 Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.
@@ -33,6 +33,7 @@ A program written in some language `XY` should be stored in a file with extensio
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
+<code>Parameter</code>, 
 <code>Predicate</code>
 
 <dl>
@@ -63,6 +64,8 @@ A program written in some language `XY` should be stored in a file with extensio
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
 
 **Inherited from PA:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
 
@@ -76,6 +79,10 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
+<dt><code>AL.Parameter</code></dt>
+<dd><code>(Location, DataType)</code></dd>
+</dl>
+<dl>
 <dt><code>AL.Predicate</code></dt>
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
@@ -84,10 +91,6 @@ A program written in some language `XY` should be stored in a file with extensio
 <dl>
 <dt><code>AL.Procedure</code></dt>
 <dd><code>(Label, [Parameter], Effect)</code></dd>
-</dl>
-<dl>
-<dt><code>AL.Procedure.Parameter</code></dt>
-<dd><code>(Location, DataType)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Program</code></dt>
@@ -123,12 +126,12 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
+<dt><code>PA.Parameter</code></dt>
+<dd><code>(<strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Procedure.Parameter</code></dt>
-<dd><code>(<strong>type:</strong> DataType)</code></dd>
+<dt><code>PA.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
 <dl>
 <dt><code>PA.Program</code></dt>

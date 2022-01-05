@@ -116,7 +116,7 @@ extension PA {
 		///   - argument: The argument for which to assign a destination location.
 		///   - availableRegisters: Argument registers that are available for assignment.
 		///   - frame: The frame in which spilled arguments can be stored.
-		init<Registers : Collection>(parameter: Procedure.Parameter, argument: Source, availableRegisters: inout Registers, frame: inout Frame)
+		init<Registers : Collection>(parameter: Parameter, argument: Source, availableRegisters: inout Registers, frame: inout Frame)
 		where Registers.Element == Register, Registers.SubSequence == Registers {
 			self.argument = argument
 			if let (assignableRegister, remainingRegisters) = availableRegisters.splittingFirst() {

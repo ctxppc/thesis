@@ -16,31 +16,6 @@ extension AL {
 		
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
-		public struct Parameter : Codable, Equatable, SimplyLowerable {
-			
-			public init(_ location: Location, _ type: DataType) {
-				self.location = location
-				self.type = type
-			}
-			
-			/// The location where the argument is stored and accessible from within the procedure.
-			public let location: Location
-			
-			/// The data type of the argument.
-			public let type: DataType
-			
-			// See protocol.
-			func lowered(in context: inout LocalContext) -> Lower.Procedure.Parameter {
-				.init(type: type)
-			}
-			
-			// See protocol.
-			public enum CodingKeys : String, CodingKey {
-				case location = "_0"
-				case type = "_1"
-			}
-			
-		}
 		
 		/// The procedure's effect when invoked.
 		public var effect: Effect

@@ -6,7 +6,7 @@ The pipeline, from high-level to low-level is:
 {% include "Pipeline.stencil" %}
 {% endfor %} ELF.
 
-This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to `/Glyco/Sourcery` and invoke `sourcery --config Languages.yaml`. Pass the `--watch` flag to enable continuous updates.
+This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project root (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to enable continuous updates.
 
 ## How to Use
 Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.

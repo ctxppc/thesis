@@ -72,6 +72,4 @@ extension AL {
 		
 	}
 	
-	public typealias BranchRelation = Lower.BranchRelation
-	
 }

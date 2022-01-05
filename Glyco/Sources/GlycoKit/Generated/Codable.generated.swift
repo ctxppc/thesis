@@ -8,6 +8,13 @@ extension AL.Program {
 	}
 }
 
+extension AL.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case location = "_0"
+		case type = "_1"
+	}
+}
+
 extension AL.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -79,6 +86,12 @@ extension PA.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
 		case procedures = "procedures"
+	}
+}
+
+extension PA.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case type = "type"
 	}
 }
 

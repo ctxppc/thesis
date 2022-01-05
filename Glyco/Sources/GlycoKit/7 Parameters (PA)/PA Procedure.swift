@@ -16,16 +16,6 @@ extension PA {
 		
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
-		public struct Parameter : Codable, Equatable {
-			
-			public init(type: DataType) {
-				self.type = type
-			}
-			
-			/// The data type of the parameter.
-			public var type: DataType
-			
-		}
 		
 		/// The procedure's effect when invoked.
 		var effect: Effect

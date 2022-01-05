@@ -16,7 +16,6 @@ extension EX {
 		
 		/// The procedure's parameters.
 		public var parameters: [Parameter] = []
-		public typealias Parameter = Lower.Procedure.Parameter
 		
 		/// The statement executed when the procedure is invoked.
 		public var body: Statement

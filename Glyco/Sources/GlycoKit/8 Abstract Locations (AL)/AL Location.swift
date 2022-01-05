@@ -27,7 +27,7 @@ extension AL {
 			/// Determines an assignment using given procedure parameters and conflict graph.
 			///
 			/// The initialiser first assigns homes for each parameter, according to the active calling convention, then assigns homes to all used locations, by increasing degree of conflict.
-			init(parameters: [Procedure.Parameter], conflicts: ConflictGraph, argumentRegisters: [Lower.Register]) {
+			init(parameters: [Parameter], conflicts: ConflictGraph, argumentRegisters: [Lower.Register]) {
 				
 				self.conflicts = conflicts
 				
