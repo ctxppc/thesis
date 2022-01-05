@@ -22,22 +22,22 @@ extension EX {
 			switch self {
 				
 				case .constant(value: let value):
-				return .copy(destination: destination, source: .immediate(value))
+				return .copy(from: .immediate(value), to: destination)
 				
 				case .location(location: let location):
-				return .copy(destination: destination, source: .location(location))
+				return .copy(from: .location(location), to: destination)
 				
 				case .binary(.constant(value: let first), let op, .constant(value: let second)):
-				return .compute(destination: destination, .immediate(first), op, .immediate(second))
+				return .compute(.immediate(first), op, .immediate(second), to: destination)
 				
 				case .binary(.constant(value: let first), let op, .location(location: let second)):
-				return .compute(destination: destination, .immediate(first), op, .location(second))
+				return .compute(.immediate(first), op, .location(second), to: destination)
 				
 				case .binary(.location(location: let first), let op, .constant(value: let second)):
-				return .compute(destination: destination, .location(first), op, .immediate(second))
+				return .compute(.location(first), op, .immediate(second), to: destination)
 				
 				case .binary(.location(location: let first), let op, .location(location: let second)):
-				return .compute(destination: destination, .location(first), op, .location(second))
+				return .compute(.location(first), op, .location(second), to: destination)
 				
 				case .binary(let first, let op, let second):
 				let firstLocation = context.allocateLocation()

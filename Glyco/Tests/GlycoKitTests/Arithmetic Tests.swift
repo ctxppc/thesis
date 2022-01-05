@@ -12,7 +12,7 @@ final class ArithmeticTests : XCTestCase {
 		let program = AL.Program(
 			.sequence([
 				location <- .immediate(1),
-				.compute(destination: location, .immediate(2), .add, .location(location)),
+				.compute(.immediate(2), .add, .location(location), to: location),
 				.return(.location(location))
 			]),
 			procedures: []
@@ -72,7 +72,7 @@ final class ArithmeticTests : XCTestCase {
 		
 		let program = AL.Program(
 			.sequence([
-				.compute(destination: testedNumber, .immediate(12), .subtract, .immediate(11)),
+				.compute(.immediate(12), .subtract, .immediate(11), to: testedNumber),
 				.if(
 					.relation(.location(testedNumber), .equal, .immediate(1)),
 					then:	isEven <- .immediate(1),

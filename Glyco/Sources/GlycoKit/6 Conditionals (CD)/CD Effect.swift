@@ -11,11 +11,11 @@ extension CD {
 		/// An effect that performs `effects`.
 		case sequence([Effect])
 		
-		/// An effect that retrieves the value in `source` and puts it in `destination`.
-		case copy(destination: Location, source: Source)
+		/// An effect that retrieves the value in `from` and puts it in `to`.
+		case copy(from: Source, to: Location)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, Source, BinaryOperator, Source)
+		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
+		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -45,7 +45,7 @@ extension CD {
 				
 				case .invoke(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
-				return [.intermediate(label: entryLabel, effects: previousEffects, successor: procedure)]
+				return [.intermediate(entryLabel, previousEffects, then: procedure)]
 				
 				case .copy, .compute, .if, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
@@ -118,11 +118,11 @@ extension CD {
 		func optimised() -> Self {
 			switch self {
 				
-				case .copy(destination: let destination, source: .location(let source)) where source == destination,
-					.compute(destination: let destination, .location(let source), .add, .immediate(0)) where source == destination,
-					.compute(destination: let destination, .immediate(0), .add, .location(let source)) where source == destination,
-					.compute(destination: let destination, .location(let source), .subtract, .immediate(0)) where source == destination,
-					.compute(destination: let destination, .immediate(0), .subtract, .location(let source)) where source == destination:
+				case .copy(from: .location(let source), to: let destination) where source == destination,
+					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
+					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
+					.compute(.location(let source), .subtract, .immediate(0), to: let destination) where source == destination,
+					.compute(.immediate(0), .subtract, .location(let source), to: let destination) where source == destination:
 				return .sequence([])
 				
 				case .if(.constant(true), then: let affirmative, else: _):
@@ -186,7 +186,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 	///
 	/// - Returns: A representation of `self` in a lower language.
 	func lowered(in context: inout CD.Context, entryLabel: CD.Lower.Label, previousEffects: [CD.Lower.Effect], exitLabel: CD.Lower.Label) throws -> [CD.Lower.Block] {
-		guard let (first, rest) = self.splittingFirst() else { return [.intermediate(label: entryLabel, effects: previousEffects, successor: exitLabel)] }
+		guard let (first, rest) = self.splittingFirst() else { return [.intermediate(entryLabel, previousEffects, then: exitLabel)] }
 		switch first {
 			
 			case .sequence(effects: let effects) where rest.doesNothing:
@@ -206,19 +206,19 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .copy(destination: let destination, source: let source):
+			case .copy(from: let source, to: let destination):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.copy(destination: destination, source: source)],
+				previousEffects:	previousEffects + [.copy(from: source, to: destination)],
 				exitLabel:			exitLabel
 			)
 			
-			case .compute(destination: let destination, let lhs, let operation, let rhs):
+			case .compute(let lhs, let operation, let rhs, to: let destination):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.compute(destination: destination, lhs, operation, rhs)],
+				previousEffects:	previousEffects + [.compute(lhs, operation, rhs, to: destination)],
 				exitLabel:			exitLabel
 			)
 			
@@ -255,11 +255,11 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			
 			case .invoke(procedure: let procedure):
 			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
-			return [.intermediate(label: entryLabel, effects: previousEffects, successor: procedure)]
+			return [.intermediate(entryLabel, previousEffects, then: procedure)]
 			
 			case .return(result: let result):
 			guard rest.doesNothing else { throw CD.Effect.LoweringError.effectAfterReturn }
-			return [.final(label: entryLabel, effects: previousEffects, result: result)]
+			return [.final(entryLabel, previousEffects, result: result)]
 			
 		}
 	}
@@ -267,5 +267,5 @@ private extension RandomAccessCollection where Element == CD.Effect {
 }
 
 public func <- (destination: CD.Location, source: CD.Source) -> CD.Effect {
-	.copy(destination: destination, source: source)
+	.copy(from: source, to: destination)
 }

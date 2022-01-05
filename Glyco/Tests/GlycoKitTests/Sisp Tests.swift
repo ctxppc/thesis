@@ -13,7 +13,7 @@ final class SispCodingTests : XCTestCase {
 			.sequence([
 				.if(
 					.constant(true),
-					then:	.assign(location, to: .constant(1))
+					then:	.assign(location, value: .constant(1))
 				),
 				.return(.location(location)),
 			]),
@@ -26,7 +26,7 @@ final class SispCodingTests : XCTestCase {
 				
 					sequence(
 						
-							if( constant( true), then: assign( a, to: constant( 1)), else: sequence())
+							if( constant( true), then: assign( a, value: constant( 1)), else: sequence())
 							return( location( a))
 					)
 			)
@@ -43,10 +43,10 @@ final class SispCodingTests : XCTestCase {
 				sequence(
 					if(
 						constant(true),
-						then:	assign( a, to: constant(1)),
+						then:	assign(a, value: constant(1)),
 						else:	sequence()
 					)
-					return(location( a))
+					return(location(a))
 				),
 				procedures:
 			)
@@ -57,7 +57,7 @@ final class SispCodingTests : XCTestCase {
 			.sequence([
 				.if(
 					.constant(true),
-					then:	.assign(location, to: .constant(1))
+					then:	.assign(location, value: .constant(1))
 				),
 				.return(.location(location)),
 			]),

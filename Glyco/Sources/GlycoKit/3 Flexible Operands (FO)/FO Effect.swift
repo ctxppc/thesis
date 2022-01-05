@@ -10,11 +10,11 @@ extension FO {
 	/// * a datum is *copied from* a source or location *to* a location.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
-		/// An effect that copies the datum from `source` to `destination`.
-		case copy(destination: Location, source: Source)
+		/// An effect that copies the datum from `from` to `to`.
+		case copy(from: Source, to: Location)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, Source, BinaryOperator, Source)
+		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
+		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
@@ -32,7 +32,7 @@ extension FO {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		public static var nop: Self { .compute(destination: .register(.zero), .location(.register(.zero)), .add, .location(.register(.zero))) }
+		public static var nop: Self { .compute(.location(.register(.zero)), .add, .location(.register(.zero)), to: .register(.zero)) }
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> [Lower.Instruction] {
@@ -60,30 +60,30 @@ extension FO {
 			
 			switch self {
 				
-				case .copy(destination: .register(let dest), source: .immediate(let imm)):
+				case .copy(from: .immediate(let imm), to: .register(let dest)):
 				return try [dest.lowered() <- imm]
 				
-				case .copy(destination: .register(let dest), source: .location(.register(let src))):
+				case .copy(from: .location(.register(let src)), to: .register(let dest)):
 				return try [dest.lowered() <- src.lowered()]
 				
-				case .copy(destination: .register(let dest), source: .location(.frameCell(let src))):
+				case .copy(from: .location(.frameCell(let src)), to: .register(let dest)):
 				return try [dest.lowered() <- src]
 				
-				case .copy(destination: .frameCell(let dest), source: .immediate(let imm)):
+				case .copy(from: .immediate(let imm), to: .frameCell(let dest)):
 				return [.t1 <- imm, dest <- .t1]
 				
-				case .copy(destination: .frameCell(let dest), source: .location(.register(let src))):
+				case .copy(from: .location(.register(let src)), to: .frameCell(let dest)):
 				return try [dest <- src.lowered()]
 				
-				case .copy(destination: .frameCell(let dest), source: .location(.frameCell(let src))):
+				case .copy(from: .location(.frameCell(let src)), to: .frameCell(let dest)):
 				return [.t1 <- src, dest <- .t1]
 				
-				case .compute(destination: let dest, let lhs, let operation, .immediate(let rhs)):
+				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
-				let (resFinalise, resReg) = try finalise(destination: dest, using: .t2)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2)
 				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(lhsReg, operation, rhs)] + resFinalise
 				
-				case .compute(destination: let destination, let lhs, let operation, let rhs):
+				case .compute(let lhs, let operation, let rhs, to: let destination):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)

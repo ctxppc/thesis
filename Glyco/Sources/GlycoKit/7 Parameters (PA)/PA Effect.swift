@@ -12,11 +12,11 @@ extension PA {
 		/// An effect that performs `effects`.
 		case sequence([Effect])
 		
-		/// An effect that retrieves the value in `source` and puts it in `destination`.
-		case copy(destination: Location, source: Source)
+		/// An effect that retrieves the value in `from` and puts it in `to`.
+		case copy(from: Source, to: Location)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, Source, BinaryOperator, Source)
+		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
+		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -36,11 +36,11 @@ extension PA {
 				case .sequence(let effects):
 				return .sequence(try effects.lowered(in: &context))
 				
-				case .copy(destination: let destination, source: let source):
-				return .copy(destination: destination, source: source)
+				case .copy(from: let source, to: let destination):
+				return .copy(from: source, to: destination)
 				
-				case .compute(destination: let destination, let lhs, let operation, let rhs):
-				return .compute(destination: destination, lhs, operation, rhs)
+				case .compute(let lhs, let operation, let rhs, to: let destination):
+				return .compute(lhs, operation, rhs, to: destination)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate, then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

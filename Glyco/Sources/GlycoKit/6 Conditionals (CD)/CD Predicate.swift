@@ -83,24 +83,10 @@ extension CD {
 			switch self {
 				
 				case .constant(let holds):
-				return [
-					.intermediate(
-						label:		entryLabel,
-						effects:	previousEffects,
-						successor:	holds ? affirmativeTarget : negativeTarget
-					)
-				]
+				return [.intermediate(entryLabel, previousEffects, then: holds ? affirmativeTarget : negativeTarget)]
 				
 				case .relation(let lhs, let relation, let rhs):
-				return [
-					.branch(
-						label:			entryLabel,
-						effects:		previousEffects,
-						predicate:		.relation(lhs, relation, rhs),
-						affirmative:	affirmativeTarget,
-						negative:		negativeTarget
-					)
-				]
+				return [.branch(entryLabel, previousEffects, if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget)]
 				
 				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
 				let intermediateAffirmative = context.allocateBlockLabel()

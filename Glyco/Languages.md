@@ -52,7 +52,7 @@ A program written in some language `XY` should be stored in a file with extensio
 </dl>
 <dl>
 <dt><code>EX.Statement</code></dt>
-<dd><code><strong>assign</strong>(Location, <strong>to:</strong> Expression)</code></dd>
+<dd><code><strong>assign</strong>(Location, <strong>value:</strong> Expression)</code></dd>
 <dd><code><strong>sequence</strong>([Statement])</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code></dd>
 <dd><code><strong>invoke</strong>(Label, [Expression])</code></dd>
@@ -69,8 +69,8 @@ A program written in some language `XY` should be stored in a file with extensio
 <dl>
 <dt><code>AL.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -116,8 +116,8 @@ A program written in some language `XY` should be stored in a file with extensio
 <dl>
 <dt><code>PA.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -151,8 +151,8 @@ A program written in some language `XY` should be stored in a file with extensio
 <dl>
 <dt><code>CD.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>invoke</strong>(Label)</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -188,9 +188,9 @@ A program written in some language `XY` should be stored in a file with extensio
 
 <dl>
 <dt><code>PR.Block</code></dt>
-<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>predicate:</strong> Predicate, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
+<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
+<dd><code><strong>branch</strong>(Label, [Effect], <strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source)</code></dd>
 </dl>
 <dl>
 <dt><code>PR.Predicate</code></dt>
@@ -218,14 +218,14 @@ A program written in some language `XY` should be stored in a file with extensio
 
 <dl>
 <dt><code>BB.Block</code></dt>
-<dd><code><strong>intermediate</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>successor:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>affirmative:</strong> Label, <strong>negative:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(<strong>label:</strong> Label, <strong>effects:</strong> [Effect], <strong>result:</strong> Source)</code></dd>
+<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
+<dd><code><strong>branch</strong>(Label, [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source)</code></dd>
 </dl>
 <dl>
 <dt><code>BB.Effect</code></dt>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 </dl>
 <dl>
 <dt><code>BB.Program</code></dt>
@@ -243,8 +243,8 @@ A program written in some language `XY` should be stored in a file with extensio
 
 <dl>
 <dt><code>FO.Effect</code></dt>
-<dd><code><strong>copy</strong>(<strong>destination:</strong> Location, <strong>source:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Location, Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>

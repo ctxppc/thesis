@@ -10,11 +10,11 @@ extension AL {
 		/// An effect that performs `effects`.
 		case sequence([Effect])
 		
-		/// An effect that retrieves the value in `source` and puts it in `destination`.
-		case copy(destination: Location, source: Source)
+		/// An effect that retrieves the value in `from` and puts it in `to`.
+		case copy(from: Source, to: Location)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `destination`.
-		case compute(destination: Location, Source, BinaryOperator, Source)
+		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
+		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -32,23 +32,14 @@ extension AL {
 				case .sequence(let effects):
 				return .sequence(try effects.lowered(in: &context))
 				
-				case .copy(destination: let destination, source: let source):
-				return .copy(destination: destination.lowered(in: &context), source: try source.lowered(in: &context))
+				case .copy(from: let source, to: let destination):
+				return .copy(from: try source.lowered(in: &context), to: destination.lowered(in: &context))
 				
-				case .compute(destination: let destination, let lhs, let operation, let rhs):
-				return try .compute(
-					destination:	destination.lowered(in: &context),
-					lhs.lowered(in: &context),
-					operation,
-					rhs.lowered(in: &context)
-				)
+				case .compute(let lhs, let operation, let rhs, to: let destination):
+				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(
-					predicate.lowered(in: &context),
-					then:	affirmative.lowered(in: &context),
-					else:	negative.lowered(in: &context)
-				)
+				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .invoke(let procedure, let arguments):
 				return .invoke(procedure, try arguments.lowered(in: &context))
@@ -108,7 +99,7 @@ extension AL {
 				case .sequence, .if, .invoke, .return:
 				return []
 				
-				case .copy(destination: let destination, source: _), .compute(destination: let destination, _, _, _):
+				case .copy(from: _, to: let destination), .compute(_, _, _, to: let destination):
 				return [destination]
 				
 			}
@@ -119,18 +110,18 @@ extension AL {
 			switch self {
 				
 				case .sequence,
-						.copy(destination: _, source: .immediate),
-						.compute(destination: _, .immediate, _, .immediate),
+						.copy(from: .immediate, to: _),
+						.compute(.immediate, _, .immediate, to: _),
 						.return(result: .immediate):
 				return []
 				
-				case .copy(destination: _, source: .location(let source)),
-						.compute(destination: _, .immediate, _, .location(let source)),
-						.compute(destination: _, .location(let source), _, .immediate),
+				case .copy(from: .location(let source), to: _),
+						.compute(.immediate, _, .location(let source), to: _),
+						.compute(.location(let source), _, .immediate, to: _),
 						.return(result: .location(let source)):
 				return [source]
 				
-				case .compute(destination: _, .location(let lhs), _, .location(let rhs)):
+				case .compute(.location(let lhs), _, .location(let rhs), to: _):
 				return [lhs, rhs]
 				
 				case .if(let predicate, then: _, else: _):
@@ -154,5 +145,5 @@ extension AL {
 }
 
 public func <- (destination: AL.Location, source: AL.Source) -> AL.Effect {
-	.copy(destination: destination, source: source)
+	.copy(from: source, to: destination)
 }

@@ -13,7 +13,7 @@ final class FlexibleOperandsTests : XCTestCase {
 		let c = frame.allocate(.word)
 		
 		let source = FO.Program(effects: [
-			.compute(destination: .frameCell(c), .location(.frameCell(a)), .add, .location(.frameCell(b)))
+			.compute(.location(.frameCell(a)), .add, .location(.frameCell(b)), to: .frameCell(c))
 		])
 		
 		let actual = try source.lowered(configuration: .init(target: .sail))

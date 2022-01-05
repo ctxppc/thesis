@@ -6,7 +6,7 @@ extension EX {
 	public enum Statement : Codable, Equatable, SimplyLowerable {
 		
 		/// A statement that assigns given location the value evaluated by given expression.
-		case assign(Location, to: Expression)
+		case assign(Location, value: Expression)
 		
 		/// A statement that a sequence of statements.
 		case sequence([Statement] = [])
@@ -24,7 +24,7 @@ extension EX {
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
-				case .assign(let destination, to: let value):
+				case .assign(let destination, value: let value):
 				return value.lowered(destination: destination, context: &context)
 				
 				case .sequence(let statements):
@@ -79,5 +79,5 @@ extension EX {
 }
 
 public func <- (destination: EX.Location, source: EX.Expression) -> EX.Statement {
-	.assign(destination, to: source)
+	.assign(destination, value: source)
 }
