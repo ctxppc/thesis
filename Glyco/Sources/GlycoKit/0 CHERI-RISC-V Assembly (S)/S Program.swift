@@ -4,7 +4,7 @@ import DepthKit
 import Foundation
 
 //sourcery: longname = CHERI-RISC-V Assembly
-/// The ground language as provided to Clang for assembly and linking.
+//sourcery: description = The ground language as provided to Clang for assembly and linking.
 public enum S : Language {
 	
 	/// A program in the S language.

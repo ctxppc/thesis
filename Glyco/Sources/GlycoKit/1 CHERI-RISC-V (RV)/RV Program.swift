@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = CHERI-RISC-V
-/// A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
+//sourcery: description = A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
 public enum RV : Language {
 	
 	/// A program in the RV language.

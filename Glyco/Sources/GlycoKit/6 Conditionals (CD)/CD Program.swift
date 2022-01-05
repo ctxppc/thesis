@@ -3,7 +3,7 @@
 import Foundation
 
 //sourcery: longname = Conditionals
-/// A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
+//sourcery: description = "A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps)."
 public enum CD : Language {
 	
 	/// A program on an CD machine.

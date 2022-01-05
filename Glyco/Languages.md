@@ -28,13 +28,14 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="EX">Grammar for EX (Expressions)</h2>
+A language that introduces structural value expressions, thereby abstracting over simple computation effects.
 
 **Inherited from AL:**
+<code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>Parameter</code>, 
-<code>Predicate</code>
+<code>Parameter</code>
 
 <dl>
 <dt><code>EX.Expression</code></dt>
@@ -42,6 +43,12 @@ A program written in some language `XY` should be stored in a file with extensio
 <dd><code><strong>location</strong>(Location)</code></dd>
 <dd><code><strong>binary</strong>(Expression, BinaryOperator, Expression)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Expression, <strong>else:</strong> Expression)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Expression, BranchRelation, Expression)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>EX.Procedure</code></dt>
@@ -62,6 +69,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
+A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 
 **Inherited from PA:**
 <code>BinaryOperator</code>, 
@@ -104,6 +112,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="PA">Grammar for PA (Parameters)</h2>
+A language that introduces procedure parameters using the PA calling convention.
 
 **Inherited from CD:**
 <code>BinaryOperator</code>, 
@@ -140,6 +149,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="CD">Grammar for CD (Conditionals)</h2>
+A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
 
 **Inherited from PR:**
 <code>BinaryOperator</code>, 
@@ -177,6 +187,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="PR">Grammar for PR</h2>
+A language that introduces predicates in branches.
 
 **Inherited from BB:**
 <code>BinaryOperator</code>, 
@@ -208,6 +219,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="BB">Grammar for BB (Basic Blocks)</h2>
+A language that groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.
 
 **Inherited from FO:**
 <code>BinaryOperator</code>, 
@@ -237,6 +249,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="FO">Grammar for FO (Frame Operands)</h2>
+A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 
 **Inherited from FL:**
 <code>BinaryOperator</code>, 
@@ -306,6 +319,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="FL">Grammar for FL (Frame Locations)</h2>
+A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`.
 
 **Inherited from RV:**
 <code>BinaryOperator</code>, 
@@ -380,6 +394,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
+A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
 
 **Inherited from S:**
 N/A
@@ -471,6 +486,7 @@ N/A
 
 
 <h2 id="S">Grammar for S (CHERI-RISC-V Assembly)</h2>
+The ground language as provided to Clang for assembly and linking.
 
 
 <dl>

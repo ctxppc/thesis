@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Expressions
-/// A language that introduces structural value expressions, thereby abstracting over simple computation effects.
+//sourcery: description = "A language that introduces structural value expressions, thereby abstracting over simple computation effects."
 public enum EX : Language {
 	
 	/// A program on an EX machine.
@@ -29,6 +29,7 @@ public enum EX : Language {
 	// See protocol.
 	public typealias Lower = AL
 	
+	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location

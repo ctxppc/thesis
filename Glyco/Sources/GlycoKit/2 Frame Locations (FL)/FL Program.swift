@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Frame Locations
-/// A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`.
+//sourcery: description = "A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`."
 public enum FL : Language {
 	
 	/// A program in the base language.

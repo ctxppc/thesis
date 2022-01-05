@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Abstract Locations
-/// A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
+//sourcery: description = "A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer."
 public enum AL : Language {
 	
 	/// A program on an AL machine.

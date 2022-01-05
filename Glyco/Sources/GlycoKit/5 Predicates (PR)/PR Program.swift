@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-/// A language that introduces predicates in branches.
+//sourcery: description = A language that introduces predicates in branches.
 public enum PR : Language {
 	
 	/// A program on a PR machine.

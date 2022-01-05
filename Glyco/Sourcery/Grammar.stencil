@@ -1,6 +1,7 @@
 {% if lang.type %}
 
 <h2 id="{{lang.type.name}}">Grammar for {{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%}</h2>
+{{ lang.type.annotations["description"] }}
 
 {% if lang.type.typealiases["Lower"].type.name %}
 **Inherited from {{lang.type.typealiases["Lower"].type.name|default: "nothing"}}:**

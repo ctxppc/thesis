@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Parameters
-/// A language that introduces procedure parameters using the PA calling convention.
+//sourcery: description = A language that introduces procedure parameters using the PA calling convention.
 public enum PA : Language {
 	
 	/// A program on a PA machine.
