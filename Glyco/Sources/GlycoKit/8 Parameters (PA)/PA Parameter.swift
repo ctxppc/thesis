@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension PA {
-	public struct Parameter : Codable, Equatable, SimplyLowerable {
+	public struct Parameter : Codable, Equatable {
 		
 		public init(_ location: Location, _ type: DataType) {
 			self.location = location
@@ -13,11 +13,6 @@ extension PA {
 		
 		/// The data type of the argument.
 		public let type: DataType
-		
-		// See protocol.
-		func lowered(in context: inout ()) -> Lower.Parameter {
-			.init(location, type)
-		}
 		
 		/// An assignment of parameters to physical locations.
 		struct Assignments {

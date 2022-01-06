@@ -15,64 +15,6 @@ where
 Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the `CHERITOOLCHAIN` environment variable; if omitted, Glyco assumes it‘s in `~/cheri`. The path to the system root can be provided through the `CHERISYSROOT` environment variable; if omitted, Glyco assumes it‘s in `output/rootfs-riscv64-purecap` within the toolchain.
 
 ## Nanopasses
-Glyco is implemented as a sequence of intermediate languages, i.e., data structures, interleaved by passes, i.e., functions, defined on each source language. A list of languages as of writing, ordering languages from low-level to high-level, is printed below. This list may become outdated as the compiler is being developed.
+Glyco is implemented as a sequence of intermediate languages, i.e., data structures, interleaved by passes, i.e., functions, defined on each source language. A list of languages with their grammar can be found in [Languages](Languages.md).
 
-<table>
-	<tr>
-		<th>Short Name</th>
-		<th>Longer Name</th>
-		<th>Description</th>
-	</tr>
-	<tr>
-		<td><code>S</code></td>
-		<td>CHERI-RISC-V Assembly</td>
-		<td>Input for Clang</td>
-	</tr>
-	<tr>
-		<td><code>RV</code></td>
-		<td>CHERI-RISC-V</td>
-		<td>Maps directly to CHERI-RISC-V (pseudo-)instructions.</td>
-	</tr>
-	<tr>
-		<td><code>FL</code></td>
-		<td>Frame Locations</td>
-		<td>Introduces frame locations, i.e., memory locations relative to the frame capability <code>cfp</code>.</td>
-	</tr>
-	<tr>
-		<td><code>FO</code></td>
-		<td>Flexible Operands</td>
-		<td>Introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.</td>
-	</tr>
-	<tr>
-		<td><code>BB</code></td>
-		<td>Basic Blocks</td>
-		<td>Groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.</td>
-	</tr>
-	<tr>
-		<td><code>PR</code></td>
-		<td>Predicates</td>
-		<td>Introduces predicates in branches.</td>
-	</tr>
-	<tr>
-		<td><code>CD</code></td>
-		<td>Conditionals</td>
-		<td>Introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).</td>
-	</tr>
-	<tr>
-		<td><code>PA</code></td>
-		<td>Parameters</td>
-		<td>Introduces procedure parameters using the PA calling convention.</td>
-	</tr>
-	<tr>
-		<td><code>AL</code></td>
-		<td>Abstract Locations</td>
-		<td>Introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.</td>
-	</tr>
-	<tr>
-		<td><code>EX</code></td>
-		<td>Expressions</td>
-		<td>Introduces structural value expressions, thereby abstracting over simple computation effects.</td>
-	</tr>
-</table>
-
-Glyco focusses on a single high-level language *Gly* and thus this list can be seen as a linked list, but the nanopass approach allows for a tree of intermediate languages to be defined with `S` as the root, or even a directed (possibly acyclic) graph of languages from numerous low-level (machine) languages to high-level (programmer-optimised) languages.
+Glyco focusses on a single high-level language *Gly* (to be designed) and thus this list can be seen as a linked list, but the nanopass approach allows for a tree of intermediate languages to be defined with `S` as the root, or even a directed (possibly acyclic) graph of languages from numerous low-level (machine) languages to high-level (programmer-optimised) languages.

@@ -35,7 +35,7 @@ extension PA {
 				Lower.Effect.copy(from: .location(.parameter(location)), to: .abstract(parameter.location))
 			}
 			
-			return try .init(name, parameters.lowered(), .sequence(prologue + [effect.lowered(in: &context)]))
+			return try .init(name, .sequence(prologue + [effect.lowered(in: &context)]))
 			
 		}
 		

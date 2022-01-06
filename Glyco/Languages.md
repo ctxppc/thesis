@@ -149,10 +149,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Parameter</code></dt>
-<dd><code>(AbstractLocation, DataType)</code></dd>
-</dl>
-<dl>
 <dt><code>AL.ParameterLocation</code></dt>
 <dd><code><strong>register</strong>(Register)</code></dd>
 <dd><code><strong>frame</strong>(Frame.Location)</code></dd>
@@ -165,7 +161,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 <dt><code>AL.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
+<dd><code>(Label, Effect)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Program</code></dt>
