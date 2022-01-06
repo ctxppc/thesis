@@ -33,3 +33,9 @@ extension FL {
 	}
 	
 }
+
+extension FL.Frame.Location : Comparable {
+	public static func < (lhs: Self, rhs: Self) -> Bool {
+		lhs.offset < rhs.offset
+	}
+}

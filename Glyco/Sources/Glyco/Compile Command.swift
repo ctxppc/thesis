@@ -28,7 +28,7 @@ struct CompileCommand : ParsableCommand {
 	var output: URL?
 	
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
-	var argumentRegisters: [FO.Register] = FO.Register.defaultArgumentRegisters
+	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
 	
 	// See protocol.
 	mutating func run() throws {
@@ -79,7 +79,7 @@ struct CompileCommand : ParsableCommand {
 
 extension CompilationConfiguration.Target : ExpressibleByArgument {}
 
-extension FO.Register : ExpressibleByArgument {
+extension AL.Register : ExpressibleByArgument {
 	public init?(argument: String) {
 		self.init(rawValue: argument)
 	}

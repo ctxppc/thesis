@@ -22,24 +22,19 @@ public enum AL : Language {
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			let (_, conflicts) = effect.livenessAndConflictsAtEntry(livenessAtExit: .nothingUsed, conflictsAtExit: .conflictFree)
 			var globalContext = GlobalContext(configuration: configuration)
-			var mainLocalContext = LocalContext(
-				assignments: .init(
-					parameters:			[],
-					conflicts:			conflicts,
-					argumentRegisters:	configuration.argumentRegisters
-				)
-			)
+			var mainLocalContext = LocalContext(assignments: .init(conflicts: conflicts))
 			return try .init(effect.lowered(in: &mainLocalContext), procedures: procedures.lowered(in: &globalContext))
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = PA
+	public typealias Lower = CD
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
+	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	
 }

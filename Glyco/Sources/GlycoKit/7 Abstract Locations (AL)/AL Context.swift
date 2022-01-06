@@ -13,7 +13,7 @@ extension AL {
 	/// A value used while lowering a procedure.
 	struct LocalContext {
 		
-		/// The assignment of abstract locations to physical locations.
+		/// The assignment of locations to physical locations.
 		var assignments: Location.Assignments
 		
 	}

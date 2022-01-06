@@ -25,7 +25,7 @@ public struct CompilationConfiguration {
 		target:				Target,
 		toolchainURL:		URL? = nil,
 		systemURL:			URL? = nil,
-		argumentRegisters:	[FO.Register] = FO.Register.defaultArgumentRegisters
+		argumentRegisters:	[AL.Register] = AL.Register.defaultArgumentRegisters
 	) {
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
@@ -57,7 +57,7 @@ public struct CompilationConfiguration {
 	public var systemURL: URL
 	
 	/// The registers used for passing arguments, in argument order.
-	public var argumentRegisters: [FO.Register]
+	public var argumentRegisters: [AL.Register]
 	
 }
 

@@ -7,20 +7,19 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testSimpleSum() throws {
 		
-		let location = AL.Location(rawValue: "a")
+		let location = AL.AbstractLocation(rawValue: "a")
 		
 		let program = AL.Program(
 			.sequence([
 				location <- .immediate(1),
-				.compute(.immediate(2), .add, .location(location), to: location),
-				.return(.location(location))
+				.compute(.immediate(2), .add, .location(.abstract(location)), to: .abstract(location)),
+				.return(.location(.abstract(location)))
 			]),
 			procedures: []
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
-			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -67,25 +66,24 @@ final class ArithmeticTests : XCTestCase {
 	
 	func testEqualsOne() throws {
 		
-		let testedNumber = AL.Location(rawValue: "a")
-		let isEven = AL.Location(rawValue: "b")
+		let testedNumber = AL.AbstractLocation(rawValue: "a")
+		let isEven = AL.AbstractLocation(rawValue: "b")
 		
 		let program = AL.Program(
 			.sequence([
-				.compute(.immediate(12), .subtract, .immediate(11), to: testedNumber),
+				.compute(.immediate(12), .subtract, .immediate(11), to: .abstract(testedNumber)),
 				.if(
-					.relation(.location(testedNumber), .equal, .immediate(1)),
+					.relation(.location(.abstract(testedNumber)), .equal, .immediate(1)),
 					then:	isEven <- .immediate(1),
 					else:	isEven <- .immediate(0)
 				),
-				.return(.location(isEven))
+				.return(.location(.abstract(isEven)))
 			]),
 			procedures:	[]
 		)
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
-			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)

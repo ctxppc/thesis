@@ -2,7 +2,7 @@
 
 extension PA {
 	
-	/// A value used during lowering.
+	/// A value used while lowering a procedure.
 	struct Context {
 		
 		/// The program's procedures.

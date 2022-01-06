@@ -8,6 +8,12 @@ extension AL.Program {
 	}
 }
 
+extension AL.AbstractLocation {
+	public enum CodingKeys : String, CodingKey {
+		case rawValue = "rawValue"
+	}
+}
+
 extension AL.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case location = "_0"
@@ -20,12 +26,6 @@ extension AL.Procedure {
 		case name = "_0"
 		case parameters = "_1"
 		case effect = "_2"
-	}
-}
-
-extension AL.Location {
-	public enum CodingKeys : String, CodingKey {
-		case rawValue = "rawValue"
 	}
 }
 
@@ -91,7 +91,8 @@ extension PA.Program {
 
 extension PA.Parameter {
 	public enum CodingKeys : String, CodingKey {
-		case type = "type"
+		case location = "_0"
+		case type = "_1"
 	}
 }
 

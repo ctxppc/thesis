@@ -15,7 +15,7 @@ extension AL {
 		func lowered(in context: inout LocalContext) throws -> Lower.Source {
 			switch self {
 				case .immediate(let imm):		return .immediate(imm)
-				case .location(let location):	return .location(location.lowered(in: &context))
+				case .location(let location):	return .location(try location.lowered(in: &context))
 			}
 		}
 		

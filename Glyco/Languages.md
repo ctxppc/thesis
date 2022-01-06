@@ -4,8 +4,8 @@
 
 The pipeline, from high-level to low-level is:
 [`EX`](#EX) →
-[`AL`](#AL) →
 [`PA`](#PA) →
+[`AL`](#AL) →
 [`CD`](#CD) →
 [`PR`](#PR) →
 [`BB`](#BB) →
@@ -42,7 +42,7 @@ A program written in some language `XY` should be stored in a file with extensio
 <h2 id="EX">Grammar for EX (Expressions)</h2>
 A language that introduces structural value expressions, thereby abstracting over simple computation effects.
 
-**Inherited from AL:**
+**Inherited from PA:**
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
@@ -80,17 +80,18 @@ A language that introduces structural value expressions, thereby abstracting ove
 </dl>
 
 
-<h2 id="AL">Grammar for AL (Abstract Locations)</h2>
-A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
+<h2 id="PA">Grammar for PA (Parameters)</h2>
+A language that introduces procedure parameters using the PA calling convention.
 
-**Inherited from PA:**
+**Inherited from AL:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
-<code>Label</code>
+<code>Label</code>, 
+<code>Location</code>
 
 <dl>
-<dt><code>AL.Effect</code></dt>
+<dt><code>PA.Effect</code></dt>
 <dd><code><strong>sequence</strong>([Effect])</code></dd>
 <dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
@@ -99,8 +100,62 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Parameter</code></dt>
+<dt><code>PA.Parameter</code></dt>
 <dd><code>(Location, DataType)</code></dd>
+</dl>
+<dl>
+<dt><code>PA.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+<dt><code>PA.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>PA.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+<dt><code>PA.Source</code></dt>
+<dd><code><strong>immediate</strong>(Int)</code></dd>
+<dd><code><strong>location</strong>(Location)</code></dd>
+</dl>
+
+
+<h2 id="AL">Grammar for AL (Abstract Locations)</h2>
+A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
+
+**Inherited from CD:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Frame</code>, 
+<code>Label</code>
+
+<dl>
+<dt><code>AL.Effect</code></dt>
+<dd><code><strong>sequence</strong>([Effect])</code></dd>
+<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+<dd><code><strong>invoke</strong>(Label, [ParameterLocation])</code></dd>
+<dd><code><strong>return</strong>(Source)</code></dd>
+</dl>
+<dl>
+<dt><code>AL.Location</code></dt>
+<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
+</dl>
+<dl>
+<dt><code>AL.Parameter</code></dt>
+<dd><code>(AbstractLocation, DataType)</code></dd>
+</dl>
+<dl>
+<dt><code>AL.ParameterLocation</code></dt>
+<dd><code><strong>register</strong>(Register)</code></dd>
+<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Predicate</code></dt>
@@ -117,46 +172,22 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
+<dt><code>AL.Register</code></dt>
+<dd><code><strong>sp</strong></code></dd>
+<dd><code><strong>fp</strong></code></dd>
+<dd><code><strong>a0</strong></code></dd>
+<dd><code><strong>a1</strong></code></dd>
+<dd><code><strong>a2</strong></code></dd>
+<dd><code><strong>a3</strong></code></dd>
+<dd><code><strong>a4</strong></code></dd>
+<dd><code><strong>a5</strong></code></dd>
+<dd><code><strong>a6</strong></code></dd>
+<dd><code><strong>a7</strong></code></dd>
+</dl>
+<dl>
 <dt><code>AL.Source</code></dt>
 <dd><code><strong>immediate</strong>(Int)</code></dd>
 <dd><code><strong>location</strong>(Location)</code></dd>
-</dl>
-
-
-<h2 id="PA">Grammar for PA (Parameters)</h2>
-A language that introduces procedure parameters using the PA calling convention.
-
-**Inherited from CD:**
-<code>BinaryOperator</code>, 
-<code>BranchRelation</code>, 
-<code>DataType</code>, 
-<code>Frame</code>, 
-<code>Label</code>, 
-<code>Location</code>, 
-<code>Predicate</code>, 
-<code>Register</code>, 
-<code>Source</code>
-
-<dl>
-<dt><code>PA.Effect</code></dt>
-<dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Parameter</code></dt>
-<dd><code>(<strong>type:</strong> DataType)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
-</dl>
-<dl>
-<dt><code>PA.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 
 
