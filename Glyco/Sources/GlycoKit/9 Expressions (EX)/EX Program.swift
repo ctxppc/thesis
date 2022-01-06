@@ -34,6 +34,5 @@ public enum EX : Language {
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter
-	public typealias Predicate = Lower.Predicate
 	
 }

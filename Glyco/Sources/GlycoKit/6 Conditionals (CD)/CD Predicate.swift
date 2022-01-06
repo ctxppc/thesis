@@ -8,27 +8,11 @@ extension CD {
 		/// A constant predicate.
 		case constant(Bool)
 		
-		/// A predicate that holds iff *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
-		case relation(lhs: Source, relation: BranchRelation, rhs: Source)
+		/// A predicate that holds iff *x* *R* *y*, where *R* is the relation, *x* is the value of the first source, and *y* is the value of the second source.
+		case relation(Source, BranchRelation, Source)
 		
-		/// A predicate that evaluates to `affirmative` if `condition` holds, or to `negative` otherwise.
-		indirect case conditional(condition: Predicate, affirmative: Predicate, negative: Predicate)
-		
-		/// Returns a predicate that holds iff `negated` does not hold.
-		public static func not(_ negated: Self) -> Self {
-			switch negated {
-				
-				case .constant(let holds):
-				return .constant(!holds)
-				
-				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs: lhs, relation: relation.negated, rhs: rhs)
-				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
-				return .conditional(condition: condition, affirmative: negative, negative: affirmative)
-				
-			}
-		}
+		/// A predicate that evaluates to `then` if the first given predicate holds, or to `else` otherwise.
+		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
 		/// Returns a copy of `self` that may be more optimised.
 		func optimised() -> Self {
@@ -37,24 +21,24 @@ extension CD {
 				case .constant:
 				return self
 				
-				case .relation(lhs: .immediate(let lhs), relation: let relation, rhs: .immediate(let rhs)):
+				case .relation(.immediate(let lhs), let relation, .immediate(let rhs)):
 				return .constant(relation.holds(lhs, rhs))
 				
-				case .relation(lhs: let lhs, relation: let relation, rhs: let rhs) where lhs == rhs:
+				case .relation(let lhs, let relation, let rhs) where lhs == rhs:
 				return .constant(relation.reflexive)
 				
-				case .conditional(condition: .constant(true), affirmative: let affirmative, negative: _):
+				case .if(.constant(true), then: let affirmative, else: _):
 				return affirmative.optimised()
 				
-				case .conditional(condition: .constant(false), affirmative: _, negative: let negative):
+				case .if(.constant(false), then: _, else: let negative):
 				return negative.optimised()
 				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				case .if(let condition, then: let affirmative, else: let negative):
 				let newCondition = condition.optimised()
 				if condition != newCondition {
-					return .conditional(condition: newCondition, affirmative: affirmative.optimised(), negative: negative.optimised()).optimised()
+					return .if(newCondition, then: affirmative.optimised(), else: negative.optimised()).optimised()
 				} else {
-					return .conditional(condition: condition, affirmative: affirmative.optimised(), negative: negative.optimised())
+					return .if(condition, then: affirmative.optimised(), else: negative.optimised())
 				}
 				
 				default:
@@ -88,7 +72,7 @@ extension CD {
 				case .relation(let lhs, let relation, let rhs):
 				return [.branch(entryLabel, previousEffects, if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget)]
 				
-				case .conditional(condition: let condition, affirmative: let affirmative, negative: let negative):
+				case .if(let condition, then: let affirmative, else: let negative):
 				let intermediateAffirmative = context.allocateBlockLabel()
 				let intermediateNegative = context.allocateBlockLabel()
 				let conditionBlocks = condition.lowered(

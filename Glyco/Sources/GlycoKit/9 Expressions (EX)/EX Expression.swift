@@ -50,10 +50,10 @@ extension EX {
 				])
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return .if(
-					predicate,
-					then:	affirmative.lowered(destination: destination, context: &context),
-					else:	negative.lowered(destination: destination, context: &context)
+				return predicate.lowered(
+					in:				&context,
+					affirmative:	affirmative.lowered(destination: destination, context: &context),
+					negative:		negative.lowered(destination: destination, context: &context)
 				)
 				
 			}

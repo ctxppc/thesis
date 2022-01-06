@@ -31,11 +31,7 @@ extension EX {
 				return .sequence(try statements.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return .if(
-					predicate,
-					then:	try affirmative.lowered(in: &context),
-					else:	try negative.lowered(in: &context)
-				)
+				return try predicate.lowered(in: &context, affirmative: affirmative.lowered(in: &context), negative: negative.lowered(in: &context))
 				
 				case .invoke(let procedure, let arguments):
 				var loweredArguments = [Lower.Source]()

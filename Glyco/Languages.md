@@ -20,11 +20,23 @@ This document is generated automatically by [Sourcery](https://github.com/krzysz
 ## How to Use
 Every intermediate language is defined by a context-free grammar, listed below. To write a program in some language, choose a production rule for that language's `Program` nonterminal (although often there's only one rule) and write a production that conforms to that rule. The rule mentions other nonterminals which are either defined in the same language are inherited from the lower language.
 
-A rule mentioning a nonterminal in square brackets like `[Effect]` is satisfied with a sequence of zero or more productions of that nonterminal, with each such production separated by whitespace.
-
-The nonterminal `String` is satisfied with a string such as `string` or `"long string"`. Quotation is required for strings that don't start with a letter (Unicode General Category L* and M*) or underscore (`_`), incl. the empty string. The nonterminal `Int` is satisfied with an integer literal such as `500` or `-12`. The nonterminal `Bool` is satisfied with either string literals `true` or `false`, optionally quoted.
-
 A program written in some language `XY` should be stored in a file with extension `.xy` (case-insensitive) since Glyco uses the extension to determine the source language.
+
+## Shared Grammar
+<dl>
+	<dt><code>[<var>N</var>]</code> for some nonterminal <var>N</var></dt>
+	<dd>Zero or more productions of <var>N</var>, each separated by whitespace (spaces, tabs, newlines, paragraph terminators, etc.).</dd>
+	<dt><code>Bool</code></dt>
+	<dd><code>true</code></dd>
+	<dd><code>"true"</code></dd>
+	<dd><code>false</code></dd>
+	<dd><code>"false"</code></dd>
+	<dt><code>Int</code></dt>
+	<dd>One or more characters between 0 and 9, inclusive, optionally prefixed by <kbd>-</kbd>. The value must be representable in the C <code>int</code> type of the compiling machine.</dd>
+	<dt><code>String</code></dt>
+	<dd>A letter (Unicode General Category L* and M*) or underscore <kbd>_</kbd>, followed by any number of alphanumeric characters (Unicode General Categories L*, M*, and N*) or underscores <kbd>_</kbd>.</dd>
+	<dd>Zero or more characters enclosed in double-quotes <kbd>"</kbd>, with any occurrences of the double-quote character <kbd>"</kbd> in the string content replaced with two instances of the same, i.e., <kbd>""</kbd>.</dd>
+</dl>
 
 
 <h2 id="EX">Grammar for EX (Expressions)</h2>
@@ -173,8 +185,8 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dl>
 <dt><code>CD.Predicate</code></dt>
 <dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(<strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source)</code></dd>
-<dd><code><strong>conditional</strong>(<strong>condition:</strong> Predicate, <strong>affirmative:</strong> Predicate, <strong>negative:</strong> Predicate)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>CD.Procedure</code></dt>

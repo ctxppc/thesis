@@ -14,22 +14,6 @@ extension AL {
 		/// A predicate that evaluates to `then` if the predicate holds, or to `else` otherwise.
 		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
-		/// Returns a predicate that holds iff `negated` does not hold.
-		public static func not(_ negated: Self) -> Self {
-			switch negated {
-				
-				case .constant(value: let holds):
-				return .constant(!holds)
-				
-				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs, relation.negated, rhs)
-				
-				case .if(let condition, then: let affirmative, else: let negative):
-				return .if(condition, then: negative, else: affirmative)
-				
-			}
-		}
-		
 		// See protocol.
 		func lowered(in context: inout LocalContext) throws -> Lower.Predicate {
 			switch self {
@@ -38,14 +22,10 @@ extension AL {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				return try .relation(lhs: lhs.lowered(in: &context), relation: relation, rhs: rhs.lowered(in: &context))
+				return try .relation(lhs.lowered(in: &context), relation, rhs.lowered(in: &context))
 				
 				case .if(let condition, then: let affirmative, else: let negative):
-				return try .conditional(
-					condition:		condition.lowered(in: &context),
-					affirmative:	affirmative.lowered(in: &context),
-					negative:		negative.lowered(in: &context)
-				)
+				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 			}
 		}
@@ -57,8 +37,7 @@ extension AL {
 				case .constant, .relation(.immediate, _, .immediate):
 				return []
 				
-				case .relation(.immediate, _, .location(let location)),
-						.relation(.location(let location), _, .immediate):
+				case .relation(.immediate, _, .location(let location)), .relation(.location(let location), _, .immediate):
 				return [location]
 				
 				case .relation(.location(let lhs), _, .location(let rhs)):
