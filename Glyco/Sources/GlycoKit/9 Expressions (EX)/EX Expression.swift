@@ -22,10 +22,10 @@ extension EX {
 			switch self {
 				
 				case .constant(value: let value):
-				return .copy(from: .immediate(value), to: destination)
+				return .set(destination, to: .immediate(value))
 				
 				case .location(location: let location):
-				return .copy(from: .location(location), to: destination)
+				return .set(destination, to: .location(location))
 				
 				case .binary(.constant(value: let first), let op, .constant(value: let second)):
 				return .compute(.immediate(first), op, .immediate(second), to: destination)
@@ -42,7 +42,7 @@ extension EX {
 				case .binary(let first, let op, let second):
 				let firstLocation = context.allocateLocation()
 				let secondLocation = context.allocateLocation()
-				return .sequence([
+				return .do([
 					first.lowered(destination: firstLocation, context: &context),
 					second.lowered(destination: secondLocation, context: &context),
 					Self.binary(.location(firstLocation), op, .location(secondLocation))

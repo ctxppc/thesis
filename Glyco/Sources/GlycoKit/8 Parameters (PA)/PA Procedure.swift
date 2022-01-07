@@ -32,10 +32,10 @@ extension PA {
 			)
 			
 			let prologue = zip(parameters, parameterLocations).map { parameter, location in
-				Lower.Effect.copy(from: .location(.parameter(location)), to: .abstract(parameter.location))
+				Lower.Effect.set(.abstract(parameter.location), to: .location(.parameter(location)))
 			}
 			
-			return try .init(name, .sequence(prologue + [effect.lowered(in: &context)]))
+			return try .init(name, .do(prologue + [effect.lowered(in: &context)]))
 			
 		}
 		

@@ -8,10 +8,10 @@ extension AL {
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
-		case sequence([Effect])
+		case `do`([Effect])
 		
-		/// An effect that retrieves the value in `from` and puts it in `to`.
-		case copy(from: Source, to: Location)
+		/// An effect that retrieves the value from given source and puts it in given location.
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -22,7 +22,7 @@ extension AL {
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
-		case invoke(Label, [ParameterLocation])
+		case call(Label, [ParameterLocation])
 		
 		/// An effect that terminates the program with `result`.
 		case `return`(Source)
@@ -31,11 +31,11 @@ extension AL {
 		func lowered(in context: inout LocalContext) throws -> Lower.Effect {
 			switch self {
 				
-				case .sequence(let effects):
-				return .sequence(try effects.lowered(in: &context))
+				case .do(let effects):
+				return .do(try effects.lowered(in: &context))
 				
-				case .copy(from: let source, to: let destination):
-				return try .copy(from: source.lowered(in: &context), to: destination.lowered(in: &context))
+				case .set(let destination, to: let source):
+				return try .set(destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
@@ -43,8 +43,8 @@ extension AL {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .invoke(let procedure, _):
-				return .invoke(procedure)
+				case .call(let procedure, _):
+				return .call(procedure)
 				
 				case .return(let result):
 				return .return(try result.lowered(in: &context))
@@ -70,12 +70,12 @@ extension AL {
 			
 			switch self {
 				
-				case .sequence(effects: let effects):
+				case .do(effects: let effects):
 				(livenessAtEntry, conflictsAtEntry) = effects.reversed().reduce((livenessAtEntry, conflictsAtEntry)) {
 					$1.livenessAndConflictsAtEntry(livenessAtExit: $0.0, conflictsAtExit: $0.1)
 				}
 				
-				case .copy, .compute, .invoke, .return:
+				case .set, .compute, .call, .return:
 				break	// already dealt with defined & used locations above
 				
 				case .if(_ /* already dealt with */, then: let affirmative, else: let negative):
@@ -98,10 +98,10 @@ extension AL {
 		private func definedLocations() -> Set<Location> {
 			switch self {
 				
-				case .sequence, .if, .invoke, .return:
+				case .do, .if, .call, .return:
 				return []
 				
-				case .copy(from: _, to: let destination), .compute(_, _, _, to: let destination):
+				case .set(let destination, to: _), .compute(_, _, _, to: let destination):
 				return [destination]
 				
 			}
@@ -111,13 +111,13 @@ extension AL {
 		private func possiblyUsedLocations() -> Set<Location> {
 			switch self {
 				
-				case .sequence,
-						.copy(from: .immediate, to: _),
+				case .do,
+						.set(_, to: .immediate),
 						.compute(.immediate, _, .immediate, to: _),
 						.return(result: .immediate):
 				return []
 				
-				case .copy(from: .location(let source), to: _),
+				case .set(_, to: .location(let source)),
 						.compute(.immediate, _, .location(let source), to: _),
 						.compute(.location(let source), _, .immediate, to: _),
 						.return(result: .location(let source)):
@@ -129,7 +129,7 @@ extension AL {
 				case .if(let predicate, then: _, else: _):
 				return predicate.usedLocations()
 				
-				case .invoke(_, let arguments):
+				case .call(_, let arguments):
 				return .init(arguments.map { .parameter($0) })
 				
 			}
@@ -140,7 +140,7 @@ extension AL {
 }
 
 public func <- (destination: AL.Location, source: AL.Source) -> AL.Effect {
-	.copy(from: source, to: destination)
+	.set(destination, to: source)
 }
 
 public func <- (destination: AL.AbstractLocation, source: AL.Source) -> AL.Effect {

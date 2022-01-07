@@ -9,10 +9,10 @@ extension CD {
 	public enum Effect : Codable, Equatable {
 		
 		/// An effect that performs `effects`.
-		case sequence([Effect])
+		case `do`([Effect])
 		
-		/// An effect that retrieves the value in `from` and puts it in `to`.
-		case copy(from: Source, to: Location)
+		/// An effect that retrieves the value from given source and puts it in given location.
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -23,7 +23,7 @@ extension CD {
 		/// An effect that invokes the labelled procedure.
 		///
 		/// This effect assumes the calling convention is respected by the rest of the program.
-		case invoke(Label)
+		case call(Label)
 		
 		/// An effect that terminates the program with given result.
 		case `return`(Source)
@@ -40,14 +40,14 @@ extension CD {
 		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label) throws -> [Lower.Block] {
 			switch self {
 				
-				case .sequence(let effects):
+				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .invoke(let procedure):
+				case .call(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.intermediate(entryLabel, previousEffects, then: procedure)]
 				
-				case .copy, .compute, .if, .return:
+				case .set, .compute, .if, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -59,7 +59,7 @@ extension CD {
 		var doesNothing: Bool {
 			switch self {
 				
-				case .sequence(let effects):
+				case .do(let effects):
 				return effects.allSatisfy(\.doesNothing)
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -77,18 +77,18 @@ extension CD {
 		var allExecutionPathsTerminate: Bool {
 			switch self {
 				
-				case .sequence(effects: let effects):
+				case .do(let effects):
 				return effects
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .copy, .compute:	// TODO: Add .invoke to this case when it becomes applicable.
+				case .set, .compute:	// TODO: Add .invoke to this case when it becomes applicable.
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
 				
-				case .invoke, .return:	// TODO: Remove .invoke from this case when no longer applicable.
+				case .call, .return:	// TODO: Remove .invoke from this case when no longer applicable.
 				return true
 				
 			}
@@ -118,12 +118,12 @@ extension CD {
 		func optimised() -> Self {
 			switch self {
 				
-				case .copy(from: .location(let source), to: let destination) where source == destination,
+				case .set(let destination, to: .location(let source)) where source == destination,
 					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
 					.compute(.location(let source), .subtract, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .subtract, .location(let source), to: let destination) where source == destination:
-				return .sequence([])
+				return .do([])
 				
 				case .if(.constant(true), then: let affirmative, else: _):
 				return affirmative.optimised()
@@ -146,10 +146,10 @@ extension CD {
 		func flattened() -> Self {
 			switch self {
 				
-				case .sequence(effects: let effects):
-				return .sequence(effects.flatMap { subeffect -> [Effect] in
+				case .do(effects: let effects):
+				return .do(effects.flatMap { subeffect -> [Effect] in
 					switch subeffect.flattened() {
-						case .sequence(let nested):	return nested
+						case .do(let nested):	return nested
 						case let flattened:			return [flattened]
 					}
 				})
@@ -189,10 +189,10 @@ private extension RandomAccessCollection where Element == CD.Effect {
 		guard let (first, rest) = self.splittingFirst() else { return [.intermediate(entryLabel, previousEffects, then: exitLabel)] }
 		switch first {
 			
-			case .sequence(effects: let effects) where rest.doesNothing:
+			case .do(effects: let effects) where rest.doesNothing:
 			return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 			
-			case .sequence(effects: let effects):
+			case .do(effects: let effects):
 			let restLabel = context.allocateBlockLabel()
 			return try effects.lowered(
 				in:					&context,
@@ -206,7 +206,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .copy(from: let source, to: let destination):
+			case .set(let destination, to: let source):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
@@ -253,7 +253,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			)
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
 			
-			case .invoke(procedure: let procedure):
+			case .call(procedure: let procedure):
 			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
 			return [.intermediate(entryLabel, previousEffects, then: procedure)]
 			
@@ -267,5 +267,5 @@ private extension RandomAccessCollection where Element == CD.Effect {
 }
 
 public func <- (destination: CD.Location, source: CD.Source) -> CD.Effect {
-	.copy(from: source, to: destination)
+	.set(destination, to: source)
 }

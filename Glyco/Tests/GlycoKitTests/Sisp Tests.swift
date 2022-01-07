@@ -10,10 +10,10 @@ final class SispCodingTests : XCTestCase {
 		
 		let location = EX.Location(rawValue: "a")
 		let program = EX.Program(
-			.sequence([
+			.do([
 				.if(
 					.constant(true),
-					then:	.assign(location, value: .constant(1))
+					then:	.set(location, to: .constant(1))
 				),
 				.return(.location(location)),
 			]),
@@ -24,9 +24,9 @@ final class SispCodingTests : XCTestCase {
 		let expected = """
 			(
 				
-					sequence(
+					do(
 						
-							if( constant( true), then: assign( a, value: constant( 1)), else: sequence())
+							if( constant( true), then: set( a, to: constant( 1)), else: do())
 							return( location( a))
 					)
 			)
@@ -40,11 +40,11 @@ final class SispCodingTests : XCTestCase {
 		
 		let actual = try SispDecoder(from: """
 			(
-				sequence(
+				do(
 					if(
 						constant(true),
-						then:	assign(a, value: constant(1)),
-						else:	sequence()
+						then:	set(a, to: constant(1)),
+						else:	do()
 					)
 					return(location(a))
 				),
@@ -54,10 +54,10 @@ final class SispCodingTests : XCTestCase {
 		
 		let location = EX.Location(rawValue: "a")
 		let expected = EX.Program(
-			.sequence([
+			.do([
 				.if(
 					.constant(true),
-					then:	.assign(location, value: .constant(1))
+					then:	.set(location, to: .constant(1))
 				),
 				.return(.location(location)),
 			]),

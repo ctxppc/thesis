@@ -9,10 +9,10 @@ extension PA {
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
-		case sequence([Effect])
+		case `do`([Effect])
 		
-		/// An effect that retrieves the value in `from` and puts it in `to`.
-		case copy(from: Source, to: Location)
+		/// An effect that retrieves the value from given source and puts it in given location.
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -21,7 +21,7 @@ extension PA {
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
 		/// An effect that invokes the labelled procedure passing given arguments.
-		case invoke(Label, [Source])
+		case call(Label, [Source])
 		
 		/// An effect that terminates the program with `result`.
 		case `return`(Source)
@@ -30,11 +30,11 @@ extension PA {
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
-				case .sequence(let effects):
-				return .sequence(try effects.lowered(in: &context))
+				case .do(let effects):
+				return .do(try effects.lowered(in: &context))
 				
-				case .copy(from: let source, to: let location):
-				return .copy(from: try source.lowered(in: &context), to: .abstract(location))
+				case .set(let location, to: let source):
+				return .set(.abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
@@ -42,19 +42,19 @@ extension PA {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .invoke(let name, let arguments):
+				case .call(let name, let arguments):
 				guard let procedure = context.procedures.first(where: { $0.name == name }) else { throw LoweringError.unrecognisedProcedure(name: name) }
 				let assignments = procedure.parameterAssignments(in: context.configuration)
 				let loweredArguments = try arguments.lowered(in: &context)
 				let registerCopies = zip(assignments.registers, loweredArguments).map { (register, argument) in
-					Lower.Effect.copy(from: argument, to: .parameter(.register(register)))
+					.register(register) <- argument
 				}
 				let frameCellCopies = zip(assignments.frameLocations, loweredArguments.dropFirst(registerCopies.count)).map { (frameLocation, argument) in
-					Lower.Effect.copy(from: argument, to: .parameter(.frame(frameLocation)))
+					.frame(frameLocation) <- argument
 				}
 				let parameterLocations = assignments.registers.map { Lower.ParameterLocation.register($0) }
 					+ assignments.frameLocations.map { .frame($0) }
-				return .sequence(frameCellCopies + registerCopies + [.invoke(name, parameterLocations)])
+				return .do(frameCellCopies + registerCopies + [.call(name, parameterLocations)])
 				
 				case .return(let result):
 				return .return(try result.lowered(in: &context))

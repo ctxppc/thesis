@@ -34,7 +34,7 @@ extension EX {
 				case .relation(let lhs, let relation, let rhs):
 				let lhsValue = context.allocateLocation()
 				let rhsValue = context.allocateLocation()
-				return .sequence([
+				return .do([
 					lhs.lowered(destination: lhsValue, context: &context),
 					rhs.lowered(destination: rhsValue, context: &context),
 					.if(.relation(.location(lhsValue), relation, .location(rhsValue)), then: affirmative, else: negative),

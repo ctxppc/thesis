@@ -72,10 +72,10 @@ A language that introduces structural value expressions, thereby abstracting ove
 </dl>
 <dl>
 <dt><code>EX.Statement</code></dt>
-<dd><code><strong>assign</strong>(Location, <strong>value:</strong> Expression)</code></dd>
-<dd><code><strong>sequence</strong>([Statement])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Expression)</code></dd>
+<dd><code><strong>do</strong>([Statement])</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [Expression])</code></dd>
+<dd><code><strong>call</strong>(Label, [Expression])</code></dd>
 <dd><code><strong>return</strong>(Expression)</code></dd>
 </dl>
 
@@ -92,11 +92,11 @@ A language that introduces procedure parameters using the PA calling convention.
 
 <dl>
 <dt><code>PA.Effect</code></dt>
-<dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>do</strong>([Effect])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [Source])</code></dd>
+<dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
@@ -136,11 +136,11 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 
 <dl>
 <dt><code>AL.Effect</code></dt>
-<dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>do</strong>([Effect])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>invoke</strong>(Label, [ParameterLocation])</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
@@ -202,11 +202,11 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 
 <dl>
 <dt><code>CD.Effect</code></dt>
-<dd><code><strong>sequence</strong>([Effect])</code></dd>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>do</strong>([Effect])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>invoke</strong>(Label)</code></dd>
+<dd><code><strong>call</strong>(Label)</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
