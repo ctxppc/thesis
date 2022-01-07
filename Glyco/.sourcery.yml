@@ -8,4 +8,4 @@ configurations:
     - Sources/GlycoKit
   templates:
     - Sourcery/Codable.stencil
-  output: Sources/GlycoKit/Generated
+  output: Sources/GlycoKit

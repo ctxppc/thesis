@@ -11,6 +11,15 @@
         }
       },
       {
+        "package": "KZFileWatchers",
+        "repositoryURL": "https://github.com/ctxppc/KZFileWatchers.git",
+        "state": {
+          "branch": null,
+          "revision": "7838b5deffc5c6865acf9e1d64498f5716180a86",
+          "version": "1.1.1"
+        }
+      },
+      {
         "package": "PatternKit",
         "repositoryURL": "https://github.com/ctxppc/PatternKit.git",
         "state": {

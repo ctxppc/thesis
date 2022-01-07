@@ -4,6 +4,7 @@ import ArgumentParser
 import DepthKit
 import Foundation
 import GlycoKit
+import KZFileWatchers
 
 @main
 struct CompileCommand : ParsableCommand {
@@ -30,6 +31,9 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
 	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
 	
+	@Flag(name: .shortAndLong, help: "Continuously observe source file for changes and compile. (Omit to compile once and exit.)")
+	var continuous: Bool = false
+	
 	// See protocol.
 	mutating func run() throws {
 		
@@ -42,10 +46,27 @@ struct CompileCommand : ParsableCommand {
 			systemURL:			systemURL,
 			argumentRegisters:	argumentRegisters
 		)
-		
 		let sourceLanguage = source.pathExtension.uppercased()
-		let sourceString = try String(contentsOf: source)
 		
+		if continuous {
+			
+			let watcher = FileWatcher.Local(path: source.absoluteURL.path)
+			fileWatcher = watcher
+			try watcher.start { [c = self] result in
+				guard case .updated(data: let sourceData) = result else { return }
+				c.compileAfterChange(sourceData: sourceData, configuration: configuration, sourceLanguage: sourceLanguage)
+			}
+			
+			print("Observing \(source.absoluteURL.path)…")
+			dispatchMain()
+			
+		} else {
+			try compile(sourceString: try .init(contentsOf: source), configuration: configuration, sourceLanguage: sourceLanguage)
+		}
+		
+	}
+	
+	private func compile(sourceString: String, configuration: CompilationConfiguration, sourceLanguage: String) throws {
 		if let language = language {
 			let ir = try HighestSupportedLanguage.loweredProgramRepresentation(
 				fromSispString:	sourceString,
@@ -72,10 +93,24 @@ struct CompileCommand : ParsableCommand {
 				print("ELF is \(elf.count) bytes long. Re-run this command with the -o <file> option to save the ELF to disk.")
 			}
 		}
-		
+	}
+	
+	private func compileAfterChange(sourceData: Data, configuration: CompilationConfiguration, sourceLanguage: String) {
+		do {
+			guard let source = String(bytes: sourceData, encoding: .utf8) else { throw DecodingError.illegalUTF8 }
+			try compile(sourceString: source, configuration: configuration, sourceLanguage: sourceLanguage)
+		} catch {
+			print(error)
+		}
+	}
+	
+	private enum DecodingError : Error {
+		case illegalUTF8
 	}
 	
 }
+
+private var fileWatcher: FileWatcher.Local?
 
 extension CompilationConfiguration.Target : ExpressibleByArgument {}
 
