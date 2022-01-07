@@ -1,5 +1,5 @@
 % © 2021–2022 Constantino Tsarouhas
-\documentclass[master=cws,  oneside, english, extralanguage=dutch]{kulemt}	% TODO: twoside for print
+\documentclass[master=cws, oneside, english, extralanguage=dutch]{kulemt}	% TODO: twoside for print
 \setup{
 	masteroption=vs,
 	title={A CHERI-RISC-V nanopass compiler for iterating quickly on secure calling conventions},
@@ -11,31 +11,36 @@
 	font=utopia
 }
 
-\usepackage{hyperref}	% Hyperlinking and PDF metadata.
 \usepackage{babel}
+\usepackage{hyperref}	% Hyperlinking and PDF metadata.
 \usepackage{lipsum}		% Fake lorem ipsum text
+\usepackage{subfiles}	% Modular documents
+\usepackage{todonotes}	% Marks TODOs
 
 \begin{document}
 
 \begin{preface}
 	\lipsum[5]
+	\todo{Write something funny here}
 \end{preface}
 
 \tableofcontents*
 
 \begin{abstract}
 	\lipsum[5]
+	\todo{Write something serious here}
 \end{abstract}
 
 \begin{abstract*}
 	\lipsum[5]
+	\todo{5 pagina's goud hier a.u.b.}
 \end{abstract*}
 
 \mainmatter
-\lipsum
+\subfile{background}
 
 \backmatter
 \bibliographystyle{abbrv}
-\bibliography{references}
+\bibliography{References}
 
 \end{document}

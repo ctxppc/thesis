@@ -16,3 +16,5 @@ Text/*.out
 Text/*.pdf
 Text/*.synctex.gz
 Text/*.toc
+Text/*.bbl
+Text/*.blg
