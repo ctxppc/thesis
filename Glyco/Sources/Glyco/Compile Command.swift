@@ -4,7 +4,9 @@ import ArgumentParser
 import DepthKit
 import Foundation
 import GlycoKit
+#if os(macOS)
 import KZFileWatchers
+#endif
 
 @main
 struct CompileCommand : ParsableCommand {
@@ -31,8 +33,10 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
 	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
 	
+	#if os(macOS)
 	@Flag(name: .shortAndLong, help: "Continuously observe source file for changes and compile. (Omit to compile once and exit.)")
 	var continuous: Bool = false
+	#endif
 	
 	// See protocol.
 	mutating func run() throws {
@@ -48,6 +52,7 @@ struct CompileCommand : ParsableCommand {
 		)
 		let sourceLanguage = source.pathExtension.uppercased()
 		
+		#if os(macOS)
 		if continuous {
 			
 			let watcher = FileWatcher.Local(path: source.absoluteURL.path)
@@ -63,6 +68,9 @@ struct CompileCommand : ParsableCommand {
 		} else {
 			try compile(sourceString: try .init(contentsOf: source), configuration: configuration, sourceLanguage: sourceLanguage)
 		}
+		#else
+		try compile(sourceString: try .init(contentsOf: source), configuration: configuration, sourceLanguage: sourceLanguage)
+		#endif
 		
 	}
 	
@@ -110,7 +118,9 @@ struct CompileCommand : ParsableCommand {
 	
 }
 
+#if os(macOS)
 private var fileWatcher: FileWatcher.Local?
+#endif
 
 extension CompilationConfiguration.Target : ExpressibleByArgument {}
 

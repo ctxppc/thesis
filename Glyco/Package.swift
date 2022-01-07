@@ -16,7 +16,6 @@ let package = Package(
 		.package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.1"),
 		.package(url: "https://github.com/apple/swift-collections.git", .upToNextMajor(from: "1.0.0")),
 		.package(url: "https://github.com/ctxppc/DepthKit.git", .upToNextMinor(from: "0.10.0")),
-		.package(url: "https://github.com/ctxppc/KZFileWatchers.git", from: "1.1.1"),
 		.package(url: "https://github.com/ctxppc/PatternKit.git", .upToNextMinor(from: "0.4.0")),
 	],
 	targets:		[
@@ -24,7 +23,6 @@ let package = Package(
 		.executableTarget(name: "Glyco", dependencies: [
 			"GlycoKit",
 			.product(name: "ArgumentParser", package: "swift-argument-parser"),
-			.product(name: "KZFileWatchers", package: "KZFileWatchers"),
 		]),
 		
 		.target(name: "GlycoKit", dependencies: [
@@ -44,3 +42,8 @@ let package = Package(
 		
 	]
 )
+
+#if os(macOS)
+	package.dependencies.append(.package(url: "https://github.com/ctxppc/KZFileWatchers.git", from: "1.1.1"))
+	package.targets[0].dependencies.append(.product(name: "KZFileWatchers", package: "KZFileWatchers"))
+#endif
