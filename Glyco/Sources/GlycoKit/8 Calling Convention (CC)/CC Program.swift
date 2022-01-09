@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Parameters
-//sourcery: description = A language that introduces procedure parameters using the PA calling convention.
-public enum PA : Language {
+//sourcery: longname = Calling Convention
+//sourcery: description = A language that introduces parameter passing and enforces the low-level Glyco calling convention.
+public enum CC : Language {
 	
-	/// A program on a PA machine.
+	/// A program on a CC machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {

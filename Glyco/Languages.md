@@ -4,7 +4,7 @@
 
 The pipeline, from high-level to low-level is:
 [`EX`](#EX) →
-[`PA`](#PA) →
+[`CC`](#CC) →
 [`AL`](#AL) →
 [`CD`](#CD) →
 [`PR`](#PR) →
@@ -42,7 +42,7 @@ A program written in some language `XY` should be stored in a file with extensio
 <h2 id="EX">Grammar for EX (Expressions)</h2>
 A language that introduces structural value expressions, thereby abstracting over simple computation effects.
 
-**Inherited from PA:**
+**Inherited from CC:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -81,8 +81,8 @@ A language that introduces structural value expressions, thereby abstracting ove
 </dl>
 
 
-<h2 id="PA">Grammar for PA (Parameters)</h2>
-A language that introduces procedure parameters using the PA calling convention.
+<h2 id="CC">Grammar for CC (Calling Convention)</h2>
+A language that introduces parameter passing and enforces the low-level Glyco calling convention.
 
 **Inherited from AL:**
 <code>BinaryOperator</code>, 
@@ -92,7 +92,7 @@ A language that introduces procedure parameters using the PA calling convention.
 <code>Location</code>
 
 <dl>
-<dt><code>PA.Effect</code></dt>
+<dt><code>CC.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
@@ -101,25 +101,25 @@ A language that introduces procedure parameters using the PA calling convention.
 <dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Parameter</code></dt>
+<dt><code>CC.Parameter</code></dt>
 <dd><code>(Location, DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Predicate</code></dt>
+<dt><code>CC.Predicate</code></dt>
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Procedure</code></dt>
+<dt><code>CC.Procedure</code></dt>
 <dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Program</code></dt>
+<dt><code>CC.Program</code></dt>
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>PA.Source</code></dt>
+<dt><code>CC.Source</code></dt>
 <dd><code><strong>immediate</strong>(Int)</code></dd>
 <dd><code><strong>location</strong>(Location)</code></dd>
 </dl>

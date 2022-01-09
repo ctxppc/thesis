@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension PA {
+extension CC {
 	
 	/// A value used while lowering a procedure.
 	struct Context {

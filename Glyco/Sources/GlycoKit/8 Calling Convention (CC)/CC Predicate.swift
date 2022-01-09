@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension PA {
+extension CC {
 	
 	/// A value that can be used in a conditional.
 	public enum Predicate : Codable, Equatable, SimplyLowerable {

@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension PA {
+extension CC {
 	public struct Parameter : Codable, Equatable {
 		
 		public init(_ location: Location, _ type: DataType) {

@@ -21,6 +21,28 @@ extension BB.Program {
 	}
 }
 
+extension CC.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "_0"
+		case procedures = "procedures"
+	}
+}
+
+extension CC.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case location = "_0"
+		case type = "_1"
+	}
+}
+
+extension CC.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "_1"
+		case effect = "_2"
+	}
+}
+
 extension CD.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
@@ -65,28 +87,6 @@ extension FO.Program {
 extension FO.HaltEffect {
 	public enum CodingKeys : String, CodingKey {
 		case result = "result"
-	}
-}
-
-extension PA.Program {
-	public enum CodingKeys : String, CodingKey {
-		case effect = "_0"
-		case procedures = "procedures"
-	}
-}
-
-extension PA.Parameter {
-	public enum CodingKeys : String, CodingKey {
-		case location = "_0"
-		case type = "_1"
-	}
-}
-
-extension PA.Procedure {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case parameters = "_1"
-		case effect = "_2"
 	}
 }
 

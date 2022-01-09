@@ -3,9 +3,9 @@
 import DepthKit
 import Foundation
 
-extension PA {
+extension CC {
 	
-	/// An effect on a PA machine.
+	/// An effect on a CC machine.
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.

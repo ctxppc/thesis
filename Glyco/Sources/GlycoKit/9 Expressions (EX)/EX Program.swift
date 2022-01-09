@@ -27,7 +27,7 @@ public enum EX : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = PA
+	public typealias Lower = CC
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation

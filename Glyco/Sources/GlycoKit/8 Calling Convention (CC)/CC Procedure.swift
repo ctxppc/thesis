@@ -2,7 +2,7 @@
 
 import Algorithms
 
-extension PA {
+extension CC {
 	
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {

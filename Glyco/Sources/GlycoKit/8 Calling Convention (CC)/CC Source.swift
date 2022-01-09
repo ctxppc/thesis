@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension PA {
+extension CC {
 	
 	/// A datum source.
 	public enum Source : Codable, Equatable, SimplyLowerable {
