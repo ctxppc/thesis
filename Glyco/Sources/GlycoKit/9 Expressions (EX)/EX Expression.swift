@@ -21,22 +21,22 @@ extension EX {
 		func lowered(destination: Lower.Location, context: inout Context) -> Lower.Effect {
 			switch self {
 				
-				case .constant(value: let value):
+				case .constant(let value):
 				return .set(destination, to: .immediate(value))
 				
-				case .location(location: let location):
+				case .location(let location):
 				return .set(destination, to: .location(location))
 				
-				case .binary(.constant(value: let first), let op, .constant(value: let second)):
+				case .binary(.constant(let first), let op, .constant(let second)):
 				return .compute(.immediate(first), op, .immediate(second), to: destination)
 				
-				case .binary(.constant(value: let first), let op, .location(location: let second)):
+				case .binary(.constant(let first), let op, .location(let second)):
 				return .compute(.immediate(first), op, .location(second), to: destination)
 				
-				case .binary(.location(location: let first), let op, .constant(value: let second)):
+				case .binary(.location(let first), let op, .constant(let second)):
 				return .compute(.location(first), op, .immediate(second), to: destination)
 				
-				case .binary(.location(location: let first), let op, .location(location: let second)):
+				case .binary(.location(let first), let op, .location(let second)):
 				return .compute(.location(first), op, .location(second), to: destination)
 				
 				case .binary(let first, let op, let second):
@@ -60,6 +60,5 @@ extension EX {
 		}
 		
 	}
-	
 	
 }
