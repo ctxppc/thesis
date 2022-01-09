@@ -61,6 +61,5 @@ extension EX {
 		
 	}
 	
-	public typealias BinaryOperator = Lower.BinaryOperator
 	
 }

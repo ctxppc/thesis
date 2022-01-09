@@ -4,9 +4,9 @@ extension RV {
 	
 	/// An arithmetic operator over two registers.
 	public enum BinaryOperator : String, Equatable, Codable {
-		case add, subtract = "sub"
+		case add, sub
 		case and, or, xor
-		case leftShift = "sll", zeroExtendingRightShift = "srl", msbExtendingRightShift = "sra"
+		case sll, srl, sra
 	}
 	
 }

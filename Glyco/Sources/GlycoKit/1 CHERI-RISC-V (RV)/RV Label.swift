@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// An identifier that can be used to jump execution to.
-	public struct Label : Codable, RawRepresentable, Hashable {
+	public struct Label : RawCodable, ExpressibleByStringLiteral, Hashable {
 		
 		/// The program entry label.
 		public static let programEntry = Self(rawValue: "main")
@@ -14,6 +14,11 @@ extension RV {
 		// See protocol.
 		public init(rawValue: String) {
 			self.rawValue = rawValue
+		}
+		
+		// See protocol.
+		public init(stringLiteral: String) {
+			self.init(rawValue: stringLiteral)
 		}
 		
 		// See protocol.

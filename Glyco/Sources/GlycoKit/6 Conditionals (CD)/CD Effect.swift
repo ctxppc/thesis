@@ -121,8 +121,8 @@ extension CD {
 				case .set(let destination, to: .location(let source)) where source == destination,
 					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
-					.compute(.location(let source), .subtract, .immediate(0), to: let destination) where source == destination,
-					.compute(.immediate(0), .subtract, .location(let source), to: let destination) where source == destination:
+					.compute(.location(let source), .sub, .immediate(0), to: let destination) where source == destination,
+					.compute(.immediate(0), .sub, .location(let source), to: let destination) where source == destination:
 				return .do([])
 				
 				case .if(.constant(true), then: let affirmative, else: _):

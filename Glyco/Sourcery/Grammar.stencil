@@ -23,6 +23,14 @@ N/A
 {% endfor %}
 </dl>
 {% endfor %}
+{% for codableType in types.based.RawCodable where codableType.name|hasPrefix:lang.type.name %}
+<dl>
+<dt><code>{{codableType.name}}</code></dt>
+{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
+<dd><code>{{initialiser.parameters[0].typeName}}</code></dd>
+{% endfor %}
+</dl>
+{% endfor %}
 
 {% for name, lang in lang.type.typealiases where name == "Lower" %}
 {% include "Grammar.stencil" %}

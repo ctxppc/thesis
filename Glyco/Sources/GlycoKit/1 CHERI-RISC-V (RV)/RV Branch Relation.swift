@@ -6,52 +6,52 @@ extension RV {
 	public enum BranchRelation : String, Equatable, Codable {
 		
 		/// The branch is taken if the values are equal.
-		case equal = "eq"
+		case eq
 		
 		/// The branch is taken if the values are not equal.
-		case unequal = "ne"
+		case ne
 		
 		/// The branch is taken if the first value is less than the second value.
-		case less = "lt"
+		case lt
 		
 		/// The branch is taken if the first value is greater than or equal to the second value.
-		case lessOrEqual = "le"
+		case le
 		
 		/// The branch is taken if the first value is less than the second value.
-		case greater = "gt"
+		case gt
 		
 		/// The branch is taken if the first value is greater than or equal to the second value.
-		case greaterOrEqual = "ge"
+		case ge
 		
 		/// Returns a relation *R* such that *x* *R* *y* iff ¬(*x* `self` *y*).
 		public var negated: Self {
 			switch self {
-				case .equal:			return .unequal
-				case .unequal:			return .equal
-				case .less:				return .greaterOrEqual
-				case .lessOrEqual:		return .greater
-				case .greater:			return .lessOrEqual
-				case .greaterOrEqual:	return .less
+				case .eq:	return .ne
+				case .ne:	return .eq
+				case .lt:	return .ge
+				case .le:	return .gt
+				case .gt:	return .le
+				case .ge:	return .lt
 			}
 		}
 		
 		/// Returns a function that determines whether `self` holds over two given integers.
 		public var holds: (Int, Int) -> Bool {
 			switch self {
-				case .equal:			return (==)
-				case .unequal:			return (!=)
-				case .less:				return (<)
-				case .lessOrEqual:		return (<=)
-				case .greater:			return (>)
-				case .greaterOrEqual:	return (>=)
+				case .eq:	return (==)
+				case .ne:	return (!=)
+				case .lt:	return (<)
+				case .le:	return (<=)
+				case .gt:	return (>)
+				case .ge:	return (>=)
 			}
 		}
 		
 		/// Returns a Boolean value indicating whether `self` holds when given two integers that are the same.
 		public var reflexive: Bool {
 			switch self {
-				case .equal, .lessOrEqual, .greaterOrEqual:	return true
-				case .unequal, .less, .greater:				return false
+				case .eq, .le, .ge:	return true
+				case .ne, .lt, .gt:	return false
 			}
 		}
 		

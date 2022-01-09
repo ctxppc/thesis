@@ -71,9 +71,9 @@ final class ArithmeticTests : XCTestCase {
 		
 		let program = AL.Program(
 			.do([
-				.compute(.immediate(12), .subtract, .immediate(11), to: .abstract(testedNumber)),
+				.compute(.immediate(12), .sub, .immediate(11), to: .abstract(testedNumber)),
 				.if(
-					.relation(.location(.abstract(testedNumber)), .equal, .immediate(1)),
+					.relation(.location(.abstract(testedNumber)), .eq, .immediate(1)),
 					then:	isEven <- .immediate(1),
 					else:	isEven <- .immediate(0)
 				),

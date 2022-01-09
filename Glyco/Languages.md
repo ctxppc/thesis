@@ -43,6 +43,7 @@ A program written in some language `XY` should be stored in a file with extensio
 A language that introduces structural value expressions, thereby abstracting over simple computation effects.
 
 **Inherited from PA:**
+<code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
@@ -184,6 +185,10 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dt><code>AL.Source</code></dt>
 <dd><code><strong>immediate</strong>(Int)</code></dd>
 <dd><code><strong>location</strong>(Location)</code></dd>
+</dl>
+<dl>
+<dt><code>AL.AbstractLocation</code></dt>
+<dd><code>String</code></dd>
 </dl>
 
 
@@ -441,22 +446,22 @@ N/A
 <dl>
 <dt><code>RV.BinaryOperator</code></dt>
 <dd><code><strong>add</strong></code></dd>
-<dd><code><strong>subtract</strong></code></dd>
+<dd><code><strong>sub</strong></code></dd>
 <dd><code><strong>and</strong></code></dd>
 <dd><code><strong>or</strong></code></dd>
 <dd><code><strong>xor</strong></code></dd>
-<dd><code><strong>leftShift</strong></code></dd>
-<dd><code><strong>zeroExtendingRightShift</strong></code></dd>
-<dd><code><strong>msbExtendingRightShift</strong></code></dd>
+<dd><code><strong>sll</strong></code></dd>
+<dd><code><strong>srl</strong></code></dd>
+<dd><code><strong>sra</strong></code></dd>
 </dl>
 <dl>
 <dt><code>RV.BranchRelation</code></dt>
-<dd><code><strong>equal</strong></code></dd>
-<dd><code><strong>unequal</strong></code></dd>
-<dd><code><strong>less</strong></code></dd>
-<dd><code><strong>lessOrEqual</strong></code></dd>
-<dd><code><strong>greater</strong></code></dd>
-<dd><code><strong>greaterOrEqual</strong></code></dd>
+<dd><code><strong>eq</strong></code></dd>
+<dd><code><strong>ne</strong></code></dd>
+<dd><code><strong>lt</strong></code></dd>
+<dd><code><strong>le</strong></code></dd>
+<dd><code><strong>gt</strong></code></dd>
+<dd><code><strong>ge</strong></code></dd>
 </dl>
 <dl>
 <dt><code>RV.DataType</code></dt>
@@ -478,10 +483,6 @@ N/A
 <dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
 <dd><code><strong>return</strong></code></dd>
 <dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
-</dl>
-<dl>
-<dt><code>RV.Label</code></dt>
-<dd><code>(<strong>rawValue:</strong> String)</code></dd>
 </dl>
 <dl>
 <dt><code>RV.Program</code></dt>
@@ -521,6 +522,10 @@ N/A
 <dd><code><strong>t4</strong></code></dd>
 <dd><code><strong>t5</strong></code></dd>
 <dd><code><strong>t6</strong></code></dd>
+</dl>
+<dl>
+<dt><code>RV.Label</code></dt>
+<dd><code>String</code></dd>
 </dl>
 
 

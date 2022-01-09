@@ -23,11 +23,11 @@ public func + (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
 }
 
 public func - (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {
-	.registerRegister(lhs, .subtract, rhs)
+	.registerRegister(lhs, .sub, rhs)
 }
 
 public func - (lhs: FL.Register, rhs: Int) -> FL.BinaryExpression {
-	.registerImmediate(lhs, .subtract, rhs)
+	.registerImmediate(lhs, .sub, rhs)
 }
 
 public func & (lhs: FL.Register, rhs: FL.Register) -> FL.BinaryExpression {

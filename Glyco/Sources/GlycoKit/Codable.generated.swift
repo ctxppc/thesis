@@ -8,12 +8,6 @@ extension AL.Program {
 	}
 }
 
-extension AL.AbstractLocation {
-	public enum CodingKeys : String, CodingKey {
-		case rawValue = "rawValue"
-	}
-}
-
 extension AL.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -105,12 +99,6 @@ extension PR.Program {
 extension RV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case instructions = "instructions"
-	}
-}
-
-extension RV.Label {
-	public enum CodingKeys : String, CodingKey {
-		case rawValue = "rawValue"
 	}
 }
 
