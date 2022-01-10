@@ -13,7 +13,7 @@ extension LS {
 			if let location = locationsBySymbol[symbol] {
 				return location
 			} else {
-				let location = Lower.Location(rawValue: "\(locationsBySymbol.count)\(symbol.rawValue)")
+				let location = Lower.Location(rawValue: "\(symbol.rawValue)_\(locationsBySymbol.count)")
 				locationsBySymbol[symbol] = location
 				return location
 			}

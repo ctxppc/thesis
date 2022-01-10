@@ -1,10 +1,10 @@
 (
-	call(fib, constant(0) constant(1) constant(30)),
-	procedures: 
+	evaluate(fib, constant(0) constant(1) constant(30)),
+	functions:
 		(fib, (prev, word) (curr, word) (iter, word),
-			if(relation(location(iter), le, constant(0)),
-				then:	return(location(curr)),
-				else:	call(fib, location(curr) binary(location(prev), add, location(curr)) binary(location(iter), sub, constant(1)))
+			if(relation(symbol(iter), le, constant(0)),
+				then:	value(symbol(curr)),
+				else:	evaluate(fib, symbol(curr) binary(symbol(prev), add, symbol(curr)) binary(symbol(iter), sub, constant(1)))
 			)
 		)
 )
