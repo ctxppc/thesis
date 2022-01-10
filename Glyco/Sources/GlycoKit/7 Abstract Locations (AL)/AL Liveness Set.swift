@@ -26,6 +26,13 @@ extension AL {
 			self.possiblyAliveLocations.formUnion(other.possiblyAliveLocations)
 		}
 		
+		/// Returns the union of the possibly alive locations from `self` and `otherGraph`.
+		func union(_ otherGraph: Self) -> Self {
+			var copy = self
+			copy.formUnion(with: otherGraph)
+			return copy
+		}
+		
 	}
 	
 }

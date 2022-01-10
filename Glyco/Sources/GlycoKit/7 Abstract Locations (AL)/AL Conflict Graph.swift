@@ -37,6 +37,13 @@ extension AL {
 			}
 		}
 		
+		/// Returns the union of the conflicting location pairs from `self` and `otherGraph`.
+		func union(_ otherGraph: Self) -> Self {
+			var copy = self
+			copy.formUnion(with: otherGraph)
+			return copy
+		}
+		
 		/// Returns the locations in the graph, ordered by increasing number of conflicts.
 		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
 			conflictingLocationsForLocation

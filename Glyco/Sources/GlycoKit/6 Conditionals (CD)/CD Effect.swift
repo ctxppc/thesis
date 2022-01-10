@@ -226,7 +226,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			let affirmativeLabel = context.allocateBlockLabel()
 			let negativeLabel = context.allocateBlockLabel()
 			let restLabel = rest.doesNothing ? exitLabel : context.allocateBlockLabel()
-			let conditionalBlocks = predicate.lowered(
+			let conditionalBlocks = try predicate.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
 				previousEffects:	previousEffects,

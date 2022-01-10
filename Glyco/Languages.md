@@ -443,6 +443,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>CD.Procedure</code></dt>

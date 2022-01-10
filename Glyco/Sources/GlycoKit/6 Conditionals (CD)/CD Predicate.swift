@@ -14,6 +14,9 @@ extension CD {
 		/// A predicate that evaluates to `then` if the first given predicate holds, or to `else` otherwise.
 		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
+		/// A predicate that performs some effect then evaluates to `then`.
+		indirect case `do`([Effect], then: Predicate)
+		
 		/// Returns a copy of `self` that may be more optimised.
 		func optimised() -> Self {
 			switch self {
@@ -41,6 +44,9 @@ extension CD {
 					return .if(condition, then: affirmative.optimised(), else: negative.optimised())
 				}
 				
+				case .do(let effects, then: let predicate):
+				return .do(effects, then: predicate.optimised())
+				
 				default:
 				return self
 				
@@ -63,7 +69,7 @@ extension CD {
 			previousEffects:	[Lower.Effect],
 			affirmativeTarget:	Lower.Label,
 			negativeTarget:		Lower.Label
-		) -> [Lower.Block] {
+		) throws -> [Lower.Block] {
 			switch self {
 				
 				case .constant(let holds):
@@ -75,21 +81,21 @@ extension CD {
 				case .if(let condition, then: let affirmative, else: let negative):
 				let intermediateAffirmative = context.allocateBlockLabel()
 				let intermediateNegative = context.allocateBlockLabel()
-				let conditionBlocks = condition.lowered(
+				let conditionBlocks = try condition.lowered(
 					in:					&context,
 					entryLabel:			entryLabel,
 					previousEffects:	previousEffects,
 					affirmativeTarget:	intermediateAffirmative,
 					negativeTarget:		intermediateNegative
 				)
-				let affirmativeBlocks = affirmative.lowered(
+				let affirmativeBlocks = try affirmative.lowered(
 					in:					&context,
 					entryLabel:			intermediateAffirmative,
 					previousEffects:	[],
 					affirmativeTarget:	affirmativeTarget,
 					negativeTarget:		negativeTarget
 				)
-				let negativeBlocks = negative.lowered(
+				let negativeBlocks = try negative.lowered(
 					in:					&context,
 					entryLabel:			intermediateNegative,
 					previousEffects:	[],
@@ -97,6 +103,21 @@ extension CD {
 					negativeTarget:		negativeTarget
 				)
 				return conditionBlocks + affirmativeBlocks + negativeBlocks
+				
+				case .do(let effects, then: let predicate):
+				let predicateLabel = context.allocateBlockLabel()
+				return try Effect.do(effects).lowered(
+					in:					&context,
+					entryLabel:			entryLabel,
+					previousEffects:	previousEffects,
+					exitLabel:			predicateLabel
+				) + predicate.lowered(
+					in:					&context,
+					entryLabel:			predicateLabel,
+					previousEffects:	[],
+					affirmativeTarget:	affirmativeTarget,
+					negativeTarget:		negativeTarget
+				)
 				
 			}
 		}

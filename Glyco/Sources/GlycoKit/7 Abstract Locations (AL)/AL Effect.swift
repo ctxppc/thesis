@@ -78,15 +78,15 @@ extension AL {
 				case .set, .compute, .call, .return:
 				break	// already dealt with defined & used locations above
 				
-				case .if(_ /* already dealt with */, then: let affirmative, else: let negative):
+				case .if(let predicate, then: let affirmative, else: let negative):
 				let (livenessAtAffirmativeEntry, conflictsAtAffirmativeEntry) =
 					affirmative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
 				let (livenessAtNegativeEntry, conflictsAtNegativeEntry) =
 					negative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
-				livenessAtEntry.formUnion(with: livenessAtAffirmativeEntry)
-				livenessAtEntry.formUnion(with: livenessAtNegativeEntry)
-				conflictsAtEntry.formUnion(with: conflictsAtAffirmativeEntry)
-				conflictsAtEntry.formUnion(with: conflictsAtNegativeEntry)
+				let livenessAtBodyEntry = livenessAtAffirmativeEntry.union(livenessAtNegativeEntry)
+				let conflictsAtBodyEntry = conflictsAtAffirmativeEntry.union(conflictsAtNegativeEntry)
+				(livenessAtEntry, conflictsAtEntry)
+					= predicate.livenessAndConflictsAtEntry(livenessAtExit: livenessAtBodyEntry, conflictsAtExit: conflictsAtBodyEntry)
 				
 			}
 			
@@ -114,6 +114,7 @@ extension AL {
 				case .do,
 						.set(_, to: .immediate),
 						.compute(.immediate, _, .immediate, to: _),
+						.if,
 						.return(result: .immediate):
 				return []
 				
@@ -125,9 +126,6 @@ extension AL {
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _):
 				return [lhs, rhs]
-				
-				case .if(let predicate, then: _, else: _):
-				return predicate.usedLocations()
 				
 				case .call(_, let arguments):
 				return .init(arguments.map { .parameter($0) })
