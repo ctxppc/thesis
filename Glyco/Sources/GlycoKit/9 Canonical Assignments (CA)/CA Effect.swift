@@ -37,7 +37,7 @@ extension CA {
 				return .compute(lhs, op, rhs, to: destination)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate, then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let name, let arguments):
 				return .call(name, arguments)

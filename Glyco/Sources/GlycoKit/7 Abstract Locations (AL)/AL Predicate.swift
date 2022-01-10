@@ -14,6 +14,9 @@ extension AL {
 		/// A predicate that evaluates to `then` if the predicate holds, or to `else` otherwise.
 		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
+		/// A predicate that performs some effect then evaluates to `then`.
+		indirect case `do`([Effect], then: Predicate)
+		
 		// See protocol.
 		func lowered(in context: inout LocalContext) throws -> Lower.Predicate {
 			switch self {
@@ -26,6 +29,9 @@ extension AL {
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+
+				case .do(let effects, then: let predicate):
+				TODO.unimplemented
 				
 			}
 		}
@@ -45,6 +51,9 @@ extension AL {
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				return condition.usedLocations().union(affirmative.usedLocations()).union(negative.usedLocations())
+				
+				case .do(let effects, then: let predicate):
+				TODO.unimplemented
 				
 			}
 		}

@@ -36,7 +36,6 @@ public enum CV : Language {
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter
-	public typealias Predicate = Lower.Predicate
 	public typealias Source = Lower.Source
 	
 }

@@ -37,20 +37,23 @@ extension CV {
 				return .set(destination, to: .binary(lhs, op, rhs))
 				
 				case .set(let destination, to: .if(let predicate, then: let affirmative, else: let negative)):
-				return .if(
-					predicate,
-					then: try Self.set(destination, to: affirmative).lowered(in: &context),
-					else: try Self.set(destination, to: negative).lowered(in: &context)
+				return try .if(
+					predicate.lowered(in: &context),
+					then: Self.set(destination, to: affirmative).lowered(in: &context),
+					else: Self.set(destination, to: negative).lowered(in: &context)
 				)
 				
 				case .set(let destination, to: .do(let effects, then: let source)):
 				return try .do(effects.lowered(in: &context) + [Self.set(destination, to: source).lowered(in: &context)])
 				
+				case .set(.init(rawValue: "result"), to: .call):	// TODO
+				return .do([])
+				
 				case .set(_, to: .call):
 				throw LoweringError.intermediateCall
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate, then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let name, let arguments):
 				return .call(name, arguments)

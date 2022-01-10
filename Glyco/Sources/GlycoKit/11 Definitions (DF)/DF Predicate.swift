@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension CC {
+extension DF {
 	
 	/// A value that can be used in a conditional.
 	public enum Predicate : Codable, Equatable, SimplyLowerable {
@@ -14,8 +14,8 @@ extension CC {
 		/// A predicate that evaluates to `then` if the predicate holds, or to `else` otherwise.
 		indirect case `if`(Predicate, then: Predicate, else: Predicate)
 		
-		/// A predicate that performs some effect then evaluates to `then`.
-		indirect case `do`([Effect], then: Predicate)
+		/// A predicate that evaluates to given predicate after associating zero or more values with a name.
+		indirect case `let`([Definition], in: Predicate)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Predicate {
@@ -25,13 +25,13 @@ extension CC {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				return try .relation(lhs.lowered(in: &context), relation, rhs.lowered(in: &context))
+				return .relation(lhs, relation, rhs)
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .do(let effects, then: let predicate):
-				return try .do(effects.lowered(in: &context), then: predicate.lowered(in: &context))
+				case .let(let definitions, in: let predicate):
+				return try .do(definitions.lowered(in: &context), then: predicate.lowered(in: &context))
 				
 			}
 		}

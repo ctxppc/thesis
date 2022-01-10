@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension CC {
+extension CV {
 	
 	/// A value that can be used in a conditional.
 	public enum Predicate : Codable, Equatable, SimplyLowerable {
@@ -25,7 +25,7 @@ extension CC {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				return try .relation(lhs.lowered(in: &context), relation, rhs.lowered(in: &context))
+				return .relation(lhs, relation, rhs)
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

@@ -3,6 +3,7 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
+[`EX`](#EX) →
 [`LS`](#LS) →
 [`DF`](#DF) →
 [`CV`](#CV) →
@@ -58,6 +59,48 @@ A program written in some language `XY` should be stored in a file with extensio
 </dl>
 
 
+<h2 id="EX">Grammar for EX (Expressions)</h2>
+A language that introduces expression semantics for values, thereby abstracting over computation effects.
+
+**Inherited from LS:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Context</code>, 
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>Symbol</code>
+
+<dl>
+<dt><code>EX.Definition</code></dt>
+<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Function</code></dt>
+<dd><code>(Label, [Parameter], Value)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Program</code></dt>
+<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Value</code></dt>
+<dd><code><strong>constant</strong>(Int)</code></dd>
+<dd><code><strong>symbol</strong>(Symbol)</code></dd>
+<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+</dl>
+
+
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
 A language that introduces lexical scopes of definitions
 
@@ -84,6 +127,7 @@ A language that introduces lexical scopes of definitions
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>LS.Program</code></dt>
@@ -119,7 +163,6 @@ A language that introduces definitions with function-wide namespacing.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Predicate</code>, 
 <code>Source</code>
 
 <dl>
@@ -129,6 +172,13 @@ A language that introduces definitions with function-wide namespacing.
 <dl>
 <dt><code>DF.Function</code></dt>
 <dd><code>(Label, [Parameter], Value)</code></dd>
+</dl>
+<dl>
+<dt><code>DF.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>DF.Program</code></dt>
@@ -155,7 +205,6 @@ A language that allows computation to be attached to an assigned value.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Predicate</code>, 
 <code>Source</code>
 
 <dl>
@@ -165,6 +214,13 @@ A language that allows computation to be attached to an assigned value.
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
+</dl>
+<dl>
+<dt><code>CV.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>CV.Procedure</code></dt>
@@ -195,7 +251,6 @@ A language that groups all effects that write to a location under one canonical 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Predicate</code>, 
 <code>Source</code>
 
 <dl>
@@ -205,6 +260,13 @@ A language that groups all effects that write to a location under one canonical 
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
+</dl>
+<dl>
+<dt><code>CA.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>CA.Procedure</code></dt>
@@ -249,6 +311,7 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>CC.Procedure</code></dt>
@@ -299,6 +362,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>constant</strong>(Bool)</code></dd>
 <dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Procedure</code></dt>

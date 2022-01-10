@@ -8,28 +8,14 @@ final class SispCodingTests : XCTestCase {
 	
 	func testEncodingEX() throws {
 		
-		let location = EX.Location(rawValue: "a")
 		let program = EX.Program(
-			.do([
-				.if(
-					.constant(true),
-					then:	.set(location, to: .constant(1))
-				),
-				.return(.location(location)),
-			]),
-			procedures:	[]
+			.if(.constant(true), then: .constant(3), else: .constant(4)),
+			functions:	[]
 		)
 		
 		let actual = try SispEncoder().encode(program).serialised()
 		let expected = """
-			(
-				
-					do(
-						
-							if( constant( true), then: set( a, to: constant( 1)), else: do())
-							return( location( a))
-					)
-			)
+			( if( constant( true), then: constant( 3), else: constant( 4)))
 			"""
 		
 		XCTAssertEqual(actual, expected)
@@ -40,28 +26,14 @@ final class SispCodingTests : XCTestCase {
 		
 		let actual = try SispDecoder(from: """
 			(
-				do(
-					if(
-						constant(true),
-						then:	set(a, to: constant(1)),
-						else:	do()
-					)
-					return(location(a))
-				),
-				procedures:
+				if(constant(true), then: constant(3), else: constant(4)),
+				functions:
 			)
 			""").decode(EX.Program.self)
 		
-		let location = EX.Location(rawValue: "a")
 		let expected = EX.Program(
-			.do([
-				.if(
-					.constant(true),
-					then:	.set(location, to: .constant(1))
-				),
-				.return(.location(location)),
-			]),
-			procedures:	[]
+			.if(.constant(true), then: .constant(3), else: .constant(4)),
+			functions:	[]
 		)
 		
 		XCTAssertEqual(actual, expected)

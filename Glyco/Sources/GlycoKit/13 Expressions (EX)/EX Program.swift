@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Definitions
-//sourcery: description = A language that introduces definitions with function-wide namespacing.
-public enum DF : Language {
+//sourcery: longname = Expressions
+//sourcery: description = "A language that introduces expression semantics for values, thereby abstracting over computation effects."
+public enum EX : Language {
 	
-	/// A program on a DF machine.
+	/// A program on an EX machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ result: Value, functions: [Function]) {
@@ -20,20 +20,13 @@ public enum DF : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			let resultValue = Location(rawValue: "result")
-			return try .init(
-				.do([
-					.set(resultValue, to: result.lowered()),
-					.return(.location(resultValue))
-				]),
-				procedures: functions.lowered()
-			)
+			try .init(result.lowered(), functions: functions.lowered())
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = CV
+	public typealias Lower = LS
 	
 	typealias Context = ()
 	
@@ -41,8 +34,7 @@ public enum DF : Language {
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Label = Lower.Label
-	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter
-	public typealias Source = Lower.Source
+	public typealias Symbol = Lower.Symbol
 	
 }
