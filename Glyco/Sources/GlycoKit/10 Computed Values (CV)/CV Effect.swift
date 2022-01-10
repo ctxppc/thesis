@@ -46,9 +46,6 @@ extension CV {
 				case .set(let destination, to: .do(let effects, then: let source)):
 				return try .do(effects.lowered(in: &context) + [Self.set(destination, to: source).lowered(in: &context)])
 				
-				case .set(.init(rawValue: "result"), to: .call):	// TODO
-				return .do([])
-				
 				case .set(_, to: .call):
 				throw LoweringError.intermediateCall
 				

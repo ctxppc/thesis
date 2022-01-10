@@ -7,13 +7,13 @@ public enum LS : Language {
 	/// A program on a LS machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Value, functions: [Function]) {
+		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
 		}
 		
 		/// The program's result.
-		public var result: Value
+		public var result: Result
 		
 		/// The program's functions.
 		public var functions: [Function]

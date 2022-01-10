@@ -7,27 +7,20 @@ public enum DF : Language {
 	/// A program on a DF machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Value, functions: [Function]) {
+		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
 		}
 		
 		/// The program's result.
-		public var result: Value
+		public var result: Result
 		
 		/// The program's functions.
 		public var functions: [Function]
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			let resultValue = Location(rawValue: "result")
-			return try .init(
-				.do([
-					.set(resultValue, to: result.lowered()),
-					.return(.location(resultValue))
-				]),
-				procedures: functions.lowered()
-			)
+			try .init(result.lowered(), procedures: functions.lowered())
 		}
 		
 	}

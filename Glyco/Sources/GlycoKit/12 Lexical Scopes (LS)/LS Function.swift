@@ -5,7 +5,7 @@ extension LS {
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
 		
-		public init(_ name: Label, _ parameters: [Parameter], _ result: Value) {
+		public init(_ name: Label, _ parameters: [Parameter], _ result: Result) {
 			self.name = name
 			self.parameters = parameters
 			self.result = result
@@ -18,7 +18,7 @@ extension LS {
 		public var parameters: [Parameter]
 		
 		/// The function's result, in terms of its parameters.
-		public var result: Value
+		public var result: Result
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Function {

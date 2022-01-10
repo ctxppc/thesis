@@ -11,7 +11,7 @@ final class ProcedureTests : XCTestCase {
 		let source = EX.Program(
 			.evaluate(fortyTwo, []),
 			functions:	[
-				.init(fortyTwo, [], .constant(42))
+				.init(fortyTwo, [], .value(.constant(42)))
 			]
 		)
 		
@@ -54,7 +54,8 @@ final class ProcedureTests : XCTestCase {
 						li gp, 1
 						j _exit
 						
-		fortytwo:		addi a0, zero, 42
+		fortytwo:		addi s1, zero, 42
+						mv a0, s1
 						ret
 		main:			j fortytwo
 						

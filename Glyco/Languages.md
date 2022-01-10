@@ -77,7 +77,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 <dt><code>EX.Function</code></dt>
-<dd><code>(Label, [Parameter], Value)</code></dd>
+<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
 <dt><code>EX.Predicate</code></dt>
@@ -88,7 +88,14 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 <dt><code>EX.Program</code></dt>
-<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>EX.Result</code></dt>
+<dd><code><strong>value</strong>(Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 <dt><code>EX.Value</code></dt>
@@ -96,7 +103,6 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dd><code><strong>symbol</strong>(Symbol)</code></dd>
 <dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 <dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 </dl>
 
@@ -116,7 +122,7 @@ A language that introduces lexical scopes of definitions
 </dl>
 <dl>
 <dt><code>LS.Function</code></dt>
-<dd><code>(Label, [Parameter], Value)</code></dd>
+<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
 <dt><code>LS.Parameter</code></dt>
@@ -131,7 +137,14 @@ A language that introduces lexical scopes of definitions
 </dl>
 <dl>
 <dt><code>LS.Program</code></dt>
-<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Result</code></dt>
+<dd><code><strong>value</strong>(Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 <dt><code>LS.Source</code></dt>
@@ -171,7 +184,7 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 <dl>
 <dt><code>DF.Function</code></dt>
-<dd><code>(Label, [Parameter], Value)</code></dd>
+<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
 <dt><code>DF.Predicate</code></dt>
@@ -182,7 +195,14 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 <dl>
 <dt><code>DF.Program</code></dt>
-<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>DF.Result</code></dt>
+<dd><code><strong>value</strong>(Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 <dt><code>DF.Value</code></dt>
