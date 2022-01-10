@@ -15,18 +15,34 @@ A program written in some language `XY` should be stored in a file with extensio
 
 ## Shared Grammar
 <dl>
-	<dt><code>[<var>N</var>]</code> for some nonterminal <var>N</var></dt>
-	<dd>Zero or more productions of <var>N</var>, each separated by whitespace (spaces, tabs, newlines, paragraph terminators, etc.).</dd>
+	<dt><code>[<var>N</var>]</code> for any <var>N</var></dt>
+	<dd>ε</dd>
+	<dd><code><var>N</var> [<var>N</var>]</code></dd>
 	<dt><code>Bool</code></dt>
 	<dd><code>true</code></dd>
 	<dd><code>"true"</code></dd>
 	<dd><code>false</code></dd>
 	<dd><code>"false"</code></dd>
 	<dt><code>Int</code></dt>
-	<dd>One or more characters between 0 and 9, inclusive, optionally prefixed by <kbd>-</kbd>. The value must be representable in the C <code>int</code> type of the compiling machine.</dd>
+	<dd><code>digits</code></dd>
+	<dd><kbd>-</kbd><code>digits</code></dd>
+	<dt><code>digits</code></dt>
+	<dd><code>digit</code></dd>
+	<dd><code>digit</code><code>digits</code></dd>
+	<dt><code>digit</code></dt>
+	<dd>Any character between 0 and 9.</dd>
 	<dt><code>String</code></dt>
-	<dd>A letter (Unicode General Category L* and M*) or underscore <kbd>_</kbd>, followed by any number of alphanumeric characters (Unicode General Categories L*, M*, and N*) or underscores <kbd>_</kbd>.</dd>
-	<dd>Zero or more characters enclosed in double-quotes <kbd>"</kbd>, with any occurrences of the double-quote character <kbd>"</kbd> in the string content replaced with two instances of the same, i.e., <kbd>""</kbd>.</dd>
+	<dd><code>id</code></dd>
+	<dd>Zero or more printable characters enclosed in double-quotes <kbd>"</kbd>, with any occurrences of the double-quote character <kbd>"</kbd> in the string content replaced with two instances of the same, i.e., <kbd>""</kbd>.</dd>
+	<dt><code>id</code></dt>
+	<dd><code>idstart</code></dd>
+	<dd><code>idstart</code><code>id</code></dd>
+	<dt><code>idstart</code></dt>
+	<dd>A character from Unicode General Category L* or M*.</dd>
+	<dd><kbd>_</kbd></dd>
+	<dt><code>idtail</code></dt>
+	<dd>A character from Unicode General Category L*, M*, or N*.</dd>
+	<dd><kbd>_</kbd></dd>
 </dl>
 
 {% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}

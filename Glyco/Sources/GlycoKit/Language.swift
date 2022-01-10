@@ -6,7 +6,7 @@ import Sisp
 /// The highest intermediate language supported by GlycoKit.
 ///
 /// Update this typealias whenever a higher language is added.
-public typealias HighestSupportedLanguage = EX
+public typealias HighestSupportedLanguage = LS
 
 public protocol Language {
 	

@@ -21,6 +21,21 @@ extension BB.Program {
 	}
 }
 
+extension CA.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "_0"
+		case procedures = "procedures"
+	}
+}
+
+extension CA.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "_1"
+		case effect = "_2"
+	}
+}
+
 extension CC.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
@@ -57,18 +72,62 @@ extension CD.Procedure {
 	}
 }
 
-extension EX.Program {
+extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
-		case body = "_0"
+		case effect = "_0"
 		case procedures = "procedures"
 	}
 }
 
-extension EX.Procedure {
+extension CV.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case parameters = "_1"
-		case body = "_2"
+		case effect = "_2"
+	}
+}
+
+extension DF.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+	}
+}
+
+extension DF.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension DF.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "_1"
+		case result = "_2"
+	}
+}
+
+extension EX.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+	}
+}
+
+extension EX.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension EX.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "_1"
+		case result = "_2"
 	}
 }
 
@@ -87,6 +146,35 @@ extension FO.Program {
 extension FO.HaltEffect {
 	public enum CodingKeys : String, CodingKey {
 		case result = "result"
+	}
+}
+
+extension LS.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+	}
+}
+
+extension LS.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
+	}
+}
+
+extension LS.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "_1"
+		case result = "_2"
+	}
+}
+
+extension LS.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 

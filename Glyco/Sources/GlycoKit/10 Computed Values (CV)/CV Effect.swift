@@ -1,0 +1,75 @@
+// Glyco © 2021–2022 Constantino Tsarouhas
+
+import DepthKit
+import Foundation
+
+extension CV {
+	
+	/// An effect on a CV machine.
+	public enum Effect : Codable, Equatable, SimplyLowerable {
+		
+		/// An effect that performs `effects`.
+		case `do`([Effect])
+		
+		/// An effect that retrieves the value from given source and puts it in given location.
+		case set(Location, to: Value)
+		
+		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
+		indirect case `if`(Predicate, then: Effect, else: Effect)
+		
+		/// An effect that invokes the labelled procedure passing given arguments.
+		case call(Label, [Source])
+		
+		/// An effect that terminates the program with `result`.
+		case `return`(Source)
+		
+		// See protocol.
+		func lowered(in context: inout Context) throws -> Lower.Effect {
+			switch self {
+				
+				case .do(let effects):
+				return .do(try effects.lowered(in: &context))
+				
+				case .set(let destination, to: .source(let source)):
+				return .set(destination, to: .source(source))
+					
+				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
+				return .set(destination, to: .binary(lhs, op, rhs))
+				
+				case .set(let destination, to: .if(let predicate, then: let affirmative, else: let negative)):
+				return .if(
+					predicate,
+					then: try Self.set(destination, to: affirmative).lowered(in: &context),
+					else: try Self.set(destination, to: negative).lowered(in: &context)
+				)
+				
+				case .set(let destination, to: .do(let effects, then: let source)):
+				return try .do(effects.lowered(in: &context) + [Self.set(destination, to: source).lowered(in: &context)])
+				
+				case .set(_, to: .call):
+				throw LoweringError.intermediateCall
+				
+				case .if(let predicate, then: let affirmative, else: let negative):
+				return try .if(predicate, then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				
+				case .call(let name, let arguments):
+				return .call(name, arguments)
+				
+				case .return(let result):
+				return .return(result)
+				
+			}
+		}
+		
+		enum LoweringError : LocalizedError {
+			case intermediateCall
+			var errorDescription: String? {
+				switch self {
+					case .intermediateCall:	return "Procedure call assignments are currently not supported by Glyco"
+				}
+			}
+		}
+		
+	}
+	
+}

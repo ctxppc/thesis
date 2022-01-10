@@ -1,27 +1,26 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Expressions
-//sourcery: description = "A language that introduces structural value expressions, thereby abstracting over simple computation effects."
-public enum EX : Language {
+//sourcery: longname = Canonical Assignments
+//sourcery: description = A language that groups all effects that write to a location under one canonical assignment effect.
+public enum CA : Language {
 	
-	/// A program on an EX machine.
+	/// A program on a CA machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ body: Statement, procedures: [Procedure]) {
-			self.body = body
+		public init(_ effect: Effect, procedures: [Procedure]) {
+			self.effect = effect
 			self.procedures = procedures
 		}
 		
-		/// The program's main body.
-		public var body: Statement
+		/// The program's effect.
+		public var effect: Effect
 		
 		/// The program's procedures.
 		public var procedures: [Procedure]
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context()
-			return try .init(body.lowered(in: &context), procedures: procedures.lowered(in: &context))
+			try .init(effect.lowered(), procedures: procedures.lowered())
 		}
 		
 	}
@@ -29,11 +28,15 @@ public enum EX : Language {
 	// See protocol.
 	public typealias Lower = CC
 	
+	typealias Context = ()
+	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter
+	public typealias Predicate = Lower.Predicate
+	public typealias Source = Lower.Source
 	
 }

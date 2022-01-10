@@ -1,28 +1,28 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension EX {
+extension CA {
 	
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
-		public init(_ name: Label, _ parameters: [Parameter] = [], _ body: Statement) {
+		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
 			self.name = name
 			self.parameters = parameters
-			self.body = body
+			self.effect = effect
 		}
 		
 		/// The name with which the procedure can be invoked.
 		public var name: Label
 		
 		/// The procedure's parameters.
-		public var parameters: [Parameter] = []
+		public var parameters: [Parameter]
 		
-		/// The statement executed when the procedure is invoked.
-		public var body: Statement
+		/// The procedure's effect when invoked.
+		public var effect: Effect
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			.init(name, parameters, try body.lowered(in: &context))
+			.init(name, parameters, try effect.lowered(in: &context))
 		}
 		
 	}

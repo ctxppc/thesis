@@ -3,7 +3,10 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
-[`EX`](#EX) →
+[`LS`](#LS) →
+[`DF`](#DF) →
+[`CV`](#CV) →
+[`CA`](#CA) →
 [`CC`](#CC) →
 [`AL`](#AL) →
 [`CD`](#CD) →
@@ -24,60 +27,197 @@ A program written in some language `XY` should be stored in a file with extensio
 
 ## Shared Grammar
 <dl>
-	<dt><code>[<var>N</var>]</code> for some nonterminal <var>N</var></dt>
-	<dd>Zero or more productions of <var>N</var>, each separated by whitespace (spaces, tabs, newlines, paragraph terminators, etc.).</dd>
+	<dt><code>[<var>N</var>]</code> for any <var>N</var></dt>
+	<dd>ε</dd>
+	<dd><code><var>N</var> [<var>N</var>]</code></dd>
 	<dt><code>Bool</code></dt>
 	<dd><code>true</code></dd>
 	<dd><code>"true"</code></dd>
 	<dd><code>false</code></dd>
 	<dd><code>"false"</code></dd>
 	<dt><code>Int</code></dt>
-	<dd>One or more characters between 0 and 9, inclusive, optionally prefixed by <kbd>-</kbd>. The value must be representable in the C <code>int</code> type of the compiling machine.</dd>
+	<dd><code>digits</code></dd>
+	<dd><kbd>-</kbd><code>digits</code></dd>
+	<dt><code>digits</code></dt>
+	<dd><code>digit</code></dd>
+	<dd><code>digit</code><code>digits</code></dd>
+	<dt><code>digit</code></dt>
+	<dd>Any character between 0 and 9.</dd>
 	<dt><code>String</code></dt>
-	<dd>A letter (Unicode General Category L* and M*) or underscore <kbd>_</kbd>, followed by any number of alphanumeric characters (Unicode General Categories L*, M*, and N*) or underscores <kbd>_</kbd>.</dd>
-	<dd>Zero or more characters enclosed in double-quotes <kbd>"</kbd>, with any occurrences of the double-quote character <kbd>"</kbd> in the string content replaced with two instances of the same, i.e., <kbd>""</kbd>.</dd>
+	<dd><code>id</code></dd>
+	<dd>Zero or more printable characters enclosed in double-quotes <kbd>"</kbd>, with any occurrences of the double-quote character <kbd>"</kbd> in the string content replaced with two instances of the same, i.e., <kbd>""</kbd>.</dd>
+	<dt><code>id</code></dt>
+	<dd><code>idstart</code></dd>
+	<dd><code>idstart</code><code>id</code></dd>
+	<dt><code>idstart</code></dt>
+	<dd>A character from Unicode General Category L* or M*.</dd>
+	<dd><kbd>_</kbd></dd>
+	<dt><code>idtail</code></dt>
+	<dd>A character from Unicode General Category L*, M*, or N*.</dd>
+	<dd><kbd>_</kbd></dd>
 </dl>
 
 
-<h2 id="EX">Grammar for EX (Expressions)</h2>
-A language that introduces structural value expressions, thereby abstracting over simple computation effects.
+<h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
+A language that introduces lexical scopes of definitions
+
+**Inherited from DF:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Label</code>
+
+<dl>
+<dt><code>LS.Definition</code></dt>
+<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Function</code></dt>
+<dd><code>(Label, [Parameter], Value)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Parameter</code></dt>
+<dd><code>(Symbol, DataType)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Program</code></dt>
+<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Source</code></dt>
+<dd><code><strong>constant</strong>(Int)</code></dd>
+<dd><code><strong>symbol</strong>(Symbol)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Value</code></dt>
+<dd><code><strong>source</strong>(Source)</code></dd>
+<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+</dl>
+<dl>
+<dt><code>LS.Symbol</code></dt>
+<dd><code>String</code></dd>
+</dl>
+
+
+<h2 id="DF">Grammar for DF (Definitions)</h2>
+A language that introduces definitions with function-wide namespacing.
+
+**Inherited from CV:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Context</code>, 
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Parameter</code>, 
+<code>Predicate</code>, 
+<code>Source</code>
+
+<dl>
+<dt><code>DF.Definition</code></dt>
+<dd><code>(Location, Value)</code></dd>
+</dl>
+<dl>
+<dt><code>DF.Function</code></dt>
+<dd><code>(Label, [Parameter], Value)</code></dd>
+</dl>
+<dl>
+<dt><code>DF.Program</code></dt>
+<dd><code>(Value, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+<dt><code>DF.Value</code></dt>
+<dd><code><strong>source</strong>(Source)</code></dd>
+<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+</dl>
+
+
+<h2 id="CV">Grammar for CV (Computed Values)</h2>
+A language that allows computation to be attached to an assigned value.
+
+**Inherited from CA:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Context</code>, 
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Parameter</code>, 
+<code>Predicate</code>, 
+<code>Source</code>
+
+<dl>
+<dt><code>CV.Effect</code></dt>
+<dd><code><strong>do</strong>([Effect])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+<dd><code><strong>return</strong>(Source)</code></dd>
+</dl>
+<dl>
+<dt><code>CV.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>CV.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+<dt><code>CV.Value</code></dt>
+<dd><code><strong>source</strong>(Source)</code></dd>
+<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+</dl>
+
+
+<h2 id="CA">Grammar for CA (Canonical Assignments)</h2>
+A language that groups all effects that write to a location under one canonical assignment effect.
 
 **Inherited from CC:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Context</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>Parameter</code>
+<code>Parameter</code>, 
+<code>Predicate</code>, 
+<code>Source</code>
 
 <dl>
-<dt><code>EX.Expression</code></dt>
-<dd><code><strong>constant</strong>(Int)</code></dd>
-<dd><code><strong>location</strong>(Location)</code></dd>
-<dd><code><strong>binary</strong>(Expression, BinaryOperator, Expression)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Expression, <strong>else:</strong> Expression)</code></dd>
+<dt><code>CA.Effect</code></dt>
+<dd><code><strong>do</strong>([Effect])</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Expression, BranchRelation, Expression)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+<dt><code>CA.Procedure</code></dt>
+<dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Statement)</code></dd>
+<dt><code>CA.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Program</code></dt>
-<dd><code>(Statement, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-<dt><code>EX.Statement</code></dt>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Expression)</code></dd>
-<dd><code><strong>do</strong>([Statement])</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Statement, <strong>else:</strong> Statement)</code></dd>
-<dd><code><strong>call</strong>(Label, [Expression])</code></dd>
-<dd><code><strong>return</strong>(Expression)</code></dd>
+<dt><code>CA.Value</code></dt>
+<dd><code><strong>source</strong>(Source)</code></dd>
+<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 </dl>
 
 
