@@ -36,9 +36,9 @@ extension BB {
 				
 				case .final(let label, let effects, result: let result):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.copy(from: result, to: .register(.a0)), .return]
+					return [.labelled(label, first)] + tail + [.set(.register(.a0), to: result), .return]
 				} else {
-					return [.labelled(label, .copy(from: result, to: .register(.a0))), .return]
+					return [.labelled(label, .set(.register(.a0), to: result)), .return]
 				}
 				
 			}

@@ -520,7 +520,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 </dl>
 <dl>
 <dt><code>BB.Effect</code></dt>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
@@ -542,7 +542,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 
 <dl>
 <dt><code>FO.Effect</code></dt>
-<dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>

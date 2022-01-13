@@ -216,7 +216,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.copy(from: source, to: destination)],
+				previousEffects:	previousEffects + [.set(destination, to: source)],
 				exitLabel:			exitLabel
 			)
 			

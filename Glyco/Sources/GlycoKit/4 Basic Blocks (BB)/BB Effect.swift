@@ -6,7 +6,7 @@ extension BB {
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that retrieves the value in `from` and puts it in `to`.
-		case copy(from: Source, to: Location)
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -21,8 +21,8 @@ extension BB {
 		public func lowered(in context: inout ()) -> [Lower.Effect] {
 			switch self {
 				
-				case .copy(from: let source, to: let destination):
-				return [.copy(from: source, to: destination)]
+				case .set(let destination, to: let source):
+				return [.set(destination, to: source)]
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return [.compute(lhs, operation, rhs, to: destination)]

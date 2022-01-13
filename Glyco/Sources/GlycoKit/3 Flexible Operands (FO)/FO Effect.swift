@@ -11,7 +11,7 @@ extension FO {
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that copies the datum from `from` to `to`.
-		case copy(from: Source, to: Location)
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -60,22 +60,22 @@ extension FO {
 			
 			switch self {
 				
-				case .copy(from: .immediate(let imm), to: .register(let dest)):
+				case .set(.register(let dest), to: .immediate(let imm)):
 				return try [dest.lowered() <- imm]
 				
-				case .copy(from: .location(.register(let src)), to: .register(let dest)):
+				case .set(.register(let dest), to: .location(.register(let src))):
 				return try [dest.lowered() <- src.lowered()]
 				
-				case .copy(from: .location(.frameCell(let src)), to: .register(let dest)):
+				case .set(.register(let dest), to: .location(.frameCell(let src))):
 				return try [dest.lowered() <- src]
 				
-				case .copy(from: .immediate(let imm), to: .frameCell(let dest)):
+				case .set(.frameCell(let dest), to: .immediate(let imm)):
 				return [.t1 <- imm, dest <- .t1]
 				
-				case .copy(from: .location(.register(let src)), to: .frameCell(let dest)):
+				case .set(.frameCell(let dest), to: .location(.register(let src))):
 				return try [dest <- src.lowered()]
 				
-				case .copy(from: .location(.frameCell(let src)), to: .frameCell(let dest)):
+				case .set(.frameCell(let dest), to: .location(.frameCell(let src))):
 				return [.t1 <- src, dest <- .t1]
 				
 				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
