@@ -13,7 +13,7 @@ extension FO {
 		public var result: Source
 		
 		// See protocol.
-		public func lowered(in context: inout ()) throws -> Lower.Instruction {
+		public func lowered(in context: inout ()) throws -> Lower.Effect {
 			switch result {
 				case .immediate(let imm):				return .a0 <- imm
 				case .location(.register(let result)):	return try .a0 <- result.lowered()

@@ -7,18 +7,18 @@ public enum FL : Language {
 	/// A program in the base language.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given instructions.
-		public init(_ instructions: [Instruction] = []) {
-			self.instructions = instructions
+		/// Creates a program with given effects.
+		public init(_ effects: [Effect] = []) {
+			self.effects = effects
 		}
 		
-		/// The program's instructions.
-		public var instructions: [Instruction] = []
+		/// The program's effects.
+		public var effects: [Effect] = []
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var frame = Frame()
-			return .init(instructions: try instructions.lowered(in: &frame))
+			return .init(instructions: try effects.lowered(in: &frame))
 		}
 		
 	}

@@ -35,12 +35,12 @@ extension FO {
 		public static var nop: Self { .compute(.location(.register(.zero)), .add, .location(.register(.zero)), to: .register(.zero)) }
 		
 		// See protocol.
-		public func lowered(in context: inout ()) throws -> [Lower.Instruction] {
+		public func lowered(in context: inout ()) throws -> [Lower.Effect] {
 			
 			/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
-			func prepare(source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Instruction], Lower.Register) {
+			func prepare(source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch source {
 					case .immediate(let imm):			return ([temporaryRegister <- imm], temporaryRegister)
 					case .location(.register(let r)):	return ([], try r.lowered())
@@ -51,7 +51,7 @@ extension FO {
 			/// Stores the datum in `temporaryRegister` in `destination` if `destination` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register wherein to put the result of the effect.
-			func finalise(destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Instruction], Lower.Register) {
+			func finalise(destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch destination {
 					case .register(let r):	return ([], try r.lowered())
 					case .frameCell(let c):	return ([c <- temporaryRegister], temporaryRegister)

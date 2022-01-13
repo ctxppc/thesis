@@ -2,39 +2,37 @@
 
 extension FL {
 	
-	/// A CHERI-RISC-V instruction.
-	///
-	/// These instructions map one to one to assembly instructions.
-	public enum Instruction : Codable, Equatable, MultiplyLowerable {
+	/// An effect on an FL machine.
+	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
-		/// An instruction that copies the contents from `source` to `destination`.
+		/// An effect that copies the contents from `source` to `destination`.
 		case copy(DataType, destination: Register, source: Register)
 		
-		/// An instruction that computes `value` and puts the result in `rd`.
+		/// An effect that computes `value` and puts the result in `rd`.
 		case compute(destination: Register, value: BinaryExpression)
 		
-		/// An instruction that loads the datum at the address in `rs1`, offset by `imm`, and puts it in `rd`.
+		/// An effect that loads the datum at the address in `rs1`, offset by `imm`, and puts it in `rd`.
 		case load(DataType, destination: Register, source: Frame.Location)
 		
-		/// An instruction that retrieves the datum from `source` and stores it in `destination`.
+		/// An effect that retrieves the datum from `source` and stores it in `destination`.
 		case store(DataType, destination: Frame.Location, source: Register)
 		
-		/// An instruction that jumps to `to` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(to: Label, Register, BranchRelation, Register)
 		
-		/// An instruction that jumps to `to`.
+		/// An effect that jumps to `to`.
 		case jump(to: Label)
 		
-		/// An instruction that puts the next PCC in `cra`, then jumps to given label.
+		/// An effect that puts the next PCC in `cra`, then jumps to given label.
 		case call(Label)
 		
-		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
+		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
 		
-		/// An instruction that can jumped to using given label.
-		indirect case labelled(Label, Instruction)
+		/// An effect that can jumped to using given label.
+		indirect case labelled(Label, Effect)
 		
-		/// An instruction that does nothing.
+		/// An effect that does nothing.
 		static var nop: Self { .zero <- Register.zero + .zero }
 		
 		// See protocol.
@@ -91,34 +89,34 @@ extension FL {
 	
 }
 
-public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Instruction {
+public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Effect {
 	.compute(destination: rd, value: value)
 }
 
-public func <- (rd: FL.Register, imm: Int) -> FL.Instruction {
+public func <- (rd: FL.Register, imm: Int) -> FL.Effect {
 	rd <- FL.Register.zero + imm
 }
 
-public func <- (rd: FL.Register, rs: FL.Register) -> FL.Instruction {
+public func <- (rd: FL.Register, rs: FL.Register) -> FL.Effect {
 	.copy(.word, destination: rd, source: rs)
 }
 
-public func <= (rd: FL.Register, rs: FL.Register) -> FL.Instruction {
+public func <= (rd: FL.Register, rs: FL.Register) -> FL.Effect {
 	.copy(.capability, destination: rd, source: rs)
 }
 
-public func <- (rd: FL.Register, src: FL.Frame.Location) -> FL.Instruction {
+public func <- (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
 	.load(.word, destination: rd, source: src)
 }
 
-public func <= (rd: FL.Register, src: FL.Frame.Location) -> FL.Instruction {
+public func <= (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
 	.load(.capability, destination: rd, source: src)
 }
 
-public func <- (dest: FL.Frame.Location, src: FL.Register) -> FL.Instruction {
+public func <- (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
 	.store(.word, destination: dest, source: src)
 }
 
-public func <= (dest: FL.Frame.Location, src: FL.Register) -> FL.Instruction {
+public func <= (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
 	.store(.capability, destination: dest, source: src)
 }

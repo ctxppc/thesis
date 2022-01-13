@@ -133,7 +133,7 @@ extension EX.Function {
 
 extension FL.Program {
 	public enum CodingKeys : String, CodingKey {
-		case instructions = "_0"
+		case effects = "_0"
 	}
 }
 

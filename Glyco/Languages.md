@@ -616,11 +616,7 @@ A language that introduces frame locations, i.e., memory locations relative to t
 <dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Frame.Location</code></dt>
-<dd><code>(<strong>offset:</strong> Int)</code></dd>
-</dl>
-<dl>
-<dt><code>FL.Instruction</code></dt>
+<dt><code>FL.Effect</code></dt>
 <dd><code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 <dd><code><strong>compute</strong>(<strong>destination:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
 <dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Frame.Location)</code></dd>
@@ -629,7 +625,11 @@ A language that introduces frame locations, i.e., memory locations relative to t
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
 <dd><code><strong>return</strong></code></dd>
-<dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
+<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>FL.Frame.Location</code></dt>
+<dd><code>(<strong>offset:</strong> Int)</code></dd>
 </dl>
 <dl>
 <dt><code>FL.Location</code></dt>
@@ -638,7 +638,7 @@ A language that introduces frame locations, i.e., memory locations relative to t
 </dl>
 <dl>
 <dt><code>FL.Program</code></dt>
-<dd><code>([Instruction])</code></dd>
+<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
 <dt><code>FL.Register</code></dt>
