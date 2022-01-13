@@ -544,6 +544,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <dt><code>FO.Effect</code></dt>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
@@ -617,10 +619,12 @@ A language that introduces frame locations, i.e., memory locations relative to t
 </dl>
 <dl>
 <dt><code>FL.Effect</code></dt>
-<dd><code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
-<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Frame.Location)</code></dd>
-<dd><code><strong>store</strong>(DataType, <strong>destination:</strong> Frame.Location, <strong>source:</strong> Register)</code></dd>
+<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
+<dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
+<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
+<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
+<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>vector:</strong> Register, <strong>index:</strong> Register)</code></dd>
+<dd><code><strong>storeElement</strong>(DataType, <strong>vector:</strong> Register, <strong>index:</strong> Register, <strong>from:</strong> Register)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>

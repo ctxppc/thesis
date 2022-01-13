@@ -16,6 +16,12 @@ extension FO {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		case getElement(of: Location, at: Source, to: Location)
+		
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		case setElement(of: Location, at: Source, to: Source)
+		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
 		
@@ -87,10 +93,16 @@ extension FO {
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
-				return lhsPrep
-					+ rhsPrep
-					+ [resReg <- .registerRegister(lhsReg, operation, rhsReg)]
-					+ resFinalise
+				return lhsPrep + rhsPrep + [resReg <- .registerRegister(lhsReg, operation, rhsReg)] + resFinalise
+				
+				case .getElement(of: let vector, at: let index, to: let destination):
+				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1)
+				let (idxPrep, idxReg) = try prepare(source: index, using: .t2)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
+				return vecPrep + idxPrep + [.loadElement(.word, into: resReg, vector: vecReg, index: idxReg)] + resFinalise
+				
+				case .setElement(of: let vector, at: let index, to: let element):
+				TODO.unimplemented
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)

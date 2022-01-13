@@ -5,19 +5,25 @@ extension FL {
 	/// An effect on an FL machine.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
-		/// An effect that copies the contents from `source` to `destination`.
-		case copy(DataType, destination: Register, source: Register)
+		/// An effect that copies the contents from `from` to `into`.
+		case copy(DataType, into: Register, from: Register)
 		
-		/// An effect that computes `value` and puts the result in `rd`.
-		case compute(destination: Register, value: BinaryExpression)
+		/// An effect that computes `value` and puts the result in `into`.
+		case compute(into: Register, value: BinaryExpression)
 		
-		/// An effect that loads the datum at the address in `rs1`, offset by `imm`, and puts it in `rd`.
-		case load(DataType, destination: Register, source: Frame.Location)
+		/// An effect that loads the datum in the frame at `from` and puts it in `into`.
+		case load(DataType, into: Register, from: Frame.Location)
 		
-		/// An effect that retrieves the datum from `source` and stores it in `destination`.
-		case store(DataType, destination: Frame.Location, source: Register)
+		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
+		case store(DataType, into: Frame.Location, from: Register)
 		
-		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
+		/// An effect that loads the element of the vector at `vector` at the zero-based position in `index` and puts it in `into`.
+		case loadElement(DataType, into: Register, vector: Register, index: Register)
+		
+		/// An effect that retrieves the datum from `from` and stores it as an element of the vector at `vector` at the zero-based position in `index`.
+		case storeElement(DataType, vector: Register, index: Register, from: Register)
+		
+		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
 		
 		/// An effect that jumps to `to`.
@@ -39,32 +45,44 @@ extension FL {
 		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
 			switch self {
 				
-				case .copy(let type, destination: let destination, source: let source):
+				case .copy(let type, into: let destination, from: let source):
 				return try [.copy(type, destination: destination.lowered(), source: source.lowered())]
 				
-				case .compute(destination: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
+				case .compute(into: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
 				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
-				case .compute(destination: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
+				case .compute(into: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
 				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
-				case .load(.word, destination: let destination, source: let source):
+				case .load(.word, into: let destination, from: let source):
 				return [
 					.offsetCapability(destination: .t0, source: .fp, offset: source.offset),
 					.loadWord(destination: try destination.lowered(), address: .t0)
 				]
 				
-				case .load(.capability, destination: let destination, source: let source):
+				case .load(.capability, into: let destination, from: let source):
 				return [.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)]
 				
-				case .store(.word, destination: let destination, source: let source):
+				case .store(.word, into: let destination, from: let source):
 				return [
 					.offsetCapability(destination: .t0, source: .fp, offset: destination.offset),
 					.storeWord(source: try source.lowered(), address: .t0)
 				]
 				
-				case .store(.capability, destination: let destination, source: let source):
+				case .store(.capability, into: let destination, from: let source):
 				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
+				
+				case .loadElement(.word, into: let destination, vector: let vector, index: let index):
+				TODO.unimplemented
+				
+				case .loadElement(.capability, into: let destination, vector: let vector, index: let index):
+				TODO.unimplemented
+				
+				case .storeElement(.word, vector: let vector, index: let index, from: let source):
+				TODO.unimplemented
+				
+				case .storeElement(.capability, vector: let vector, index: let index, from: let source):
+				TODO.unimplemented
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
 				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
@@ -90,7 +108,7 @@ extension FL {
 }
 
 public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Effect {
-	.compute(destination: rd, value: value)
+	.compute(into: rd, value: value)
 }
 
 public func <- (rd: FL.Register, imm: Int) -> FL.Effect {
@@ -98,25 +116,25 @@ public func <- (rd: FL.Register, imm: Int) -> FL.Effect {
 }
 
 public func <- (rd: FL.Register, rs: FL.Register) -> FL.Effect {
-	.copy(.word, destination: rd, source: rs)
+	.copy(.word, into: rd, from: rs)
 }
 
 public func <= (rd: FL.Register, rs: FL.Register) -> FL.Effect {
-	.copy(.capability, destination: rd, source: rs)
+	.copy(.capability, into: rd, from: rs)
 }
 
 public func <- (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
-	.load(.word, destination: rd, source: src)
+	.load(.word, into: rd, from: src)
 }
 
 public func <= (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
-	.load(.capability, destination: rd, source: src)
+	.load(.capability, into: rd, from: src)
 }
 
 public func <- (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
-	.store(.word, destination: dest, source: src)
+	.store(.word, into: dest, from: src)
 }
 
 public func <= (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
-	.store(.capability, destination: dest, source: src)
+	.store(.capability, into: dest, from: src)
 }

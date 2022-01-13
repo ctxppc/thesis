@@ -28,10 +28,10 @@ extension BB {
 				return [.compute(lhs, operation, rhs, to: destination)]
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				TODO.unimplemented
+				return [.getElement(of: vector, at: index, to: destination)]
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				TODO.unimplemented
+				return [.setElement(of: vector, at: index, to: element)]
 				
 			}
 		}
