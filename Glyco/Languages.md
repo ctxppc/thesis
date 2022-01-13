@@ -100,8 +100,10 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 <dt><code>EX.Value</code></dt>
 <dd><code><strong>constant</strong>(Int)</code></dd>
-<dd><code><strong>symbol</strong>(Symbol)</code></dd>
+<dd><code><strong>vector</strong>([Value])</code></dd>
+<dd><code><strong>named</strong>(Symbol)</code></dd>
 <dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 <dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 </dl>
@@ -231,6 +233,7 @@ A language that allows computation to be attached to an assigned value.
 <dt><code>CV.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -254,6 +257,7 @@ A language that allows computation to be attached to an assigned value.
 <dt><code>CV.Value</code></dt>
 <dd><code><strong>source</strong>(Source)</code></dd>
 <dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 <dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
@@ -277,6 +281,7 @@ A language that groups all effects that write to a location under one canonical 
 <dt><code>CA.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -300,6 +305,7 @@ A language that groups all effects that write to a location under one canonical 
 <dt><code>CA.Value</code></dt>
 <dd><code><strong>source</strong>(Source)</code></dd>
 <dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 </dl>
 
 
@@ -318,6 +324,8 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -363,6 +371,8 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -434,6 +444,8 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
 <dd><code><strong>return</strong>(Source)</code></dd>
@@ -455,7 +467,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 </dl>
 
 
-<h2 id="PR">Grammar for PR</h2>
+<h2 id="PR">Grammar for PR (Predicates)</h2>
 A language that introduces predicates in branches.
 
 **Inherited from BB:**
@@ -510,6 +522,8 @@ A language that groups effects into blocks of effects where blocks can only be e
 <dt><code>BB.Effect</code></dt>
 <dd><code><strong>copy</strong>(<strong>from:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
 <dt><code>BB.Program</code></dt>

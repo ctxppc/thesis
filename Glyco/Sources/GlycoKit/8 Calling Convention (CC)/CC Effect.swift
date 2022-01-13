@@ -17,6 +17,12 @@ extension CC {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		case getElement(of: Location, at: Source, to: Location)
+		
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		case setElement(of: Location, at: Source, to: Source)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -38,6 +44,12 @@ extension CC {
 				
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
+				
+				case .getElement(of: let vector, at: let index, to: let destination):
+				return .getElement(of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
+				
+				case .setElement(of: let vector, at: let index, to: let element):
+				return try .setElement(of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

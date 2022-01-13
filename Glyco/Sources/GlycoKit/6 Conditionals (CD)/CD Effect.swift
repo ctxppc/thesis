@@ -17,6 +17,12 @@ extension CD {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		case getElement(of: Location, at: Source, to: Location)
+		
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		case setElement(of: Location, at: Source, to: Source)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -47,7 +53,7 @@ extension CD {
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.intermediate(entryLabel, previousEffects, then: procedure)]
 				
-				case .set, .compute, .if, .return:
+				case .set, .compute, .getElement, .setElement, .if, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -82,7 +88,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .set, .compute:	// TODO: Add .invoke to this case when it becomes applicable.
+				case .set, .compute, .getElement, .setElement:	// TODO: Add .invoke to this case when it becomes applicable.
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -219,6 +225,22 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				in:					&context,
 				entryLabel:			entryLabel,
 				previousEffects:	previousEffects + [.compute(lhs, operation, rhs, to: destination)],
+				exitLabel:			exitLabel
+			)
+			
+			case .getElement(of: let vector, at: let index, to: let destination):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.getElement(of: vector, at: index, to: destination)],
+				exitLabel:			exitLabel
+			)
+			
+			case .setElement(of: let vector, at: let index, to: let element):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.setElement(of: vector, at: index, to: element)],
 				exitLabel:			exitLabel
 			)
 			

@@ -16,6 +16,12 @@ extension AL {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		case getElement(of: Location, at: Source, to: Location)
+		
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		case setElement(of: Location, at: Source, to: Source)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -39,6 +45,12 @@ extension AL {
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
+				
+				case .getElement(of: let vector, at: let index, to: let destination):
+				return try .getElement(of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				
+				case .setElement(of: let vector, at: let index, to: let element):
+				return try .setElement(of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -75,7 +87,7 @@ extension AL {
 					$1.livenessAndConflictsAtEntry(livenessAtExit: $0.0, conflictsAtExit: $0.1)
 				}
 				
-				case .set, .compute, .call, .return:
+				case .set, .compute, .getElement, .setElement, .call, .return:
 				break	// already dealt with defined & used locations above
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
@@ -98,10 +110,12 @@ extension AL {
 		private func definedLocations() -> Set<Location> {
 			switch self {
 				
-				case .do, .if, .call, .return:
+				case .do, .setElement, .if, .call, .return:
 				return []
 				
-				case .set(let destination, to: _), .compute(_, _, _, to: let destination):
+				case .set(let destination, to: _),
+						.compute(_, _, _, to: let destination),
+						.getElement(of: _, at: _, to: let destination):
 				return [destination]
 				
 			}
@@ -126,6 +140,14 @@ extension AL {
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _):
 				return [lhs, rhs]
+				
+				case .getElement(of: let vector, at: .immediate, to: _),
+						.setElement(of: let vector, at: .immediate, to: _):
+				return [vector]
+				
+				case .getElement(of: let vector, at: .location(let index), to: _),
+						.setElement(of: let vector, at: .location(let index), to: _):
+				return [vector, index]
 				
 				case .call(_, let arguments):
 				return .init(arguments.map { .parameter($0) })

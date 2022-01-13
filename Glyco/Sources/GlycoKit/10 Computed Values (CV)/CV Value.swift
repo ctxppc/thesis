@@ -10,6 +10,9 @@ extension CV {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		case binary(Source, BinaryOperator, Source)
 		
+		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
+		case element(of: Location, at: Source)
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		

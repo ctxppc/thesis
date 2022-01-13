@@ -14,6 +14,9 @@ extension CA {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Value)
 		
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		case setElement(of: Location, at: Source, to: Source)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -32,9 +35,15 @@ extension CA {
 				
 				case .set(let destination, to: .source(let source)):
 				return .set(destination, to: source)
-					
+				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
 				return .compute(lhs, op, rhs, to: destination)
+				
+				case .set(let destination, to: .element(of: let vector, at: let index)):
+				return .getElement(of: vector, at: index, to: destination)
+				
+				case .setElement(of: let vector, at: let index, to: let element):
+				return .setElement(of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

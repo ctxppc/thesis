@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+//sourcery: longname = Predicates
 //sourcery: description = A language that introduces predicates in branches.
 public enum PR : Language {
 	

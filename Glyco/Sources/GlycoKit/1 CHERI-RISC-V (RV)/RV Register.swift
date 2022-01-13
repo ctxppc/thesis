@@ -42,14 +42,10 @@ extension RV {
 		case t3, t4, t5, t6
 		
 		/// The integer register's identifier.
-		public var x: String {
-			"\(rawValue)"
-		}
+		public var x: String { rawValue }
 		
 		/// The capability register's identifier.
-		public var c: String {
-			"c\(rawValue)"
-		}
+		public var c: String { "c\(rawValue)" }
 		
 	}
 	
