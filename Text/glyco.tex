@@ -1,0 +1,7 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+
+\chapter{Glyco}
+Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning "sweet", alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture. Glyco supports targets running on CheriBSD and on a Sail-based emulator of the CHERI-RISC-V ISA. Glyco is built following a \emph{nanopass} compiler design, described by several authors in the context of compiler education but also commercial compiler development. A nanopass compiler consists of numerous small passes, hence the term \enquote{nanopass}, which translate one intermediate language (IL) to another. Source code is parsed into the compiler’s first IL, which is then translated via nanopasses through different ILs, ending up in the compiler's final IL (called Assembly, abbreviated S) that is simply CHERI-RISC-V assembly. Glyco then feeds this assembly to LLVM which builds \& links an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+
+\end{document}

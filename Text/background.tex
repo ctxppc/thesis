@@ -1,11 +1,7 @@
 \documentclass[main.tex]{subfiles}
 \begin{document}
-\mainmatter
 
-\chapter{Background}
-
-\section{Memory Safety}
-
+\chapter{Memory Safety}
 Most security bugs classified as “serious” in large projects such as the Chromium browser engine are memory safety bugs,\cite{chromium} such as out-of-bounds array or call stack accesses that either arise from the use of “memory-unsafe” programming languages such as C, the use of memory safety opt-outs (such as Rust’s unsafe) in “memory-safe” programming languages, or bugs in the compiler or standard library implementation of a memory-safe programming language or runtime environment such as the Java VM or an ECMAScript interpreter.
 
 Common approaches to mitigating attacks or restricting the attack vector that such a bug can cause include reintroducing compiler-inserted array bounds checks in memory-unsafe programming languages and enforcing page-level permissions in the virtual memory system of the operating system. However, runtime checks introduce a runtime cost, and virtual memory protection doesn’t protect against a compromised or vulnerable library such as Apache Log4j accessing potentially sensitive data in the process’ address space such as TLS session keys stored in an in-process OpenSSL data structure.
