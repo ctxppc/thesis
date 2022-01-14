@@ -26,13 +26,14 @@ extension CC {
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
 			
 			let assignments = parameterAssignments(in: context.configuration)
-			let parameterLocations = chain(
-				assignments.registers.map { Lower.ParameterLocation.register($0) },
-				assignments.frameLocations.map { .frame($0) }
+			
+			let parameterLocationPairs = chain(
+				assignments.registers.map { (p, r) in (p, Lower.ParameterLocation.register(r)) },
+				assignments.frameLocations.map { (p, l) in (p, Lower.ParameterLocation.frame(l)) }
 			)
 			
-			let prologue = zip(parameters, parameterLocations).map { parameter, location in
-				Lower.Effect.set(.abstract(parameter.location), to: .location(.parameter(location)))
+			let prologue = parameterLocationPairs.map { parameter, location in
+				Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.parameter(location)))
 			}
 			
 			return try .init(name, .do(prologue + [effect.lowered(in: &context)]))
@@ -48,11 +49,11 @@ extension CC {
 			var registers = configuration.argumentRegisters[...]
 			
 			var parameters = self.parameters[...]
-			while let register = registers.popFirst(), let _ = parameters.popFirst() {
-				assignments.registers.append(register)
+			while let register = registers.popFirst(), let parameter = parameters.popFirst() {
+				assignments.registers.append((parameter, register))
 			}
 			while let parameter = parameters.popFirst() {
-				assignments.frameLocations.append(frame.allocate(parameter.type))
+				assignments.frameLocations.append((parameter, frame.allocate(parameter.type)))
 			}
 			
 			return assignments

@@ -16,8 +16,13 @@ extension CC {
 		
 		/// An assignment of parameters to physical locations.
 		struct Assignments {
-			var registers: [Lower.Register] = []
-			var frameLocations: [Lower.Frame.Location] = []
+			
+			/// Parameter–register pairs of parameters passed via registers.
+			var registers: [(Parameter, Lower.Register)] = []
+			
+			/// Parameter–frame location pairs of parameters passed via the call frame.
+			var frameLocations: [(Parameter, Lower.Frame.Location)] = []
+			
 		}
 		
 	}

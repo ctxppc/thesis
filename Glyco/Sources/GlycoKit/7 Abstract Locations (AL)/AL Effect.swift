@@ -11,16 +11,16 @@ extension AL {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(Location, to: Source)
+		case set(DataType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -31,7 +31,7 @@ extension AL {
 		case call(Label, [ParameterLocation])
 		
 		/// An effect that terminates the program with `result`.
-		case `return`(Source)
+		case `return`(DataType, Source)
 		
 		// See protocol.
 		func lowered(in context: inout LocalContext) throws -> Lower.Effect {
@@ -40,17 +40,17 @@ extension AL {
 				case .do(let effects):
 				return .do(try effects.lowered(in: &context))
 				
-				case .set(let destination, to: let source):
-				return try .set(.word, destination.lowered(in: &context), to: source.lowered(in: &context))
+				case .set(let type, let destination, to: let source):
+				return try .set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				return try .getElement(.word, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				case .getElement(let type, of: let vector, at: let index, to: let destination):
+				return try .getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				return try .setElement(.word, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				case .setElement(let type, of: let vector, at: let index, to: let element):
+				return try .setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -58,8 +58,8 @@ extension AL {
 				case .call(let procedure, _):
 				return .call(procedure)
 				
-				case .return(let result):
-				return .return(.word, try result.lowered(in: &context))
+				case .return(let type, let result):
+				return .return(type, try result.lowered(in: &context))
 				
 			}
 		}
@@ -113,9 +113,9 @@ extension AL {
 				case .do, .setElement, .if, .call, .return:
 				return []
 				
-				case .set(let destination, to: _),
+				case .set(_, let destination, to: _),
 						.compute(_, _, _, to: let destination),
-						.getElement(of: _, at: _, to: let destination):
+						.getElement(_, of: _, at: _, to: let destination):
 				return [destination]
 				
 			}
@@ -126,27 +126,27 @@ extension AL {
 			switch self {
 				
 				case .do,
-						.set(_, to: .immediate),
+						.set(_, _, to: .immediate),
 						.compute(.immediate, _, .immediate, to: _),
 						.if,
-						.return(result: .immediate):
+						.return(_, .immediate):
 				return []
 				
-				case .set(_, to: .location(let source)),
+				case .set(_, _, to: .location(let source)),
 						.compute(.immediate, _, .location(let source), to: _),
 						.compute(.location(let source), _, .immediate, to: _),
-						.return(result: .location(let source)):
+						.return(_, .location(let source)):
 				return [source]
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _):
 				return [lhs, rhs]
 				
-				case .getElement(of: let vector, at: .immediate, to: _),
-						.setElement(of: let vector, at: .immediate, to: _):
+				case .getElement(_, of: let vector, at: .immediate, to: _),
+						.setElement(_, of: let vector, at: .immediate, to: _):
 				return [vector]
 				
-				case .getElement(of: let vector, at: .location(let index), to: _),
-						.setElement(of: let vector, at: .location(let index), to: _):
+				case .getElement(_, of: let vector, at: .location(let index), to: _),
+						.setElement(_, of: let vector, at: .location(let index), to: _):
 				return [vector, index]
 				
 				case .call(_, let arguments):
@@ -157,16 +157,4 @@ extension AL {
 		
 	}
 	
-}
-
-public func <- (destination: AL.Location, source: AL.Source) -> AL.Effect {
-	.set(destination, to: source)
-}
-
-public func <- (destination: AL.AbstractLocation, source: AL.Source) -> AL.Effect {
-	.abstract(destination) <- source
-}
-
-public func <- (destination: AL.ParameterLocation, source: AL.Source) -> AL.Effect {
-	.parameter(destination) <- source
 }

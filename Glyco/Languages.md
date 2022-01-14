@@ -322,13 +322,13 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 <dl>
 <dt><code>CC.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
 <dl>
 <dt><code>CC.Parameter</code></dt>
@@ -369,13 +369,13 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dl>
 <dt><code>AL.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Location</code></dt>
