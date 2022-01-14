@@ -39,7 +39,7 @@ extension FL {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		static var nop: Self { .zero <- Register.zero + .zero }
+		static var nop: Self { .compute(into: .zero, value: Register.zero + .zero) }
 		
 		// See protocol.
 		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
@@ -56,7 +56,7 @@ extension FL {
 				
 				case .load(.word, into: let destination, from: let source):
 				return [
-					.offsetCapability(destination: .t0, source: .fp, offset: source.offset),
+					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: source.offset),
 					.loadWord(destination: try destination.lowered(), address: .t0)
 				]
 				
@@ -65,7 +65,7 @@ extension FL {
 				
 				case .store(.word, into: let destination, from: let source):
 				return [
-					.offsetCapability(destination: .t0, source: .fp, offset: destination.offset),
+					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: destination.offset),
 					.storeWord(source: try source.lowered(), address: .t0)
 				]
 				
@@ -73,16 +73,28 @@ extension FL {
 				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
 				
 				case .loadElement(.word, into: let destination, vector: let vector, index: let index):
-				TODO.unimplemented
+				return try [
+					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.loadWord(destination: destination.lowered(), address: destination.lowered()),
+				]
 				
 				case .loadElement(.capability, into: let destination, vector: let vector, index: let index):
-				TODO.unimplemented
+				return try [
+					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.loadCapability(destination: destination.lowered(), address: destination.lowered(), offset: 0),
+				]
 				
 				case .storeElement(.word, vector: let vector, index: let index, from: let source):
-				TODO.unimplemented
+				return try [
+					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
+					.storeWord(source: source.lowered(), address: .t0),
+				]
 				
 				case .storeElement(.capability, vector: let vector, index: let index, from: let source):
-				TODO.unimplemented
+				return try [
+					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
+					.storeCapability(source: source.lowered(), address: .t0, offset: 0),
+				]
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
 				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
@@ -105,36 +117,4 @@ extension FL {
 		
 	}
 	
-}
-
-public func <- (rd: FL.Register, value: FL.BinaryExpression) -> FL.Effect {
-	.compute(into: rd, value: value)
-}
-
-public func <- (rd: FL.Register, imm: Int) -> FL.Effect {
-	rd <- FL.Register.zero + imm
-}
-
-public func <- (rd: FL.Register, rs: FL.Register) -> FL.Effect {
-	.copy(.word, into: rd, from: rs)
-}
-
-public func <= (rd: FL.Register, rs: FL.Register) -> FL.Effect {
-	.copy(.capability, into: rd, from: rs)
-}
-
-public func <- (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
-	.load(.word, into: rd, from: src)
-}
-
-public func <= (rd: FL.Register, src: FL.Frame.Location) -> FL.Effect {
-	.load(.capability, into: rd, from: src)
-}
-
-public func <- (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
-	.store(.word, into: dest, from: src)
-}
-
-public func <= (dest: FL.Frame.Location, src: FL.Register) -> FL.Effect {
-	.store(.capability, into: dest, from: src)
 }

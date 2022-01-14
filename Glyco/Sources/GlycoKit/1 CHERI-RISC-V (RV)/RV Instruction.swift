@@ -33,8 +33,11 @@ extension RV {
 		/// An instruction that retrieves the capability of type `type` from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
 		case storeCapability(source: Register, address: Register, offset: Int)
 		
+		/// An instruction that offsets the capability in `source` by the offset in `offset` and puts it in `destination`.
+		case offsetCapability(destination: Register, source: Register, offset: Register)
+		
 		/// An instruction that offsets the capability in `source` by `offset` and puts it in `destination`.
-		case offsetCapability(destination: Register, source: Register, offset: Int)
+		case offsetCapabilityWithImmediate(destination: Register, source: Register, offset: Int)
 		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
@@ -87,6 +90,9 @@ extension RV {
 				return "\(tabs)clc \(cs.x), \(offset)(\(address.c))"
 				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
+				return "\(tabs)cincoffset \(destination.c), \(source.c), \(offset.x)"
+				
+				case .offsetCapabilityWithImmediate(destination: let destination, source: let source, offset: let offset):
 				return "\(tabs)cincoffsetimm \(destination.c), \(source.c), \(offset)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):

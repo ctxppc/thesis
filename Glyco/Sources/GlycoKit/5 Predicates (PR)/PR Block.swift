@@ -12,7 +12,7 @@ extension PR {
 		case branch(Label, [Effect], if: Predicate, then: Label, else: Label)
 		
 		/// A block that executes given effects then terminates with `result`
-		case final(Label, [Effect], result: Source)
+		case final(Label, [Effect], result: Source, type: DataType)
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> Lower.Block {
@@ -33,8 +33,8 @@ extension PR {
 				case .branch(let label, let effects, if: .relation(let lhs, let relation, let rhs), then: let affirmative, else: let negative):
 				return .branch(label, effects, lhs: lhs, relation: relation, rhs: rhs, then: affirmative, else: negative)
 				
-				case .final(let label, let effects, result: let result):
-				return .final(label, effects, result: result)
+				case .final(let label, let effects, result: let result, type: let type):
+				return .final(label, effects, result: result, type: type)
 				
 			}
 		}
@@ -44,7 +44,7 @@ extension PR {
 			switch self {
 				case .intermediate(let label, _, then: _):				return label
 				case .branch(let label, _, if: _, then: _, else: _):	return label
-				case .final(let label, _, result: _):					return label
+				case .final(let label, _, result: _, type: _):			return label
 			}
 		}
 		

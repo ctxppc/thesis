@@ -41,16 +41,16 @@ extension AL {
 				return .do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: let source):
-				return try .set(destination.lowered(in: &context), to: source.lowered(in: &context))
+				return try .set(.word, destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				return try .getElement(of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				return try .getElement(.word, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				return try .setElement(of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				return try .setElement(.word, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -59,7 +59,7 @@ extension AL {
 				return .call(procedure)
 				
 				case .return(let result):
-				return .return(try result.lowered(in: &context))
+				return .return(.word, try result.lowered(in: &context))
 				
 			}
 		}

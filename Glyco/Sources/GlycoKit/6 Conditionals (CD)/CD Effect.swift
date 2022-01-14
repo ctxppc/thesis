@@ -12,16 +12,16 @@ extension CD {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(Location, to: Source)
+		case set(DataType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		case getElement(DataType,of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		case setElement(DataType,of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -32,7 +32,7 @@ extension CD {
 		case call(Label)
 		
 		/// An effect that terminates the program with given result.
-		case `return`(Source)
+		case `return`(DataType, Source)
 		
 		/// Returns a representation of `self` in a lower language.
 		///
@@ -124,7 +124,7 @@ extension CD {
 		func optimised() -> Self {
 			switch self {
 				
-				case .set(let destination, to: .location(let source)) where source == destination,
+				case .set(_, let destination, to: .location(let source)) where source == destination,
 					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
 					.compute(.location(let source), .sub, .immediate(0), to: let destination) where source == destination,
@@ -212,11 +212,11 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .set(let destination, to: let source):
+			case .set(let type, let destination, to: let source):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.set(destination, to: source)],
+				previousEffects:	previousEffects + [.set(type, destination, to: source)],
 				exitLabel:			exitLabel
 			)
 			
@@ -228,19 +228,19 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .getElement(of: let vector, at: let index, to: let destination):
+			case .getElement(let type, of: let vector, at: let index, to: let destination):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.getElement(of: vector, at: index, to: destination)],
+				previousEffects:	previousEffects + [.getElement(type, of: vector, at: index, to: destination)],
 				exitLabel:			exitLabel
 			)
 			
-			case .setElement(of: let vector, at: let index, to: let element):
+			case .setElement(let type, of: let vector, at: let index, to: let element):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.setElement(of: vector, at: index, to: element)],
+				previousEffects:	previousEffects + [.setElement(type, of: vector, at: index, to: element)],
 				exitLabel:			exitLabel
 			)
 			
@@ -279,15 +279,11 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
 			return [.intermediate(entryLabel, previousEffects, then: procedure)]
 			
-			case .return(result: let result):
+			case .return(let type, let result):
 			guard rest.doesNothing else { throw CD.Effect.LoweringError.effectAfterReturn }
-			return [.final(entryLabel, previousEffects, result: result)]
+			return [.final(entryLabel, previousEffects, result: result, type: type)]
 			
 		}
 	}
 	
-}
-
-public func <- (destination: CD.Location, source: CD.Source) -> CD.Effect {
-	.set(destination, to: source)
 }

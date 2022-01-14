@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Foundation
+
 extension FO {
 	
 	/// An effect on an FO machine.
@@ -11,16 +13,18 @@ extension FO {
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that copies the datum from `from` to `to`.
-		case set(Location, to: Source)
+		///
+		/// When `to` is an immediate, the data type cannot be `.capability`.
+		case set(DataType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
@@ -46,67 +50,79 @@ extension FO {
 			/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
-			func prepare(source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
+			func prepare(source: Source, using temporaryRegister: Lower.Register, type: DataType) throws -> ([Lower.Effect], Lower.Register) {
 				switch source {
-					case .immediate(let imm):			return ([temporaryRegister <- imm], temporaryRegister)
+					case .immediate(let imm):			return ([.compute(into: temporaryRegister, value: Lower.Register.zero + imm)], temporaryRegister)
 					case .location(.register(let r)):	return ([], try r.lowered())
-					case .location(.frameCell(let c)):	return ([temporaryRegister <- c], temporaryRegister)
+					case .location(.frameCell(let c)):	return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
 				}
 			}
 			
 			/// Stores the datum in `temporaryRegister` in `destination` if `destination` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register wherein to put the result of the effect.
-			func finalise(destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
+			func finalise(destination: Location, using temporaryRegister: Lower.Register, type: DataType) throws -> ([Lower.Effect], Lower.Register) {
 				switch destination {
 					case .register(let r):	return ([], try r.lowered())
-					case .frameCell(let c):	return ([c <- temporaryRegister], temporaryRegister)
+					case .frameCell(let c):	return ([.store(type, into: c, from: temporaryRegister)], temporaryRegister)
 				}
 			}
 			
 			switch self {
 				
-				case .set(.register(let dest), to: .immediate(let imm)):
-				return try [dest.lowered() <- imm]
+				case .set(.word, .register(let dest), to: .immediate(let imm)):
+				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + imm)]
 				
-				case .set(.register(let dest), to: .location(.register(let src))):
-				return try [dest.lowered() <- src.lowered()]
+				case .set(.capability, .register, to: .immediate):
+				throw LoweringError.settingCapabilityUsingImmediate
 				
-				case .set(.register(let dest), to: .location(.frameCell(let src))):
-				return try [dest.lowered() <- src]
+				case .set(let type, .register(let dest), to: .location(.register(let src))):
+				return try [.copy(type, into: dest.lowered(), from: src.lowered())]
 				
-				case .set(.frameCell(let dest), to: .immediate(let imm)):
-				return [.t1 <- imm, dest <- .t1]
+				case .set(let type, .register(let dest), to: .location(.frameCell(let src))):
+				return try [.load(type, into: dest.lowered(), from: src)]
 				
-				case .set(.frameCell(let dest), to: .location(.register(let src))):
-				return try [dest <- src.lowered()]
+				case .set(.word, .frameCell(let dest), to: .immediate(let imm)):
+				return [
+					.compute(into: .t1, value: .zero + imm),
+					.store(.word, into: dest, from: .t1)
+				]
 				
-				case .set(.frameCell(let dest), to: .location(.frameCell(let src))):
-				return [.t1 <- src, dest <- .t1]
+				case .set(.capability, .frameCell, to: .immediate):
+				throw LoweringError.settingCapabilityUsingImmediate
+				
+				case .set(let type, .frameCell(let dest), to: .location(.register(let src))):
+				return try [.store(type, into: dest, from: src.lowered())]
+				
+				case .set(let type, .frameCell(let dest), to: .location(.frameCell(let src))):
+				return [.load(type, into: .t1, from: src), .store(type, into: dest, from: .t1)]
 				
 				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2)
-				return lhsPrep + [resReg <- FL.BinaryExpression.registerImmediate(lhsReg, operation, rhs)] + resFinalise
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2, type: .word)
+				return lhsPrep + [.compute(into: resReg, value: .registerImmediate(lhsReg, operation, rhs))] + resFinalise
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
-				return lhsPrep + rhsPrep + [resReg <- .registerRegister(lhsReg, operation, rhsReg)] + resFinalise
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
+				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .word)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: .word)
+				return lhsPrep + rhsPrep + [.compute(into: resReg, value: .registerRegister(lhsReg, operation, rhsReg))] + resFinalise
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1)
-				let (idxPrep, idxReg) = try prepare(source: index, using: .t2)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3)
+				case .getElement(let type, of: let vector, at: let index, to: let destination):
+				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
+				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: type)
 				return vecPrep + idxPrep + [.loadElement(.word, into: resReg, vector: vecReg, index: idxReg)] + resFinalise
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				TODO.unimplemented
+				case .setElement(let type, of: let vector, at: let index, to: let element):
+				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
+				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
+				let (elemPrep, elemReg) = try prepare(source: element, using: .t3, type: type)
+				return vecPrep + idxPrep + elemPrep + [.storeElement(.word, vector: vecReg, index: idxReg, from: elemReg)]
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2)
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
+				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .word)
 				return lhsPrep + rhsPrep + [.branch(to: target, lhsReg, relation, rhsReg)]
 				
 				case .jump(to: let target):
@@ -125,7 +141,16 @@ extension FO {
 			}
 		
 		}
-	
+		
+		enum LoweringError : LocalizedError {
+			case settingCapabilityUsingImmediate
+			var errorDescription: String? {
+				switch self {
+					case .settingCapabilityUsingImmediate:	return "Cannot set a capability register or frame cell using an immediate"
+				}
+			}
+		}
+		
 	}
 	
 }

@@ -11,8 +11,8 @@ extension BB {
 		/// A block that executes given effects, then jumps to the block labelled `then` if *x* `relation` *y*, or to the block labelled `else` otherwise, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(Label, [Effect], lhs: Source, relation: BranchRelation, rhs: Source, then: Label, else: Label)
 		
-		/// A block that executes given effects then terminates with `result`
-		case final(Label, [Effect], result: Source)
+		/// A block that executes given effects then terminates with `result` of type `type`.
+		case final(Label, [Effect], result: Source, type: DataType)
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> [Lower.Effect] {
@@ -34,11 +34,11 @@ extension BB {
 					return [.labelled(label, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
 				}
 				
-				case .final(let label, let effects, result: let result):
+				case .final(let label, let effects, result: let result, type: let type):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.set(.register(.a0), to: result), .return]
+					return [.labelled(label, first)] + tail + [.set(type, .register(.a0), to: result), .return]
 				} else {
-					return [.labelled(label, .set(.register(.a0), to: result)), .return]
+					return [.labelled(label, .set(type, .register(.a0), to: result)), .return]
 				}
 				
 			}

@@ -442,13 +442,13 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dl>
 <dt><code>CD.Effect</code></dt>
 <dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
 <dl>
 <dt><code>CD.Predicate</code></dt>
@@ -485,7 +485,7 @@ A language that introduces predicates in branches.
 <dt><code>PR.Block</code></dt>
 <dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
 <dd><code><strong>branch</strong>(Label, [Effect], <strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source)</code></dd>
+<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
 <dt><code>PR.Predicate</code></dt>
@@ -516,14 +516,14 @@ A language that groups effects into blocks of effects where blocks can only be e
 <dt><code>BB.Block</code></dt>
 <dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
 <dd><code><strong>branch</strong>(Label, [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source)</code></dd>
+<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
 <dt><code>BB.Effect</code></dt>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
 <dt><code>BB.Program</code></dt>
@@ -542,10 +542,10 @@ A language that introduces flexible operands in instructions, i.e., instructions
 
 <dl>
 <dt><code>FO.Effect</code></dt>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
@@ -554,7 +554,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 <dl>
 <dt><code>FO.HaltEffect</code></dt>
-<dd><code>(<strong>result:</strong> Source)</code></dd>
+<dd><code>(<strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
 <dt><code>FO.Location</code></dt>
@@ -720,7 +720,8 @@ N/A
 <dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 <dd><code><strong>storeWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 <dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
+<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 <dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
 <dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
