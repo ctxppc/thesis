@@ -10,13 +10,15 @@
 
 \newglossaryentry{nanopass}{
 	name=nanopass,
-	description=a function that transforms a program in one \gls{il} to a program in another \gls{il}
+	description=a function that transforms a program in one \gls{il} to a program in another \gls{il},
+	plural=nanopasses
 }
 \newcommand{\nanopass}{\gls{nanopass}}
+\newcommand{\nanopasses}{\glspl{nanopass}}
 
 \newglossaryentry{lowerlang}{
 	name=lower language,
-	description=the \il{} that immediately follows the \il{} currently being discussed after one \lowering{}
+	description=the \il{} output by a single \lowering{} of a program in the \il{} currently being discussed
 }
 \newcommand{\lowerlang}{\gls{lowerlang}}
 

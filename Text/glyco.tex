@@ -3,12 +3,33 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Glyco}
-Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning "sweet", alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-Glyco is built following a \emph{nanopass} compiler design, described by several authors in the context of compiler education \cite{:educomp} but also commercial compiler development \cite{:commcomp}. A nanopass compiler consists of numerous small passes, hence the term \enquote{\nanopass{}}, which translate one \il{} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via nanopasses through different \ils{}, ending up in the compiler's final \il{} (called Assembly, abbreviated S) that is simply CHERI-RISC-V assembly. Glyco then feeds this assembly to LLVM which builds \& links an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-Glyco currently defines 13 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}. Starting from the highest \il{}, these are:
-\include{Language Summary}
+Glyco is built following a \emph{nanopass} compiler design, described by several authors in the context of compiler education \cite{:educomp} and commercial compiler development \cite{:commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\nanopasses{}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \nanopasses{} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to LLVM for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+
+The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \nanopass{} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \nanopass{}. This process goes on until a suitable level of abstraction has been achieved.
+
+An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \nanopass{} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
+
+Glyco currently defines 14 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Starting from the lowest \il{}, these are:
+\input{Language Summary}
+
+Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
+
+\section{From Assembly to Basic Blocks}
+
+The first \il{}, named \emph{CHERI-RISC-V Assembly}, is simply the CHERI-RISC-V assembly language (see \cref{bnf:s}), except for some linkage boilerplate that is added by the compiler just before passing it to LLVM.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		<Program> ::= (assembly: <String>)
+	\end{grammar}
+	\caption{The grammar for the CHERI-RISC-V Assembly \il{}.}
+	\label{bnf:s}
+\end{figure}
+
+% TODO
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

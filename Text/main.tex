@@ -11,15 +11,20 @@
 	font=utopia
 }
 
+\usepackage{amsmath}					% Math support
 \usepackage{babel}						% Language support
 \usepackage[autostyle=true]{csquotes}	% Curly quotes
-\usepackage[dvipsnames]{xcolor}			% Named colours — keep before hyperref!
+
+\usepackage[dvipsnames]{xcolor}			% Named colours — keep before hyperref
 \usepackage{hyperref}					% Hyperlinking and PDF metadata.
+\usepackage{cleveref}					% Better references — keep after hyperref
 \usepackage[toc]{glossaries}			% Glossary — keep after hyperref!
+
 \usepackage{lipsum}						% Fake lorem ipsum text
 \usepackage{subfiles}					% Modular documents
+\usepackage{syntax}						% Grammar
 \usepackage{todonotes}					% Marks TODOs
-\usepackage{xparse}						% Advanced command parsing (used in newdualentry)
+\usepackage{xparse}						% Advanced command parsing — used in newdualentry
 
 \hypersetup{
     colorlinks=true,		% false: boxed links; true: coloured links
