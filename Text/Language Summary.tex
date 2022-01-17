@@ -1,0 +1,17 @@
+
+\begin{itemize}
+	\item EX (Expressions): A language that introduces expression semantics for values, thereby abstracting over computation effects.
+	\item LS (Lexical Scopes): A language that introduces lexical scopes of definitions
+	\item DF (Definitions): A language that introduces definitions with function-wide namespacing.
+	\item CV (Computed Values): A language that allows computation to be attached to an assigned value.
+	\item CA (Canonical Assignments): A language that groups all effects that write to a location under one canonical assignment effect.
+	\item CC (Calling Convention): A language that introduces parameter passing and enforces the low-level Glyco calling convention.
+	\item AL (Abstract Locations): A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
+	\item CD (Conditionals): A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
+	\item PR (Predicates): A language that introduces predicates in branches.
+	\item BB (Basic Blocks): A language that groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.
+	\item FO (Frame Operands): A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
+	\item FL (Frame Locations): A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`.
+	\item RV (CHERI-RISC-V): A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
+	\item S (CHERI-RISC-V Assembly): The ground language as provided to Clang for assembly and linking.
+\end{itemize}

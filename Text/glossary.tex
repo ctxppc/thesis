@@ -1,13 +1,23 @@
 \newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a nanopass as part of the compiler's routine}
+\newcommand{\il}{\gls{il}}
+\newcommand{\ils}{\glspl{il}}
 
 \newglossaryentry{lowering}{
 	name=lowering,
 	description=the act of transforming a higher-level to a lower-level intermediate language through one or more nanopasses
 }
+\newcommand{\lowering}{\gls{lowering}}
 
 \newglossaryentry{nanopass}{
 	name=nanopass,
 	description=a function that transforms a program in one \gls{il} to a program in another \gls{il}
 }
+\newcommand{\nanopass}{\gls{nanopass}}
+
+\newglossaryentry{lowerlang}{
+	name=lower language,
+	description=the \il{} that immediately follows the \il{} currently being discussed after one \lowering{}
+}
+\newcommand{\lowerlang}{\gls{lowerlang}}
 
 \makeglossaries

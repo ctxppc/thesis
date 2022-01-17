@@ -9,3 +9,8 @@ configurations:
   templates:
     - Sourcery/Codable.stencil
   output: Sources/GlycoKit
+- sources:
+    - Sources/GlycoKit
+  templates:
+    - Sourcery/Summary (Text).stencil
+  output: ../Text/Language Summary.tex
