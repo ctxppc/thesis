@@ -11,14 +11,44 @@
 	font=utopia
 }
 
-\usepackage{babel}
-\usepackage[autostyle=true]{csquotes}
-\usepackage{hyperref}	% Hyperlinking and PDF metadata.
-\usepackage{lipsum}		% Fake lorem ipsum text
-\usepackage{subfiles}	% Modular documents
-\usepackage{todonotes}	% Marks TODOs
+\usepackage{babel}						% Language support
+\usepackage[autostyle=true]{csquotes}	% Curly quotes
+\usepackage[dvipsnames]{xcolor}			% Named colours — keep before hyperref!
+\usepackage{hyperref}					% Hyperlinking and PDF metadata.
+\usepackage[toc]{glossaries}			% Glossary — keep after hyperref!
+\usepackage{lipsum}						% Fake lorem ipsum text
+\usepackage{subfiles}					% Modular documents
+\usepackage{todonotes}					% Marks TODOs
+\usepackage{xparse}						% Advanced command parsing (used in newdualentry)
+
+\hypersetup{
+    colorlinks=true,		% false: boxed links; true: coloured links
+    linkcolor=Blue,			% colour of internal links
+    citecolor=OliveGreen,	% colour of links to bibliography
+    filecolor=cyan,			% colour of file links
+    urlcolor=magenta		% colour of external links
+}
+
+\newcommand{\onlyinsubfile}[1]{#1}
+\newcommand{\notinsubfile}[1]{}
+
+\DeclareDocumentCommand{\newdualentry}{ O{} O{} m m m m } {
+	\newglossaryentry{gls-#3}{name={#5},text={#5\glsadd{#3}},
+	description={#6},#1
+	}
+	\makeglossaries
+	\newacronym[see={{gls-#3}},#2]{#3}{#4}{#5\glsadd{gls-#3}}
+}
+
+\def\biblio{\bibliographystyle{apalike}\bibliography{References}}
+
+\input{glossary.tex}
 
 \begin{document}
+
+\renewcommand{\onlyinsubfile}[1]{}
+\renewcommand{\notinsubfile}[1]{#1}
+\def\biblio{}
 
 \begin{preface}
 	\lipsum[5]
@@ -42,6 +72,10 @@
 \subfile{glyco}
 
 \backmatter
+\glsaddall
+\setglossarystyle{list}
+\printglossaries
+
 \bibliographystyle{apalike}
 \bibliography{References}
 

@@ -18,3 +18,8 @@ Text/*.synctex.gz
 Text/*.toc
 Text/*.bbl
 Text/*.blg
+Text/*.glg
+Text/*.glo
+Text/*.gls
+Text/*.glsdefs
+Text/*.ist
