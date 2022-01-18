@@ -19,14 +19,71 @@ Many of these \ils{} are adapted from an educational compiler in a compilers cou
 
 \section{From Assembly to Basic Blocks}
 
-The first \il{}, named \emph{CHERI-RISC-V Assembly}, is simply the CHERI-RISC-V assembly language (see \cref{bnf:s}), except for some linkage boilerplate that is added by the compiler just before passing it to LLVM.
+The first \il{}, named \emph{CHERI-RISC-V Assembly} (abbr. \emph{S}), is simply the CHERI-RISC-V assembly language and can be seen in \cref{bnf:s}, except for some linkage boilerplate that is added by the compiler just before passing it to LLVM.
 
 \begin{figure}[ht]
 	\begin{grammar}
 		<Program> ::= (assembly: <String>)
 	\end{grammar}
-	\caption{The grammar for the CHERI-RISC-V Assembly \il{}.}
+	\caption{The grammar for S.}
 	\label{bnf:s}
+\end{figure}
+
+The second \il{}, named \emph{CHERI-RISC-V} (abbr. \emph{RV}), abstracts away from the textual nature of code by encoding each instruction in the language itself. An abridged grammar can be seen in \cref{bnf:rv}.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (instructions: <Instructions>)
+		
+		<Instructions> ::= <Instruction> | <Instruction> <Instructions>
+		
+		<Instruction> ::= copy(<DataType>, destination: <Register>, source: <Register>)
+			\alt registerRegister(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, rs2: <Register>)
+			\alt registerImmediate(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, imm: <Int>)
+			\alt loadWord(destination: <Register>, address: <Register>)
+			\alt storeWord(source: <Register>, address: <Register>)
+			\alt offsetCapability(destination: <Register>, source: <Register>, offset: <Register>)
+			\alt branch(rs1: <Register>, relation: <BranchRelation>, rs2: <Register>, target: <Label>)
+			\alt jump(target: <Label>)
+			\alt call(target: <Label>)
+			\alt return
+			\alt labelled(<Label>, <Instruction>)
+			\alt $\cdots$
+			
+		<Register> ::= zero | ra | sp | gp | tp | t0 | t1 | t2 | fp | s1 | a0 | a1 | a2 | a3 | a4 | a5 | a6 | a7 | s2 | s3 | s4 | s5 | s6 | s7 | s8 | s9 | s10 | s11 | t3 | t4 | t5 | t6
+		
+	\end{grammar}
+	\caption{Abridged grammar for RV.}
+	\label{bnf:rv}
+\end{figure}
+
+The next \il{} introduces the call frame, hence its name \emph{Frame Locations} (abbr. \emph{FL}), and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays. An abridged grammar is shown in \cref{bnf:fl}. FL reserves the register \texttt{t0} to perform the necessary capability offset operations; register \texttt{t0} is therefore no longer available at this level of abstraction.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (<Effects>)
+		
+		<Effects> ::= <Effect> | <Effect> <Effects>
+		
+		<Effect> ::= copy(<DataType>, into: <Register>, from: <Register>)
+			\alt compute(into: <Register>, value: <BinaryExpression>)
+			\alt load(<DataType>, into: <Register>, from: <Frame.Location>)
+			\alt store(<DataType>, into: <Frame.Location>, from: <Register>)
+			\alt loadElement(<DataType>, into: <Register>, vector: <Register>, index: <Register>)
+			\alt storeElement(<DataType>, vector: <Register>, index: <Register>, from: <Register>)
+			\alt branch(to: <Label>, <Register>, <BranchRelation>, <Register>)
+			\alt jump(to: <Label>)
+			\alt call(<Label>)
+			\alt return
+			\alt labelled(<Label>, <Effect>)
+			
+		<Register> ::= zero | ra | sp | gp | tp | t1 | t2 | fp | s1 | a0 | a1 | a2 | a3 | a4 | a5 | a6 | a7 | s2 | s3 | s4 | s5 | s6 | s7 | s8 | s9 | s10 | s11 | t3 | t4 | t5 | t6
+		
+	\end{grammar}
+	\caption{Abridged grammar for FL.}
+	\label{bnf:fl}
 \end{figure}
 
 % TODO
