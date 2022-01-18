@@ -11,9 +11,9 @@ extension FL {
 		/// The number of bytes that have been allocated on the frame.
 		private(set) var allocatedBytes = 0
 		
-		/// Allocates space for a datum of type `type` and returns its location.
-		public mutating func allocate(_ type: DataType) -> Location {
-			allocatedBytes += type.byteSize
+		/// Allocates space for `length` data of type `type` and returns its location.
+		public mutating func allocate(_ type: DataType, length: Int = 1) -> Location {
+			allocatedBytes += type.byteSize * length
 			return .init(offset: -allocatedBytes)
 		}
 		
