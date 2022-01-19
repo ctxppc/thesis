@@ -1,5 +1,0 @@
-\begin{description}
-{% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}
-{% include "Summary Item (Text).stencil" %}
-{% endfor %}
-\end{description}

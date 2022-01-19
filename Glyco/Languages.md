@@ -636,11 +636,6 @@ A language that introduces frame locations, i.e., memory locations relative to t
 <dd><code>(<strong>offset:</strong> Int)</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Location</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
-</dl>
-<dl>
 <dt><code>FL.Program</code></dt>
 <dd><code>([Effect])</code></dd>
 </dl>

@@ -75,33 +75,42 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two de
 			\alt labelled(<Label>, <Effect>)
 			\alt $\cdots$
 		
+		<BinaryExpression> ::= registerRegister(<Register>, <BinaryOperator>, <Register>)
+			\alt registerImmediate(<Register>, <BinaryOperator>, <Int>)
+		
+		<Frame.Location> ::= (offset: <Int>)
+		
 	\end{grammar}
 	\caption{Abridged grammar for FL.}
 	\label{bnf:fl}
 \end{figure}
 
-\paragraph{Flexible Operands (FO)} The next abstraction removes the explicit scalar load and store effects and enhances copy and computation effects to directly refer to the call frame. An abridged grammar is presented in \cref{bnf:fo}.
+\paragraph{Flexible Operands (FO)} The next abstraction removes the explicit scalar load and store effects and enhances copy and computation effects to directly refer to the call frame, adapted from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \cref{bnf:fo}.
 
 \begin{figure}[ht]
 	\begin{grammar}
 		
 		<Program> ::= (<Effects>)
 		
-		<Effects> ::= <Effect> | <Effect> <Effects>
-		
 		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
 			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
 			\alt getElement(<DataType>, of: <Location>, at: <Source>, to: <Location>)
 			\alt setElement(<DataType>, of: <Location>, at: <Source>, to: <Source>)
 			\alt branch(to: <Label>, <Source>, <BranchRelation>, <Source>)
-			\alt jump(to: <Label>)
-			\alt labelled(<Label>, <Effect>)
 			\alt $\cdots$
+		
+		<Location> ::= register(<Register>) | frameCell(<Frame.Location>)
+		
+		<Source> ::= location(<Location>) | immediate(<Int>)
 		
 	\end{grammar}
 	\caption{Abridged grammar for FO.}
 	\label{bnf:fo}
 \end{figure}
+
+\section{Introducing Basic Blocks}
+
+% TODO
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

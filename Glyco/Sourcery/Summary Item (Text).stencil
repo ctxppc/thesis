@@ -1,6 +1,0 @@
-{% if lang.type %}
-{% for name, lang in lang.type.typealiases where name == "Lower" %}
-{% include "Summary Item (Text).stencil" %}
-{% endfor %}
-	\item[{{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%}] {{ lang.type.annotations["description"] }}
-{% endif %}
