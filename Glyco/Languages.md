@@ -531,7 +531,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 </dl>
 
 
-<h2 id="FO">Grammar for FO (Frame Operands)</h2>
+<h2 id="FO">Grammar for FO (Flexible Operands)</h2>
 A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 
 **Inherited from FL:**
@@ -563,7 +563,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 <dl>
 <dt><code>FO.Program</code></dt>
-<dd><code>(<strong>effects:</strong> [Effect])</code></dd>
+<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
 <dt><code>FO.Register</code></dt>
@@ -730,7 +730,7 @@ N/A
 </dl>
 <dl>
 <dt><code>RV.Program</code></dt>
-<dd><code>(<strong>instructions:</strong> [Instruction])</code></dd>
+<dd><code>([Instruction])</code></dd>
 </dl>
 <dl>
 <dt><code>RV.Register</code></dt>

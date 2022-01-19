@@ -18,7 +18,7 @@ public enum FL : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var frame = Frame()
-			return .init(instructions: try effects.lowered(in: &frame))
+			return .init(try effects.lowered(in: &frame))
 		}
 		
 	}

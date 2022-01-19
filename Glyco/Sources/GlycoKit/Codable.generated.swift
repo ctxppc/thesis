@@ -139,7 +139,7 @@ extension FL.Program {
 
 extension FO.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effects = "effects"
+		case effects = "_0"
 	}
 }
 
@@ -187,7 +187,7 @@ extension PR.Program {
 
 extension RV.Program {
 	public enum CodingKeys : String, CodingKey {
-		case instructions = "instructions"
+		case instructions = "_0"
 	}
 }
 

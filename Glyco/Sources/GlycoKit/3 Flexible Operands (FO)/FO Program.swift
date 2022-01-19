@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Frame Operands
+//sourcery: longname = Flexible Operands
 //sourcery: description = "A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions."
 public enum FO : Language {
 	
@@ -8,7 +8,7 @@ public enum FO : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given effects.
-		public init(effects: [Effect]) {
+		public init(_ effects: [Effect]) {
 			self.effects = effects
 		}
 		

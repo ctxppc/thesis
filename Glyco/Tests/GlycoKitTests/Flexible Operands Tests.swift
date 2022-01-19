@@ -12,7 +12,7 @@ final class FlexibleOperandsTests : XCTestCase {
 		let b = frame.allocate(.word)
 		let c = frame.allocate(.word)
 		
-		let source = FO.Program(effects: [
+		let source = FO.Program([
 			.compute(.location(.frameCell(a)), .add, .location(.frameCell(b)), to: .frameCell(c))
 		])
 		

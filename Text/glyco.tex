@@ -8,19 +8,17 @@ Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enq
 
 Glyco is built following a \emph{nanopass} compiler design, described by several authors in the context of compiler education \cite{:educomp} and commercial compiler development \cite{:commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\nanopasses{}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \nanopasses{} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to LLVM for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
 
-The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \nanopass{} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \nanopass{}. This process goes on until a suitable level of abstraction has been achieved.
+The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \nanopass{} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \nanopass{}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \nanopass{} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
 
-Glyco currently defines 14 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Starting from the lowest \il{}, these are:
-\input{Language Summary}
+Glyco currently defines 14 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
 
-Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
+\section{Basic Abstractions over Assembly}
 
-\section{From Assembly to Basic Blocks}
+The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI-RISC-V's assembly language that are useful in higher abstractions.
 
-The first \il{}, named \emph{CHERI-RISC-V Assembly} (abbr. \emph{S}), is simply the CHERI-RISC-V assembly language and can be seen in \cref{bnf:s}, except for some linkage boilerplate that is added by the compiler just before passing it to LLVM.
-
+\paragraph{CHERI-RISC-V Assembly (S)} The ground language is a wrapper around the assembly representation of the program, as can been seen in \cref{bnf:s}. This language is compiled by adding some runtime code to this assembly before passing it to Clang.
 \begin{figure}[ht]
 	\begin{grammar}
 		<Program> ::= (assembly: <String>)
@@ -29,12 +27,11 @@ The first \il{}, named \emph{CHERI-RISC-V Assembly} (abbr. \emph{S}), is simply 
 	\label{bnf:s}
 \end{figure}
 
-The second \il{}, named \emph{CHERI-RISC-V} (abbr. \emph{RV}), abstracts away from the textual nature of code by encoding each instruction in the language itself. An abridged grammar can be seen in \cref{bnf:rv}.
-
+\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{:compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \cref{bnf:rv}.
 \begin{figure}[ht]
 	\begin{grammar}
 		
-		<Program> ::= (instructions: <Instructions>)
+		<Program> ::= (<Instructions>)
 		
 		<Instructions> ::= <Instruction> | <Instruction> <Instructions>
 		
@@ -46,19 +43,19 @@ The second \il{}, named \emph{CHERI-RISC-V} (abbr. \emph{RV}), abstracts away fr
 			\alt offsetCapability(destination: <Register>, source: <Register>, offset: <Register>)
 			\alt branch(rs1: <Register>, relation: <BranchRelation>, rs2: <Register>, target: <Label>)
 			\alt jump(target: <Label>)
-			\alt call(target: <Label>)
-			\alt return
 			\alt labelled(<Label>, <Instruction>)
 			\alt $\cdots$
 			
-		<Register> ::= zero | ra | sp | gp | tp | t0 | t1 | t2 | fp | s1 | a0 | a1 | a2 | a3 | a4 | a5 | a6 | a7 | s2 | s3 | s4 | s5 | s6 | s7 | s8 | s9 | s10 | s11 | t3 | t4 | t5 | t6
+		<Register> ::= zero | ra | sp | gp | tp | t0 | t1 | t2 | fp | s1 | $\cdots$
 		
 	\end{grammar}
 	\caption{Abridged grammar for RV.}
 	\label{bnf:rv}
 \end{figure}
 
-The next \il{} introduces the call frame, hence its name \emph{Frame Locations} (abbr. \emph{FL}), and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays. An abridged grammar is shown in \cref{bnf:fl}. FL reserves the register \texttt{t0} to perform the necessary capability offset operations; register \texttt{t0} is therefore no longer available at this level of abstraction.
+\paragraph{Frame Locations (FL)} This language introduces the call frame, hence its name, and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays.
+
+It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two deviations due to the ISA. A first deviation is that a computation effect can write its result to a different register than the one used for one of its operands. A second deviation is that a computation effect cannot read from memory, since RISC-V requires an explicit load instruction before performing a computation. An abridged grammar is shown in \cref{bnf:fl}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -75,18 +72,36 @@ The next \il{} introduces the call frame, hence its name \emph{Frame Locations} 
 			\alt storeElement(<DataType>, vector: <Register>, index: <Register>, from: <Register>)
 			\alt branch(to: <Label>, <Register>, <BranchRelation>, <Register>)
 			\alt jump(to: <Label>)
-			\alt call(<Label>)
-			\alt return
 			\alt labelled(<Label>, <Effect>)
-			
-		<Register> ::= zero | ra | sp | gp | tp | t1 | t2 | fp | s1 | a0 | a1 | a2 | a3 | a4 | a5 | a6 | a7 | s2 | s3 | s4 | s5 | s6 | s7 | s8 | s9 | s10 | s11 | t3 | t4 | t5 | t6
+			\alt $\cdots$
 		
 	\end{grammar}
 	\caption{Abridged grammar for FL.}
 	\label{bnf:fl}
 \end{figure}
 
-% TODO
+\paragraph{Flexible Operands (FO)} The next abstraction removes the explicit scalar load and store effects and enhances copy and computation effects to directly refer to the call frame. An abridged grammar is presented in \cref{bnf:fo}.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (<Effects>)
+		
+		<Effects> ::= <Effect> | <Effect> <Effects>
+		
+		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
+			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
+			\alt getElement(<DataType>, of: <Location>, at: <Source>, to: <Location>)
+			\alt setElement(<DataType>, of: <Location>, at: <Source>, to: <Source>)
+			\alt branch(to: <Label>, <Source>, <BranchRelation>, <Source>)
+			\alt jump(to: <Label>)
+			\alt labelled(<Label>, <Effect>)
+			\alt $\cdots$
+		
+	\end{grammar}
+	\caption{Abridged grammar for FO.}
+	\label{bnf:fo}
+\end{figure}
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

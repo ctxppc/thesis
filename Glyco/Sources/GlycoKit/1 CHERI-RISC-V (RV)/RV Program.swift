@@ -8,7 +8,7 @@ public enum RV : Language {
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given instructions.
-		public init(instructions: [Instruction]) {
+		public init(_ instructions: [Instruction]) {
 			self.instructions = instructions
 		}
 		
