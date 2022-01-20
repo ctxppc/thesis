@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension AL {
+extension ALA {
 	
 	/// A location for parameters.
 	public enum ParameterLocation : Codable, Hashable, Comparable, SimplyLowerable {

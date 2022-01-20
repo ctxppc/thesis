@@ -2,7 +2,7 @@
 
 import Collections
 
-extension AL {
+extension ALA {
 	
 	/// A machine register.
 	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {

@@ -15,6 +15,27 @@ extension AL.Procedure {
 	}
 }
 
+extension ALA.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "_0"
+		case procedures = "procedures"
+	}
+}
+
+extension ALA.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case effect = "_1"
+	}
+}
+
+extension ALA.Analysis {
+	public enum CodingKeys : String, CodingKey {
+		case conflictingLocationsForLocation = "conflictingLocationsForLocation"
+		case possiblyLiveLocations = "possiblyLiveLocations"
+	}
+}
+
 extension BB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case blocks = "_0"

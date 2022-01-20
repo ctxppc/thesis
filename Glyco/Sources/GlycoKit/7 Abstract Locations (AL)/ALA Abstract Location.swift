@@ -3,7 +3,7 @@
 import Algorithms
 import DepthKit
 
-extension AL {
+extension ALA {
 	
 	/// An abstract storage location on an AL machine.
 	public struct AbstractLocation : RawCodable, Hashable, SimplyLowerable {
@@ -18,14 +18,14 @@ extension AL {
 		
 		// See protocol.
 		func lowered(in context: inout LocalContext) -> Lower.Location {
-			context.assignments[self]
+			TODO.unimplemented
 		}
 		
 	}
 	
 }
 
-extension AL.AbstractLocation : Comparable {
+extension ALA.AbstractLocation : Comparable {
 	public static func <(earlier: Self, later: Self) -> Bool {
 		earlier.rawValue < later.rawValue
 	}

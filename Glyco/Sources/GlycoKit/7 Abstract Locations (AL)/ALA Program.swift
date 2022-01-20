@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Abstract Locations
-//sourcery: description = "A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer."
-public enum AL : Language {
+//sourcery: longname = Abstract Locations (Analysed)
+//sourcery: description = "A language that introduces abstract locations, annotated with liveness and conflict information."
+public enum ALA : Language {
 	
-	/// A program on an AL machine.
+	/// A program on an ALA machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {
@@ -20,24 +20,18 @@ public enum AL : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = AL.Context(analysis: .init())
-			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
+			TODO.unimplemented
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = ALA
+	public typealias Lower = CD
 	
-	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
-	public typealias Location = Lower.Location
-	public typealias ParameterLocation = Lower.ParameterLocation
-	public typealias Register = Lower.Register
-	public typealias Source = Lower.Source
 	
 }

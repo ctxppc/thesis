@@ -2,19 +2,13 @@
 
 extension AL {
 	
-	/// A value used while lowering a program.
-	struct GlobalContext {
-		
-		/// The compilation configuration.
-		let configuration: CompilationConfiguration
-		
-	}
-	
 	/// A value used while lowering a procedure.
-	struct LocalContext {
+	public struct Context {
 		
-		/// The assignment of locations to physical locations.
-		var assignments: Location.Assignments
+		/// The analysis.
+		///
+		/// When a program element's lowering begins, this value is the analysis at exit. When a program element's lowering finishes, this value is the analysis at entry.
+		var analysis: Lower.Analysis
 		
 	}
 	

@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension AL {
+extension ALA {
 	
 	/// A datum source.
 	public enum Source : Codable, Equatable, SimplyLowerable {

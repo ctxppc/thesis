@@ -10,6 +10,7 @@ The pipeline, from high-level to low-level is:
 [`CA`](#CA) →
 [`CC`](#CC) →
 [`AL`](#AL) →
+[`ALA`](#ALA) →
 [`CD`](#CD) →
 [`PR`](#PR) →
 [`BB`](#BB) →
@@ -359,12 +360,17 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
 A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 
-**Inherited from CD:**
+**Inherited from ALA:**
+<code>AbstractLocation</code>, 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Frame</code>, 
-<code>Label</code>
+<code>Label</code>, 
+<code>Location</code>, 
+<code>ParameterLocation</code>, 
+<code>Register</code>, 
+<code>Source</code>
 
 <dl>
 <dt><code>AL.Effect</code></dt>
@@ -376,16 +382,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 <dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
 <dd><code><strong>return</strong>(DataType, Source)</code></dd>
-</dl>
-<dl>
-<dt><code>AL.Location</code></dt>
-<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
-</dl>
-<dl>
-<dt><code>AL.ParameterLocation</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 <dt><code>AL.Predicate</code></dt>
@@ -403,7 +399,47 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Register</code></dt>
+<dt><code>ALA.Analysis</code></dt>
+<dd><code>(<strong>conflictingLocationsForLocation:</strong> [Location : Set<Location>], <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Effect</code></dt>
+<dd><code><strong>do</strong>([Effect], Analysis)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, Analysis)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, Analysis)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Location</code></dt>
+<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.ParameterLocation</code></dt>
+<dd><code><strong>register</strong>(Register)</code></dd>
+<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool, Analysis)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source, Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, Analysis)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Procedure</code></dt>
+<dd><code>(Label, Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Register</code></dt>
 <dd><code><strong>sp</strong></code></dd>
 <dd><code><strong>fp</strong></code></dd>
 <dd><code><strong>a0</strong></code></dd>
@@ -416,12 +452,86 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>a7</strong></code></dd>
 </dl>
 <dl>
-<dt><code>AL.Source</code></dt>
+<dt><code>ALA.Source</code></dt>
 <dd><code><strong>immediate</strong>(Int)</code></dd>
 <dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
-<dt><code>AL.AbstractLocation</code></dt>
+<dt><code>ALA.AbstractLocation</code></dt>
+<dd><code>String</code></dd>
+</dl>
+
+
+<h2 id="ALA">Grammar for ALA (Abstract Locations (Analysed))</h2>
+A language that introduces abstract locations, annotated with liveness and conflict information.
+
+**Inherited from CD:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Frame</code>, 
+<code>Label</code>
+
+<dl>
+<dt><code>ALA.Analysis</code></dt>
+<dd><code>(<strong>conflictingLocationsForLocation:</strong> [Location : Set<Location>], <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Effect</code></dt>
+<dd><code><strong>do</strong>([Effect], Analysis)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, Analysis)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, Analysis)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Location</code></dt>
+<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.ParameterLocation</code></dt>
+<dd><code><strong>register</strong>(Register)</code></dd>
+<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Predicate</code></dt>
+<dd><code><strong>constant</strong>(Bool, Analysis)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source, Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, Analysis)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Procedure</code></dt>
+<dd><code>(Label, Effect)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Program</code></dt>
+<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Register</code></dt>
+<dd><code><strong>sp</strong></code></dd>
+<dd><code><strong>fp</strong></code></dd>
+<dd><code><strong>a0</strong></code></dd>
+<dd><code><strong>a1</strong></code></dd>
+<dd><code><strong>a2</strong></code></dd>
+<dd><code><strong>a3</strong></code></dd>
+<dd><code><strong>a4</strong></code></dd>
+<dd><code><strong>a5</strong></code></dd>
+<dd><code><strong>a6</strong></code></dd>
+<dd><code><strong>a7</strong></code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Source</code></dt>
+<dd><code><strong>immediate</strong>(Int)</code></dd>
+<dd><code><strong>location</strong>(Location)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.AbstractLocation</code></dt>
 <dd><code>String</code></dd>
 </dl>
 

@@ -34,76 +34,77 @@ extension AL {
 		case `return`(DataType, Source)
 		
 		// See protocol.
-		func lowered(in context: inout LocalContext) throws -> Lower.Effect {
+		func lowered(in context: inout Context) throws -> Lower.Effect {
+			let analysisAtExit = context.analysis	// the lowered effect's analysis is the analysis before lowering it
+			context.analysis.update(defined: definedLocations(), possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context))
+				return .do(
+					try effects
+						.reversed()
+						.lowered(in: &context)	// lower the effects in reverse order so that analysis flows backwards
+						.reversed(),			// emit effects in the right order by reversing again
+					analysisAtExit				// the do effect's analysis is the analysis before lowering its subeffects
+				)
 				
 				case .set(let type, let destination, to: let source):
-				return try .set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
+				return .set(type, destination, to: source, analysisAtExit)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				return try .compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination.lowered(in: &context))
+				return .compute(lhs, operation, rhs, to: destination, analysisAtExit)
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				return try .getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				return .getElement(type, of: vector, at: index, to: destination, analysisAtExit)
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				return try .setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				return .setElement(type, of: vector, at: index, to: element, analysisAtExit)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
-				
-				case .call(let procedure, _):
-				return .call(procedure)
-				
-				case .return(let type, let result):
-				return .return(type, try result.lowered(in: &context))
-				
-			}
-		}
-		
-		/// Returns a tuple consisting of (1) a set partitioning locations whose current value is either possibly used or definitely not used at the point *right before* executing `self` and (2) an undirected graph of locations who are connected iff they simultaneously hold a value that is possibly needed by an effect executed in the future.
-		///
-		/// - Parameter livenessAtExit: The liveness set right after executing `self`.
-		/// - Parameter conflictsAtExit: The conflict graph right after executing `self`.
-		func livenessAndConflictsAtEntry(livenessAtExit: LivenessSet, conflictsAtExit: ConflictGraph) -> (LivenessSet, ConflictGraph) {
-			
-			var livenessAtEntry = livenessAtExit
-			let definedLocations = definedLocations()
-			livenessAtEntry.markAsDefinitelyDiscarded(definedLocations)			// with this ordering,
-			livenessAtEntry.markAsPossiblyUsedLater(possiblyUsedLocations())	// copy to self or compute in-place becomes possibly-used-later
-			
-			var conflictsAtEntry = conflictsAtExit
-			for definedLocation in definedLocations {
-				conflictsAtEntry.insertConflict(definedLocation, livenessAtExit.possiblyAliveLocations)
-			}
-			
-			switch self {
-				
-				case .do(effects: let effects):
-				(livenessAtEntry, conflictsAtEntry) = effects.reversed().reduce((livenessAtEntry, conflictsAtEntry)) {
-					$1.livenessAndConflictsAtEntry(livenessAtExit: $0.0, conflictsAtExit: $0.1)
+				do {
+					
+					/*						 │
+					┌────────────────────────┼────────────────────────┐
+					│    ┌───────────────────▼───────────────────┐    │
+					│    │                                       │    │
+					│    │               Predicate               │    │
+					│    │                                       │    │
+					│    └───────┬───────────────────────┬───────┘    │
+					│ analysisAtA│firmativeEntry         │            │
+					│    ┌───────▼────────┐     ┌────────▼───────┐    │
+					│    │  Affirmative   │     │    Negative    │    │
+					│    │     branch     │     │     branch     │    │
+					│    └───────┬────────┘     └────────┬───────┘    │
+					│            │    analysisAtEnd      │            │
+					└────────────┼───────────────────────┼────────────┘
+								 │    analysisAtExit     │
+								 └───────────┬───────────┘
+											 │
+											 ▼
+					 */
+					
+					let analysisAtEnd = context.analysis	// analysisAtExit == analysisAtEnd as long as if doesn't def/use anything itself but this is cleaner
+					
+					let loweredAffirmative = try affirmative.lowered(in: &context)
+					let analysisAtAffirmativeEntry = context.analysis
+					
+					context.analysis = analysisAtEnd		// reset for second branch
+					let loweredNegative = try negative.lowered(in: &context)
+					
+					context.analysis.formUnion(with: analysisAtAffirmativeEntry)	// merge analysis of second branch with the one of first branch
+					let loweredPredicate = try predicate.lowered(in: &context)
+					
+					return .if(loweredPredicate, then: loweredAffirmative, else: loweredNegative, analysisAtExit)
+					
 				}
 				
-				case .set, .compute, .getElement, .setElement, .call, .return:
-				break	// already dealt with defined & used locations above
+				case .call(let procedure, let parameterLocations):
+				return .call(procedure, parameterLocations, analysisAtExit)
 				
-				case .if(let predicate, then: let affirmative, else: let negative):
-				let (livenessAtAffirmativeEntry, conflictsAtAffirmativeEntry) =
-					affirmative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
-				let (livenessAtNegativeEntry, conflictsAtNegativeEntry) =
-					negative.livenessAndConflictsAtEntry(livenessAtExit: livenessAtExit, conflictsAtExit: conflictsAtExit)
-				let livenessAtBodyEntry = livenessAtAffirmativeEntry.union(livenessAtNegativeEntry)
-				let conflictsAtBodyEntry = conflictsAtAffirmativeEntry.union(conflictsAtNegativeEntry)
-				(livenessAtEntry, conflictsAtEntry)
-					= predicate.livenessAndConflictsAtEntry(livenessAtExit: livenessAtBodyEntry, conflictsAtExit: conflictsAtBodyEntry)
+				case .return(let type, let result):
+				return .return(type, result, analysisAtExit)
 				
 			}
-			
-			return (livenessAtEntry, conflictsAtEntry)
-			
 		}
 		
 		/// Returns the locations defined by `self`.
