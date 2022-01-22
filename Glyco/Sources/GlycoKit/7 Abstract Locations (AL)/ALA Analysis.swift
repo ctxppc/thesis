@@ -62,6 +62,19 @@ extension ALA {
 			self.possiblyLiveLocations.formUnion(other.possiblyLiveLocations)
 		}
 		
+		/// Returns a Boolean value indicating whether the analysis' conflict graph contains a conflict between `firstLocation` and any location in `otherLocations`.
+		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
+			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
+			return !conflictingLocations.isDisjoint(with: otherLocations)
+		}
+		
+		/// Returns the locations, ordered by increasing number of conflicts.
+		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
+			conflictingLocationsForLocation
+				.sorted { ($0.value.count, $0.key) < ($1.value.count, $1.key) }	// also order by location for deterministic ordering
+				.map(\.key)
+		}
+		
 	}
 	
 }

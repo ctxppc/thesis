@@ -2,19 +2,11 @@
 
 extension ALA {
 	
-	/// A value used while lowering a program.
-	struct GlobalContext {
-		
-		/// The compilation configuration.
-		let configuration: CompilationConfiguration
-		
-	}
-	
 	/// A value used while lowering a procedure.
-	struct LocalContext {
+	struct Context {
 		
 		/// The assignment of locations to physical locations.
-		var assignments: ()	// TODO
+		var assignments: Location.Assignments
 		
 	}
 	

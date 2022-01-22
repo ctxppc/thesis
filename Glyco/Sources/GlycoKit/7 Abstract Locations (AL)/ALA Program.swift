@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Abstract Locations (Analysed)
+//sourcery: longname = "Abstract Locations, Analysed"
 //sourcery: description = "A language that introduces abstract locations, annotated with liveness and conflict information."
 public enum ALA : Language {
 	
@@ -20,7 +20,8 @@ public enum ALA : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			TODO.unimplemented
+			var context = Context(assignments: .init(from: effect.analysis))
+			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		
 	}

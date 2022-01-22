@@ -98,8 +98,8 @@ extension AL {
 					
 				}
 				
-				case .call(let procedure, let parameterLocations):
-				return .call(procedure, parameterLocations, analysisAtExit)
+				case .call(let name, _):
+				return .call(name, analysisAtExit)
 				
 				case .return(let type, let result):
 				return .return(type, result, analysisAtExit)

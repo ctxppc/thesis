@@ -12,7 +12,7 @@ extension ALA {
 		case location(Location)
 		
 		// See protocol.
-		func lowered(in context: inout LocalContext) throws -> Lower.Source {
+		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .immediate(let imm):		return .immediate(imm)
 				case .location(let location):	return .location(try location.lowered(in: &context))

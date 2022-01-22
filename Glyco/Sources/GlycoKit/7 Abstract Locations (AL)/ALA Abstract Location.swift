@@ -17,8 +17,8 @@ extension ALA {
 		public var rawValue: String
 		
 		// See protocol.
-		func lowered(in context: inout LocalContext) -> Lower.Location {
-			TODO.unimplemented
+		func lowered(in context: inout Context) -> Lower.Location {
+			context.assignments[self]
 		}
 		
 	}

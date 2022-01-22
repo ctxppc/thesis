@@ -17,8 +17,9 @@ extension ALA {
 		public var effect: Effect
 		
 		// See protocol.
-		func lowered(in context: inout GlobalContext) throws -> Lower.Procedure {
-			TODO.unimplemented
+		func lowered(in context: inout ()) throws -> Lower.Procedure {	// procedures don't take a context
+			var context = ALA.Context(assignments: .init(from: effect.analysis))
+			return .init(name, try effect.lowered(in: &context))
 		}
 		
 	}
