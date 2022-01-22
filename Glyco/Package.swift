@@ -7,7 +7,7 @@ let package = Package(
 	name:			"Glyco",
 	platforms:		[.macOS(.v11)],
 	products:		[
-		.executable(name: "Glyco", targets: ["Glyco"]),
+		.executable(name: "glyco", targets: ["glyco"]),
 		.library(name: "GlycoKit", targets: ["GlycoKit"]),
 		.library(name: "Sisp", targets: ["Sisp"]),
 	],
@@ -20,7 +20,7 @@ let package = Package(
 	],
 	targets:		[
 		
-		.executableTarget(name: "Glyco", dependencies: [
+		.executableTarget(name: "glyco", dependencies: [
 			"GlycoKit",
 			.product(name: "ArgumentParser", package: "swift-argument-parser"),
 		]),
