@@ -20,9 +20,9 @@ public enum ALA : Language {
 		
 		// See protocol.
 		public mutating func optimise() {
-			while let (firstLocation, otherLocation) = effect.safelyCoalescableLocations() {
+			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				var analysis = Analysis()
-				effect = effect.coalescing(firstLocation, into: otherLocation, analysis: &analysis)
+				effect = effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
 			}
 		}
 		

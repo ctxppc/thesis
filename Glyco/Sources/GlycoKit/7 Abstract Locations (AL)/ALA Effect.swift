@@ -135,10 +135,10 @@ extension ALA {
 				}
 				
 				case .call(let name, let locations, _):
-				return .call(name, locations, analysisAtEntry)
+				return .call(name, locations, analysis)
 				
 				case .return(let type, let result, _):
-				return .return(type, result, analysisAtEntry)
+				return .return(type, result, analysis)
 				
 			}
 		}
@@ -211,7 +211,7 @@ extension ALA {
 		}
 		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
-		func safelyCoalescableLocations() -> (Location, Location)? {
+		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
 			switch self {
 				
 				case .do(let effects, _):
@@ -221,8 +221,11 @@ extension ALA {
 						.compactMap { $0.safelyCoalescableLocations() }
 						.first
 				
-				case .set(_, let destination, to: .location(let source), let analysis) where analysis.safelyCoalescable(destination, source):
+				case .set(_, .abstract(let destination), to: .location(let source), let analysis) where analysis.safelyCoalescable(.abstract(destination), source):
 				return (destination, source)
+					
+				case .set(_, let destination, to: .location(.abstract(let source)), let analysis) where analysis.safelyCoalescable(destination, .abstract(source)):
+				return (source, destination)
 				
 				case .set, .compute, .getElement, .setElement, .call, .return:
 				return nil
@@ -235,35 +238,35 @@ extension ALA {
 			}
 		}
 		
-		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the effect's analysis at entry is updated accordingly.
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
 		///
 		/// - Parameters:
-		///   - removedLocation: The location that is replaced by `remainingLocation`.
-		///   - remainingLocation: The location that remains.
+		///   - removedLocation: The location that is replaced by `retainedLocation`.
+		///   - retainedLocation: The location that remains.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
-		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the effect's analysis at entry is updated accordingly.
-		func coalescing(_ removedLocation: Location, into remainingLocation: Location, analysis: inout Analysis) -> Self {
-			updated(using: { $0.coalescingLocally(removedLocation, into: remainingLocation) }, analysis: &analysis)
+		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
+		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) -> Self {
+			updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
-		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation`, without updating any children effects or analysis information.
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.
 		///
 		/// This method should be used as part of an `update(using:analysis:)` call which ensures the coalescing is done globally and analysis information is updated appropriately.
 		///
 		/// - Parameters:
-		///   - removedLocation: The location that is replaced by `remainingLocation`.
-		///   - remainingLocation: The location that remains.
+		///   - removedLocation: The location that is replaced by `retainedLocation`.
+		///   - retainedLocation: The location that is retained.
 		///
-		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `remainingLocation`.
-		func coalescingLocally(_ removedLocation: Location, into remainingLocation: Location) -> Self {
+		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
+		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location) -> Self {
 			
 			func substitute(_ location: Location) -> Location {
-				location == removedLocation ? remainingLocation : location
+				location == .abstract(removedLocation) ? retainedLocation : location
 			}
 			
 			func substitute(_ source: Source) -> Source {
-				source == .location(removedLocation) ? .location(remainingLocation) : source
+				source == .location(.abstract(removedLocation)) ? .location(retainedLocation) : source
 			}
 			
 			switch self {
@@ -271,14 +274,14 @@ extension ALA {
 				case .do, .if, .call:
 				return self
 				
-				case .set(_, removedLocation, to: .location(remainingLocation), let analysis),
-					.set(_, remainingLocation, to: .location(removedLocation), let analysis),
-					.set(_, remainingLocation, to: .location(remainingLocation), let analysis),
-					.set(_, removedLocation, to: .location(removedLocation), let analysis):
+				case .set(_, .abstract(removedLocation), to: .location(retainedLocation), let analysis),
+					.set(_, retainedLocation, to: .location(.abstract(removedLocation)), let analysis),
+					.set(_, retainedLocation, to: .location(retainedLocation), let analysis),
+					.set(_, .abstract(removedLocation), to: .location(.abstract(removedLocation)), let analysis):
 				return .do([], analysis)
 				
-				case .set(let dataType, removedLocation, to: let source, let analysis):
-				return .set(dataType, remainingLocation, to: source, analysis)
+				case .set(let dataType, .abstract(removedLocation), to: let source, let analysis):
+				return .set(dataType, retainedLocation, to: source, analysis)
 				
 				case .set:
 				return self

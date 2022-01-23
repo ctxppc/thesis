@@ -104,7 +104,7 @@ extension ALA {
 		
 		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
-		func safelyCoalescableLocations() -> (Location, Location)? {
+		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
 			switch self {
 				
 				case .constant, .relation:
@@ -126,14 +126,14 @@ extension ALA {
 			}
 		}
 		
-		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the analysis at entry is updated accordingly.
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the analysis at entry is updated accordingly.
 		///
 		/// - Parameters:
-		///   - removedLocation: The location that is replaced by `remainingLocation`.
-		///   - remainingLocation: The location that remains.
+		///   - removedLocation: The location that is replaced by `retainedLocation`.
+		///   - retainedLocation: The location that remains.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		func coalescing(_ removedLocation: Location, into remainingLocation: Location, analysis: inout Analysis) -> Self {
-			updated(using: { $0.coalescingLocally(removedLocation, into: remainingLocation) }, analysis: &analysis)
+		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) -> Self {
+			updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
 	}
