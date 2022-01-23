@@ -5,11 +5,11 @@ import Sisp
 
 public protocol Program : Codable, Equatable {
 	
-	/// Optimises `self` and returns a Boolean value indicating whether the program has changed.
-	///
-	/// - Returns: `true` if `self` is more optimised; `false` if `self` is unchanged.
-	@discardableResult
-	mutating func optimise() -> Bool
+	/// Optimises `self`.
+	mutating func optimise()
+	
+	/// Validates `self`.
+	func validate() throws
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram
@@ -31,7 +31,9 @@ public struct CompilationConfiguration {
 		target:				Target,
 		toolchainURL:		URL? = nil,
 		systemURL:			URL? = nil,
-		argumentRegisters:	[AL.Register] = AL.Register.defaultArgumentRegisters
+		argumentRegisters:	[AL.Register] = AL.Register.defaultArgumentRegisters,
+		optimise:			Bool = true,
+		validate:			Bool = true
 	) {
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
@@ -42,6 +44,8 @@ public struct CompilationConfiguration {
 			.appendingPathComponent("output")
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
 		self.argumentRegisters = argumentRegisters
+		self.optimise = optimise
+		self.validate = validate
 	}
 	
 	/// The program's target platform.
@@ -65,17 +69,35 @@ public struct CompilationConfiguration {
 	/// The registers used for passing arguments, in argument order.
 	public var argumentRegisters: [AL.Register]
 	
+	/// A Boolean value indicating whether programs are optimised in each language before lowering them.
+	public var optimise: Bool
+	
+	/// A Boolean value indicating whether programs are validated in each language before lowering them.
+	public var validate: Bool
+	
 }
 
 extension Program {
 	
-	public func optimise() -> Bool {
-		false
-	}
+	public func optimise() {}
+	
+	public func validate() {}
 	
 	public func elf(configuration: CompilationConfiguration) throws -> Data {
-		try lowered(configuration: configuration)
+		try processedLowering(configuration: configuration)
 			.elf(configuration: configuration)
+	}
+	
+	/// Optionally optimises and validates `self`, then returns a representation of `self` in a lower language.
+	public func processedLowering(configuration: CompilationConfiguration) throws -> LowerProgram {
+		var copy = self
+		if configuration.optimise {
+			copy.optimise()
+		}
+		if configuration.validate {
+			try copy.validate()
+		}
+		return try copy.lowered(configuration: configuration)
 	}
 	
 	public func write(to url: URL) throws {

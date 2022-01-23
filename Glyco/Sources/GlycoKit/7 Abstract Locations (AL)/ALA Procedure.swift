@@ -16,6 +16,14 @@ extension ALA {
 		/// The procedure's effect when invoked.
 		public var effect: Effect
 		
+		/// Optimises the procedure.
+		public mutating func optimise() {
+			while let (firstLocation, otherLocation) = effect.safelyCoalescableLocations() {
+				var analysis = Analysis()
+				effect = effect.coalescing(firstLocation, into: otherLocation, analysis: &analysis)
+			}
+		}
+		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {	// procedures don't take a context
 			var context = ALA.Context(assignments: .init(from: effect.analysisAtEntry))

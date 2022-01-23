@@ -19,6 +19,14 @@ public enum ALA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public mutating func optimise() {
+			while let (firstLocation, otherLocation) = effect.safelyCoalescableLocations() {
+				var analysis = Analysis()
+				effect = effect.coalescing(firstLocation, into: otherLocation, analysis: &analysis)
+			}
+		}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(assignments: .init(from: effect.analysisAtEntry))
 			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())

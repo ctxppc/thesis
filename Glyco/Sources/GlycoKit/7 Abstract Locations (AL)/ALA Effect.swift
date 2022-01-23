@@ -64,35 +64,42 @@ extension ALA {
 			}
 		}
 		
-		/// Updates the analysis at entry of `self`.
+		/// Returns a (possibly) transformed copy of `self` with updated analysis at entry.
 		///
-		/// - Parameter analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		mutating func update(analysis: inout Analysis) {
-			analysis.update(defined: definedLocations(), possiblyUsed: possiblyUsedLocations())
-			switch self {
+		/// The transformation is applied first. If the transformed effect contains children, it is applied to those children as well.
+		///
+		/// - Parameters:
+		///    - transform: A function that transforms effects. The default function returns the provided effect unaltered.
+		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///
+		/// - Returns: `transform(self)` with updated analysis at entry.
+		func updated(using transform: Transformation = { $0 }, analysis: inout Analysis) -> Self {
+			let transformed = transform(self)
+			analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
+			switch transformed {
 				
 				case .do(let effects, _):
-				self = .do(
+				return .do(
 					effects
 						.reversed()
-						.map { $0.updating(analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
-						.reversed(),								// reverse back to normal order
+						.map { $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
+						.reversed(),												// reverse back to normal order
 					analysis
 				)
 				
 				case .set(let type, let destination, to: let source, _):
-				self = .set(type, destination, to: source, analysis)
+				return .set(type, destination, to: source, analysis)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination, _):
-				self = .compute(lhs, operation, rhs, to: destination, analysis)
+				return .compute(lhs, operation, rhs, to: destination, analysis)
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, _):
-				self = .getElement(type, of: vector, at: index, to: destination, analysis)
+				return .getElement(type, of: vector, at: index, to: destination, analysis)
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element, _):
-				self = .setElement(type, of: vector, at: index, to: element, analysis)
+				return .setElement(type, of: vector, at: index, to: element, analysis)
 				
-				case .if(var predicate, then: var affirmative, else: var negative, _):
+				case .if(let predicate, then: let affirmative, else: let negative, _):
 				do {
 					
 					/*						 │
@@ -116,31 +123,28 @@ extension ALA {
 					 */
 					
 					var analysisAtAffirmativeEntry = analysis
-					affirmative.update(analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = affirmative.updated(analysis: &analysisAtAffirmativeEntry)
 					
-					negative.update(analysis: &analysis)
+					let updatedNegative = negative.updated(analysis: &analysis)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					predicate.update(analysis: &analysis)
+					let updatedPredicate = predicate.updated(analysis: &analysis)
 					
-					self = .if(predicate, then: affirmative, else: negative, analysis)
+					return .if(updatedPredicate, then: updatedAffirmative, else: updatedNegative, analysis)
 					
 				}
 				
 				case .call(let name, let locations, _):
-				self = .call(name, locations, analysisAtEntry)
+				return .call(name, locations, analysisAtEntry)
 				
 				case .return(let type, let result, _):
-				self = .return(type, result, analysisAtEntry)
+				return .return(type, result, analysisAtEntry)
 				
 			}
 		}
 		
-		func updating(analysis: inout Analysis) -> Self {
-			var copy = self
-			copy.update(analysis: &analysis)
-			return copy
-		}
+		/// A function that transforms an effect into the same effect or different effect.
+		typealias Transformation = (Self) -> Self
 		
 		/// The analysis of `self` at entry.
 		var analysisAtEntry: Analysis {
@@ -204,6 +208,95 @@ extension ALA {
 				return .init(arguments.map { .parameter($0) })
 				
 			}
+		}
+		
+		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
+		func safelyCoalescableLocations() -> (Location, Location)? {
+			switch self {
+				
+				case .do(let effects, _):
+				return effects
+						.reversed()
+						.lazy
+						.compactMap { $0.safelyCoalescableLocations() }
+						.first
+				
+				case .set(_, let destination, to: .location(let source), let analysis) where analysis.safelyCoalescable(destination, source):
+				return (destination, source)
+				
+				case .set, .compute, .getElement, .setElement, .call, .return:
+				return nil
+				
+				case .if(let predicate, then: let affirmative, else: let negative, _):
+				return negative.safelyCoalescableLocations()
+					?? affirmative.safelyCoalescableLocations()
+					?? predicate.safelyCoalescableLocations()
+				
+			}
+		}
+		
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the effect's analysis at entry is updated accordingly.
+		///
+		/// - Parameters:
+		///   - removedLocation: The location that is replaced by `remainingLocation`.
+		///   - remainingLocation: The location that remains.
+		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///
+		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the effect's analysis at entry is updated accordingly.
+		func coalescing(_ removedLocation: Location, into remainingLocation: Location, analysis: inout Analysis) -> Self {
+			updated(using: { $0.coalescingLocally(removedLocation, into: remainingLocation) }, analysis: &analysis)
+		}
+		
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation`, without updating any children effects or analysis information.
+		///
+		/// This method should be used as part of an `update(using:analysis:)` call which ensures the coalescing is done globally and analysis information is updated appropriately.
+		///
+		/// - Parameters:
+		///   - removedLocation: The location that is replaced by `remainingLocation`.
+		///   - remainingLocation: The location that remains.
+		///
+		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `remainingLocation`.
+		func coalescingLocally(_ removedLocation: Location, into remainingLocation: Location) -> Self {
+			
+			func substitute(_ location: Location) -> Location {
+				location == removedLocation ? remainingLocation : location
+			}
+			
+			func substitute(_ source: Source) -> Source {
+				source == .location(removedLocation) ? .location(remainingLocation) : source
+			}
+			
+			switch self {
+				
+				case .do, .if, .call:
+				return self
+				
+				case .set(_, removedLocation, to: .location(remainingLocation), let analysis),
+					.set(_, remainingLocation, to: .location(removedLocation), let analysis),
+					.set(_, remainingLocation, to: .location(remainingLocation), let analysis),
+					.set(_, removedLocation, to: .location(removedLocation), let analysis):
+				return .do([], analysis)
+				
+				case .set(let dataType, removedLocation, to: let source, let analysis):
+				return .set(dataType, remainingLocation, to: source, analysis)
+				
+				case .set:
+				return self
+				
+				case .compute(let lhs, let op, let rhs, to: let destination, let analysis):
+				return .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysis)
+				
+				case .getElement(let dataType, of: let vector, at: let index, to: let destination, let analysis):
+				return .getElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(destination), analysis)
+				
+				case .setElement(let dataType, of: let vector, at: let index, to: let source, let analysis):
+				return .setElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(source), analysis)
+				
+				case .return(let dataType, let value, let analysis):
+				return .return(dataType, substitute(value), analysis)
+				
+			}
+			
 		}
 		
 	}

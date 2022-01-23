@@ -36,51 +36,51 @@ extension ALA {
 			}
 		}
 		
-		/// Updates the analysis at entry of `self`.
+		/// Returns a copy of `self` with updated analysis at entry.
 		///
-		/// - Parameter analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		mutating func update(analysis: inout Analysis) {
+		/// For each contained effect, the transformation is applied first. If the transformed effect contains children, it is applied to those children as well.
+		///
+		/// - Parameters:
+		///    - transform: A function that transforms effects. The default function returns the provided effect unaltered.
+		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///
+		/// - Returns: A copy of `self` where any contained effects have been transformed using `transform` and with updated analysis at entry.
+		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis) -> Self {
 			analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
 				case .constant(let holds, _):
-				self = .constant(holds, analysis)
+				return .constant(holds, analysis)
 				
 				case .relation(let lhs, let relation, let rhs, _):
-				self = .relation(lhs, relation, rhs, analysis)
+				return .relation(lhs, relation, rhs, analysis)
 				
-				case .if(var condition, then: var affirmative, else: var negative, _):
+				case .if(let condition, then: let affirmative, else: let negative, _):
 				do {
 					
 					var analysisAtAffirmativeEntry = analysis
-					affirmative.update(analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
 					
-					negative.update(analysis: &analysis)
+					let updatedNegative = negative.updated(using: transform, analysis: &analysis)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					condition.update(analysis: &analysis)
+					let updatedCondition = condition.updated(using: transform, analysis: &analysis)
 					
-					self = .if(condition, then: affirmative, else: negative, analysis)
+					return .if(updatedCondition, then: updatedAffirmative, else: updatedNegative, analysis)
 					
 				}
 				
 				case .do(let effects, then: let predicate, _):
-				self = .do(
+				return .do(
 					effects
 						.reversed()
-						.map { $0.updating(analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
-						.reversed(),								// reverse back to normal order
-					then: predicate.updating(analysis: &analysis),
+						.map { $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
+						.reversed(),												// reverse back to normal order
+					then: predicate.updated(using: transform, analysis: &analysis),
 					analysis
 				)
 				
 			}
-		}
-		
-		func updating(analysis: inout Analysis) -> Self {
-			var copy = self
-			copy.update(analysis: &analysis)
-			return copy
 		}
 		
 		/// Returns the locations possibly used by `self`.
@@ -100,6 +100,40 @@ extension ALA {
 				return [lhs, rhs]
 				
 			}
+		}
+		
+		
+		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
+		func safelyCoalescableLocations() -> (Location, Location)? {
+			switch self {
+				
+				case .constant, .relation:
+				return nil
+				
+				case .if(let condition, then: let affirmative, else: let negative, _):
+				return negative.safelyCoalescableLocations()
+					?? affirmative.safelyCoalescableLocations()
+					?? condition.safelyCoalescableLocations()
+				
+				case .do(let effects, then: let predicate, _):
+				return effects
+					.reversed()
+					.lazy
+					.compactMap { $0.safelyCoalescableLocations() }
+					.first
+					?? predicate.safelyCoalescableLocations()
+				
+			}
+		}
+		
+		/// Returns a copy of `self` where `removedLocation` is coalesced into `remainingLocation` and the analysis at entry is updated accordingly.
+		///
+		/// - Parameters:
+		///   - removedLocation: The location that is replaced by `remainingLocation`.
+		///   - remainingLocation: The location that remains.
+		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		func coalescing(_ removedLocation: Location, into remainingLocation: Location, analysis: inout Analysis) -> Self {
+			updated(using: { $0.coalescingLocally(removedLocation, into: remainingLocation) }, analysis: &analysis)
 		}
 		
 	}

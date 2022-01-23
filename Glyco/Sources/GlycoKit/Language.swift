@@ -54,7 +54,7 @@ extension Language {
 			return try SispEncoder().encode(program).serialised()
 		} else {
 			return try Lower.loweredProgramRepresentation(
-				program.lowered(configuration: configuration),
+				program.processedLowering(configuration: configuration),
 				targetLanguage:	targetLanguage,
 				configuration:	configuration
 			)

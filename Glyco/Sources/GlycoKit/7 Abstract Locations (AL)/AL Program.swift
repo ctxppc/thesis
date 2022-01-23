@@ -21,7 +21,7 @@ public enum AL : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var analysis = Lower.Analysis()
-			return try .init(effect.lowered().updating(analysis: &analysis), procedures: procedures.lowered())
+			return try .init(effect.lowered().updated(analysis: &analysis), procedures: procedures.lowered())
 		}
 		
 	}

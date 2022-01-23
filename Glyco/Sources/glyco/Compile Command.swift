@@ -30,8 +30,14 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, help: "The generated file (to be overwritten). (Omit to discard the ELF file after building it or to print the intermediate representation to standard out.)")
 	var output: URL?
 	
-	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The argument registers to use in order. (Omit to use the standard RISC-V argument registers.)")
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The registers to use for passing arguments, in parameter order.")
 	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
+	
+	@Flag(name: .long, inversion: .prefixedNo, help: "Enable/disable intra-language optimisations.")
+	var optimise: Bool = true
+	
+	@Flag(name: .long, inversion: .prefixedNo, help: "Enable/disable intra-language validations.")
+	var validate: Bool = true
 	
 	#if os(macOS)
 	@Flag(name: .shortAndLong, help: "Continuously observe source file for changes and compile. (Omit to compile once and exit.)")
@@ -48,7 +54,9 @@ struct CompileCommand : ParsableCommand {
 			target:				target,
 			toolchainURL:		toolchainURL,
 			systemURL:			systemURL,
-			argumentRegisters:	argumentRegisters
+			argumentRegisters:	argumentRegisters,
+			optimise:			optimise,
+			validate:			validate
 		)
 		let sourceLanguage = source.pathExtension.uppercased()
 		
