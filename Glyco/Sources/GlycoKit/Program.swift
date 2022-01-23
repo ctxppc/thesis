@@ -5,6 +5,12 @@ import Sisp
 
 public protocol Program : Codable, Equatable {
 	
+	/// Optimises `self` and returns a Boolean value indicating whether the program has changed.
+	///
+	/// - Returns: `true` if `self` is more optimised; `false` if `self` is unchanged.
+	@discardableResult
+	mutating func optimise() -> Bool
+	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram
 	
@@ -62,6 +68,10 @@ public struct CompilationConfiguration {
 }
 
 extension Program {
+	
+	public func optimise() -> Bool {
+		false
+	}
 	
 	public func elf(configuration: CompilationConfiguration) throws -> Data {
 		try lowered(configuration: configuration)

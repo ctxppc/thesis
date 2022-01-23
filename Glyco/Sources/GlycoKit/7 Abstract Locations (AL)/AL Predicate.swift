@@ -19,62 +19,19 @@ extension AL {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Predicate {
-			let analysisAtExit = context.analysis	// the lowered predicate's analysis is the analysis before lowering it
-			context.analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
-				case .constant(value: let holds):
-				return .constant(holds, analysisAtExit)
+				case .constant(let holds):
+				return .constant(holds, .init())
 				
 				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs, relation, rhs, analysisAtExit)
+				return .relation(lhs, relation, rhs, .init())
 				
 				case .if(let condition, then: let affirmative, else: let negative):
-				do {
-					
-					let analysisAtEnd = context.analysis	// analysisAtExit == analysisAtEnd as long as if doesn't def/use anything itself but this is cleaner
-					
-					let loweredAffirmative = try affirmative.lowered(in: &context)
-					let analysisAtAffirmativeEntry = context.analysis
-					
-					context.analysis = analysisAtEnd		// reset for second branch
-					let loweredNegative = try negative.lowered(in: &context)
-					
-					context.analysis.formUnion(with: analysisAtAffirmativeEntry)	// merge analysis of second branch with the one of first branch
-					let loweredCondition = try condition.lowered(in: &context)
-					
-					return .if(loweredCondition, then: loweredAffirmative, else: loweredNegative, analysisAtExit)
-					
-				}
+				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), .init())
 				
 				case .do(let effects, then: let predicate):
-				return try .do(
-					effects
-						.reversed()
-						.lowered(in: &context)	// lower the effects in reverse order so that analysis flows backwards
-						.reversed(),			// emit effects in the right order by reversing again
-					then: predicate.lowered(in: &context),
-					analysisAtExit
-				)
-				
-			}
-		}
-		
-		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> Set<Location> {
-			switch self {
-
-				case .constant,
-						.relation(.immediate, _, .immediate),
-						.if,
-						.do:
-				return []
-
-				case .relation(.immediate, _, .location(let location)), .relation(.location(let location), _, .immediate):
-				return [location]
-
-				case .relation(.location(let lhs), _, .location(let rhs)):
-				return [lhs, rhs]
+				return try .do(effects.lowered(in: &context), then: predicate.lowered(in: &context), .init())
 				
 			}
 		}

@@ -18,8 +18,8 @@ extension AL {
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
-			var context = AL.Context(analysis: .init())
-			return .init(name, try effect.lowered(in: &context))
+			var analysis = Lower.Analysis()
+			return .init(name, try effect.lowered().updating(analysis: &analysis))
 		}
 		
 	}

@@ -20,14 +20,16 @@ public enum AL : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = AL.Context(analysis: .init())
-			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
+			var analysis = Lower.Analysis()
+			return try .init(effect.lowered().updating(analysis: &analysis), procedures: procedures.lowered())
 		}
 		
 	}
 	
 	// See protocol.
 	public typealias Lower = ALA
+	
+	typealias Context = ()
 	
 	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator

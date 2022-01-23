@@ -36,6 +36,72 @@ extension ALA {
 			}
 		}
 		
+		/// Updates the analysis at entry of `self`.
+		///
+		/// - Parameter analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		mutating func update(analysis: inout Analysis) {
+			analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
+			switch self {
+				
+				case .constant(let holds, _):
+				self = .constant(holds, analysis)
+				
+				case .relation(let lhs, let relation, let rhs, _):
+				self = .relation(lhs, relation, rhs, analysis)
+				
+				case .if(var condition, then: var affirmative, else: var negative, _):
+				do {
+					
+					var analysisAtAffirmativeEntry = analysis
+					affirmative.update(analysis: &analysisAtAffirmativeEntry)
+					
+					negative.update(analysis: &analysis)
+					analysis.formUnion(with: analysisAtAffirmativeEntry)
+					
+					condition.update(analysis: &analysis)
+					
+					self = .if(condition, then: affirmative, else: negative, analysis)
+					
+				}
+				
+				case .do(let effects, then: let predicate, _):
+				self = .do(
+					effects
+						.reversed()
+						.map { $0.updating(analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
+						.reversed(),								// reverse back to normal order
+					then: predicate.updating(analysis: &analysis),
+					analysis
+				)
+				
+			}
+		}
+		
+		func updating(analysis: inout Analysis) -> Self {
+			var copy = self
+			copy.update(analysis: &analysis)
+			return copy
+		}
+		
+		/// Returns the locations possibly used by `self`.
+		private func possiblyUsedLocations() -> Set<Location> {
+			switch self {
+				
+				case .constant,
+					.relation(.immediate, _, .immediate, _),
+					.if,
+					.do:
+				return []
+				
+				case .relation(.immediate, _, .location(let location), _), .relation(.location(let location), _, .immediate, _):
+				return [location]
+				
+				case .relation(.location(let lhs), _, .location(let rhs), _):
+				return [lhs, rhs]
+				
+			}
+		}
+		
 	}
 	
 }

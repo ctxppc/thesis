@@ -2,7 +2,7 @@
 
 extension ALA {
 	
-	/// A value describing the liveness set and conflict graph at exit of the effect or predicate it's attached to.
+	/// A value describing the liveness set and conflict graph at entry of the effect or predicate it's attached to.
 	public struct Analysis : Equatable, Codable {
 		
 		/// Constructs an analysis value.
@@ -34,6 +34,17 @@ extension ALA {
 			}
 		}
 		
+		/// Returns a copy of `self` with additional information about an effect or predicate applied to it.
+		///
+		/// - Parameters:
+		///    - defined: The locations that are defined by the effect.
+		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.
+		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) -> Self where D.Element == Location, U.Element == Location {
+			var copy = self
+			copy.update(defined: defined, possiblyUsed: possiblyUsed)
+			return copy
+		}
+		
 		/// Adds conflicts between `firstLocation` and `otherLocations`.
 		///
 		/// This method does not add a conflict between a location and itself.
@@ -42,6 +53,12 @@ extension ALA {
 				guard conflictingLocationsForLocation[firstLocation, default: []].insert(otherLocation).inserted else { continue }	// optimisation
 				conflictingLocationsForLocation[otherLocation, default: []].insert(firstLocation)
 			}
+		}
+		
+		/// Returns a Boolean value indicating whether the analysis' conflict graph contains a conflict between `firstLocation` and any location in `otherLocations`.
+		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
+			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
+			return !conflictingLocations.isDisjoint(with: otherLocations)
 		}
 		
 		/// Marks `locations` as being possibly used by a successor.
@@ -62,10 +79,17 @@ extension ALA {
 			self.possiblyLiveLocations.formUnion(other.possiblyLiveLocations)
 		}
 		
-		/// Returns a Boolean value indicating whether the analysis' conflict graph contains a conflict between `firstLocation` and any location in `otherLocations`.
-		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
-			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
-			return !conflictingLocations.isDisjoint(with: otherLocations)
+		/// Returns a Boolean value indicating whether given locations used in a copy effect can be safely coalesced.
+		func safelyCoalescable(_ firstLocation: Location, _ otherLocation: Location) -> Bool {
+			
+			guard !containsConflict(firstLocation, [otherLocation]) else { return false }
+			
+			// Apply (conservative) heuristic by Briggs et al. to avoid turning a K-colourable conflict graph into non-K-colourable.
+			let conflictingLocationsOfUnion = conflictingLocationsForLocation[firstLocation, default: []]
+				.union(conflictingLocationsForLocation[otherLocation, default: []])
+				.subtracting([firstLocation, otherLocation])
+			return conflictingLocationsOfUnion.count /* new conflict count */ < Lower.Register.assignableRegisters.count /* K */
+			
 		}
 		
 		/// Returns the locations, ordered by increasing number of conflicts.

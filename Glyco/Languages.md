@@ -364,6 +364,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>AbstractLocation</code>, 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Context</code>, 
 <code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
@@ -410,7 +411,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
 <dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
 <dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
 </dl>
 <dl>
@@ -484,7 +485,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 <dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
 <dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
 <dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
 </dl>
 <dl>
