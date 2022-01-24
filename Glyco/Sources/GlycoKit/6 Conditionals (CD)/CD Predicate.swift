@@ -3,7 +3,7 @@
 extension CD {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable, Equatable {
+	public enum Predicate : Codable, Equatable, Optimisable {
 		
 		/// A constant predicate.
 		case constant(Bool)
@@ -17,38 +17,47 @@ extension CD {
 		/// A predicate that performs some effect then evaluates to `then`.
 		indirect case `do`([Effect], then: Predicate)
 		
-		/// Returns a copy of `self` that may be more optimised.
-		func optimised() -> Self {
+		// See protocol.
+		@discardableResult
+		mutating func optimise() -> Bool {
 			switch self {
 				
 				case .constant:
-				return self
+				return false
 				
 				case .relation(.immediate(let lhs), let relation, .immediate(let rhs)):
-				return .constant(relation.holds(lhs, rhs))
+				self = .constant(relation.holds(lhs, rhs))
+				return true
 				
 				case .relation(let lhs, let relation, let rhs) where lhs == rhs:
-				return .constant(relation.reflexive)
+				self = .constant(relation.reflexive)
+				return true
 				
-				case .if(.constant(true), then: let affirmative, else: _):
-				return affirmative.optimised()
+				case .relation:
+				return false
 				
-				case .if(.constant(false), then: _, else: let negative):
-				return negative.optimised()
+				case .if(.constant(true), then: var affirmative, else: _):
+				affirmative.optimise()
+				self = affirmative
+				return true
 				
-				case .if(let condition, then: let affirmative, else: let negative):
-				let newCondition = condition.optimised()
-				if condition != newCondition {
-					return .if(newCondition, then: affirmative.optimised(), else: negative.optimised()).optimised()
-				} else {
-					return .if(condition, then: affirmative.optimised(), else: negative.optimised())
-				}
+				case .if(.constant(false), then: _, else: var negative):
+				negative.optimise()
+				self = negative
+				return true
 				
-				case .do(let effects, then: let predicate):
-				return .do(effects, then: predicate.optimised())
+				case .if(var condition, then: var affirmative, else: var negative):
+				let conditionOptimised = condition.optimise()
+				let affirmativeOptimised = affirmative.optimise()
+				let negativeOptimised = negative.optimise()
+				self = .if(condition, then: affirmative, else: negative)
+				return conditionOptimised || affirmativeOptimised || negativeOptimised
 				
-				default:
-				return self
+				case .do(var effects, then: var predicate):
+				let effectsOptimised = effects.optimise()
+				let predicateOptimised = predicate.optimise()
+				self = .do(effects, then: predicate)
+				return effectsOptimised || predicateOptimised
 				
 			}
 		}

@@ -3,7 +3,7 @@
 extension CD {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, MultiplyLowerable {
+	public struct Procedure : Codable, Equatable, MultiplyLowerable, Optimisable {
 		
 		public init(_ name: Label, _ effect: Effect) {
 			self.name = name
@@ -20,8 +20,12 @@ extension CD {
 		func lowered(in context: inout Context) throws -> [Lower.Block] {
 			try effect
 				.flattened()
-				.optimised()
 				.lowered(in: &context, entryLabel: name, previousEffects: [], exitLabel: .programExit)
+		}
+		
+		// See protocol.
+		mutating func optimise() -> Bool {
+			effect.optimise()
 		}
 		
 	}

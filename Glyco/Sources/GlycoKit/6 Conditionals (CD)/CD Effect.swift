@@ -6,7 +6,7 @@ import Foundation
 extension CD {
 	
 	/// An effect on an CD machine.
-	public enum Effect : Codable, Equatable {
+	public enum Effect : Codable, Equatable, Optimisable {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])
@@ -128,37 +128,48 @@ extension CD {
 			
 		}
 		
-		/// Returns a copy of `self` that may be more optimised.
-		///
-		/// This method is more effective on flattened effects.
-		func optimised() -> Self {
+		// See protocol.
+		@discardableResult
+		mutating func optimise() -> Bool {
 			switch self {
+				
+				case .do(var effects):
+				let optimised = effects.optimise()
+				self = .do(effects)
+				return optimised
 				
 				case .set(_, let destination, to: .location(let source)) where source == destination,
 					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
 					.compute(.location(let source), .sub, .immediate(0), to: let destination) where source == destination,
 					.compute(.immediate(0), .sub, .location(let source), to: let destination) where source == destination:
-				return .do([])
+				self = .do([])
+				return true
 				
-				case .if(.constant(true), then: let affirmative, else: _):
-				return affirmative.optimised()
+				case .if(.constant(true), then: var affirmative, else: _):
+				affirmative.optimise()
+				self = affirmative
+				return true
 				
-				case .if(.constant(false), then: _, else: let negative):
-				return negative.optimised()
+				case .if(.constant(false), then: _, else: var negative):
+				negative.optimise()
+				self = negative
+				return true
 				
-				case .if(let predicate, then: let affirmative, else: let negative):
-				let newPredicate = predicate.optimised()
-				let newConditional = Self.if(newPredicate, then: affirmative.optimised(), else: negative.optimised())
-				return newPredicate == predicate ? newConditional : newConditional.optimised()
+				case .if(var predicate, then: var affirmative, else: var negative):
+				let conditionOptimised = predicate.optimise()
+				let affirmativeOptimised = affirmative.optimise()
+				let negativeOptimised = negative.optimise()
+				self = .if(predicate, then: affirmative, else: negative)
+				return conditionOptimised || affirmativeOptimised || negativeOptimised
 				
 				default:
-				return self
+				return false
 				
 			}
 		}
 		
-		/// Flattens nested sequence in `self`.
+		/// Flattens nested `do` effects in `self`.
 		func flattened() -> Self {
 			switch self {
 				
@@ -166,7 +177,7 @@ extension CD {
 				return .do(effects.flatMap { subeffect -> [Effect] in
 					switch subeffect.flattened() {
 						case .do(let nested):	return nested
-						case let flattened:			return [flattened]
+						case let flattened:		return [flattened]
 					}
 				})
 				

@@ -21,6 +21,12 @@ public enum CD : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public mutating func optimise() {
+			while effect.optimise() {}
+			while procedures.optimise() {}
+		}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			guard effect.allExecutionPathsTerminate else { throw LoweringError.someExecutionPathsDoNotTerminate }
 			var context = Context()
