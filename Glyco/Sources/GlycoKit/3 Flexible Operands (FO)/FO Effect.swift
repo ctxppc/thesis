@@ -26,6 +26,16 @@ extension FO {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
+		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int)
+		
+		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame(savedFrameCapability: Frame.Location)
+		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
 		
@@ -119,6 +129,12 @@ extension FO {
 				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
 				let (elemPrep, elemReg) = try prepare(source: element, using: .t3, type: type)
 				return vecPrep + idxPrep + elemPrep + [.storeElement(.word, vector: vecReg, index: idxReg, from: elemReg)]
+				
+				case .pushFrame(bytes: let bytes):
+				return [.pushFrame(bytes: bytes)]
+				
+				case .popFrame(savedFrameCapability: let savedFrameCapability):
+				return [.popFrame(savedFrameCapability: savedFrameCapability)]
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
 				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)

@@ -17,6 +17,16 @@ extension BB {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
+		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int)
+		
+		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame(savedFrameCapability: Frame.Location)
+		
 		// See protocol.
 		public func lowered(in context: inout ()) -> [Lower.Effect] {
 			switch self {
@@ -32,6 +42,12 @@ extension BB {
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
 				return [.setElement(type, of: vector, at: index, to: element)]
+				
+				case .pushFrame(bytes: let bytes):
+				return [.pushFrame(bytes: bytes)]
+				
+				case .popFrame(savedFrameCapability: let savedFrameCapability):
+				return [.popFrame(savedFrameCapability: savedFrameCapability)]
 				
 			}
 		}

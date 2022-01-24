@@ -26,6 +26,16 @@ extension CD {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
+		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int)
+		
+		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame(savedFrameCapability: Frame.Location)
+		
 		/// An effect that invokes the labelled procedure.
 		///
 		/// This effect assumes the calling convention is respected by the rest of the program.
@@ -53,7 +63,7 @@ extension CD {
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.intermediate(entryLabel, previousEffects, then: procedure)]
 				
-				case .set, .compute, .getElement, .setElement, .if, .return:
+				case .set, .compute, .getElement, .setElement, .if, .pushFrame, .popFrame, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -88,13 +98,13 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .set, .compute, .getElement, .setElement:	// TODO: Add .invoke to this case when it becomes applicable.
+				case .set, .compute, .getElement, .setElement, .pushFrame, .popFrame:	// TODO: Add .call to this case when it becomes applicable.
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
 				
-				case .call, .return:	// TODO: Remove .invoke from this case when no longer applicable.
+				case .call, .return:	// TODO: Remove .call from this case when no longer applicable.
 				return true
 				
 			}
@@ -274,6 +284,22 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
+			
+			case .pushFrame(bytes: let bytes):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.pushFrame(bytes: bytes)],
+				exitLabel:			exitLabel
+			)
+			
+			case .popFrame(savedFrameCapability: let savedFrameCapability):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.popFrame(savedFrameCapability: savedFrameCapability)],
+				exitLabel:			exitLabel
+			)
 			
 			case .call(procedure: let procedure):
 			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
