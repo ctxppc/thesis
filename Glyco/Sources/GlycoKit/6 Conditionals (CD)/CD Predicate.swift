@@ -19,7 +19,7 @@ extension CD {
 		
 		// See protocol.
 		@discardableResult
-		mutating func optimise() -> Bool {
+		public mutating func optimise() -> Bool {
 			switch self {
 				
 				case .constant:

@@ -1,10 +1,19 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-protocol Optimisable {
+public protocol Optimisable {
 	
 	/// Optimises `self` and returns a Boolean value indicating whether any changes have been made.
 	@discardableResult
 	mutating func optimise() -> Bool
+	
+}
+
+extension Optimisable {
+	
+	/// Optimises `self` until it cannot be optimised more.
+	mutating func optimiseUntilFixedPoint() {
+		while optimise() {}
+	}
 	
 }
 
@@ -20,6 +29,11 @@ extension MutableCollection where Element : Optimisable {
 			}
 		}
 		return optimised
+	}
+	
+	/// Optimises the elements in `self` until they cannot be optimised more.
+	mutating func optimiseUntilFixedPoint() {
+		while optimise() {}
 	}
 	
 }

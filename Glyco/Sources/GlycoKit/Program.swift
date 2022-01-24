@@ -3,10 +3,7 @@
 import Foundation
 import Sisp
 
-public protocol Program : Codable, Equatable {
-	
-	/// Optimises `self`.
-	mutating func optimise()
+public protocol Program : Codable, Equatable, Optimisable {
 	
 	/// Validates `self`.
 	func validate() throws
@@ -79,7 +76,7 @@ public struct CompilationConfiguration {
 
 extension Program {
 	
-	public func optimise() {}
+	public func optimise() -> Bool { false }
 	
 	public func validate() {}
 	
@@ -92,7 +89,7 @@ extension Program {
 	public func processedLowering(configuration: CompilationConfiguration) throws -> LowerProgram {
 		var copy = self
 		if configuration.optimise {
-			copy.optimise()
+			copy.optimiseUntilFixedPoint()
 		}
 		if configuration.validate {
 			try copy.validate()
