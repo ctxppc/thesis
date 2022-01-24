@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension FL {
+extension CF {
 	
 	/// An effect on an FL machine.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
@@ -17,11 +17,24 @@ extension FL {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		case allocateVector(DataType, count: Int = 1, into: Register)
+		
 		/// An effect that loads the element of the vector at `vector` at the zero-based position in `index` and puts it in `into`.
 		case loadElement(DataType, into: Register, vector: Register, index: Register)
 		
 		/// An effect that retrieves the datum from `from` and stores it as an element of the vector at `vector` at the zero-based position in `index`.
 		case storeElement(DataType, vector: Register, index: Register, from: Register)
+		
+		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int)
+		
+		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame(savedFrameCapability: Frame.Location)
 		
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
@@ -72,6 +85,14 @@ extension FL {
 				case .store(.capability, into: let destination, from: let source):
 				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
 				
+				case .allocateVector(let dataType, count: let count, into: let vector):
+				let vector = try vector.lowered()
+				return [
+					.setCapabilityBounds(destination: vector, source: .sp, length: -dataType.byteSize * count),
+					.getCapabilityLength(destination: .t0, source: vector),			// actual upper bound may be further down due to adjusted base (lower) and length (larger)
+					.offsetCapability(destination: .sp, source: .sp, offset: .t0),	// move stack cap to vector's actual upper bound
+				]
+				
 				case .loadElement(.word, into: let destination, vector: let vector, index: let index):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
@@ -94,6 +115,18 @@ extension FL {
 				return try [
 					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
 					.storeCapability(source: source.lowered(), address: .t0, offset: 0),
+				]
+				
+				case .pushFrame(bytes: let bytes):
+				return [
+					.copy(.capability, destination: .fp, source: .sp),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -bytes),
+				]
+
+				case .popFrame(savedFrameCapability: let savedFrameCapability):
+				return [
+					.copy(.capability, destination: .sp, source: .fp),
+					.loadCapability(destination: .fp, address: .fp, offset: savedFrameCapability.offset),
 				]
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):

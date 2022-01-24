@@ -17,7 +17,7 @@ final class FlexibleOperandsTests : XCTestCase {
 		])
 		
 		let actual = try source.lowered(configuration: .init(target: .sail))
-		let expected = FL.Program([
+		let expected = CF.Program([
 			.load(.word, into: .t1, from: .init(offset: -4)),
 			.load(.word, into: .t2, from: .init(offset: -8)),
 			.compute(into: .t3, value: .registerRegister(.t1, .add, .t2)),

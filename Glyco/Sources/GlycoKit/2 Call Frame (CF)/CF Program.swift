@@ -1,8 +1,8 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Frame Locations
-//sourcery: description = "A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`."
-public enum FL : Language {
+//sourcery: longname = Call Frame
+//sourcery: description = "A language that introduces call frames and operations for managing the call frame."
+public enum CF : Language {
 	
 	/// A program in the base language.
 	public struct Program : Codable, GlycoKit.Program {

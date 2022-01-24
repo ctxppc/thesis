@@ -93,6 +93,12 @@ extension CD.Procedure {
 	}
 }
 
+extension CF.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effects = "_0"
+	}
+}
+
 extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
@@ -149,12 +155,6 @@ extension EX.Function {
 		case name = "_0"
 		case parameters = "_1"
 		case result = "_2"
-	}
-}
-
-extension FL.Program {
-	public enum CodingKeys : String, CodingKey {
-		case effects = "_0"
 	}
 }
 

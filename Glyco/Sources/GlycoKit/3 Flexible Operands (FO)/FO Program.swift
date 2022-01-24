@@ -23,7 +23,7 @@ public enum FO : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = FL
+	public typealias Lower = CF
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation

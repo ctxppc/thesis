@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension FL {
+extension CF {
 	
 	/// A value that keeps track of allocated frame cells in a single frame.
 	public struct Frame {
@@ -34,7 +34,7 @@ extension FL {
 	
 }
 
-extension FL.Frame.Location : Comparable {
+extension CF.Frame.Location : Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.offset < rhs.offset
 	}

@@ -39,6 +39,14 @@ extension RV {
 		/// An instruction that offsets the capability in `source` by `offset` and puts it in `destination`.
 		case offsetCapabilityWithImmediate(destination: Register, source: Register, offset: Int)
 		
+		/// An instruction that determines the (integer) length of the capability in `source` and puts it in `destination`.
+		case getCapabilityLength(destination: Register, source: Register)
+		
+		/// An instruction that copies the capability from `source` to `datum` then adjusts its length to `length` bytes.
+		///
+		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
+		case setCapabilityBounds(destination: Register, source: Register, length: Int)
+		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
@@ -94,6 +102,12 @@ extension RV {
 				
 				case .offsetCapabilityWithImmediate(destination: let destination, source: let source, offset: let offset):
 				return "\(tabs)cincoffsetimm \(destination.c), \(source.c), \(offset)"
+				
+				case .getCapabilityLength(destination: let destination, source: let source):
+				return "\(tabs)cgetlen \(destination.x), \(source.c)"
+				
+				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
+				return "\(tabs)csetboundsimm \(destination.c), \(source.c), \(length)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "\(tabs)b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"

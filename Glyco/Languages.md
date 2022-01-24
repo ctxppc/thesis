@@ -15,7 +15,7 @@ The pipeline, from high-level to low-level is:
 [`PR`](#PR) →
 [`BB`](#BB) →
 [`FO`](#FO) →
-[`FL`](#FL) →
+[`CF`](#CF) →
 [`RV`](#RV) →
 [`S`](#S) →
  ELF.
@@ -645,7 +645,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 <h2 id="FO">Grammar for FO (Flexible Operands)</h2>
 A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 
-**Inherited from FL:**
+**Inherited from CF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -714,8 +714,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 
 
-<h2 id="FL">Grammar for FL (Frame Locations)</h2>
-A language that introduces frame locations, i.e., memory locations relative to the frame capability `cfp`.
+<h2 id="CF">Grammar for CF (Call Frame)</h2>
+A language that introduces call frames and operations for managing the call frame.
 
 **Inherited from RV:**
 <code>BinaryOperator</code>, 
@@ -724,18 +724,21 @@ A language that introduces frame locations, i.e., memory locations relative to t
 <code>Label</code>
 
 <dl>
-<dt><code>FL.BinaryExpression</code></dt>
+<dt><code>CF.BinaryExpression</code></dt>
 <dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
 <dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Effect</code></dt>
+<dt><code>CF.Effect</code></dt>
 <dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 <dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
 <dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 <dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
+<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Register)</code></dd>
 <dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>vector:</strong> Register, <strong>index:</strong> Register)</code></dd>
 <dd><code><strong>storeElement</strong>(DataType, <strong>vector:</strong> Register, <strong>index:</strong> Register, <strong>from:</strong> Register)</code></dd>
+<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 <dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 <dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(Label)</code></dd>
@@ -743,15 +746,15 @@ A language that introduces frame locations, i.e., memory locations relative to t
 <dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Frame.Location</code></dt>
+<dt><code>CF.Frame.Location</code></dt>
 <dd><code>(<strong>offset:</strong> Int)</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Program</code></dt>
+<dt><code>CF.Program</code></dt>
 <dd><code>([Effect])</code></dd>
 </dl>
 <dl>
-<dt><code>FL.Register</code></dt>
+<dt><code>CF.Register</code></dt>
 <dd><code><strong>zero</strong></code></dd>
 <dd><code><strong>ra</strong></code></dd>
 <dd><code><strong>sp</strong></code></dd>
@@ -828,6 +831,8 @@ N/A
 <dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 <dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 <dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
 <dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
 <dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
 <dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
