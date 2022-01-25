@@ -53,9 +53,9 @@ The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI
 	\label{bnf:rv}
 \end{figure}
 
-\paragraph{Frame Locations (FL)} This language introduces the call frame, hence its name, and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays.
+\paragraph{Call Frame (CF)} This language introduces the call frame, hence its name, and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays.
 
-It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two deviations due to the ISA. A first deviation is that a computation effect can write its result to a different register than the one used for one of its operands. A second deviation is that a computation effect cannot read from memory, since RISC-V requires an explicit load instruction before performing a computation. An abridged grammar is shown in \cref{bnf:fl}.
+It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few deviations due to the ISA. A first deviation is that a computation effect can write its result to a different register than the one used for one of its operands. A second deviation is that a computation effect cannot read from memory, since RISC-V requires an explicit load instruction before performing a computation. Additionally, CF introduces statically allocated arrays, a feature not present in the \cite{:compcourse} compiler. An abridged grammar is shown in \cref{bnf:cf}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -68,6 +68,7 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two de
 			\alt compute(into: <Register>, value: <BinaryExpression>)
 			\alt load(<DataType>, into: <Register>, from: <Frame.Location>)
 			\alt store(<DataType>, into: <Frame.Location>, from: <Register>)
+			\alt allocateVector(<DataType>, count: <Int>, into: <Register>)
 			\alt loadElement(<DataType>, into: <Register>, vector: <Register>, index: <Register>)
 			\alt storeElement(<DataType>, vector: <Register>, index: <Register>, from: <Register>)
 			\alt branch(to: <Label>, <Register>, <BranchRelation>, <Register>)
@@ -81,8 +82,8 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two de
 		<Frame.Location> ::= (offset: <Int>)
 		
 	\end{grammar}
-	\caption{Abridged grammar for FL.}
-	\label{bnf:fl}
+	\caption{Abridged grammar for CF.}
+	\label{bnf:cf}
 \end{figure}
 
 \paragraph{Flexible Operands (FO)} The next abstraction removes the explicit scalar load and store effects and enhances copy and computation effects to directly refer to the call frame, adapted from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \cref{bnf:fo}.
@@ -94,6 +95,7 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with two de
 		
 		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
 			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
+			\alt allocateVector(<DataType>, count: <Int>, into: <Location>)
 			\alt getElement(<DataType>, of: <Location>, at: <Source>, to: <Location>)
 			\alt setElement(<DataType>, of: <Location>, at: <Source>, to: <Source>)
 			\alt branch(to: <Label>, <Source>, <BranchRelation>, <Source>)
