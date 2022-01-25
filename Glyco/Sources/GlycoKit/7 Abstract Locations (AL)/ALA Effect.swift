@@ -16,6 +16,9 @@ extension ALA {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
 		
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		case allocateVector(DataType, count: Int = 1, into: Location, analysisAtEntry: Analysis)
+		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
 		
@@ -40,17 +43,20 @@ extension ALA {
 				case .do(let effects, analysisAtEntry: _):
 				return .do(try effects.lowered(in: &context))
 				
-				case .set(let dataType, let destination, to: let source, analysisAtEntry: _):
-				return try .set(dataType, destination.lowered(in: &context), to: source.lowered(in: &context))
+				case .set(let type, let destination, to: let source, analysisAtEntry: _):
+				return try .set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				return try .compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
-				case .getElement(let dataType, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
-				return try .getElement(dataType, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: _):
+				return .allocateVector(type, count: count, into: try vector.lowered(in: &context))
 				
-				case .setElement(let dataType, of: let vector, at: let index, to: let source, analysisAtEntry: _):
-				return try .setElement(dataType, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
+				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
+				return try .getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				
+				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: _):
+				return try .setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -58,8 +64,8 @@ extension ALA {
 				case .call(let name, _, analysisAtEntry: _):
 				return .call(name)
 				
-				case .return(let dataType, let value, analysisAtEntry: _):
-				return .return(dataType, try value.lowered(in: &context))
+				case .return(let type, let value, analysisAtEntry: _):
+				return .return(type, try value.lowered(in: &context))
 				
 			}
 		}
@@ -92,6 +98,9 @@ extension ALA {
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination, analysisAtEntry: _):
 				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: analysis)
+				
+				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: _):
+				return .allocateVector(type, count: count, into: vector, analysisAtEntry: analysis)
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
 				return .getElement(type, of: vector, at: index, to: destination, analysisAtEntry: analysis)
@@ -152,6 +161,7 @@ extension ALA {
 				case .do(_, analysisAtEntry: let analysis),
 					.set(_, _, to: _, analysisAtEntry: let analysis),
 					.compute(_, _, _, to: _, analysisAtEntry: let analysis),
+					.allocateVector(_, count: _, into: _, analysisAtEntry: let analysis),
 					.getElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.setElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
@@ -170,6 +180,7 @@ extension ALA {
 				
 				case .set(_, let destination, to: _, analysisAtEntry: _),
 					.compute(_, _, _, to: let destination, analysisAtEntry: _),
+					.allocateVector(_, count: _, into: let destination, analysisAtEntry: _),
 					.getElement(_, of: _, at: _, to: let destination, analysisAtEntry: _):
 				return [destination]
 				
@@ -183,6 +194,7 @@ extension ALA {
 				case .do,
 					.set(_, _, to: .immediate, analysisAtEntry: _),
 					.compute(.immediate, _, .immediate, to: _, analysisAtEntry: _),
+					.allocateVector,
 					.if,
 					.return(_, .immediate, analysisAtEntry: _):
 				return []
@@ -229,7 +241,7 @@ extension ALA {
 					where analysis.safelyCoalescable(destination, .abstract(source)):
 				return (source, destination)
 				
-				case .set, .compute, .getElement, .setElement, .call, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -282,8 +294,8 @@ extension ALA {
 					.set(_, .abstract(removedLocation), to: .location(.abstract(removedLocation)), analysisAtEntry: let analysis):
 				return .do([], analysisAtEntry: analysis)
 				
-				case .set(let dataType, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
-				return .set(dataType, retainedLocation, to: source, analysisAtEntry: analysis)
+				case .set(let type, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
+				return .set(type, retainedLocation, to: source, analysisAtEntry: analysis)
 				
 				case .set:
 				return self
@@ -291,14 +303,17 @@ extension ALA {
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
 				return .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
 				
-				case .getElement(let dataType, of: let vector, at: let index, to: let destination, analysisAtEntry: let analysis):
-				return .getElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(destination), analysisAtEntry: analysis)
+				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: let analysis):
+				return .allocateVector(type, count: count, into: substitute(vector), analysisAtEntry: analysis)
 				
-				case .setElement(let dataType, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
-				return .setElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
+				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: let analysis):
+				return .getElement(type, of: substitute(vector), at: substitute(index), to: substitute(destination), analysisAtEntry: analysis)
 				
-				case .return(let dataType, let value, analysisAtEntry: let analysis):
-				return .return(dataType, substitute(value), analysisAtEntry: analysis)
+				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
+				return .setElement(type, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
+				
+				case .return(let type, let value, analysisAtEntry: let analysis):
+				return .return(type, substitute(value), analysisAtEntry: analysis)
 				
 			}
 			
