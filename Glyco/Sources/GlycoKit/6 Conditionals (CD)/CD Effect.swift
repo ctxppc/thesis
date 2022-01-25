@@ -17,6 +17,9 @@ extension CD {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		case allocateVector(DataType, count: Int = 1, into: Location)
+		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		case getElement(DataType,of: Location, at: Source, to: Location)
 		
@@ -63,7 +66,7 @@ extension CD {
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.intermediate(entryLabel, previousEffects, then: procedure)]
 				
-				case .set, .compute, .getElement, .setElement, .if, .pushFrame, .popFrame, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .pushFrame, .popFrame, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -98,7 +101,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .set, .compute, .getElement, .setElement, .pushFrame, .popFrame:	// TODO: Add .call to this case when it becomes applicable.
+				case .set, .compute, .allocateVector, .getElement, .setElement, .pushFrame, .popFrame:	// TODO: Add .call to this case when it becomes applicable.
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -246,6 +249,14 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				in:					&context,
 				entryLabel:			entryLabel,
 				previousEffects:	previousEffects + [.compute(lhs, operation, rhs, to: destination)],
+				exitLabel:			exitLabel
+			)
+			
+			case .allocateVector(let type, count: let count, into: let vector):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.allocateVector(type, count: count, into: vector)],
 				exitLabel:			exitLabel
 			)
 			

@@ -38,28 +38,28 @@ extension AL {
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context), .init())
+				return .do(try effects.lowered(in: &context), analysisAtEntry: .init())
 				
 				case .set(let type, let destination, to: let source):
-				return .set(type, destination, to: source, .init())
+				return .set(type, destination, to: source, analysisAtEntry: .init())
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				return .compute(lhs, operation, rhs, to: destination, .init())
+				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: .init())
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				return .getElement(type, of: vector, at: index, to: destination, .init())
+				return .getElement(type, of: vector, at: index, to: destination, analysisAtEntry: .init())
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				return .setElement(type, of: vector, at: index, to: element, .init())
+				return .setElement(type, of: vector, at: index, to: element, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), .init())
+				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), analysisAtEntry: .init())
 				
 				case .call(let name, let parameters):
-				return .call(name, parameters, .init())
+				return .call(name, parameters, analysisAtEntry: .init())
 				
 				case .return(let type, let result):
-				return .return(type, result, .init())
+				return .return(type, result, analysisAtEntry: .init())
 				
 			}
 		}

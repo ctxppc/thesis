@@ -22,16 +22,16 @@ extension AL {
 			switch self {
 				
 				case .constant(let holds):
-				return .constant(holds, .init())
+				return .constant(holds, analysisAtEntry: .init())
 				
 				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs, relation, rhs, .init())
+				return .relation(lhs, relation, rhs, analysisAtEntry: .init())
 				
 				case .if(let condition, then: let affirmative, else: let negative):
-				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), .init())
+				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), analysisAtEntry: .init())
 				
 				case .do(let effects, then: let predicate):
-				return try .do(effects.lowered(in: &context), then: predicate.lowered(in: &context), .init())
+				return try .do(effects.lowered(in: &context), then: predicate.lowered(in: &context), analysisAtEntry: .init())
 				
 			}
 		}

@@ -6,31 +6,31 @@ extension ALA {
 	public enum Predicate : Codable, Equatable, SimplyLowerable {
 		
 		/// A constant predicate.
-		case constant(Bool, Analysis)
+		case constant(Bool, analysisAtEntry: Analysis)
 		
 		/// A predicate that holds iff *x* *R* *y*, where *x* is the value of the first source, *y* is the value of the second source, and *R* is the branch relation.
-		case relation(Source, BranchRelation, Source, Analysis)
+		case relation(Source, BranchRelation, Source, analysisAtEntry: Analysis)
 		
 		/// A predicate that evaluates to `then` if the predicate holds, or to `else` otherwise.
-		indirect case `if`(Predicate, then: Predicate, else: Predicate, Analysis)
+		indirect case `if`(Predicate, then: Predicate, else: Predicate, analysisAtEntry: Analysis)
 		
 		/// A predicate that performs some effect then evaluates to `then`.
-		indirect case `do`([Effect], then: Predicate, Analysis)
+		indirect case `do`([Effect], then: Predicate, analysisAtEntry: Analysis)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Predicate {
 			switch self {
 				
-				case .constant(let holds, _):
+				case .constant(let holds, analysisAtEntry: _):
 				return .constant(holds)
 				
-				case .relation(let lhs, let relation, let rhs, _):
+				case .relation(let lhs, let relation, let rhs, analysisAtEntry: _):
 				return try .relation(lhs.lowered(in: &context), relation, rhs.lowered(in: &context))
 				
-				case .if(let predicate, then: let affirmative, else: let negative, _):
+				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .do(let effects, then: let predicate, _):
+				case .do(let effects, then: let predicate, analysisAtEntry: _):
 				return try .do(effects.lowered(in: &context), then: predicate.lowered(in: &context))
 				
 			}
@@ -49,13 +49,13 @@ extension ALA {
 			analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
-				case .constant(let holds, _):
-				return .constant(holds, analysis)
+				case .constant(let holds, analysisAtEntry: _):
+				return .constant(holds, analysisAtEntry: analysis)
 				
-				case .relation(let lhs, let relation, let rhs, _):
-				return .relation(lhs, relation, rhs, analysis)
+				case .relation(let lhs, let relation, let rhs, analysisAtEntry: _):
+				return .relation(lhs, relation, rhs, analysisAtEntry: analysis)
 				
-				case .if(let condition, then: let affirmative, else: let negative, _):
+				case .if(let condition, then: let affirmative, else: let negative, analysisAtEntry: _):
 				do {
 					
 					var analysisAtAffirmativeEntry = analysis
@@ -66,18 +66,18 @@ extension ALA {
 					
 					let updatedCondition = condition.updated(using: transform, analysis: &analysis)
 					
-					return .if(updatedCondition, then: updatedAffirmative, else: updatedNegative, analysis)
+					return .if(updatedCondition, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					
 				}
 				
-				case .do(let effects, then: let predicate, _):
+				case .do(let effects, then: let predicate, analysisAtEntry: _):
 				return .do(
 					effects
 						.reversed()
 						.map { $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
 						.reversed(),												// reverse back to normal order
 					then: predicate.updated(using: transform, analysis: &analysis),
-					analysis
+					analysisAtEntry: analysis
 				)
 				
 			}
@@ -88,15 +88,16 @@ extension ALA {
 			switch self {
 				
 				case .constant,
-					.relation(.immediate, _, .immediate, _),
+					.relation(.immediate, _, .immediate, analysisAtEntry: _),
 					.if,
 					.do:
 				return []
 				
-				case .relation(.immediate, _, .location(let location), _), .relation(.location(let location), _, .immediate, _):
+				case .relation(.immediate, _, .location(let location), analysisAtEntry: _),
+					.relation(.location(let location), _, .immediate, analysisAtEntry: _):
 				return [location]
 				
-				case .relation(.location(let lhs), _, .location(let rhs), _):
+				case .relation(.location(let lhs), _, .location(let rhs), analysisAtEntry: _):
 				return [lhs, rhs]
 				
 			}
@@ -110,12 +111,12 @@ extension ALA {
 				case .constant, .relation:
 				return nil
 				
-				case .if(let condition, then: let affirmative, else: let negative, _):
+				case .if(let condition, then: let affirmative, else: let negative, analysisAtEntry: _):
 				return negative.safelyCoalescableLocations()
 					?? affirmative.safelyCoalescableLocations()
 					?? condition.safelyCoalescableLocations()
 				
-				case .do(let effects, then: let predicate, _):
+				case .do(let effects, then: let predicate, analysisAtEntry: _):
 				return effects
 					.reversed()
 					.lazy

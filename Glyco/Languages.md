@@ -405,14 +405,14 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 <dt><code>ALA.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect], Analysis)</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, Analysis)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, Analysis)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
-<dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Location</code></dt>
@@ -426,10 +426,10 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 <dt><code>ALA.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool, Analysis)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source, Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, Analysis)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, Analysis)</code></dd>
+<dd><code><strong>constant</strong>(Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Procedure</code></dt>
@@ -479,14 +479,14 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 <dt><code>ALA.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect], Analysis)</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, Analysis)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, Analysis)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, Analysis)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, [ParameterLocation], Analysis)</code></dd>
-<dd><code><strong>return</strong>(DataType, Source, Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Location</code></dt>
@@ -500,10 +500,10 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 <dt><code>ALA.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool, Analysis)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source, Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, Analysis)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, Analysis)</code></dd>
+<dd><code><strong>constant</strong>(Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>relation</strong>(Source, BranchRelation, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Procedure</code></dt>
@@ -555,6 +555,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dd><code><strong>do</strong>([Effect])</code></dd>
 <dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 <dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -635,6 +636,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 <dt><code>BB.Effect</code></dt>
 <dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 <dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
@@ -659,6 +661,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <dt><code>FO.Effect</code></dt>
 <dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 <dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 <dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 <dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>

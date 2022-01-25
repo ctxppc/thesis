@@ -20,6 +20,9 @@ extension FO {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		case allocateVector(DataType, count: Int = 1, into: Location)
+		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
@@ -117,6 +120,10 @@ extension FO {
 				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .word)
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: .word)
 				return lhsPrep + rhsPrep + [.compute(into: resReg, value: .registerRegister(lhsReg, operation, rhsReg))] + resFinalise
+				
+				case .allocateVector(let type, count: let count, into: let vector):
+				let (finaliseVector, vectorReg) = try finalise(destination: vector, using: .t1, type: type)
+				return [.allocateVector(type, count: count, into: vectorReg)] + finaliseVector
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
 				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
