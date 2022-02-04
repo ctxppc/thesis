@@ -47,6 +47,12 @@ extension RV {
 		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
 		case setCapabilityBounds(destination: Register, source: Register, length: Int)
 		
+		/// An instruction that determines the (integer) address of the capability in `source` and puts it in `destination`.
+		case getCapabilityAddress(destination: Register, source: Register)
+		
+		/// An instruction that copies copies `destination` to `source`, replacing the address with the integer in `address`.
+		case setCapabilityAddress(destination: Register, source: Register, address: Register)
+		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
@@ -108,6 +114,12 @@ extension RV {
 				
 				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
 				return "\(tabs)csetboundsimm \(destination.c), \(source.c), \(length)"
+				
+				case .getCapabilityAddress(destination: let destination, source: let source):
+				return "\(tabs)cgetaddr \(destination.x), \(source.c)"
+				
+				case .setCapabilityAddress(destination: let destination, source: let source, address: let address):
+				return "\(tabs)csetaddr \(destination.c), \(source.c), \(address.x)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "\(tabs)b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"

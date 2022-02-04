@@ -87,10 +87,12 @@ extension CF {
 				
 				case .allocateVector(let dataType, count: let count, into: let vector):
 				let vector = try vector.lowered()
+				let byteSize = dataType.byteSize * count
 				return [
-					.setCapabilityBounds(destination: vector, source: .sp, length: -dataType.byteSize * count),
-					.getCapabilityLength(destination: .t0, source: vector),			// actual upper bound may be further down due to adjusted base (lower) and length (larger)
-					.offsetCapability(destination: .sp, source: .sp, offset: .t0),	// move stack cap to vector's actual upper bound
+					.offsetCapabilityWithImmediate(destination: vector, source: .sp, offset: -byteSize),	// compute tentative base
+					.setCapabilityBounds(destination: vector, source: vector, length: byteSize),			// actual base may be lower, length may be greater
+					.getCapabilityAddress(destination: .t0, source: vector),								// move stack pointer to actual base
+					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				
 				case .loadElement(.word, into: let destination, vector: let vector, index: let index):
