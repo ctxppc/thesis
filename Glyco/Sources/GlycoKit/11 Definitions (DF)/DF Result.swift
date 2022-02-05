@@ -16,6 +16,9 @@ extension DF {
 		/// A result provided by given result after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Result)
 		
+		/// A result provided by given result after performing given effects.
+		indirect case `do`([Effect], then: Result)
+		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
@@ -35,6 +38,9 @@ extension DF {
 				
 				case .let(let definitions, in: let result):
 				return try .do(definitions.lowered(in: &context) + [result.lowered(in: &context)])
+				
+				case .do(let effects, then: let result):
+				return try .do(effects.lowered(in: &context) + [result.lowered(in: &context)])
 				
 			}
 		}

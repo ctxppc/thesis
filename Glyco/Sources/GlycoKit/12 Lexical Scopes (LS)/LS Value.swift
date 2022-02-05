@@ -10,6 +10,12 @@ extension LS {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		case binary(Source, BinaryOperator, Source)
 		
+		/// A value that evaluates to the element at zero-based position `at` in the vector named `of`.
+		case element(of: Symbol, at: Source)
+		
+		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
+		case vector(DataType, count: Int)
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
@@ -28,6 +34,12 @@ extension LS {
 				
 				case .binary(let lhs, let op, let rhs):
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
+				
+				case .element(of: let vector, at: let index):
+				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .vector(let dataType, count: let count):
+				return .vector(dataType, count: count)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

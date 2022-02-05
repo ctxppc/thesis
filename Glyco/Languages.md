@@ -78,7 +78,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Value</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>vector</strong>([Value])</code></dd>
+	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
@@ -139,6 +139,8 @@ A language that introduces lexical scopes of definitions
 	<dt><code>LS.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -184,11 +186,17 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
+	<dt><code>DF.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+</dl>
+<dl>
 	<dt><code>DF.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>DF.Definition</code></dt>
@@ -205,9 +213,12 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>DF.Function</code></dt>
@@ -255,6 +266,7 @@ A language that allows computation to be attached to an assigned value.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
@@ -301,6 +313,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>

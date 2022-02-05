@@ -42,6 +42,9 @@ extension CA {
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				return .getElement(.word, of: vector, at: index, to: destination)
 				
+				case .set(let destination, to: .vector(let dataType, count: let count)):
+				return .allocateVector(dataType, count: count, into: destination)
+				
 				case .setElement(of: let vector, at: let index, to: let element):
 				return .setElement(.word, of: vector, at: index, to: element)
 				

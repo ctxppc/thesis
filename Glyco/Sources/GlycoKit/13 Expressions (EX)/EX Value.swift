@@ -7,8 +7,8 @@ extension EX {
 		/// A value that evaluates to given number.
 		case constant(Int)
 		
-		/// A value that evaluates to a vector of values.
-		case vector([Value])
+		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
+		case vector(DataType, count: Int)
 		
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
@@ -32,8 +32,8 @@ extension EX {
 				case .constant(let value):
 				return .source(.constant(value))
 					
-				case .vector(let values):
-				TODO.unimplemented
+				case .vector(let dataType, count: let count):
+				return .vector(dataType, count: count)
 				
 				case .named(let symbol):
 				return .source(.symbol(symbol))
@@ -47,7 +47,12 @@ extension EX {
 				], in: .binary(.symbol(l), op, .symbol(r)))
 				
 				case .element(of: let vector, at: let index):
-				TODO.unimplemented
+				let vec = Lower.Symbol(rawValue: "vec")	// TODO: Risk of shadowing?
+				let idx = Lower.Symbol(rawValue: "idx")
+				return try .let([
+					.init(vec, vector.lowered(in: &context)),
+					.init(idx, index.lowered(in: &context))
+				], in: .element(of: vec, at: .symbol(idx)))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

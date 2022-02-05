@@ -8,7 +8,7 @@ extension CV {
 	/// An effect on a CV machine.
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
-		/// An effect that performs `effects`.
+		/// An effect that performs given effects.
 		case `do`([Effect])
 		
 		/// An effect that evaluates given value and puts it in given location.
@@ -41,6 +41,9 @@ extension CV {
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				return .set(destination, to: .element(of: vector, at: index))
+				
+				case .set(let destination, to: .vector(let dataType, count: let count)):
+				return .set(destination, to: .vector(dataType, count: count))
 				
 				case .set(let destination, to: .if(let predicate, then: let affirmative, else: let negative)):
 				return try .if(

@@ -13,6 +13,9 @@ extension CV {
 		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
 		case element(of: Location, at: Source)
 		
+		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
+		case vector(DataType, count: Int)
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
