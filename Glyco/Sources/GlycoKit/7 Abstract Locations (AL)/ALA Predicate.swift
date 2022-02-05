@@ -88,13 +88,13 @@ extension ALA {
 			switch self {
 				
 				case .constant,
-					.relation(.immediate, _, .immediate, analysisAtEntry: _),
+					.relation(.constant, _, .constant, analysisAtEntry: _),
 					.if,
 					.do:
 				return []
 				
-				case .relation(.immediate, _, .location(let location), analysisAtEntry: _),
-					.relation(.location(let location), _, .immediate, analysisAtEntry: _):
+				case .relation(.constant, _, .location(let location), analysisAtEntry: _),
+					.relation(.location(let location), _, .constant, analysisAtEntry: _):
 				return [location]
 				
 				case .relation(.location(let lhs), _, .location(let rhs), analysisAtEntry: _):

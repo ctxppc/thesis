@@ -1,8 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import DepthKit
-import Foundation
-
 extension CA {
 	
 	/// An effect on a CA machine.

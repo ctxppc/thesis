@@ -83,6 +83,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>EX.Definition</code></dt>
@@ -103,11 +104,18 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
+	<dt><code>EX.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
 	<dt><code>EX.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
 
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
@@ -146,6 +154,7 @@ A language that introduces lexical scopes of definitions
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Function</code></dt>
@@ -161,11 +170,18 @@ A language that introduces lexical scopes of definitions
 	<dd><code>(Symbol, Value)</code></dd>
 </dl>
 <dl>
+	<dt><code>LS.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+</dl>
+<dl>
 	<dt><code>LS.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Context</code></dt>
@@ -191,6 +207,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
 	<dt><code>DF.Result</code></dt>
@@ -228,7 +245,7 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
-A language that allows computation to be attached to an assigned value.
+A language that allows a computation to be attached to a value.
 
 **Inherited from CA:**
 <code>BinaryOperator</code>, 
@@ -347,7 +364,7 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 </dl>
 <dl>
 	<dt><code>CC.Source</code></dt>
-	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
@@ -454,7 +471,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Source</code></dt>
-	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
@@ -616,8 +633,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 <dl>
 	<dt><code>FO.Source</code></dt>
-	<dd><code><strong>location</strong>(Location)</code></dd>
 	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>FO.HaltEffect</code></dt>

@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Computed Values
-//sourcery: description = A language that allows computation to be attached to an assigned value.
+//sourcery: description = A language that allows a computation to be attached to a value.
 public enum CV : Language {
 	
 	/// A program on a CV machine.

@@ -25,6 +25,9 @@ extension EX {
 		/// A value that evaluates to given value after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Value)
 		
+		/// A value that evaluates to given value after performing given effects.
+		indirect case `do`([Effect], then: Value)
+		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Value {
 			switch self {
@@ -39,16 +42,16 @@ extension EX {
 				return .source(.symbol(symbol))
 				
 				case .binary(let lhs, let op, let rhs):
-				let l = Lower.Symbol(rawValue: "lhs")	// TODO: Risk of shadowing?
-				let r = Lower.Symbol(rawValue: "rhs")
+				let l = context.bag.uniqueName(from: "lhs")
+				let r = context.bag.uniqueName(from: "rhs")
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))
 				], in: .binary(.symbol(l), op, .symbol(r)))
 				
 				case .element(of: let vector, at: let index):
-				let vec = Lower.Symbol(rawValue: "vec")	// TODO: Risk of shadowing?
-				let idx = Lower.Symbol(rawValue: "idx")
+				let vec = context.bag.uniqueName(from: "vec")
+				let idx = context.bag.uniqueName(from: "idx")
 				return try .let([
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
@@ -59,6 +62,9 @@ extension EX {
 				
 				case .let(let definitions, in: let body):
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				
+				case .do(let effects, then: let value):
+				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
 				
 			}
 		}

@@ -1,7 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import DepthKit
-
 extension ALA {
 	
 	/// An effect on an ALA machine.
@@ -192,24 +190,24 @@ extension ALA {
 			switch self {
 				
 				case .do,
-					.set(_, _, to: .immediate, analysisAtEntry: _),
-					.compute(.immediate, _, .immediate, to: _, analysisAtEntry: _),
+					.set(_, _, to: .constant, analysisAtEntry: _),
+					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
 					.allocateVector,
 					.if,
-					.return(_, .immediate, analysisAtEntry: _):
+					.return(_, .constant, analysisAtEntry: _):
 				return []
 				
 				case .set(_, _, to: .location(let source), analysisAtEntry: _),
-					.compute(.immediate, _, .location(let source), to: _, analysisAtEntry: _),
-					.compute(.location(let source), _, .immediate, to: _, analysisAtEntry: _),
+					.compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
+					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _),
 					.return(_, .location(let source), analysisAtEntry: _):
 				return [source]
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _, analysisAtEntry: _):
 				return [lhs, rhs]
 				
-				case .getElement(_, of: let vector, at: .immediate, to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: .immediate, to: _, analysisAtEntry: _):
+				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
+					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
 				return [vector]
 				
 				case .getElement(_, of: let vector, at: .location(let index), to: _, analysisAtEntry: _),

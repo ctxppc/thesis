@@ -1,8 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import Algorithms
-import DepthKit
-
 extension ALA {
 	
 	/// An abstract storage location on an AL machine.

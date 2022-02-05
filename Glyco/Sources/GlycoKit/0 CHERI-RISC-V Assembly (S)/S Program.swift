@@ -1,6 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import DepthKit
 import Foundation
 
 //sourcery: longname = CHERI-RISC-V Assembly

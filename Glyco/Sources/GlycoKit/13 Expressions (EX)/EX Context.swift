@@ -2,7 +2,7 @@
 
 extension EX {
 	
-	/// A value used while lowering a function.
+	/// A value used while lowering.
 	struct Context {
 		
 		/// The symbol bag.

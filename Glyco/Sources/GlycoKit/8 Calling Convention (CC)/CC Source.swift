@@ -5,8 +5,8 @@ extension CC {
 	/// A datum source.
 	public enum Source : Codable, Equatable, SimplyLowerable {
 		
-		/// The operand is a given value.
-		case immediate(Int)
+		/// The operand is given value.
+		case constant(Int)
 		
 		/// The operand is to be retrieved from a given location.
 		case location(Location)
@@ -14,7 +14,7 @@ extension CC {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
-				case .immediate(let imm):		return .immediate(imm)
+				case .constant(let imm):		return .constant(imm)
 				case .location(let location):	return .location(.abstract(location))
 			}
 		}

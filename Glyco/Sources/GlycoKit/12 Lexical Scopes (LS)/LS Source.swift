@@ -14,7 +14,7 @@ extension LS {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
-				case .constant(let value):	return .immediate(value)
+				case .constant(let value):	return .constant(value)
 				case .symbol(let symbol):	return .location(symbol.lowered(in: &context))
 			}
 		}

@@ -1,8 +1,8 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension DF {
+extension LS {
 	
-	/// An effect on a DF machine.
+	/// An effect on an LS machine.
 	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs given effects.
@@ -12,7 +12,7 @@ extension DF {
 		indirect case `let`([Definition], in: Effect)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		case setElement(of: Symbol, at: Source, to: Source)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Effect {
@@ -22,10 +22,10 @@ extension DF {
 				return .do(try effects.lowered(in: &context))
 				
 				case .let(let definitions, in: let effect):
-				return try .do(definitions.lowered(in: &context) + [effect.lowered(in: &context)])
+				return try .let(definitions.lowered(in: &context), in: effect.lowered(in: &context))
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				return .setElement(of: vector, at: index, to: element)
+				return try .setElement(of: vector.lowered(in: &context), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 			}
 		}

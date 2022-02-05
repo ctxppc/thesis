@@ -16,14 +16,14 @@ import Foundation
 ///		}
 ///
 ///		enum Source : Codable {
-///		    case immediate(Int)
+///		    case constant(Int)
 ///		    case location(Location)
 ///		}
 ///
 /// the value
 ///
 /// 	Effect.sequence(effects: [
-/// 	    .copy(destination: .init(rawValue: 5), source: .immediate(10)),
+/// 	    .copy(destination: .init(rawValue: 5), source: .constant(10)),
 /// 	    .sequence(effects: [
 /// 	        .copy(destination: .init(rawValue: 15), source: .location(.init(rawValue: 20))
 /// 	    ])
@@ -32,7 +32,7 @@ import Foundation
 /// is encoded as
 ///
 /// 	sequence(effects:
-/// 	    copy(destination: 5, source: immediate(10))
+/// 	    copy(destination: 5, source: constant(10))
 /// 	    sequence(effects:
 ///				copy(destination: 15, source: location(20))
 /// 	    )

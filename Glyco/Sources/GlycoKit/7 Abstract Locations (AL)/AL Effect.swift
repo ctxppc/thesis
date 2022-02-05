@@ -1,7 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import DepthKit
-
 extension AL {
 	
 	/// An effect on an AL machine.
@@ -59,7 +57,12 @@ extension AL {
 				return .setElement(type, of: vector, at: index, to: element, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context), analysisAtEntry: .init())
+				return try .if(
+					predicate.lowered(in: &context),
+					then:				affirmative.lowered(in: &context),
+					else:				negative.lowered(in: &context),
+					analysisAtEntry:	.init()
+				)
 				
 				case .call(let name, let parameters):
 				return .call(name, parameters, analysisAtEntry: .init())
