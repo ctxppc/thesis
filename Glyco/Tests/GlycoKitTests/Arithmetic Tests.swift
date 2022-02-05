@@ -120,13 +120,13 @@ final class ArithmeticTests : XCTestCase {
 		main:			addi t1, zero, 12
 						addi s1, t1, -11
 						addi t2, zero, 1
-						beq s1, t2, BB0
-						j BB1
-		BB0:			addi s1, zero, 1
-						j BB2
-		BB1:			addi s1, zero, 0
-						j BB2
-		BB2:			mv a0, s1
+						beq s1, t2, then$1
+						j else$1
+		then$1:			addi s1, zero, 1
+						j endif$1
+		else$1:			addi s1, zero, 0
+						j endif$1
+		endif$1:		mv a0, s1
 						ret
 						
 						.align 6

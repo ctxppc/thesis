@@ -223,7 +223,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 			
 			case .do(effects: let effects):
-			let restLabel = context.allocateBlockLabel()
+			let restLabel = context.bag.uniqueName(from: "then")
 			return try effects.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
@@ -277,9 +277,9 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			)
 			
 			case .if(let predicate, then: let affirmative, else: let negative):
-			let affirmativeLabel = context.allocateBlockLabel()
-			let negativeLabel = context.allocateBlockLabel()
-			let restLabel = rest.doesNothing ? exitLabel : context.allocateBlockLabel()
+			let affirmativeLabel = context.bag.uniqueName(from: "then")
+			let negativeLabel = context.bag.uniqueName(from: "else")
+			let restLabel = rest.doesNothing ? exitLabel : context.bag.uniqueName(from: "endif")
 			let conditionalBlocks = try predicate.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,

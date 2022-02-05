@@ -66,7 +66,6 @@ A language that introduces expression semantics for values, thereby abstracting 
 **Inherited from LS:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Context</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
@@ -95,6 +94,9 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>EX.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>EX.Function</code></dt>

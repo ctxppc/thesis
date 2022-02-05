@@ -32,8 +32,8 @@ extension EX {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				let l = Lower.Symbol(rawValue: "lhs")	// TODO: Risk of shadowing?
-				let r = Lower.Symbol(rawValue: "rhs")
+				let l = context.bag.uniqueName(from: "lhs")
+				let r = context.bag.uniqueName(from: "rhs")
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))

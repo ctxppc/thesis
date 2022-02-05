@@ -3,11 +3,16 @@
 extension LS {
 	
 	/// An identifier for a named value.
-	public struct Symbol : RawCodable, Hashable, SimplyLowerable {
+	public struct Symbol : Name, RawCodable, SimplyLowerable {
 		
 		// See protocol.
 		public init(rawValue: String) {
 			self.rawValue = rawValue
+		}
+		
+		// See protocol.
+		public init(stringLiteral: String) {
+			self.init(rawValue: stringLiteral)
 		}
 		
 		// See protocol.

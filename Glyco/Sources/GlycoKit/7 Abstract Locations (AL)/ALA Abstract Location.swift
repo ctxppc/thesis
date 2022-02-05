@@ -6,11 +6,16 @@ import DepthKit
 extension ALA {
 	
 	/// An abstract storage location on an AL machine.
-	public struct AbstractLocation : RawCodable, Hashable, SimplyLowerable {
+	public struct AbstractLocation : Name, RawCodable, SimplyLowerable {
 		
 		// See protocol.
 		public init(rawValue: String) {
 			self.rawValue = rawValue
+		}
+		
+		// See protocol.
+		public init(stringLiteral: String) {
+			self.init(rawValue: stringLiteral)
 		}
 		
 		/// The identifier.
