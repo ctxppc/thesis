@@ -403,7 +403,15 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 <dt><code>ALA.Analysis</code></dt>
-<dd><code>(<strong>conflictingLocationsForLocation:</strong> [Location : Set<Location>], <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Conflict</code></dt>
+<dd><code>(ALA.Location, ALA.Location)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.ConflictSet</code></dt>
+<dd><code>([Conflict])</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Effect</code></dt>
@@ -478,7 +486,15 @@ A language that introduces abstract locations, annotated with liveness and confl
 
 <dl>
 <dt><code>ALA.Analysis</code></dt>
-<dd><code>(<strong>conflictingLocationsForLocation:</strong> [Location : Set<Location>], <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.Conflict</code></dt>
+<dd><code>(ALA.Location, ALA.Location)</code></dd>
+</dl>
+<dl>
+<dt><code>ALA.ConflictSet</code></dt>
+<dd><code>([Conflict])</code></dd>
 </dl>
 <dl>
 <dt><code>ALA.Effect</code></dt>

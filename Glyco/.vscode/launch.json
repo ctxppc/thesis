@@ -1,51 +1,69 @@
 {
     "configurations": [
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug Glyco",
-            "program": "${workspaceFolder}/.build/debug/Glyco",
-            "args": [],
-            "cwd": "${workspaceFolder:Glyco}",
-            "preLaunchTask": "swift: Build Debug Glyco"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Release Glyco",
-            "program": "${workspaceFolder}/.build/release/Glyco",
-            "args": [],
-            "cwd": "${workspaceFolder:Glyco}",
-            "preLaunchTask": "swift: Build Release Glyco"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Debug grammex",
-            "program": "${workspaceFolder}/.build/debug/grammex",
-            "args": [],
-            "cwd": "${workspaceFolder:Glyco}",
-            "preLaunchTask": "swift: Build Debug grammex"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Release grammex",
-            "program": "${workspaceFolder}/.build/release/grammex",
-            "args": [],
-            "cwd": "${workspaceFolder:Glyco}",
-            "preLaunchTask": "swift: Build Release grammex"
-        },
-        {
-            "type": "lldb",
-            "request": "launch",
-            "name": "Test Glyco",
-            "program": "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
-            "args": [
-                ".build/debug/GlycoPackageTests.xctest"
-            ],
-            "cwd": "${workspaceFolder:Glyco}",
-            "preLaunchTask": "swift: Build All"
-        }
-    ]
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug Glyco",
+			"program": "${workspaceFolder}/.build/debug/Glyco",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Debug Glyco"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Release Glyco",
+			"program": "${workspaceFolder}/.build/release/Glyco",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Release Glyco"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug grammex",
+			"program": "${workspaceFolder}/.build/debug/grammex",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Debug grammex"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Release grammex",
+			"program": "${workspaceFolder}/.build/release/grammex",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Release grammex"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Test Glyco",
+			"program": "/Applications/Xcode.app/Contents/Developer/usr/bin/xctest",
+			"args": [
+				".build/debug/GlycoPackageTests.xctest"
+			],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build All"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Debug glyco",
+			"program": "${workspaceFolder:Glyco}/.build/debug/glyco",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Debug glyco"
+		},
+		{
+			"type": "lldb",
+			"request": "launch",
+			"name": "Release glyco",
+			"program": "${workspaceFolder:Glyco}/.build/release/glyco",
+			"args": [],
+			"cwd": "${workspaceFolder:Glyco}",
+			"preLaunchTask": "swift: Build Release glyco"
+		}
+	]
 }

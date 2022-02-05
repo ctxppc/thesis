@@ -86,6 +86,20 @@ extension CF {
 				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
 				
 				case .allocateVector(let dataType, count: let count, into: let vector):
+				/*
+					 ┌──────────┐ high
+					 │          │
+					 │          │◄───── previous sp
+					 │ ┌──────┐ │
+					 │ │ …    │ │
+					 │ │ 3    │ │
+					 │ │ 2    │ │
+					 │ │ 1    │ │
+					 │ │ 0    │ │◄───── vector & new sp
+					 │ └──────┘ │
+					 │          │
+					 └──────────┘ low
+				 */
 				let vector = try vector.lowered()
 				let byteSize = dataType.byteSize * count
 				return [

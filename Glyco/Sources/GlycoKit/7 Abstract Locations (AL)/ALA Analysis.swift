@@ -6,16 +6,13 @@ extension ALA {
 	public struct Analysis : Equatable, Codable {
 		
 		/// Constructs an analysis value.
-		public init(conflictingLocationsForLocation: [Location : Set<Location>] = [:], possiblyLiveLocations: Set<Location> = []) {
-			self.conflictingLocationsForLocation = conflictingLocationsForLocation
+		public init(conflicts: ConflictSet = .init([]), possiblyLiveLocations: Set<Location> = []) {
+			self.conflicts = conflicts
 			self.possiblyLiveLocations = possiblyLiveLocations
-			// TODO: Enforce `conflictingLocationsForLocation` invariant by inserting symmetric edges
 		}
 		
-		/// A mapping from locations to locations that conflict with the former.
-		///
-		/// - Invariant: The mapping is symmetric, i.e., for every location `a` and `b`, if `conflictingLocationsForLocation[a]!.contains(b)` then `conflictingLocationsForLocation[b]!.contains(a)`.
-		public private(set) var conflictingLocationsForLocation: [Location : Set<Location>]
+		/// The conflict set.
+		public private(set) var conflicts: ConflictSet
 		
 		/// The locations whose values are possibly used by a successor.
 		public private(set) var possiblyLiveLocations: Set<Location>
@@ -49,16 +46,14 @@ extension ALA {
 		///
 		/// This method does not add a conflict between a location and itself.
 		private mutating func insertConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) {
-			for otherLocation in otherLocations.subtracting([firstLocation]) {
-				guard conflictingLocationsForLocation[firstLocation, default: []].insert(otherLocation).inserted else { continue }	// optimisation
-				conflictingLocationsForLocation[otherLocation, default: []].insert(firstLocation)
+			for otherLocation in otherLocations {
+				conflicts.insert(.init(firstLocation, otherLocation))
 			}
 		}
 		
 		/// Returns a Boolean value indicating whether the analysis' conflict graph contains a conflict between `firstLocation` and any location in `otherLocations`.
 		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
-			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
-			return !conflictingLocations.isDisjoint(with: otherLocations)
+			conflicts.containsConflict(firstLocation, otherLocations)
 		}
 		
 		/// Marks `locations` as being possibly used by a successor.
@@ -73,30 +68,18 @@ extension ALA {
 		
 		/// Adds the conflicting location pairs from `other` to `self` and marks the possibly live locations in `other` as possibly live in `self`.
 		mutating func formUnion(with other: Self) {
-			for (firstLocation, otherLocations) in other.conflictingLocationsForLocation {
-				self.conflictingLocationsForLocation[firstLocation, default: []].formUnion(otherLocations)
-			}
+			self.conflicts.formUnion(with: other.conflicts)
 			self.possiblyLiveLocations.formUnion(other.possiblyLiveLocations)
 		}
 		
 		/// Returns a Boolean value indicating whether given locations used in a copy effect can be safely coalesced.
 		func safelyCoalescable(_ firstLocation: Location, _ otherLocation: Location) -> Bool {
-			
-			guard !containsConflict(firstLocation, [otherLocation]) else { return false }
-			
-			// Apply (conservative) heuristic by Briggs et al. to avoid turning a K-colourable conflict graph into non-K-colourable.
-			let conflictingLocationsOfUnion = conflictingLocationsForLocation[firstLocation, default: []]
-				.union(conflictingLocationsForLocation[otherLocation, default: []])
-				.subtracting([firstLocation, otherLocation])
-			return conflictingLocationsOfUnion.count /* new conflict count */ < Lower.Register.assignableRegisters.count /* K */
-			
+			conflicts.safelyCoalescable(firstLocation, otherLocation)
 		}
 		
 		/// Returns the locations, ordered by increasing number of conflicts.
 		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
-			conflictingLocationsForLocation
-				.sorted { ($0.value.count, $0.key) < ($1.value.count, $1.key) }	// also order by location for deterministic ordering
-				.map(\.key)
+			conflicts.locationsOrderedByIncreasingNumberOfConflicts()
 		}
 		
 	}

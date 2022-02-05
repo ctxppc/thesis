@@ -16,7 +16,9 @@ N/A
 <dl>
 <dt><code>{{codableType.name}}</code></dt>
 {% for initialiser in codableType.initializers|public %}
+{% if initialiser|!annotated: "isInternalForm" %}
 <dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
+{% endif %}
 {% endfor %}
 {% for case in codableType.cases %}
 <dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>

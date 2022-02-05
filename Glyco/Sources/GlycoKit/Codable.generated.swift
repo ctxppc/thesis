@@ -31,8 +31,15 @@ extension ALA.Procedure {
 
 extension ALA.Analysis {
 	public enum CodingKeys : String, CodingKey {
-		case conflictingLocationsForLocation = "conflictingLocationsForLocation"
+		case conflicts = "conflicts"
 		case possiblyLiveLocations = "possiblyLiveLocations"
+	}
+}
+
+extension ALA.Conflict {
+	public enum CodingKeys : String, CodingKey {
+		case first = "_0"
+		case second = "_1"
 	}
 }
 
