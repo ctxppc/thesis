@@ -3,38 +3,45 @@
 <h2 id="{{lang.type.name}}">Grammar for {{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%}</h2>
 {{ lang.type.annotations["description"] }}
 
-{% if lang.type.typealiases["Lower"].type.name %}
-**Inherited from {{lang.type.typealiases["Lower"].type.name|default: "nothing"}}:**
-{% for name, typealias in lang.type.typealiases where name != "Lower" %}
+	{% if lang.type.typealiases["Lower"].type.name %}
+**Inherited from {{lang.type.typealiases["Lower"].type.name}}:**
+		{% for name, typealias in lang.type.typealiases where name != "Lower" %}
 <code>{{name}}</code>{% if not forloop.last %}, {% endif %}
-{% empty %}
+		{% empty %}
 N/A
-{% endfor %}
-{% endif %}
-
-{% for codableType in types.based.Codable where codableType.name|hasPrefix:lang.type.name %}
+		{% endfor %}
+	{% endif %}
+	
+	{% for language in types.enums|public|implements: "Language" %}
+		{% if language.name == lang.type.name %}
+			{% for codableType in language.containedTypes %}
+				{% if true %}
+					{% if codableType|implements: "RawCodable" %}
 <dl>
-<dt><code>{{codableType.name}}</code></dt>
-{% for initialiser in codableType.initializers|public %}
-{% if initialiser|!annotated: "isInternalForm" %}
-<dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
-{% endif %}
-{% endfor %}
-{% for case in codableType.cases %}
-<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
-{% endfor %}
+	<dt><code>{{codableType.name}}</code></dt>
+						{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
+	<dd><code>{{initialiser.parameters[0].typeName}}</code></dd>
+						{% endfor %}
 </dl>
-{% endfor %}
-{% for codableType in types.based.RawCodable where codableType.name|hasPrefix:lang.type.name %}
+					{% else %}
 <dl>
-<dt><code>{{codableType.name}}</code></dt>
-{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
-<dd><code>{{initialiser.parameters[0].typeName}}</code></dd>
-{% endfor %}
+	<dt><code>{{codableType.name}}</code></dt>
+						{% for initialiser in codableType.initializers|public %}
+							{% if initialiser|!annotated: "isInternalForm" %}
+	<dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
+							{% endif %}
+						{% endfor %}
+						{% for case in codableType.cases %}
+	<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
+						{% endfor %}
 </dl>
-{% endfor %}
-
-{% for name, lang in lang.type.typealiases where name == "Lower" %}
-{% include "Grammar.stencil" %}
-{% endfor %}
+					{% endif %}
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+	
+	{% for name, lang in lang.type.typealiases where name == "Lower" %}
+	{% include "Grammar.stencil" %}
+	{% endfor %}
 {% endif %}

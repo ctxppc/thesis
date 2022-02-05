@@ -71,44 +71,42 @@ A language that introduces expression semantics for values, thereby abstracting 
 <code>Label</code>, 
 <code>Parameter</code>, 
 <code>Symbol</code>
-
 <dl>
-<dt><code>EX.Definition</code></dt>
-<dd><code>(Symbol, Value)</code></dd>
+	<dt><code>EX.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Function</code></dt>
-<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dt><code>EX.Value</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>vector</strong>([Value])</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+	<dt><code>EX.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Program</code></dt>
-<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dt><code>EX.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Result</code></dt>
-<dd><code><strong>value</strong>(Value)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dt><code>EX.Function</code></dt>
+	<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
-<dt><code>EX.Value</code></dt>
-<dd><code><strong>constant</strong>(Int)</code></dd>
-<dd><code><strong>vector</strong>([Value])</code></dd>
-<dd><code><strong>named</strong>(Symbol)</code></dd>
-<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
-<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dt><code>EX.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
-
 
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
 A language that introduces lexical scopes of definitions
@@ -118,55 +116,56 @@ A language that introduces lexical scopes of definitions
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
-
 <dl>
-<dt><code>LS.Definition</code></dt>
-<dd><code>(Symbol, Value)</code></dd>
+	<dt><code>LS.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Function</code></dt>
-<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dt><code>LS.Symbol</code></dt>
+	<dd><code>String</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Parameter</code></dt>
-<dd><code>(Symbol, DataType)</code></dd>
+	<dt><code>LS.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+	<dt><code>LS.Parameter</code></dt>
+	<dd><code>(Symbol, DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Program</code></dt>
-<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dt><code>LS.Value</code></dt>
+	<dd><code><strong>source</strong>(Source)</code></dd>
+	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Result</code></dt>
-<dd><code><strong>value</strong>(Value)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dt><code>LS.Function</code></dt>
+	<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Source</code></dt>
-<dd><code><strong>constant</strong>(Int)</code></dd>
-<dd><code><strong>symbol</strong>(Symbol)</code></dd>
+	<dt><code>LS.Source</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>symbol</strong>(Symbol)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Value</code></dt>
-<dd><code><strong>source</strong>(Source)</code></dd>
-<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dt><code>LS.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
 </dl>
 <dl>
-<dt><code>LS.Symbol</code></dt>
-<dd><code>String</code></dd>
+	<dt><code>LS.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
-
+<dl>
+	<dt><code>LS.Context</code></dt>
+</dl>
 
 <h2 id="DF">Grammar for DF (Definitions)</h2>
 A language that introduces definitions with function-wide namespacing.
@@ -180,42 +179,40 @@ A language that introduces definitions with function-wide namespacing.
 <code>Location</code>, 
 <code>Parameter</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>DF.Definition</code></dt>
-<dd><code>(Location, Value)</code></dd>
+	<dt><code>DF.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
-<dt><code>DF.Function</code></dt>
-<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dt><code>DF.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
-<dt><code>DF.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+	<dt><code>DF.Definition</code></dt>
+	<dd><code>(Location, Value)</code></dd>
 </dl>
 <dl>
-<dt><code>DF.Program</code></dt>
-<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dt><code>DF.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>DF.Result</code></dt>
-<dd><code><strong>value</strong>(Value)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dt><code>DF.Value</code></dt>
+	<dd><code><strong>source</strong>(Source)</code></dd>
+	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
-<dt><code>DF.Value</code></dt>
-<dd><code><strong>source</strong>(Source)</code></dd>
-<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
-<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
-<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dt><code>DF.Function</code></dt>
+	<dd><code>(Label, [Parameter], Result)</code></dd>
 </dl>
-
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
 A language that allows computation to be attached to an assigned value.
@@ -229,41 +226,39 @@ A language that allows computation to be attached to an assigned value.
 <code>Location</code>, 
 <code>Parameter</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>CV.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>call</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
+	<dt><code>CV.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>CV.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>CV.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>CV.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dt><code>CV.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>CV.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>CV.Procedure</code></dt>
+	<dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>CV.Value</code></dt>
-<dd><code><strong>source</strong>(Source)</code></dd>
-<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
-<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+	<dt><code>CV.Value</code></dt>
+	<dd><code><strong>source</strong>(Source)</code></dd>
+	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
 </dl>
-
 
 <h2 id="CA">Grammar for CA (Canonical Assignments)</h2>
 A language that groups all effects that write to a location under one canonical assignment effect.
@@ -277,38 +272,36 @@ A language that groups all effects that write to a location under one canonical 
 <code>Location</code>, 
 <code>Parameter</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>CA.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
-<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>call</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(Source)</code></dd>
+	<dt><code>CA.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>CA.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>CA.Procedure</code></dt>
+	<dd><code>(Label, [Parameter], Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>CA.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dt><code>CA.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
-<dt><code>CA.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>CA.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>CA.Value</code></dt>
-<dd><code><strong>source</strong>(Source)</code></dd>
-<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dt><code>CA.Value</code></dt>
+	<dd><code><strong>source</strong>(Source)</code></dd>
+	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 </dl>
-
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
 A language that introduces parameter passing and enforces the low-level Glyco calling convention.
@@ -319,44 +312,45 @@ A language that introduces parameter passing and enforces the low-level Glyco ca
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>
-
 <dl>
-<dt><code>CC.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>call</strong>(Label, [Source])</code></dd>
-<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dt><code>CC.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>CC.Parameter</code></dt>
-<dd><code>(Location, DataType)</code></dd>
+	<dt><code>CC.Context</code></dt>
 </dl>
 <dl>
-<dt><code>CC.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>CC.Parameter</code></dt>
+	<dd><code>(Location, DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>CC.Procedure</code></dt>
-<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dt><code>CC.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>CC.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>CC.Source</code></dt>
+	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
-<dt><code>CC.Source</code></dt>
-<dd><code><strong>immediate</strong>(Int)</code></dd>
-<dd><code><strong>location</strong>(Location)</code></dd>
+	<dt><code>CC.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
-
+<dl>
+	<dt><code>CC.Procedure</code></dt>
+	<dd><code>(Label, [Parameter], Effect)</code></dd>
+</dl>
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
 A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
@@ -373,106 +367,33 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>ParameterLocation</code>, 
 <code>Register</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>AL.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
-<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dt><code>AL.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>AL.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Procedure</code></dt>
-<dd><code>(Label, Effect)</code></dd>
+	<dt><code>AL.Procedure</code></dt>
+	<dd><code>(Label, Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>AL.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>AL.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
+	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
-<dl>
-<dt><code>ALA.Analysis</code></dt>
-<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Conflict</code></dt>
-<dd><code>(ALA.Location, ALA.Location)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.ConflictSet</code></dt>
-<dd><code>([Conflict])</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Location</code></dt>
-<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.ParameterLocation</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Procedure</code></dt>
-<dd><code>(Label, Effect)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Register</code></dt>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
-</dl>
-<dl>
-<dt><code>ALA.Source</code></dt>
-<dd><code><strong>immediate</strong>(Int)</code></dd>
-<dd><code><strong>location</strong>(Location)</code></dd>
-</dl>
-<dl>
-<dt><code>ALA.AbstractLocation</code></dt>
-<dd><code>String</code></dd>
-</dl>
-
 
 <h2 id="ALA">Grammar for ALA (Abstract Locations, Analysed)</h2>
 A language that introduces abstract locations, annotated with liveness and conflict information.
@@ -483,79 +404,80 @@ A language that introduces abstract locations, annotated with liveness and confl
 <code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>
-
 <dl>
-<dt><code>ALA.Analysis</code></dt>
-<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+	<dt><code>ALA.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Conflict</code></dt>
-<dd><code>(ALA.Location, ALA.Location)</code></dd>
+	<dt><code>ALA.Register</code></dt>
+	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>fp</strong></code></dd>
+	<dd><code><strong>a0</strong></code></dd>
+	<dd><code><strong>a1</strong></code></dd>
+	<dd><code><strong>a2</strong></code></dd>
+	<dd><code><strong>a3</strong></code></dd>
+	<dd><code><strong>a4</strong></code></dd>
+	<dd><code><strong>a5</strong></code></dd>
+	<dd><code><strong>a6</strong></code></dd>
+	<dd><code><strong>a7</strong></code></dd>
 </dl>
 <dl>
-<dt><code>ALA.ConflictSet</code></dt>
-<dd><code>([Conflict])</code></dd>
+	<dt><code>ALA.AbstractLocation</code></dt>
+	<dd><code>String</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dt><code>ALA.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Location</code></dt>
-<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
+	<dt><code>ALA.ParameterLocation</code></dt>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.ParameterLocation</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
+	<dt><code>ALA.Source</code></dt>
+	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>location</strong>(Location)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dt><code>ALA.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Procedure</code></dt>
-<dd><code>(Label, Effect)</code></dd>
+	<dt><code>ALA.Location</code></dt>
+	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+	<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>ALA.Context</code></dt>
 </dl>
 <dl>
-<dt><code>ALA.Register</code></dt>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
+	<dt><code>ALA.Procedure</code></dt>
+	<dd><code>(Label, Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.Source</code></dt>
-<dd><code><strong>immediate</strong>(Int)</code></dd>
-<dd><code><strong>location</strong>(Location)</code></dd>
+	<dt><code>ALA.Analysis</code></dt>
+	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
 </dl>
 <dl>
-<dt><code>ALA.AbstractLocation</code></dt>
-<dd><code>String</code></dd>
+	<dt><code>ALA.ConflictSet</code></dt>
+	<dd><code>([Conflict])</code></dd>
 </dl>
-
+<dl>
+	<dt><code>ALA.Conflict</code></dt>
+	<dd><code>(ALA.Location, ALA.Location)</code></dd>
+</dl>
 
 <h2 id="CD">Grammar for CD (Conditionals)</h2>
 A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
@@ -569,37 +491,38 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>CD.Effect</code></dt>
-<dd><code><strong>do</strong>([Effect])</code></dd>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
-<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
-<dd><code><strong>call</strong>(Label)</code></dd>
-<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dt><code>CD.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-<dt><code>CD.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>CD.Context</code></dt>
 </dl>
 <dl>
-<dt><code>CD.Procedure</code></dt>
-<dd><code>(Label, Effect)</code></dd>
+	<dt><code>CD.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-<dt><code>CD.Program</code></dt>
-<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dt><code>CD.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
+	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
 </dl>
-
+<dl>
+	<dt><code>CD.Procedure</code></dt>
+	<dd><code>(Label, Effect)</code></dd>
+</dl>
 
 <h2 id="PR">Grammar for PR (Predicates)</h2>
 A language that introduces predicates in branches.
@@ -614,24 +537,22 @@ A language that introduces predicates in branches.
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>PR.Block</code></dt>
-<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(Label, [Effect], <strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
+	<dt><code>PR.Program</code></dt>
+	<dd><code>([Block])</code></dd>
 </dl>
 <dl>
-<dt><code>PR.Predicate</code></dt>
-<dd><code><strong>constant</strong>(Bool)</code></dd>
-<dd><code><strong>not</strong>(Predicate)</code></dd>
-<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dt><code>PR.Block</code></dt>
+	<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
+	<dd><code><strong>branch</strong>(Label, [Effect], <strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>PR.Program</code></dt>
-<dd><code>([Block])</code></dd>
+	<dt><code>PR.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>not</strong>(Predicate)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 </dl>
-
 
 <h2 id="BB">Grammar for BB (Basic Blocks)</h2>
 A language that groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.
@@ -645,28 +566,26 @@ A language that groups effects into blocks of effects where blocks can only be e
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>
-
 <dl>
-<dt><code>BB.Block</code></dt>
-<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
-<dd><code><strong>branch</strong>(Label, [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
+	<dt><code>BB.Program</code></dt>
+	<dd><code>([BB.Block])</code></dd>
 </dl>
 <dl>
-<dt><code>BB.Effect</code></dt>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
-<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
+	<dt><code>BB.Effect</code></dt>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 </dl>
 <dl>
-<dt><code>BB.Program</code></dt>
-<dd><code>([BB.Block])</code></dd>
+	<dt><code>BB.Block</code></dt>
+	<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
+	<dd><code><strong>branch</strong>(Label, [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
-
 
 <h2 id="FO">Grammar for FO (Flexible Operands)</h2>
 A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
@@ -676,72 +595,70 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
-
 <dl>
-<dt><code>FO.Effect</code></dt>
-<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
-<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
-<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
-<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
-<dd><code><strong>call</strong>(Label)</code></dd>
-<dd><code><strong>return</strong></code></dd>
-<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+	<dt><code>FO.Program</code></dt>
+	<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
-<dt><code>FO.HaltEffect</code></dt>
-<dd><code>(<strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
+	<dt><code>FO.Source</code></dt>
+	<dd><code><strong>location</strong>(Location)</code></dd>
+	<dd><code><strong>immediate</strong>(Int)</code></dd>
 </dl>
 <dl>
-<dt><code>FO.Location</code></dt>
-<dd><code><strong>register</strong>(Register)</code></dd>
-<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
+	<dt><code>FO.HaltEffect</code></dt>
+	<dd><code>(<strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
 </dl>
 <dl>
-<dt><code>FO.Program</code></dt>
-<dd><code>([Effect])</code></dd>
+	<dt><code>FO.Effect</code></dt>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
+	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>FO.Register</code></dt>
-<dd><code><strong>zero</strong></code></dd>
-<dd><code><strong>ra</strong></code></dd>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>gp</strong></code></dd>
-<dd><code><strong>tp</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>s1</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
-<dd><code><strong>s2</strong></code></dd>
-<dd><code><strong>s3</strong></code></dd>
-<dd><code><strong>s4</strong></code></dd>
-<dd><code><strong>s5</strong></code></dd>
-<dd><code><strong>s6</strong></code></dd>
-<dd><code><strong>s7</strong></code></dd>
-<dd><code><strong>s8</strong></code></dd>
-<dd><code><strong>s9</strong></code></dd>
-<dd><code><strong>s10</strong></code></dd>
-<dd><code><strong>s11</strong></code></dd>
-<dd><code><strong>t4</strong></code></dd>
-<dd><code><strong>t5</strong></code></dd>
-<dd><code><strong>t6</strong></code></dd>
+	<dt><code>FO.Location</code></dt>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+	<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
-<dt><code>FO.Source</code></dt>
-<dd><code><strong>location</strong>(Location)</code></dd>
-<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dt><code>FO.Register</code></dt>
+	<dd><code><strong>zero</strong></code></dd>
+	<dd><code><strong>ra</strong></code></dd>
+	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>gp</strong></code></dd>
+	<dd><code><strong>tp</strong></code></dd>
+	<dd><code><strong>fp</strong></code></dd>
+	<dd><code><strong>s1</strong></code></dd>
+	<dd><code><strong>a0</strong></code></dd>
+	<dd><code><strong>a1</strong></code></dd>
+	<dd><code><strong>a2</strong></code></dd>
+	<dd><code><strong>a3</strong></code></dd>
+	<dd><code><strong>a4</strong></code></dd>
+	<dd><code><strong>a5</strong></code></dd>
+	<dd><code><strong>a6</strong></code></dd>
+	<dd><code><strong>a7</strong></code></dd>
+	<dd><code><strong>s2</strong></code></dd>
+	<dd><code><strong>s3</strong></code></dd>
+	<dd><code><strong>s4</strong></code></dd>
+	<dd><code><strong>s5</strong></code></dd>
+	<dd><code><strong>s6</strong></code></dd>
+	<dd><code><strong>s7</strong></code></dd>
+	<dd><code><strong>s8</strong></code></dd>
+	<dd><code><strong>s9</strong></code></dd>
+	<dd><code><strong>s10</strong></code></dd>
+	<dd><code><strong>s11</strong></code></dd>
+	<dd><code><strong>t4</strong></code></dd>
+	<dd><code><strong>t5</strong></code></dd>
+	<dd><code><strong>t6</strong></code></dd>
 </dl>
-
 
 <h2 id="CF">Grammar for CF (Call Frame)</h2>
 A language that introduces call frames and operations for managing the call frame.
@@ -751,176 +668,182 @@ A language that introduces call frames and operations for managing the call fram
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
 <code>Label</code>
-
 <dl>
-<dt><code>CF.BinaryExpression</code></dt>
-<dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
-<dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
+	<dt><code>CF.Program</code></dt>
+	<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
-<dt><code>CF.Effect</code></dt>
-<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
-<dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
-<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
-<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
-<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Register)</code></dd>
-<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>vector:</strong> Register, <strong>index:</strong> Register)</code></dd>
-<dd><code><strong>storeElement</strong>(DataType, <strong>vector:</strong> Register, <strong>index:</strong> Register, <strong>from:</strong> Register)</code></dd>
-<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
-<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
-<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
-<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
-<dd><code><strong>call</strong>(Label)</code></dd>
-<dd><code><strong>return</strong></code></dd>
-<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+	<dt><code>CF.Effect</code></dt>
+	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
+	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
+	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Register)</code></dd>
+	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>vector:</strong> Register, <strong>index:</strong> Register)</code></dd>
+	<dd><code><strong>storeElement</strong>(DataType, <strong>vector:</strong> Register, <strong>index:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
+	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
 <dl>
-<dt><code>CF.Frame.Location</code></dt>
-<dd><code>(<strong>offset:</strong> Int)</code></dd>
+	<dt><code>CF.Register</code></dt>
+	<dd><code><strong>zero</strong></code></dd>
+	<dd><code><strong>ra</strong></code></dd>
+	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>gp</strong></code></dd>
+	<dd><code><strong>tp</strong></code></dd>
+	<dd><code><strong>t1</strong></code></dd>
+	<dd><code><strong>t2</strong></code></dd>
+	<dd><code><strong>fp</strong></code></dd>
+	<dd><code><strong>s1</strong></code></dd>
+	<dd><code><strong>a0</strong></code></dd>
+	<dd><code><strong>a1</strong></code></dd>
+	<dd><code><strong>a2</strong></code></dd>
+	<dd><code><strong>a3</strong></code></dd>
+	<dd><code><strong>a4</strong></code></dd>
+	<dd><code><strong>a5</strong></code></dd>
+	<dd><code><strong>a6</strong></code></dd>
+	<dd><code><strong>a7</strong></code></dd>
+	<dd><code><strong>s2</strong></code></dd>
+	<dd><code><strong>s3</strong></code></dd>
+	<dd><code><strong>s4</strong></code></dd>
+	<dd><code><strong>s5</strong></code></dd>
+	<dd><code><strong>s6</strong></code></dd>
+	<dd><code><strong>s7</strong></code></dd>
+	<dd><code><strong>s8</strong></code></dd>
+	<dd><code><strong>s9</strong></code></dd>
+	<dd><code><strong>s10</strong></code></dd>
+	<dd><code><strong>s11</strong></code></dd>
+	<dd><code><strong>t3</strong></code></dd>
+	<dd><code><strong>t4</strong></code></dd>
+	<dd><code><strong>t5</strong></code></dd>
+	<dd><code><strong>t6</strong></code></dd>
 </dl>
 <dl>
-<dt><code>CF.Program</code></dt>
-<dd><code>([Effect])</code></dd>
+	<dt><code>CF.BinaryExpression</code></dt>
+	<dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
+	<dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
 </dl>
 <dl>
-<dt><code>CF.Register</code></dt>
-<dd><code><strong>zero</strong></code></dd>
-<dd><code><strong>ra</strong></code></dd>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>gp</strong></code></dd>
-<dd><code><strong>tp</strong></code></dd>
-<dd><code><strong>t1</strong></code></dd>
-<dd><code><strong>t2</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>s1</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
-<dd><code><strong>s2</strong></code></dd>
-<dd><code><strong>s3</strong></code></dd>
-<dd><code><strong>s4</strong></code></dd>
-<dd><code><strong>s5</strong></code></dd>
-<dd><code><strong>s6</strong></code></dd>
-<dd><code><strong>s7</strong></code></dd>
-<dd><code><strong>s8</strong></code></dd>
-<dd><code><strong>s9</strong></code></dd>
-<dd><code><strong>s10</strong></code></dd>
-<dd><code><strong>s11</strong></code></dd>
-<dd><code><strong>t3</strong></code></dd>
-<dd><code><strong>t4</strong></code></dd>
-<dd><code><strong>t5</strong></code></dd>
-<dd><code><strong>t6</strong></code></dd>
+	<dt><code>CF.Frame</code></dt>
+	<dd><code>()</code></dd>
 </dl>
-
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
 A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
 
 **Inherited from S:**
 N/A
-
 <dl>
-<dt><code>RV.BinaryOperator</code></dt>
-<dd><code><strong>add</strong></code></dd>
-<dd><code><strong>sub</strong></code></dd>
-<dd><code><strong>and</strong></code></dd>
-<dd><code><strong>or</strong></code></dd>
-<dd><code><strong>xor</strong></code></dd>
-<dd><code><strong>sll</strong></code></dd>
-<dd><code><strong>srl</strong></code></dd>
-<dd><code><strong>sra</strong></code></dd>
+	<dt><code>RV.Program</code></dt>
+	<dd><code>([Instruction])</code></dd>
 </dl>
 <dl>
-<dt><code>RV.BranchRelation</code></dt>
-<dd><code><strong>eq</strong></code></dd>
-<dd><code><strong>ne</strong></code></dd>
-<dd><code><strong>lt</strong></code></dd>
-<dd><code><strong>le</strong></code></dd>
-<dd><code><strong>gt</strong></code></dd>
-<dd><code><strong>ge</strong></code></dd>
+	<dt><code>RV.Register</code></dt>
+	<dd><code><strong>zero</strong></code></dd>
+	<dd><code><strong>ra</strong></code></dd>
+	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>gp</strong></code></dd>
+	<dd><code><strong>tp</strong></code></dd>
+	<dd><code><strong>t0</strong></code></dd>
+	<dd><code><strong>t1</strong></code></dd>
+	<dd><code><strong>t2</strong></code></dd>
+	<dd><code><strong>fp</strong></code></dd>
+	<dd><code><strong>s1</strong></code></dd>
+	<dd><code><strong>a0</strong></code></dd>
+	<dd><code><strong>a1</strong></code></dd>
+	<dd><code><strong>a2</strong></code></dd>
+	<dd><code><strong>a3</strong></code></dd>
+	<dd><code><strong>a4</strong></code></dd>
+	<dd><code><strong>a5</strong></code></dd>
+	<dd><code><strong>a6</strong></code></dd>
+	<dd><code><strong>a7</strong></code></dd>
+	<dd><code><strong>s2</strong></code></dd>
+	<dd><code><strong>s3</strong></code></dd>
+	<dd><code><strong>s4</strong></code></dd>
+	<dd><code><strong>s5</strong></code></dd>
+	<dd><code><strong>s6</strong></code></dd>
+	<dd><code><strong>s7</strong></code></dd>
+	<dd><code><strong>s8</strong></code></dd>
+	<dd><code><strong>s9</strong></code></dd>
+	<dd><code><strong>s10</strong></code></dd>
+	<dd><code><strong>s11</strong></code></dd>
+	<dd><code><strong>t3</strong></code></dd>
+	<dd><code><strong>t4</strong></code></dd>
+	<dd><code><strong>t5</strong></code></dd>
+	<dd><code><strong>t6</strong></code></dd>
 </dl>
 <dl>
-<dt><code>RV.DataType</code></dt>
-<dd><code><strong>word</strong></code></dd>
-<dd><code><strong>capability</strong></code></dd>
+	<dt><code>RV.Label</code></dt>
+	<dd><code>String</code></dd>
 </dl>
 <dl>
-<dt><code>RV.Instruction</code></dt>
-<dd><code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-<dd><code><strong>registerRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
-<dd><code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
-<dd><code><strong>loadWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-<dd><code><strong>storeWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
-<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
-<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
-<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
-<dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
-<dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
-<dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
-<dd><code><strong>return</strong></code></dd>
-<dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
+	<dt><code>RV.Context</code></dt>
 </dl>
 <dl>
-<dt><code>RV.Program</code></dt>
-<dd><code>([Instruction])</code></dd>
+	<dt><code>RV.DataType</code></dt>
+	<dd><code><strong>word</strong></code></dd>
+	<dd><code><strong>capability</strong></code></dd>
 </dl>
 <dl>
-<dt><code>RV.Register</code></dt>
-<dd><code><strong>zero</strong></code></dd>
-<dd><code><strong>ra</strong></code></dd>
-<dd><code><strong>sp</strong></code></dd>
-<dd><code><strong>gp</strong></code></dd>
-<dd><code><strong>tp</strong></code></dd>
-<dd><code><strong>t0</strong></code></dd>
-<dd><code><strong>t1</strong></code></dd>
-<dd><code><strong>t2</strong></code></dd>
-<dd><code><strong>fp</strong></code></dd>
-<dd><code><strong>s1</strong></code></dd>
-<dd><code><strong>a0</strong></code></dd>
-<dd><code><strong>a1</strong></code></dd>
-<dd><code><strong>a2</strong></code></dd>
-<dd><code><strong>a3</strong></code></dd>
-<dd><code><strong>a4</strong></code></dd>
-<dd><code><strong>a5</strong></code></dd>
-<dd><code><strong>a6</strong></code></dd>
-<dd><code><strong>a7</strong></code></dd>
-<dd><code><strong>s2</strong></code></dd>
-<dd><code><strong>s3</strong></code></dd>
-<dd><code><strong>s4</strong></code></dd>
-<dd><code><strong>s5</strong></code></dd>
-<dd><code><strong>s6</strong></code></dd>
-<dd><code><strong>s7</strong></code></dd>
-<dd><code><strong>s8</strong></code></dd>
-<dd><code><strong>s9</strong></code></dd>
-<dd><code><strong>s10</strong></code></dd>
-<dd><code><strong>s11</strong></code></dd>
-<dd><code><strong>t3</strong></code></dd>
-<dd><code><strong>t4</strong></code></dd>
-<dd><code><strong>t5</strong></code></dd>
-<dd><code><strong>t6</strong></code></dd>
+	<dt><code>RV.Instruction</code></dt>
+	<dd><code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>registerRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
+	<dd><code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
+	<dd><code><strong>loadWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>storeWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
+	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
+	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
 </dl>
 <dl>
-<dt><code>RV.Label</code></dt>
-<dd><code>String</code></dd>
+	<dt><code>RV.BranchRelation</code></dt>
+	<dd><code><strong>eq</strong></code></dd>
+	<dd><code><strong>ne</strong></code></dd>
+	<dd><code><strong>lt</strong></code></dd>
+	<dd><code><strong>le</strong></code></dd>
+	<dd><code><strong>gt</strong></code></dd>
+	<dd><code><strong>ge</strong></code></dd>
 </dl>
-
+<dl>
+	<dt><code>RV.BinaryOperator</code></dt>
+	<dd><code><strong>add</strong></code></dd>
+	<dd><code><strong>sub</strong></code></dd>
+	<dd><code><strong>and</strong></code></dd>
+	<dd><code><strong>or</strong></code></dd>
+	<dd><code><strong>xor</strong></code></dd>
+	<dd><code><strong>sll</strong></code></dd>
+	<dd><code><strong>srl</strong></code></dd>
+	<dd><code><strong>sra</strong></code></dd>
+</dl>
 
 <h2 id="S">Grammar for S (CHERI-RISC-V Assembly)</h2>
 The ground language as provided to Clang for assembly and linking.
 
-
 <dl>
-<dt><code>S.Program</code></dt>
-<dd><code>(<strong>assembly:</strong> String)</code></dd>
+	<dt><code>S.Program</code></dt>
+	<dd><code>(<strong>assembly:</strong> String)</code></dd>
 </dl>
-
+<dl>
+	<dt><code>S.CompilationError</code></dt>
+	<dd><code><strong>clangError</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>S.LoweringError</code></dt>
+	<dd><code><strong>unknownLanguage</strong>(String)</code></dd>
+	<dd><code><strong>invalidEncoding</strong></code></dd>
+</dl>
