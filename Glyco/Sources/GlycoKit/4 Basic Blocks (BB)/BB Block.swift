@@ -3,29 +3,36 @@
 extension BB {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public enum Block : Codable, Equatable, MultiplyLowerable {
+	public struct Block : Codable, Equatable, MultiplyLowerable {
 		
-		/// A block that executes given effects, then jumps to the block labelled `then`.
-		case intermediate(Label, [Effect], then: Label)
+		/// Creates a block with given label, effects, and continuation.
+		public init(label: Label, do effects: [Effect], then continuation: Continuation) {
+			self.label = label
+			self.effects = effects
+			self.continuation = continuation
+		}
 		
-		/// A block that executes given effects, then jumps to the block labelled `then` if *x* `relation` *y*, or to the block labelled `else` otherwise, where *x* is the value of `lhs` and *y* is the value of `rhs`.
-		case branch(Label, [Effect], lhs: Source, relation: BranchRelation, rhs: Source, then: Label, else: Label)
+		/// The block's label.
+		public var label: Label
 		
-		/// A block that executes given effects then terminates with `result` of type `type`.
-		case final(Label, [Effect], result: Source, type: DataType)
+		/// The block's effects.
+		public var effects: [Effect]
+		
+		/// The action to take after executing `effects`.
+		public var continuation: Continuation
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> [Lower.Effect] {
-			switch self {
+			switch continuation {
 				
-				case .intermediate(let label, let effects, then: let successor):
+				case .continue(to: let successor):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
 					return [.labelled(label, first)] + tail + [.jump(to: successor)]
 				} else {
 					return [.labelled(label, .jump(to: successor))]
 				}
 				
-				case .branch(let label, let effects, lhs: let lhs, relation: let relation, rhs: let rhs, then: let affirmative, else: let negative):
+				case .branch(let lhs, let relation, let rhs, then: let affirmative, else: let negative):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
 					return [.labelled(label, first)]
 						+ tail
@@ -34,11 +41,11 @@ extension BB {
 					return [.labelled(label, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
 				}
 				
-				case .final(let label, let effects, result: let result, type: let type):
+				case .return:
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.set(type, .register(.a0), to: result), .return]
+					return [.labelled(label, first)] + tail + [.return]
 				} else {
-					return [.labelled(label, .set(type, .register(.a0), to: result)), .return]
+					return [.labelled(label, .return)]
 				}
 				
 			}

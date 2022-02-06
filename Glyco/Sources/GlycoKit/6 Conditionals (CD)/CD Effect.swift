@@ -43,8 +43,10 @@ extension CD {
 		/// This effect assumes the calling convention is respected by the rest of the program.
 		case call(Label)
 		
-		/// An effect that terminates the program with given result.
-		case `return`(DataType, Source)
+		/// An effect that returns to the caller.
+		///
+		/// This effect assumes the calling convention is respected by the rest of the program.
+		case `return`
 		
 		/// Returns a representation of `self` in a lower language.
 		///
@@ -63,7 +65,7 @@ extension CD {
 				
 				case .call(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
-				return [.intermediate(entryLabel, previousEffects, then: procedure)]
+				return [.init(label: entryLabel, do: previousEffects, then: .continue(to: procedure))]
 				
 				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .pushFrame, .popFrame, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
@@ -215,7 +217,7 @@ private extension RandomAccessCollection where Element == CD.Effect {
 	///
 	/// - Returns: A representation of `self` in a lower language.
 	func lowered(in context: inout CD.Context, entryLabel: CD.Lower.Label, previousEffects: [CD.Lower.Effect], exitLabel: CD.Lower.Label) throws -> [CD.Lower.Block] {
-		guard let (first, rest) = self.splittingFirst() else { return [.intermediate(entryLabel, previousEffects, then: exitLabel)] }
+		guard let (first, rest) = self.splittingFirst() else { return [.init(label: entryLabel, do: previousEffects, then: .continue(to: exitLabel))] }
 		switch first {
 			
 			case .do(effects: let effects) where rest.doesNothing:
@@ -322,13 +324,11 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .call(procedure: let procedure):
-			guard rest.isEmpty && exitLabel == .programExit else { throw CD.Effect.LoweringError.effectAfterInvocation }
-			return [.intermediate(entryLabel, previousEffects, then: procedure)]
+			case .call(let procedure):
+			return [.init(label: entryLabel, do: previousEffects, then: .continue(to: procedure))]
 			
-			case .return(let type, let result):
-			guard rest.doesNothing else { throw CD.Effect.LoweringError.effectAfterReturn }
-			return [.final(entryLabel, previousEffects, result: result, type: type)]
+			case .return:
+			return [.init(label: entryLabel, do: previousEffects, then: .return)]
 			
 		}
 	}

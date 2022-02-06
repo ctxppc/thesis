@@ -424,7 +424,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
-	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
 </dl>
 
 <h2 id="ALA">Grammar for ALA (Abstract Locations, Analysed)</h2>
@@ -484,7 +484,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>return</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Location</code></dt>
@@ -549,7 +549,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
-	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>CD.Procedure</code></dt>
@@ -562,6 +562,7 @@ A language that introduces predicates in branches.
 **Inherited from BB:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Context</code>, 
 <code>DataType</code>, 
 <code>Effect</code>, 
 <code>Frame</code>, 
@@ -575,9 +576,13 @@ A language that introduces predicates in branches.
 </dl>
 <dl>
 	<dt><code>PR.Block</code></dt>
-	<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
-	<dd><code><strong>branch</strong>(Label, [Effect], <strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-	<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
+	<dd><code>(<strong>label:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
+</dl>
+<dl>
+	<dt><code>PR.Continuation</code></dt>
+	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>branch</strong>(<strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>PR.Predicate</code></dt>
@@ -613,10 +618,14 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 </dl>
 <dl>
+	<dt><code>BB.Continuation</code></dt>
+	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>branch</strong>(Source, BranchRelation, Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+</dl>
+<dl>
 	<dt><code>BB.Block</code></dt>
-	<dd><code><strong>intermediate</strong>(Label, [Effect], <strong>then:</strong> Label)</code></dd>
-	<dd><code><strong>branch</strong>(Label, [Effect], <strong>lhs:</strong> Source, <strong>relation:</strong> BranchRelation, <strong>rhs:</strong> Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-	<dd><code><strong>final</strong>(Label, [Effect], <strong>result:</strong> Source, <strong>type:</strong> DataType)</code></dd>
+	<dd><code>(<strong>label:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
 </dl>
 
 <h2 id="FO">Grammar for FO (Flexible Operands)</h2>

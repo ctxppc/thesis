@@ -49,6 +49,14 @@ extension BB.Program {
 	}
 }
 
+extension BB.Block {
+	public enum CodingKeys : String, CodingKey {
+		case label = "label"
+		case effects = "do"
+		case continuation = "then"
+	}
+}
+
 extension CA.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
@@ -210,6 +218,14 @@ extension LS.Definition {
 extension PR.Program {
 	public enum CodingKeys : String, CodingKey {
 		case blocks = "_0"
+	}
+}
+
+extension PR.Block {
+	public enum CodingKeys : String, CodingKey {
+		case label = "label"
+		case effects = "do"
+		case continuation = "then"
 	}
 }
 

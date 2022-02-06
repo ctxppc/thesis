@@ -82,10 +82,10 @@ extension CD {
 			switch self {
 				
 				case .constant(let holds):
-				return [.intermediate(entryLabel, previousEffects, then: holds ? affirmativeTarget : negativeTarget)]
+				return [.init(label: entryLabel, do: previousEffects, then: .continue(to: holds ? affirmativeTarget : negativeTarget))]
 				
 				case .relation(let lhs, let relation, let rhs):
-				return [.branch(entryLabel, previousEffects, if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget)]
+				return [.init(label: entryLabel, do: previousEffects, then: .branch(if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget))]
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				let intermediateAffirmative = context.bag.uniqueName(from: "then")

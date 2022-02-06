@@ -26,6 +26,8 @@ public enum PR : Language {
 	// See protocol.
 	public typealias Lower = BB
 	
+	public typealias Context = ()
+	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType

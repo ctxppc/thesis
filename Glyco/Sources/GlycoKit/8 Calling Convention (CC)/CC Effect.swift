@@ -31,7 +31,7 @@ extension CC {
 		/// An effect that invokes the labelled procedure passing given arguments.
 		case call(Label, [Source])
 		
-		/// An effect that terminates the program with `result`.
+		/// An effect that returns given result to the caller.
 		case `return`(DataType, Source)
 		
 		// See protocol.
@@ -81,7 +81,11 @@ extension CC {
 				}
 				
 				case .return(let type, let result):
-				return .return(type, try result.lowered(in: &context))
+				return .do([
+					// TODO: Apply calling conventions
+					.set(type, .parameter(.register(.a0)), to: try result.lowered(in: &context)),
+					.return,
+				])
 				
 			}
 		}

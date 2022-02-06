@@ -31,8 +31,10 @@ extension ALA {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
 		case call(Label, [ParameterLocation], analysisAtEntry: Analysis)
 		
-		/// An effect that terminates the program with `result`.
-		case `return`(DataType, Source, analysisAtEntry: Analysis)
+		/// An effect that returns to the caller.
+		///
+		/// This effect assumes a suitable calling convention has already been applied to the program.
+		case `return`(analysisAtEntry: Analysis)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Effect {
@@ -62,8 +64,8 @@ extension ALA {
 				case .call(let name, _, analysisAtEntry: _):
 				return .call(name)
 				
-				case .return(let type, let value, analysisAtEntry: _):
-				return .return(type, try value.lowered(in: &context))
+				case .return(analysisAtEntry: _):
+				return .return
 				
 			}
 		}
@@ -144,8 +146,8 @@ extension ALA {
 				case .call(let name, let locations, analysisAtEntry: _):
 				return .call(name, locations, analysisAtEntry: analysis)
 				
-				case .return(let type, let result, analysisAtEntry: _):
-				return .return(type, result, analysisAtEntry: analysis)
+				case .return(analysisAtEntry: _):
+				return .return(analysisAtEntry: analysis)
 				
 			}
 		}
@@ -164,7 +166,7 @@ extension ALA {
 					.setElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.call(_, _, analysisAtEntry: let analysis),
-					.return(_, _, analysisAtEntry: let analysis):
+					.return(analysisAtEntry: let analysis):
 				return analysis
 			}
 		}
@@ -194,13 +196,12 @@ extension ALA {
 					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
 					.allocateVector,
 					.if,
-					.return(_, .constant, analysisAtEntry: _):
+					.return:
 				return []
 				
 				case .set(_, _, to: .location(let source), analysisAtEntry: _),
 					.compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
-					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _),
-					.return(_, .location(let source), analysisAtEntry: _):
+					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _):
 				return [source]
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _, analysisAtEntry: _):
@@ -283,7 +284,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .call:
+				case .do, .if, .call, .return:
 				return self
 				
 				case .set(_, .abstract(removedLocation), to: .location(retainedLocation), analysisAtEntry: let analysis),
@@ -309,9 +310,6 @@ extension ALA {
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
 				return .setElement(type, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
-				
-				case .return(let type, let value, analysisAtEntry: let analysis):
-				return .return(type, substitute(value), analysisAtEntry: analysis)
 				
 			}
 			
