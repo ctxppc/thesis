@@ -49,7 +49,7 @@ extension CA {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let name, let arguments):
-				return .call(name, arguments)
+				return .call(name, arguments, result: "result")	// TODO
 				
 				case .return(let result):
 				return .return(.word, result)

@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Calling Convention
-//sourcery: description = A language that introduces parameter passing and enforces the low-level Glyco calling convention.
+//sourcery: description = A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
 public enum CC : Language {
 	
 	/// A program on a CC machine.

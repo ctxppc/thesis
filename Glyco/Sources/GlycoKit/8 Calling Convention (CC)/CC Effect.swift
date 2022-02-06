@@ -28,8 +28,8 @@ extension CC {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
-		/// An effect that invokes the labelled procedure passing given arguments.
-		case call(Label, [Source])
+		/// An effect that invokes the labelled procedure passing given arguments and puts the procedure's result in `result`.
+		case call(Label, [Source], result: Location)
 		
 		/// An effect that returns given result to the caller.
 		case `return`(DataType, Source)
@@ -59,8 +59,10 @@ extension CC {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .call(let name, let arguments):
+				case .call(let name, let arguments, result: let result):
 				do {
+					
+					// TODO: Apply calling conventions & copy a0 to `result`
 					
 					guard let procedure = context.procedures.first(where: { $0.name == name }) else { throw LoweringError.unrecognisedProcedure(name: name) }
 					let assignments = procedure.parameterAssignments(in: context.configuration)

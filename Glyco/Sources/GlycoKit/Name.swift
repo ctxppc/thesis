@@ -24,3 +24,9 @@ struct Bag<NameType : Name> {
 	private var usesByPrefix: [String : Int] = [:]
 	
 }
+
+extension Name {
+	public init(stringLiteral: String) {
+		self.init(rawValue: stringLiteral)
+	}
+}

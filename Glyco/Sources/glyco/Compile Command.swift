@@ -16,9 +16,11 @@ struct CompileCommand : ParsableCommand {
 	
 	private static let discussion = """
 	Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the CHERITOOLCHAIN environment variable; if omitted, Glyco assumes it‘s in ~/cheri. The path to the system root can be provided through the CHERISYSROOT environment variable; if omitted, Glyco assumes it‘s in output/rootfs-riscv64-purecap within the toolchain.
+	
+	When an intermediate language is specified with the -l option, Glyco lowers the source file to that language and, by default, emits the lowered program to standard out. When no intermediate language is specified, Glyco lowers the source file to an ELF binary without emitting it by default. Pass -o to output the lowered program or binary to a file in the source file‘s directory with the same basename as the source file, or specify a path (relative to the current directory) using -O. When both -o and -O are passed, -O takes precedence. Both -o and -O overwrite files.
 	"""
 	
-	@Argument(help: "A Gly or intermediate file. The file‘s extension must be .gly or the name of an intermediate language: .S, .rv, .fl, etc.")
+	@Argument(help: "A Gly or intermediate file (relative to the current directory). The file‘s extension must be .gly or the name of an intermediate language: .S, .rv, .fl, etc.")
 	var source: URL
 	
 	@Option(name: .shortAndLong, help: "The intermediate language (S, FL, FO, etc.) to emit. (Omit to build an ELF file.)")
@@ -27,8 +29,11 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(CompilationConfiguration.Target.sail) and \(CompilationConfiguration.Target.cheriBSD).")
 	var target: CompilationConfiguration.Target = .sail
 	
-	@Option(name: .shortAndLong, help: "The generated file (to be overwritten). (Omit to discard the ELF file after building it or to print the intermediate representation to standard out.)")
-	var output: URL?
+	@Flag(name: .shortAndLong, help: "Output to a file (to be overwritten) with a derived filename in the source file‘s directory.")
+	var outputsWithDerivedName: Bool = false
+	
+	@Option(name: [.customShort("O"), .long], help: "Output to a file (to be overwritten) at a specified location (relative to the current directory).")
+	var outputPath: URL?
 	
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The registers to use for passing arguments, in parameter order.")
 	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
@@ -90,7 +95,7 @@ struct CompileCommand : ParsableCommand {
 				targetLanguage:	language.uppercased(),
 				configuration:	configuration
 			)
-			if let outputURL = output {
+			if let outputURL = outputURL {
 				try ir.write(to: outputURL, atomically: false, encoding: .utf8)
 				print("Exported \(language.uppercased()) representation to \(outputURL.absoluteString).")
 			} else {
@@ -102,11 +107,11 @@ struct CompileCommand : ParsableCommand {
 				sourceLanguage:	sourceLanguage,
 				configuration:	configuration
 			)
-			if let outputURL = output {
+			if let outputURL = outputURL {
 				try elf.write(to: outputURL)
 				print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
 			} else {
-				print("ELF is \(elf.count) bytes long. Re-run this command with the -o <file> option to save the ELF to disk.")
+				print("The ELF executable is \(elf.count) bytes long. Re-run this command with the -o flag or -O <file> option to save the binary to disk.")
 			}
 		}
 	}
@@ -117,6 +122,24 @@ struct CompileCommand : ParsableCommand {
 			try compile(sourceString: source, configuration: configuration, sourceLanguage: sourceLanguage)
 		} catch {
 			print(error)
+		}
+	}
+	
+	private var outputURL: URL? {
+		if let outputURL = outputPath {
+			return outputURL
+		} else if outputsWithDerivedName {
+			let base = source
+				.deletingLastPathComponent()
+				.appendingPathComponent(
+					source
+						.deletingPathExtension()
+						.lastPathComponent,
+					isDirectory: false
+				)
+			return language.map(base.appendingPathExtension) ?? base
+		} else {
+			return nil
 		}
 	}
 	

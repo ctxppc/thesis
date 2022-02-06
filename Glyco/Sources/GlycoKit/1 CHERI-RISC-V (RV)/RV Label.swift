@@ -17,11 +17,6 @@ extension RV {
 		}
 		
 		// See protocol.
-		public init(stringLiteral: String) {
-			self.init(rawValue: stringLiteral)
-		}
-		
-		// See protocol.
 		public let rawValue: String
 		
 	}

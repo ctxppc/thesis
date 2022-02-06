@@ -10,11 +10,6 @@ extension ALA {
 			self.rawValue = rawValue
 		}
 		
-		// See protocol.
-		public init(stringLiteral: String) {
-			self.init(rawValue: stringLiteral)
-		}
-		
 		/// The identifier.
 		public var rawValue: String
 		
