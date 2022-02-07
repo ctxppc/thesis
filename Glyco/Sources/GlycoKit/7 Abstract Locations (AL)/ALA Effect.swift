@@ -32,6 +32,16 @@ extension ALA {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int, analysisAtEntry: Analysis)
 		
+		/// Pushes a frame of size `bytes` bytes to the call stack.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int, analysisAtEntry: Analysis)
+		
+		/// Pops a frame from the call stack.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame(analysisAtEntry: Analysis)
+		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
@@ -72,6 +82,12 @@ extension ALA {
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				return .pop(bytes: bytes)
+				
+				case .pushFrame(bytes: let bytes, analysisAtEntry: _):
+				return .pushFrame(bytes: bytes)
+				
+				case .popFrame(analysisAtEntry: _):
+				return .popFrame
 				
 				case .call(let name, _, analysisAtEntry: _):
 				return .call(name)
@@ -161,6 +177,12 @@ extension ALA {
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				return .pop(bytes: bytes, analysisAtEntry: analysis)
 				
+				case .pushFrame(bytes: let bytes, analysisAtEntry: _):
+				return .pushFrame(bytes: bytes, analysisAtEntry: analysis)
+				
+				case .popFrame(analysisAtEntry: _):
+				return .popFrame(analysisAtEntry: analysis)
+				
 				case .call(let name, let locations, analysisAtEntry: _):
 				return .call(name, locations, analysisAtEntry: analysis)
 				
@@ -185,6 +207,8 @@ extension ALA {
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.push(_, _, analysisAtEntry: let analysis),
 					.pop(bytes: _, analysisAtEntry: let analysis),
+					.pushFrame(bytes: _, analysisAtEntry: let analysis),
+					.popFrame(analysisAtEntry: let analysis),
 					.call(_, _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -195,7 +219,7 @@ extension ALA {
 		private func definedLocations() -> Set<Location> {
 			switch self {
 				
-				case .do, .setElement, .if, .push, .pop, .call, .return:
+				case .do, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
 				return []
 				
 				case .set(_, let destination, to: _, analysisAtEntry: _),
@@ -218,6 +242,8 @@ extension ALA {
 					.if,
 					.push(_, .constant, analysisAtEntry: _),
 					.pop,
+					.pushFrame,
+					.popFrame,
 					.return:
 				return []
 				
@@ -263,7 +289,7 @@ extension ALA {
 					where analysis.safelyCoalescable(destination, .abstract(source)):
 				return (source, destination)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .call, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -307,7 +333,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .call, .return:
+				case .do, .if, .pop, .pushFrame, .popFrame, .call, .return:
 				return self
 				
 				case .set(_, .abstract(removedLocation), to: .location(retainedLocation), analysisAtEntry: let analysis),
@@ -319,7 +345,7 @@ extension ALA {
 				case .set(let type, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
 				return .set(type, retainedLocation, to: source, analysisAtEntry: analysis)
 				
-				case .set, .pop:
+				case .set:
 				return self
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):

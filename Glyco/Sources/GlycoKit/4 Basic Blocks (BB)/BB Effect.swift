@@ -26,15 +26,15 @@ extension BB {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		/// Pushes a frame of size `bytes` bytes to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(bytes: Int)
 		
-		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		/// Pops a frame from the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
-		case popFrame(savedFrameCapability: Frame.Location)
+		case popFrame
 		
 		// See protocol.
 		public func lowered(in context: inout ()) -> [Lower.Effect] {
@@ -64,8 +64,8 @@ extension BB {
 				case .pushFrame(bytes: let bytes):
 				return [.pushFrame(bytes: bytes)]
 				
-				case .popFrame(savedFrameCapability: let savedFrameCapability):
-				return [.popFrame(savedFrameCapability: savedFrameCapability)]
+				case .popFrame:
+				return [.popFrame]
 				
 			}
 		}

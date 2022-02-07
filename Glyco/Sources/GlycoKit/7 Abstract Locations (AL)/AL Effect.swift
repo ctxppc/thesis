@@ -32,6 +32,16 @@ extension AL {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
+		/// Pushes a frame of size `bytes` bytes to the call stack.
+		///
+		/// This effect must be executed exactly once before any effects accessing the call frame.
+		case pushFrame(bytes: Int)
+		
+		/// Pops a frame from the call stack.
+		///
+		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		case popFrame
+		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
@@ -75,6 +85,12 @@ extension AL {
 				
 				case .pop(bytes: let bytes):
 				return .pop(bytes: bytes, analysisAtEntry: .init())
+				
+				case .pushFrame(bytes: let bytes):
+				return .pushFrame(bytes: bytes, analysisAtEntry: .init())
+				
+				case .popFrame:
+				return .popFrame(analysisAtEntry: .init())
 				
 				case .call(let name, let parameters):
 				return .call(name, parameters, analysisAtEntry: .init())

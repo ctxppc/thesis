@@ -20,10 +20,10 @@ extension CD {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType,of: Location, at: Source, to: Location)
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType,of: Location, at: Source, to: Source)
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -34,15 +34,15 @@ extension CD {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		/// Pushes a frame of size `bytes` bytes to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(bytes: Int)
 		
-		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		/// Pops a frame from the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
-		case popFrame(savedFrameCapability: Frame.Location)
+		case popFrame
 		
 		/// An effect that invokes the labelled procedure.
 		///
@@ -339,11 +339,11 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .popFrame(savedFrameCapability: let savedFrameCapability):
+			case .popFrame:
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.popFrame(savedFrameCapability: savedFrameCapability)],
+				previousEffects:	previousEffects + [.popFrame],
 				exitLabel:			exitLabel
 			)
 			

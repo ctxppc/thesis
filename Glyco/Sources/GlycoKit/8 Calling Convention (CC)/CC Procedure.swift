@@ -28,15 +28,23 @@ extension CC {
 			let assignments = parameterAssignments(in: context.configuration)
 			
 			let parameterLocationPairs = chain(
-				assignments.registers.map { (p, r) in (p, Lower.ParameterLocation.register(r)) },
-				assignments.frameLocations.map { (p, l) in (p, Lower.ParameterLocation.frame(l)) }
+				assignments.viaRegisters.map { ($0.parameter, Lower.ParameterLocation.register($0.register)) },
+				assignments.viaCallFrame.map { ($0.parameter, Lower.ParameterLocation.frame($0.calleeLocation)) }
 			)
 			
-			let prologue = parameterLocationPairs.map { parameter, location in
+			let setArgumentLocations = parameterLocationPairs.map { parameter, location in
 				Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.parameter(location)))
 			}
 			
-			return try .init(name, .do(prologue + [effect.lowered(in: &context)]))
+			return try .init(name, .do(
+				[
+					.push(.capability, .location(.parameter(.register(.fp)))),
+					.set(.capability, .parameter(.register(.fp)), to: .location(.parameter(.register(.sp)))),
+					
+				] + setArgumentLocations + [
+					effect.lowered(in: &context)
+				]
+			))
 			
 		}
 		
@@ -47,13 +55,20 @@ extension CC {
 			
 			var frame = Lower.Frame()
 			var registers = configuration.argumentRegisters[...]
-			
 			var parameters = self.parameters[...]
+			
 			while let register = registers.popFirst(), let parameter = parameters.popFirst() {
-				assignments.registers.append((parameter, register))
+				assignments.viaRegisters.append(.init(parameter: parameter, register: register))
 			}
+			
+			var calleeOffset = 0
 			while let parameter = parameters.popFirst() {
-				assignments.frameLocations.append((parameter, frame.allocate(parameter.type)))
+				calleeOffset -= parameter.type.byteSize
+				assignments.viaCallFrame.append(.init(
+					parameter:		parameter,
+					calleeLocation:	frame.allocate(parameter.type),
+					callerOffset:	calleeOffset
+				))
 			}
 			
 			return assignments

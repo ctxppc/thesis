@@ -17,11 +17,42 @@ extension CC {
 		/// An assignment of parameters to physical locations.
 		struct Assignments {
 			
-			/// Parameter–register pairs of parameters passed via registers.
-			var registers: [(Parameter, Lower.Register)] = []
+			/// Assignments of parameters passed via registers.
+			var viaRegisters: [RegisterAssignment] = []
 			
-			/// Parameter–frame location pairs of parameters passed via the call frame.
-			var frameLocations: [(Parameter, Lower.Frame.Location)] = []
+			/// Assignments of parameters passed via the call frame.
+			var viaCallFrame: [FrameAssignment] = []
+			
+		}
+		
+		/// An assignment of a parameter to a register.
+		struct RegisterAssignment {
+			
+			/// The parameter being assigned to `register`.
+			var parameter: Parameter
+			
+			/// The register that `parameter` is assigned to.
+			///
+			/// The caller stores the argument to and the callee loads the argument from this location.
+			var register: Lower.Register
+			
+		}
+		
+		/// An assignment of a parameter to a call frame location.
+		struct FrameAssignment {
+			
+			/// The parameter being assigned to `location`.
+			var parameter: Parameter
+			
+			/// The frame location that `parameter` is assigned to relative to the callee.
+			///
+			/// The callee loads the argument from this location.
+			var calleeLocation: Lower.Frame.Location
+			
+			/// The frame location that `parameter` is assigned to relative to the caller's stack capability.
+			///
+			/// The caller stores the argument to this location.
+			var callerOffset: Int
 			
 		}
 		

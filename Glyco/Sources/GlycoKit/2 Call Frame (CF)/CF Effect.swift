@@ -32,15 +32,15 @@ extension CF {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
+		/// Pushes a frame of size `bytes` bytes to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` by `bytes` bytes downward.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(bytes: Int)
 		
-		/// Pops a frame by copying `cfp` to `csp` then restoring `cfp` to the capability stored in `savedFrameCapability`.
+		/// Pops a frame by copying `cfp` to `csp` and popping `cfp` from the stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
-		case popFrame(savedFrameCapability: Frame.Location)
+		case popFrame
 		
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
@@ -155,15 +155,29 @@ extension CF {
 				return [.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: bytes)]
 				
 				case .pushFrame(bytes: let bytes):
+				let frameCapOffsetBeforeStackCapUpdate = -DataType.capability.byteSize
 				return [
-					.copy(.capability, destination: .fp, source: .sp),
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -bytes),
+					
+					// Push fp but defer sp update.
+					.storeCapability(source: .fp, address: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
+					
+					// Set up fp for new frame using virtually updated sp.
+					.offsetCapabilityWithImmediate(destination: .fp, source: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
+					
+					// Actually update sp, for both saved fp and requested frame size.
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.capability.byteSize + bytes)),
+					
 				]
 
-				case .popFrame(savedFrameCapability: let savedFrameCapability):
+				case .popFrame:
 				return [
-					.copy(.capability, destination: .sp, source: .fp),
-					.loadCapability(destination: .fp, address: .fp, offset: savedFrameCapability.offset),
+					
+					// Pop frame and saved fp by moving sp one word above the saved fp's location.
+					.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.capability.byteSize),
+					
+					// Restore saved fp — follow the linked list.
+					.loadCapability(destination: .fp, address: .fp, offset: 0)
+					
 				]
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):

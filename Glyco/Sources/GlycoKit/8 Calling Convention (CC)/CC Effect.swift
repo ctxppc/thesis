@@ -68,17 +68,9 @@ extension CC {
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
 					let loweredArguments = try arguments.lowered(in: &context)
-					let passArgsByRegister = zip(assignments.registers, loweredArguments).map { (asn, argument) in
-						Lower.Effect.set(asn.0.type, .parameter(.register(asn.1)), to: argument)
-					}
-					let passArgsByFrame = zip(assignments.frameLocations, loweredArguments.dropFirst(passArgsByRegister.count)).map { (asn, argument) in
-						Lower.Effect.set(asn.0.type, .parameter(.frame(asn.1)), to: argument)
-					}
 					
-					let parameterLocations = assignments.registers.map { Lower.ParameterLocation.register($0.1) }
-						+ assignments.frameLocations.map { .frame($0.1) }
 					
-					return .do(passArgsByFrame + passArgsByRegister + [.call(name, parameterLocations)])
+					TODO.unimplemented
 					
 				}
 				
