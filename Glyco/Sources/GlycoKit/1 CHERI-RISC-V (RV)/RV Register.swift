@@ -11,12 +11,6 @@ extension RV {
 		/// The stack pointer register.
 		case sp
 		
-		/// The global pointer register.
-		case gp
-		
-		/// The thread pointer register.
-		case tp
-		
 		/// A register for temporaries.
 		case t0, t1, t2
 		

@@ -24,12 +24,6 @@ extension FO {
 		/// The stack pointer register.
 		case sp
 		
-		/// The global pointer register.
-		case gp
-		
-		/// The thread pointer register.
-		case tp
-		
 		/// The frame pointer register.
 		case fp
 		
@@ -53,8 +47,6 @@ extension FO {
 			switch self {
 				case .zero:	return .zero
 				case .sp:	return .sp
-				case .gp:	return .gp
-				case .tp:	return .tp
 				case .fp:	return .fp
 				case .s1:	return .s1
 				case .a0:	return .a0
@@ -84,8 +76,8 @@ extension FO {
 		/// The party that must save `self` before or after a function invocation.
 		var saver: Saver {
 			switch self {
-				case .zero, .sp, .gp:										return .nobody
-				case .tp, .fp, .s1:											return .callee
+				case .zero, .sp:											return .nobody
+				case .fp, .s1:												return .callee
 				case .a0, .a1, .a2, .a3, .a4, .a5, .a6, .a7:				return .caller
 				case .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11:	return .callee
 				case .t4, .t5, .t6:											return .caller
