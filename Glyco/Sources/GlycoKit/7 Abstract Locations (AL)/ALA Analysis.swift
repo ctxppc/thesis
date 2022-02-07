@@ -25,7 +25,7 @@ extension ALA {
 		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) where D.Element == Location, U.Element == Location {
 			let possiblyLiveLocationsAtExit = possiblyLiveLocations
 			markAsDefinitelyDiscarded(defined)
-			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add poss. used after def. discarded
+			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
 			for definedLocation in defined {
 				insertConflict(definedLocation, possiblyLiveLocationsAtExit)
 			}

@@ -75,11 +75,11 @@ extension ALA {
 		/// The transformation is applied first. If the transformed effect contains children, it is applied to those children as well.
 		///
 		/// - Parameters:
-		///    - transform: A function that transforms effects. The default function returns the provided effect unaltered.
+		///    - transform: A function that transforms effects.
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
-		func updated(using transform: Transformation = { $0 }, analysis: inout Analysis) -> Self {
+		func updated(using transform: Transformation, analysis: inout Analysis) -> Self {
 			let transformed = transform(self)
 			analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
 			switch transformed {
@@ -111,14 +111,14 @@ extension ALA {
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				do {
 					
-					/*						 │
+					/*			      analysisAtEntry
 					┌────────────────────────┼────────────────────────┐
 					│    ┌───────────────────▼───────────────────┐    │
 					│    │                                       │    │
 					│    │               Predicate               │    │
 					│    │                                       │    │
 					│    └───────┬───────────────────────┬───────┘    │
-					│ analysisAtA│firmativeEntry         │            │
+					│ analysisAtAffirmativeEntry         │            │
 					│    ┌───────▼────────┐     ┌────────▼───────┐    │
 					│    │  Affirmative   │     │    Negative    │    │
 					│    │     branch     │     │     branch     │    │
@@ -132,12 +132,12 @@ extension ALA {
 					 */
 					
 					var analysisAtAffirmativeEntry = analysis
-					let updatedAffirmative = affirmative.updated(analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
 					
-					let updatedNegative = negative.updated(analysis: &analysis)
+					let updatedNegative = negative.updated(using: transform, analysis: &analysis)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					let updatedPredicate = predicate.updated(analysis: &analysis)
+					let updatedPredicate = predicate.updated(using: transform, analysis: &analysis)
 					
 					return .if(updatedPredicate, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					

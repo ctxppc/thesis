@@ -19,7 +19,7 @@ extension AL {
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
 			var analysis = Lower.Analysis()
-			return .init(name, try effect.lowered().updated(analysis: &analysis))
+			return .init(name, try effect.lowered().updated(using: { $0 }, analysis: &analysis))
 		}
 		
 	}
