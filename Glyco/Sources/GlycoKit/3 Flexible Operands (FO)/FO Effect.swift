@@ -29,6 +29,12 @@ extension FO {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
+		/// An effect that retrieves the value from given source and pushes it to the call frame.
+		case push(DataType, Source)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int)
+		
 		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -136,6 +142,13 @@ extension FO {
 				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
 				let (elemPrep, elemReg) = try prepare(source: element, using: .t3, type: type)
 				return vecPrep + idxPrep + elemPrep + [.storeElement(.word, vector: vecReg, index: idxReg, from: elemReg)]
+				
+				case .push(let dataType, let source):
+				let (prep, reg) = try prepare(source: source, using: .t1, type: dataType)
+				return prep + [.push(dataType, reg)]
+				
+				case .pop(bytes: let bytes):
+				return [.pop(bytes: bytes)]
 				
 				case .pushFrame(bytes: let bytes):
 				return [.pushFrame(bytes: bytes)]

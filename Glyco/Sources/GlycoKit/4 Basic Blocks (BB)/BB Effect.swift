@@ -20,6 +20,12 @@ extension BB {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
+		/// An effect that retrieves the value from given source and pushes it to the call frame.
+		case push(DataType, Source)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int)
+		
 		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -48,6 +54,12 @@ extension BB {
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
 				return [.setElement(type, of: vector, at: index, to: element)]
+				
+				case .push(let dataType, let source):
+				return [.push(dataType, source)]
+				
+				case .pop(bytes: let bytes):
+				return [.pop(bytes: bytes)]
 				
 				case .pushFrame(bytes: let bytes):
 				return [.pushFrame(bytes: bytes)]

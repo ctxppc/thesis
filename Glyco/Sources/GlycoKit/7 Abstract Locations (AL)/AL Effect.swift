@@ -26,6 +26,12 @@ extension AL {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
+		/// An effect that retrieves the value from given source and pushes it to the call frame.
+		case push(DataType, Source)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int)
+		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
@@ -63,6 +69,12 @@ extension AL {
 					else:				negative.lowered(in: &context),
 					analysisAtEntry:	.init()
 				)
+				
+				case .push(let dataType, let source):
+				return .push(dataType, source, analysisAtEntry: .init())
+				
+				case .pop(bytes: let bytes):
+				return .pop(bytes: bytes, analysisAtEntry: .init())
 				
 				case .call(let name, let parameters):
 				return .call(name, parameters, analysisAtEntry: .init())

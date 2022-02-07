@@ -26,6 +26,12 @@ extension CF {
 		/// An effect that retrieves the datum from `from` and stores it as an element of the vector at `vector` at the zero-based position in `index`.
 		case storeElement(DataType, vector: Register, index: Register, from: Register)
 		
+		/// An effect that retrieves the value from given register and pushes it to the call frame.
+		case push(DataType, Register)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int)
+		
 		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -132,6 +138,21 @@ extension CF {
 					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
 					.storeCapability(source: source.lowered(), address: .t0, offset: 0),
 				]
+				
+				case .push(.word, let source):
+				return try [
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.word.byteSize),
+					.storeWord(source: source.lowered(), address: .sp),
+				]
+				
+				case .push(.capability, let source):
+				return try [
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.word.byteSize),
+					.storeCapability(source: source.lowered(), address: .sp, offset: 0),
+				]
+				
+				case .pop(bytes: let bytes):
+				return [.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: bytes)]
 				
 				case .pushFrame(bytes: let bytes):
 				return [

@@ -26,6 +26,12 @@ extension ALA {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
 		
+		/// An effect that retrieves the value from given source and pushes it to the call frame.
+		case push(DataType, Source, analysisAtEntry: Analysis)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int, analysisAtEntry: Analysis)
+		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
@@ -60,6 +66,12 @@ extension ALA {
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				
+				case .push(let dataType, let source, analysisAtEntry: _):
+				return .push(dataType, try source.lowered(in: &context))
+				
+				case .pop(bytes: let bytes, analysisAtEntry: _):
+				return .pop(bytes: bytes)
 				
 				case .call(let name, _, analysisAtEntry: _):
 				return .call(name)
@@ -143,6 +155,12 @@ extension ALA {
 					
 				}
 				
+				case .push(let dataType, let source, analysisAtEntry: _):
+				return .push(dataType, source, analysisAtEntry: analysis)
+				
+				case .pop(bytes: let bytes, analysisAtEntry: _):
+				return .pop(bytes: bytes, analysisAtEntry: analysis)
+				
 				case .call(let name, let locations, analysisAtEntry: _):
 				return .call(name, locations, analysisAtEntry: analysis)
 				
@@ -165,6 +183,8 @@ extension ALA {
 					.getElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.setElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
+					.push(_, _, analysisAtEntry: let analysis),
+					.pop(bytes: _, analysisAtEntry: let analysis),
 					.call(_, _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -175,7 +195,7 @@ extension ALA {
 		private func definedLocations() -> Set<Location> {
 			switch self {
 				
-				case .do, .setElement, .if, .call, .return:
+				case .do, .setElement, .if, .push, .pop, .call, .return:
 				return []
 				
 				case .set(_, let destination, to: _, analysisAtEntry: _),
@@ -196,12 +216,15 @@ extension ALA {
 					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
 					.allocateVector,
 					.if,
+					.push(_, .constant, analysisAtEntry: _),
+					.pop,
 					.return:
 				return []
 				
 				case .set(_, _, to: .location(let source), analysisAtEntry: _),
 					.compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
-					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _):
+					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _),
+					.push(_, .location(let source), analysisAtEntry: _):
 				return [source]
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _, analysisAtEntry: _):
@@ -240,7 +263,7 @@ extension ALA {
 					where analysis.safelyCoalescable(destination, .abstract(source)):
 				return (source, destination)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .call, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -296,7 +319,7 @@ extension ALA {
 				case .set(let type, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
 				return .set(type, retainedLocation, to: source, analysisAtEntry: analysis)
 				
-				case .set:
+				case .set, .pop:
 				return self
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
@@ -310,6 +333,9 @@ extension ALA {
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
 				return .setElement(type, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
+				
+				case .push(let dataType, let source, analysisAtEntry: let analysis):
+				return .push(dataType, substitute(source), analysisAtEntry: analysis)
 				
 			}
 			

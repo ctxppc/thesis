@@ -423,6 +423,8 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -483,6 +485,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
@@ -546,6 +550,8 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
@@ -614,6 +620,8 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 </dl>
@@ -656,6 +664,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
@@ -722,6 +732,8 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>vector:</strong> Register, <strong>index:</strong> Register)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>vector:</strong> Register, <strong>index:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Register)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>savedFrameCapability:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>

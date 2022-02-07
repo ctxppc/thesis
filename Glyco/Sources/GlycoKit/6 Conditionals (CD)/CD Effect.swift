@@ -28,6 +28,12 @@ extension CD {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
+		/// An effect that retrieves the value from given source and pushes it to the call frame.
+		case push(DataType, Source)
+		
+		/// An effect that removes `bytes` bytes from the stack.
+		case pop(bytes: Int)
+		
 		/// Pushes a frame of size `bytes` bytes to the call stack by copying `csp` to `cfp` then offsetting `csp` by `bytes` bytes downward.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -63,12 +69,12 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
+				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .return:
+				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
+				
 				case .call(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
 				return [.init(label: entryLabel, do: previousEffects, then: .continue(to: procedure))]
-				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .pushFrame, .popFrame, .return:
-				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
 		}
@@ -102,7 +108,8 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .pushFrame, .popFrame:	// TODO: Add .call to this case when it becomes applicable.
+				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame:
+				// TODO: Add .call to this case when it becomes applicable.
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -307,6 +314,22 @@ private extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
+			
+			case .push(let dataType, let source):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.push(dataType, source)],
+				exitLabel:			exitLabel
+			)
+			
+			case .pop(bytes: let bytes):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.pop(bytes: bytes)],
+				exitLabel:			exitLabel
+			)
 			
 			case .pushFrame(bytes: let bytes):
 			return try rest.lowered(
