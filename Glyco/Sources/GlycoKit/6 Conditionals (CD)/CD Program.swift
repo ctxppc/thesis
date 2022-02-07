@@ -31,7 +31,7 @@ public enum CD : Language {
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			guard effect.allExecutionPathsTerminate else { throw LoweringError.someExecutionPathsDoNotTerminate }
 			var context = Context()
-			return .init(try (procedures + [.init(.programEntry, effect)]).lowered(in: &context))
+			return .init(try (procedures + [.init(.programEntry, in: effect)]).lowered(in: &context))
 		}
 		
 		enum LoweringError : LocalizedError {

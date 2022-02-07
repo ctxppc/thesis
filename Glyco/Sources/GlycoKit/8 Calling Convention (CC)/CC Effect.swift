@@ -35,51 +35,88 @@ extension CC {
 		case `return`(DataType, Source)
 		
 		// See protocol.
+		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context))
+				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let type, let location, to: let source):
-				return .set(type, .abstract(location), to: try source.lowered(in: &context))
+				Lowered.set(type, .abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination):
-				return try .compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
+				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
 				
 				case .allocateVector(let type, count: let count, into: let vector):
-				return .allocateVector(type, count: count, into: .abstract(vector))
+				Lowered.allocateVector(type, count: count, into: .abstract(vector))
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				return .getElement(type, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
+				Lowered.getElement(type, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				return try .setElement(type, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				try Lowered.setElement(type, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let name, let arguments, result: let result):
-				do {
+				if let procedure = context.procedures[name] {
 					
-					// TODO: Apply calling conventions & copy a0 to `result`
-					
-					guard let procedure = context.procedures[name] else { throw LoweringError.unrecognisedProcedure(name: name) }
+					// Prepare assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
-					let loweredArguments = try arguments.lowered(in: &context)
+					// Allocate structure for frame-resident arguments, if there are any.
+					// a0 is overwritten with a register-resident arg after all frame-resident args have already been passed, so we can use it freely.
+					let argumentsStructure = Lower.Location.register(.a0)
+					let argumentsStructureSize = assignments.viaCallFrame.lazy.map(\.parameter).totalByteSize()
+					if argumentsStructureSize > 0 {
+						Lowered.allocateVector(.byte, count: argumentsStructureSize, into: argumentsStructure)
+					}
 					
+					// Prepare arguments for lowering.
+					let arguments = try arguments.lowered(in: &context).makeIterator()
 					
-					TODO.unimplemented
+					// First arguments go via registers. Consume arguments iterator by eagerly evaluating the zip.
+					let assignmentArgumentPairsViaRegisters = Array(zip(assignments.viaRegisters, arguments))
 					
+					// Remaining arguments go via call frame. Consume arguments iterator by eagerly evaluating the zip.
+					let assignmentArgumentPairsViaFrame = Array(zip(assignments.viaCallFrame, arguments))
+					
+					// Pass frame-resident arguments first.
+					for (assignment, argument) in assignmentArgumentPairsViaFrame {
+						Lowered.setElement(
+							assignment.parameter.type,
+							of:	.register(.sp),
+							at:	.constant(assignment.location.offset),
+							to:	argument
+						)
+					}
+					
+					// Pass register-resident arguments last to limit liveness range of registers.
+					for (assignment, argument) in assignmentArgumentPairsViaRegisters {
+						Lowered.set(assignment.parameter.type, .register(assignment.register), to: argument)
+					}
+					
+					// Invoke procedure.
+					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) } + assignments.viaCallFrame.map { .frame($0.location) })
+					
+					// Deallocate frame-resident arguments, if any.
+					if argumentsStructureSize > 0 {
+						Lowered.pop(bytes: argumentsStructureSize)
+					}
+					
+					// Write result.
+					Lowered.set(procedure.resultType, .abstract(result), to: .location(.register(.a0)))
+					
+				} else {
+					throw LoweringError.unrecognisedProcedure(name: name)
 				}
 				
 				case .return(let type, let result):
-				return .do([
-					// TODO: Apply calling conventions
-					.set(type, .register(.a0), to: try result.lowered(in: &context)),
-					.return,
-				])
+				// TODO: Apply calling convention
+				Lowered.set(type, .register(.a0), to: try result.lowered(in: &context))
+				Lowered.return
 				
 			}
 		}

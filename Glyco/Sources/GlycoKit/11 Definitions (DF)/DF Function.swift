@@ -5,9 +5,11 @@ extension DF {
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
 		
-		public init(_ name: Label, _ parameters: [Parameter], _ result: Result) {
+		/// Creates a function with given name, parameters, result type, and effect.
+		public init(_ name: Label, takes parameters: [Parameter], returns resultType: DataType, in result: Result) {
 			self.name = name
 			self.parameters = parameters
+			self.resultType = resultType
 			self.result = result
 		}
 		
@@ -17,12 +19,15 @@ extension DF {
 		/// The function's parameters.
 		public var parameters: [Parameter]
 		
+		/// The function's result type.
+		public var resultType: DataType
+		
 		/// The function's result, in terms of its parameters.
 		public var result: Result
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			.init(name, parameters, try result.lowered())
+			.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 		}
 		
 	}

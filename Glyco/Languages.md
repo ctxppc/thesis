@@ -101,7 +101,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 	<dt><code>EX.Function</code></dt>
-	<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>EX.Effect</code></dt>
@@ -158,7 +158,7 @@ A language that introduces lexical scopes of definitions
 </dl>
 <dl>
 	<dt><code>LS.Function</code></dt>
-	<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Source</code></dt>
@@ -241,7 +241,7 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 <dl>
 	<dt><code>DF.Function</code></dt>
-	<dd><code>(Label, [Parameter], Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
 </dl>
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
@@ -278,7 +278,7 @@ A language that allows a computation to be attached to a value.
 </dl>
 <dl>
 	<dt><code>CV.Procedure</code></dt>
-	<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>CV.Value</code></dt>
@@ -309,7 +309,7 @@ A language that groups all effects that write to a location under one canonical 
 </dl>
 <dl>
 	<dt><code>CA.Procedure</code></dt>
-	<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>CA.Effect</code></dt>
@@ -381,7 +381,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Procedure</code></dt>
-	<dd><code>(Label, [Parameter], Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
@@ -396,7 +396,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>ParameterLocation</code>, 
 <code>Register</code>, 
 <code>Source</code>
 <dl>
@@ -427,7 +426,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
-	<dd><code><strong>call</strong>(Label, [ParameterLocation])</code></dd>
+	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 
@@ -469,11 +468,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.ParameterLocation</code></dt>
-	<dd><code><strong>register</strong>(Register)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
-</dl>
-<dl>
 	<dt><code>ALA.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
@@ -491,20 +485,21 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popFrame</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>call</strong>(Label, [ParameterLocation], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Location], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Location</code></dt>
 	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-	<dd><code><strong>parameter</strong>(ParameterLocation)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>ALA.Procedure</code></dt>
-	<dd><code>(Label, Effect)</code></dd>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
@@ -563,7 +558,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 </dl>
 <dl>
 	<dt><code>CD.Procedure</code></dt>
-	<dd><code>(Label, Effect)</code></dd>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
 <h2 id="PR">Grammar for PR (Predicates)</h2>

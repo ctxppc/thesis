@@ -5,9 +5,11 @@ extension CA {
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
-		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
+		/// Creates a procedure with given name, parameters, result type, and effect.
+		public init(_ name: Label, takes parameters: [Parameter], returns resultType: DataType, in effect: Effect) {
 			self.name = name
 			self.parameters = parameters
+			self.resultType = resultType
 			self.effect = effect
 		}
 		
@@ -17,12 +19,15 @@ extension CA {
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
 		
+		/// The procedure's result type.
+		public var resultType: DataType
+		
 		/// The procedure's effect when invoked.
 		public var effect: Effect
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			.init(name, parameters, try effect.lowered(in: &context))
+			.init(name, takes: parameters, returns: resultType, in: try effect.lowered(in: &context))
 		}
 		
 	}

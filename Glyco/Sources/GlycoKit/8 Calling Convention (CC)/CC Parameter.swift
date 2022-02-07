@@ -17,10 +17,10 @@ extension CC {
 		/// An assignment of parameters to physical locations.
 		struct Assignments {
 			
-			/// Assignments of parameters passed via registers.
+			/// Assignments of parameters passed via registers, in parameter order.
 			var viaRegisters: [RegisterAssignment] = []
 			
-			/// Assignments of parameters passed via the call frame.
+			/// Assignments of parameters passed via the call frame, in parameter order.
 			var viaCallFrame: [FrameAssignment] = []
 			
 		}
@@ -46,10 +46,19 @@ extension CC {
 			
 			/// The frame location that `parameter` is assigned to relative to the callee's call frame.
 			///
-			/// The callee loads the argument from this location. The caller stores the argument to this location after computing the callee's frame capability.
+			/// The callee loads the argument from this location.
 			var location: Lower.Frame.Location
 			
 		}
 		
 	}
+}
+
+extension Sequence where Element == CC.Parameter {
+	
+	/// Returns the total size of the parameters in `self`, in bytes.
+	func totalByteSize() -> Int {
+		lazy.map(\.type.byteSize).reduce(0, +)
+	}
+	
 }

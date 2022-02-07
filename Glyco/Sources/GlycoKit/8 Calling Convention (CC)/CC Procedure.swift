@@ -7,9 +7,10 @@ extension CC {
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, Named, SimplyLowerable {
 		
-		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
+		public init(_ name: Label, takes parameters: [Parameter], returns resultType: DataType, in effect: Effect) {
 			self.name = name
 			self.parameters = parameters
+			self.resultType = resultType
 			self.effect = effect
 		}
 		
@@ -18,6 +19,9 @@ extension CC {
 		
 		/// The procedure's parameters.
 		public var parameters: [Parameter]
+		
+		/// The procedure's result type.
+		public var resultType: DataType
 		
 		/// The procedure's effect when invoked.
 		public var effect: Effect
@@ -51,19 +55,24 @@ extension CC {
 		/// Returns the assignments of the procedure's parameters to physical locations.
 		func parameterAssignments(in configuration: CompilationConfiguration) -> Parameter.Assignments {
 			
+			// Prepare empty assignment.
 			var assignments = Parameter.Assignments()
 			
-			var frame = Lower.Frame()
+			// Prepare available arguments registers and remaining parameters.
 			var registers = configuration.argumentRegisters[...]
 			var parameters = self.parameters[...]
 			
+			// As long as there is an argument register available, assign the next parameter to it.
 			while let register = registers.popFirst(), let parameter = parameters.popFirst() {
 				assignments.viaRegisters.append(.init(parameter: parameter, register: register))
 			}
 			
-			while let parameter = parameters.popFirst() {
-				assignments.viaCallFrame.append(.init(parameter: parameter, location: frame.allocate(parameter.type)))
+			// Assign remaining parameters to the call frame, in reverse order to ensure stack order — cf. `Frame.addParameter(_:count:)`.
+			var frame = Lower.Frame()
+			while let parameter = parameters.popLast() {
+				assignments.viaCallFrame.append(.init(parameter: parameter, location: frame.addParameter(parameter.type)))
 			}
+			assignments.viaCallFrame.reverse()	// ensure parameter order
 			
 			return assignments
 			

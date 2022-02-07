@@ -25,7 +25,7 @@ extension ALA.Program {
 extension ALA.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case effect = "_1"
+		case effect = "in"
 	}
 }
 
@@ -67,8 +67,9 @@ extension CA.Program {
 extension CA.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case effect = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case effect = "in"
 	}
 }
 
@@ -89,8 +90,9 @@ extension CC.Parameter {
 extension CC.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case effect = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case effect = "in"
 	}
 }
 
@@ -104,7 +106,7 @@ extension CD.Program {
 extension CD.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case effect = "_1"
+		case effect = "in"
 	}
 }
 
@@ -124,8 +126,9 @@ extension CV.Program {
 extension CV.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case effect = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case effect = "in"
 	}
 }
 
@@ -146,8 +149,9 @@ extension DF.Definition {
 extension DF.Function {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case result = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
 	}
 }
 
@@ -168,8 +172,9 @@ extension EX.Definition {
 extension EX.Function {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case result = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
 	}
 }
 
@@ -203,8 +208,9 @@ extension LS.Parameter {
 extension LS.Function {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case parameters = "_1"
-		case result = "_2"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
 	}
 }
 
