@@ -13,7 +13,7 @@ final class ArithmeticTests : XCTestCase {
 			.do([
 				.set(.signedWord, .abstract(location), to: .constant(1)),
 				.compute(.constant(2), .add, .location(.abstract(location)), to: .abstract(location)),
-				.set(.signedWord, .parameter(.register(.a0)), to: .location(.abstract(location))),
+				.set(.signedWord, .register(.a0), to: .location(.abstract(location))),
 				.return,
 			]),
 			procedures: []
@@ -79,7 +79,7 @@ final class ArithmeticTests : XCTestCase {
 					then:	.set(.signedWord, .abstract(isEven), to: .constant(1)),
 					else:	.set(.signedWord, .abstract(isEven), to: .constant(0))
 				),
-				.set(.signedWord, .parameter(.register(.a0)), to: .location(.abstract(isEven))),
+				.set(.signedWord, .register(.a0), to: .location(.abstract(isEven))),
 				.return,
 			]),
 			procedures:	[]

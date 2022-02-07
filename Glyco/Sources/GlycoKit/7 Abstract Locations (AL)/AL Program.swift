@@ -38,7 +38,6 @@ public enum AL : Language {
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
-	public typealias ParameterLocation = Lower.ParameterLocation
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
 	

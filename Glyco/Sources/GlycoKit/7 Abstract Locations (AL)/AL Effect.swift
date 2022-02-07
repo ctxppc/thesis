@@ -44,8 +44,8 @@ extension AL {
 		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
-		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
-		case call(Label, [ParameterLocation])
+		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis.
+		case call(Label, [Location])
 		
 		/// An effect that returns to the caller.
 		case `return`

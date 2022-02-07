@@ -44,8 +44,8 @@ extension ALA {
 		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
-		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter locations are only used for the purposes of liveness analysis.
-		case call(Label, [ParameterLocation], analysisAtEntry: Analysis)
+		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis.
+		case call(Label, [Location], analysisAtEntry: Analysis)
 		
 		/// An effect that returns to the caller.
 		///
@@ -265,7 +265,7 @@ extension ALA {
 				return [vector, index]
 				
 				case .call(_, let arguments, analysisAtEntry: _):
-				return .init(arguments.map { .parameter($0) })
+				return .init(arguments.map { $0 })
 				
 			}
 		}

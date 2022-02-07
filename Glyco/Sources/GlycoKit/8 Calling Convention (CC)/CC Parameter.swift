@@ -44,15 +44,10 @@ extension CC {
 			/// The parameter being assigned to `location`.
 			var parameter: Parameter
 			
-			/// The frame location that `parameter` is assigned to relative to the callee.
+			/// The frame location that `parameter` is assigned to relative to the callee's call frame.
 			///
-			/// The callee loads the argument from this location.
-			var calleeLocation: Lower.Frame.Location
-			
-			/// The frame location that `parameter` is assigned to relative to the caller's stack capability.
-			///
-			/// The caller stores the argument to this location.
-			var callerOffset: Int
+			/// The callee loads the argument from this location. The caller stores the argument to this location after computing the callee's frame capability.
+			var location: Lower.Frame.Location
 			
 		}
 		

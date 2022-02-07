@@ -5,14 +5,21 @@ extension ALA {
 	/// A location.
 	public enum Location : Codable, Hashable, Comparable, SimplyLowerable {
 		
+		/// An abstract location, to be lowered to a physical location after register allocation.
 		case abstract(AbstractLocation)
-		case parameter(ParameterLocation)
+		
+		/// A location fixed to given register.
+		case register(Register)
+		
+		/// A location fixed to given frame location.
+		case frame(Frame.Location)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Location {
 			switch self {
 				case .abstract(let location):	return location.lowered(in: &context)
-				case .parameter(let location):	return try location.lowered(in: &context)
+				case .register(let register):	return .register(try register.lowered())
+				case .frame(let location):		return .frameCell(location)
 			}
 		}
 		

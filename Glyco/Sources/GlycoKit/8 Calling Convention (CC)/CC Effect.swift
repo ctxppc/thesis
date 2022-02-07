@@ -77,7 +77,7 @@ extension CC {
 				case .return(let type, let result):
 				return .do([
 					// TODO: Apply calling conventions
-					.set(type, .parameter(.register(.a0)), to: try result.lowered(in: &context)),
+					.set(type, .register(.a0), to: try result.lowered(in: &context)),
 					.return,
 				])
 				
