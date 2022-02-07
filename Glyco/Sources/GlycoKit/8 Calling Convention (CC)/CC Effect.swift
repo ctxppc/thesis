@@ -5,7 +5,7 @@ import Foundation
 extension CC {
 	
 	/// An effect on a CC machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : Codable, Equatable, SimplyLowerable, Composable {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])
