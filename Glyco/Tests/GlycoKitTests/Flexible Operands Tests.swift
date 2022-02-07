@@ -18,10 +18,10 @@ final class FlexibleOperandsTests : XCTestCase {
 		
 		let actual = try source.lowered(configuration: .init(target: .sail))
 		let expected = CF.Program([
-			.load(.signedWord, into: .t1, from: .init(offset: -4)),
-			.load(.signedWord, into: .t2, from: .init(offset: -8)),
+			.load(.signedWord, into: .t1, from: .init(offset: -8)),
+			.load(.signedWord, into: .t2, from: .init(offset: -12)),
 			.compute(into: .t3, value: .registerRegister(.t1, .add, .t2)),
-			.store(.signedWord, into: .init(offset: -12), from: .t3),
+			.store(.signedWord, into: .init(offset: -16), from: .t3),
 		])
 		
 		XCTAssertEqual(actual, expected)
