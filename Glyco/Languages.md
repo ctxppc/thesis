@@ -586,7 +586,7 @@ A language that introduces predicates in branches.
 </dl>
 <dl>
 	<dt><code>PR.Block</code></dt>
-	<dd><code>(<strong>label:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
+	<dd><code>(<strong>name:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
 </dl>
 <dl>
 	<dt><code>PR.Continuation</code></dt>
@@ -637,7 +637,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 </dl>
 <dl>
 	<dt><code>BB.Block</code></dt>
-	<dd><code>(<strong>label:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
+	<dd><code>(<strong>name:</strong> Label, <strong>do:</strong> [Effect], <strong>then:</strong> Continuation)</code></dd>
 </dl>
 
 <h2 id="FO">Grammar for FO (Flexible Operands)</h2>

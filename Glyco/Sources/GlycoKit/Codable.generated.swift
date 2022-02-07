@@ -51,7 +51,7 @@ extension BB.Program {
 
 extension BB.Block {
 	public enum CodingKeys : String, CodingKey {
-		case label = "label"
+		case name = "name"
 		case effects = "do"
 		case continuation = "then"
 	}
@@ -223,7 +223,7 @@ extension PR.Program {
 
 extension PR.Block {
 	public enum CodingKeys : String, CodingKey {
-		case label = "label"
+		case name = "name"
 		case effects = "do"
 		case continuation = "then"
 	}

@@ -3,17 +3,17 @@
 extension BB {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public struct Block : Codable, Equatable, MultiplyLowerable {
+	public struct Block : Codable, Equatable, Named, MultiplyLowerable {
 		
-		/// Creates a block with given label, effects, and continuation.
-		public init(label: Label, do effects: [Effect], then continuation: Continuation) {
-			self.label = label
+		/// Creates a block with given name, effects, and continuation.
+		public init(name: Label, do effects: [Effect], then continuation: Continuation) {
+			self.name = name
 			self.effects = effects
 			self.continuation = continuation
 		}
 		
-		/// The block's label.
-		public var label: Label
+		// See protocol.
+		public var name: Label
 		
 		/// The block's effects.
 		public var effects: [Effect]
@@ -27,25 +27,25 @@ extension BB {
 				
 				case .continue(to: let successor):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.jump(to: successor)]
+					return [.labelled(name, first)] + tail + [.jump(to: successor)]
 				} else {
-					return [.labelled(label, .jump(to: successor))]
+					return [.labelled(name, .jump(to: successor))]
 				}
 				
 				case .branch(let lhs, let relation, let rhs, then: let affirmative, else: let negative):
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)]
+					return [.labelled(name, first)]
 						+ tail
 						+ [.branch(to: affirmative, lhs, relation, rhs), .jump(to: negative)]
 				} else {
-					return [.labelled(label, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
+					return [.labelled(name, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
 				}
 				
 				case .return:
 				if let (first, tail) = try effects.lowered().splittingFirst() {
-					return [.labelled(label, first)] + tail + [.return]
+					return [.labelled(name, first)] + tail + [.return]
 				} else {
-					return [.labelled(label, .return)]
+					return [.labelled(name, .return)]
 				}
 				
 			}

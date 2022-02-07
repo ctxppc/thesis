@@ -58,12 +58,12 @@ extension CD {
 		///
 		/// - Parameters:
 		///    - context: The context in which `self` is being lowered.
-		///    - entryLabel: The label of the entry block representing `self`.
+		///    - entryLabel: The name of the entry block representing `self`.
 		///    - previousEffects: Effects to be executed before executing `self`.
-		///    - exitLabel: The label to jump to after executing `self` and any successors.
+		///    - exitLabel: The name of the block to jump to after executing `self` and its successors.
 		///
 		/// - Returns: A representation of `self` in a lower language.
-		func lowered(in context: inout Context, entryLabel: Lower.Label, previousEffects: [Lower.Effect], exitLabel: Lower.Label) throws -> [Lower.Block] {
+		func lowered(in context: inout Context, entryLabel: Lower.Block.Name, previousEffects: [Lower.Effect], exitLabel: Lower.Block.Name) throws -> [Lower.Block] {
 			switch self {
 				
 				case .do(let effects):
@@ -74,7 +74,7 @@ extension CD {
 				
 				case .call(let procedure):
 				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
-				return [.init(label: entryLabel, do: previousEffects, then: .continue(to: procedure))]
+				return [.init(name: entryLabel, do: previousEffects, then: .continue(to: procedure))]
 				
 			}
 		}
@@ -218,13 +218,13 @@ private extension RandomAccessCollection where Element == CD.Effect {
 	///
 	/// - Parameters:
 	///    - context: The context in which `self` is being lowered.
-	///    - entryLabel: The label of the lowered entry block.
+	///    - entryLabel: The name of the lowered entry block.
 	///    - previousEffects: Effects to be executed before executing `self`.
-	///    - exitLabel: The label to jump to after executing `self`.
+	///    - exitLabel: The name of the block to jump to after executing `self`.
 	///
 	/// - Returns: A representation of `self` in a lower language.
 	func lowered(in context: inout CD.Context, entryLabel: CD.Lower.Label, previousEffects: [CD.Lower.Effect], exitLabel: CD.Lower.Label) throws -> [CD.Lower.Block] {
-		guard let (first, rest) = self.splittingFirst() else { return [.init(label: entryLabel, do: previousEffects, then: .continue(to: exitLabel))] }
+		guard let (first, rest) = self.splittingFirst() else { return [.init(name: entryLabel, do: previousEffects, then: .continue(to: exitLabel))] }
 		switch first {
 			
 			case .do(effects: let effects) where rest.doesNothing:
@@ -348,10 +348,10 @@ private extension RandomAccessCollection where Element == CD.Effect {
 			)
 			
 			case .call(let procedure):
-			return [.init(label: entryLabel, do: previousEffects, then: .continue(to: procedure))]
+			return [.init(name: entryLabel, do: previousEffects, then: .continue(to: procedure))]
 			
 			case .return:
-			return [.init(label: entryLabel, do: previousEffects, then: .return)]
+			return [.init(name: entryLabel, do: previousEffects, then: .return)]
 			
 		}
 	}

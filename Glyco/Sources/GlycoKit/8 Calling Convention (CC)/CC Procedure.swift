@@ -5,7 +5,7 @@ import Algorithms
 extension CC {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, SimplyLowerable {
+	public struct Procedure : Codable, Equatable, Named, SimplyLowerable {
 		
 		public init(_ name: Label, _ parameters: [Parameter], _ effect: Effect) {
 			self.name = name

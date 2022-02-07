@@ -4,6 +4,14 @@ protocol Name : RawRepresentable, Hashable, ExpressibleByStringLiteral where Raw
 	init(rawValue: RawValue)
 }
 
+protocol Named {
+	
+	/// The value's name.
+	var name: Name { get }
+	associatedtype Name : GlycoKit.Name
+	
+}
+
 struct Bag<NameType : Name> {
 	
 	mutating func uniqueName(from prefix: String) -> NameType {
@@ -29,4 +37,13 @@ extension Name {
 	public init(stringLiteral: String) {
 		self.init(rawValue: stringLiteral)
 	}
+}
+
+extension Sequence where Element : Named {
+	
+	/// Accesses the first element named `name`.
+	subscript (name: Element.Name) -> Element? {
+		first(where: { $0.name == name })
+	}
+	
 }

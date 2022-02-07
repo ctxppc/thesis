@@ -66,10 +66,10 @@ extension CD {
 		///
 		/// - Parameters:
 		///    - context: The context in which `self` is being lowered.
-		///    - entryLabel: The label of the entry block representing `self`.
+		///    - entryLabel: The name of the entry block representing `self`.
 		///    - previousEffects: Effects to be executed in the entry block before evaluating the predicate.
-		///    - affirmativeTarget: The label of the block to jump to if `self` holds.
-		///    - negativeTarget: The label of the block to jump to if `self` doesn't hold.
+		///    - affirmativeTarget: The name of the block to jump to if `self` holds.
+		///    - negativeTarget: The name of the block to jump to if `self` doesn't hold.
 		///
 		/// - Returns: A representation of `self` in a lower language.
 		func lowered(
@@ -82,10 +82,10 @@ extension CD {
 			switch self {
 				
 				case .constant(let holds):
-				return [.init(label: entryLabel, do: previousEffects, then: .continue(to: holds ? affirmativeTarget : negativeTarget))]
+				return [.init(name: entryLabel, do: previousEffects, then: .continue(to: holds ? affirmativeTarget : negativeTarget))]
 				
 				case .relation(let lhs, let relation, let rhs):
-				return [.init(label: entryLabel, do: previousEffects, then: .branch(if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget))]
+				return [.init(name: entryLabel, do: previousEffects, then: .branch(if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget))]
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				let intermediateAffirmative = context.bag.uniqueName(from: "then")

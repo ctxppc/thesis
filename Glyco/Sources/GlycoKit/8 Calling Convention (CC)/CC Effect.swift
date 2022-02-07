@@ -64,7 +64,7 @@ extension CC {
 					
 					// TODO: Apply calling conventions & copy a0 to `result`
 					
-					guard let procedure = context.procedures.first(where: { $0.name == name }) else { throw LoweringError.unrecognisedProcedure(name: name) }
+					guard let procedure = context.procedures[name] else { throw LoweringError.unrecognisedProcedure(name: name) }
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
 					let loweredArguments = try arguments.lowered(in: &context)

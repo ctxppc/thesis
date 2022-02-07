@@ -3,17 +3,17 @@
 extension PR {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public struct Block : Codable, Equatable, SimplyLowerable {
+	public struct Block : Codable, Equatable, Named, SimplyLowerable {
 		
-		/// Creates a block with given label, effects, and continuation.
-		public init(label: Label, do effects: [Effect], then continuation: Continuation) {
-			self.label = label
+		/// Creates a block with given name, effects, and continuation.
+		public init(name: Label, do effects: [Effect], then continuation: Continuation) {
+			self.name = name
 			self.effects = effects
 			self.continuation = continuation
 		}
 		
-		/// The block's label.
-		public var label: Label
+		// See protocol.
+		public var name: Label
 		
 		/// The block's effects.
 		public var effects: [Effect]
@@ -23,7 +23,7 @@ extension PR {
 		
 		// See protocol.
 		public func lowered(in context: inout Context) throws -> Lower.Block {
-			.init(label: label, do: effects, then: continuation.lowered(in: &context))
+			.init(name: name, do: effects, then: continuation.lowered(in: &context))
 		}
 		
 	}
