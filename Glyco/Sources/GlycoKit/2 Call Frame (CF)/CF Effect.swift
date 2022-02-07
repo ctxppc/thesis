@@ -62,6 +62,7 @@ extension CF {
 		
 		// See protocol.
 		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
+			let temp = Lower.Register.t0
 			switch self {
 				
 				case .copy(.byte, into: let destination, from: let source):
@@ -81,14 +82,14 @@ extension CF {
 				
 				case .load(.byte, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: source.offset),
-					.loadByte(destination: try destination.lowered(), address: .t0)
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
+					.loadByte(destination: try destination.lowered(), address: temp)
 				]
 				
 				case .load(.signedWord, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: source.offset),
-					.loadSignedWord(destination: try destination.lowered(), address: .t0)
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
+					.loadSignedWord(destination: try destination.lowered(), address: temp)
 				]
 				
 				case .load(.capability, into: let destination, from: let source):
@@ -96,18 +97,18 @@ extension CF {
 				
 				case .store(.byte, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: destination.offset),
-					.storeByte(source: try source.lowered(), address: .t0)
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
+					.storeByte(source: try source.lowered(), address: temp)
 				]
 				
 				case .store(.signedWord, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: destination.offset),
-					.storeSignedWord(source: try source.lowered(), address: .t0)
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
+					.storeSignedWord(source: try source.lowered(), address: temp)
 				]
 				
 				case .store(.capability, into: let destination, from: let source):
-				return [.storeCapability(source: try source.lowered(), address: .fp, offset: destination.offset)]
+				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
 				
 				case .allocateVector(let dataType, count: let count, into: let vector):
 				/*
@@ -129,7 +130,7 @@ extension CF {
 				return [
 					.offsetCapabilityWithImmediate(destination: vector, source: .sp, offset: -byteSize),	// compute tentative base
 					.setCapabilityBounds(destination: vector, source: vector, length: byteSize),			// actual base may be lower, length may be greater
-					.getCapabilityAddress(destination: .t0, source: vector),								// move stack pointer to actual base
+					.getCapabilityAddress(destination: temp, source: vector),								// move stack pointer to actual base
 					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				
@@ -153,20 +154,20 @@ extension CF {
 				
 				case .storeElement(.byte, vector: let vector, index: let index, from: let source):
 				return try [
-					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
-					.storeByte(source: source.lowered(), address: .t0),
+					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.storeByte(source: source.lowered(), address: temp),
 				]
 				
 				case .storeElement(.signedWord, vector: let vector, index: let index, from: let source):
 				return try [
-					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
-					.storeSignedWord(source: source.lowered(), address: .t0),
+					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.storeSignedWord(source: source.lowered(), address: temp),
 				]
 				
 				case .storeElement(.capability, vector: let vector, index: let index, from: let source):
 				return try [
-					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
-					.storeCapability(source: source.lowered(), address: .t0, offset: 0),
+					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.storeCapability(source: source.lowered(), address: temp, offset: 0),
 				]
 				
 				case .push(.capability, let source):

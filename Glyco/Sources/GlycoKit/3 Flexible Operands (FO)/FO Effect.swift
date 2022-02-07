@@ -69,7 +69,7 @@ extension FO {
 			/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
-			func prepare(source: Source, using temporaryRegister: Lower.Register, type: DataType) throws -> ([Lower.Effect], Lower.Register) {
+			func load(_ type: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch source {
 					case .immediate(let imm):			return ([.compute(into: temporaryRegister, value: Lower.Register.zero + imm)], temporaryRegister)
 					case .location(.register(let r)):	return ([], try r.lowered())
@@ -80,12 +80,16 @@ extension FO {
 			/// Stores the datum in `temporaryRegister` in `destination` if `destination` isn't a register.
 			///
 			/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register wherein to put the result of the effect.
-			func finalise(destination: Location, using temporaryRegister: Lower.Register, type: DataType) throws -> ([Lower.Effect], Lower.Register) {
+			func store(_ type: DataType, to destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch destination {
 					case .register(let r):	return ([], try r.lowered())
 					case .frameCell(let c):	return ([.store(type, into: c, from: temporaryRegister)], temporaryRegister)
 				}
 			}
+			
+			let temp1 = Lower.Register.t1
+			let temp2 = Lower.Register.t2
+			let temp3 = Lower.Register.t3
 			
 			switch self {
 				
@@ -109,8 +113,8 @@ extension FO {
 				
 				case .set(let type, .frameCell(let dest), to: .immediate(let imm)):
 				return [
-					.compute(into: .t1, value: .zero + imm),
-					.store(type, into: dest, from: .t1),
+					.compute(into: temp1, value: .zero + imm),
+					.store(type, into: dest, from: temp1),
 				]
 				
 				case .set(let type, .frameCell(let dest), to: .location(.register(let src))):
@@ -118,40 +122,40 @@ extension FO {
 				
 				case .set(let type, .frameCell(let dest), to: .location(.frameCell(let src))):
 				return [
-					.load(type, into: .t1, from: src),
-					.store(type, into: dest, from: .t1),
+					.load(type, into: temp1, from: src),
+					.store(type, into: dest, from: temp1),
 				]
 				
 				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2, type: .signedWord)
-				return lhsPrep + [.compute(into: resReg, value: .registerImmediate(lhsReg, operation, rhs))] + resFinalise
+				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
+				let (storeResult, dest) = try store(.signedWord, to: destination, using: temp2)
+				return loadLHS + [.compute(into: dest, value: .registerImmediate(lhs, operation, rhs))] + storeResult
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .signedWord)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: .signedWord)
-				return lhsPrep + rhsPrep + [.compute(into: resReg, value: .registerRegister(lhsReg, operation, rhsReg))] + resFinalise
+				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
+				let (loadRHS, rhs) = try load(.signedWord, from: rhs, using: temp2)
+				let (storeResult, dest) = try store(.signedWord, to: destination, using: temp3)
+				return loadLHS + loadRHS + [.compute(into: dest, value: .registerRegister(lhs, operation, rhs))] + storeResult
 				
 				case .allocateVector(let type, count: let count, into: let vector):
-				let (finaliseVector, vectorReg) = try finalise(destination: vector, using: .t1, type: type)
-				return [.allocateVector(type, count: count, into: vectorReg)] + finaliseVector
+				let (storeVector, vector) = try store(type, to: vector, using: temp1)
+				return [.allocateVector(type, count: count, into: vector)] + storeVector
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
-				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: type)
-				return vecPrep + idxPrep + [.loadElement(type, into: resReg, vector: vecReg, index: idxReg)] + resFinalise
+				let (loadVector, vector) = try load(type, from: .location(vector), using: temp1)
+				let (loadIndex, index) = try load(type, from: index, using: temp2)
+				let (storeElement, dest) = try store(type, to: destination, using: temp3)
+				return loadVector + loadIndex + [.loadElement(type, into: dest, vector: vector, index: index)] + storeElement
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
-				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
-				let (elemPrep, elemReg) = try prepare(source: element, using: .t3, type: type)
-				return vecPrep + idxPrep + elemPrep + [.storeElement(type, vector: vecReg, index: idxReg, from: elemReg)]
+				let (loadVector, vector) = try load(type, from: .location(vector), using: temp1)
+				let (loadIndex, index) = try load(type, from: index, using: temp2)
+				let (loadElement, element) = try load(type, from: element, using: temp3)
+				return loadVector + loadIndex + loadElement + [.storeElement(type, vector: vector, index: index, from: element)]
 				
 				case .push(let type, let source):
-				let (prep, reg) = try prepare(source: source, using: .t1, type: type)
-				return prep + [.push(type, reg)]
+				let (loadElement, element) = try load(type, from: source, using: temp1)
+				return loadElement + [.push(type, element)]
 				
 				case .pop(bytes: let bytes):
 				return [.pop(bytes: bytes)]
@@ -163,9 +167,9 @@ extension FO {
 				return [.popFrame]
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .signedWord)
-				return lhsPrep + rhsPrep + [.branch(to: target, lhsReg, relation, rhsReg)]
+				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
+				let (loadRHS, rhs) = try load(.signedWord, from: rhs, using: temp2)
+				return loadLHS + loadRHS + [.branch(to: target, lhs, relation, rhs)]
 				
 				case .jump(to: let target):
 				return [.jump(to: target)]
