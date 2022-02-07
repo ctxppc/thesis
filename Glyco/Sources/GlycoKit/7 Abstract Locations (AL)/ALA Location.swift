@@ -58,7 +58,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frameCell(frame.allocate(.word))
+					home = .frameCell(frame.allocate(.signedWord))	// TODO: Generalise if locations become typed.
 				}
 				homesByLocation[location] = home
 				return home

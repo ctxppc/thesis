@@ -64,8 +64,14 @@ extension CF {
 		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
 			switch self {
 				
-				case .copy(let type, into: let destination, from: let source):
-				return try [.copy(type, destination: destination.lowered(), source: source.lowered())]
+				case .copy(.byte, into: let destination, from: let source):
+				TODO.unimplemented
+				
+				case .copy(.signedWord, into: let destination, from: let source):
+				return try [.copyWord(destination: destination.lowered(), source: source.lowered())]
+				
+				case .copy(.capability, into: let destination, from: let source):
+				return try [.copyCapability(destination: destination.lowered(), source: source.lowered())]
 				
 				case .compute(into: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
 				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
@@ -73,19 +79,31 @@ extension CF {
 				case .compute(into: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
 				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
-				case .load(.word, into: let destination, from: let source):
+				case .load(.byte, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: source.offset),
-					.loadWord(destination: try destination.lowered(), address: .t0)
+					.loadByte(destination: try destination.lowered(), address: .t0)
+				]
+				
+				case .load(.signedWord, into: let destination, from: let source):
+				return [
+					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: source.offset),
+					.loadSignedWord(destination: try destination.lowered(), address: .t0)
 				]
 				
 				case .load(.capability, into: let destination, from: let source):
 				return [.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)]
 				
-				case .store(.word, into: let destination, from: let source):
+				case .store(.byte, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: destination.offset),
-					.storeWord(source: try source.lowered(), address: .t0)
+					.storeByte(source: try source.lowered(), address: .t0)
+				]
+				
+				case .store(.signedWord, into: let destination, from: let source):
+				return [
+					.offsetCapabilityWithImmediate(destination: .t0, source: .fp, offset: destination.offset),
+					.storeSignedWord(source: try source.lowered(), address: .t0)
 				]
 				
 				case .store(.capability, into: let destination, from: let source):
@@ -115,10 +133,16 @@ extension CF {
 					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				
-				case .loadElement(.word, into: let destination, vector: let vector, index: let index):
+				case .loadElement(.byte, into: let destination, vector: let vector, index: let index):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
-					.loadWord(destination: destination.lowered(), address: destination.lowered()),
+					.loadByte(destination: destination.lowered(), address: destination.lowered()),
+				]
+				
+				case .loadElement(.signedWord, into: let destination, vector: let vector, index: let index):
+				return try [
+					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.loadSignedWord(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
 				case .loadElement(.capability, into: let destination, vector: let vector, index: let index):
@@ -127,10 +151,16 @@ extension CF {
 					.loadCapability(destination: destination.lowered(), address: destination.lowered(), offset: 0),
 				]
 				
-				case .storeElement(.word, vector: let vector, index: let index, from: let source):
+				case .storeElement(.byte, vector: let vector, index: let index, from: let source):
 				return try [
 					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
-					.storeWord(source: source.lowered(), address: .t0),
+					.storeByte(source: source.lowered(), address: .t0),
+				]
+				
+				case .storeElement(.signedWord, vector: let vector, index: let index, from: let source):
+				return try [
+					.offsetCapability(destination: .t0, source: vector.lowered(), offset: index.lowered()),
+					.storeSignedWord(source: source.lowered(), address: .t0),
 				]
 				
 				case .storeElement(.capability, vector: let vector, index: let index, from: let source):
@@ -139,16 +169,16 @@ extension CF {
 					.storeCapability(source: source.lowered(), address: .t0, offset: 0),
 				]
 				
-				case .push(.word, let source):
-				return try [
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.word.byteSize),
-					.storeWord(source: source.lowered(), address: .sp),
-				]
-				
 				case .push(.capability, let source):
 				return try [
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.word.byteSize),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.capability.byteSize),
 					.storeCapability(source: source.lowered(), address: .sp, offset: 0),
+				]
+				
+				case .push(let type, let source):
+				return try [
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -type.byteSize),
+					.storeByte(source: source.lowered(), address: .sp),
 				]
 				
 				case .pop(bytes: let bytes):

@@ -721,7 +721,6 @@ A language that introduces call frames and operations for managing the call fram
 **Inherited from RV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Label</code>
 <dl>
 	<dt><code>CF.Program</code></dt>
@@ -745,6 +744,12 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+</dl>
+<dl>
+	<dt><code>CF.DataType</code></dt>
+	<dd><code><strong>byte</strong></code></dd>
+	<dd><code><strong>signedWord</strong></code></dd>
+	<dd><code><strong>capability</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>CF.Register</code></dt>
@@ -842,18 +847,16 @@ N/A
 	<dt><code>RV.Context</code></dt>
 </dl>
 <dl>
-	<dt><code>RV.DataType</code></dt>
-	<dd><code><strong>word</strong></code></dd>
-	<dd><code><strong>capability</strong></code></dd>
-</dl>
-<dl>
 	<dt><code>RV.Instruction</code></dt>
-	<dd><code><strong>copy</strong>(DataType, <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>copyWord</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>copyCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>registerRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
 	<dd><code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
-	<dd><code><strong>loadWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-	<dd><code><strong>storeWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>

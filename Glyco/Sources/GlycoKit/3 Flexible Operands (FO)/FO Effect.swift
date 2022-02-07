@@ -89,7 +89,10 @@ extension FO {
 			
 			switch self {
 				
-				case .set(.word, .register(let dest), to: .immediate(let imm)):
+				case .set(.byte, .register(let dest), to: .immediate(let imm)):
+				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + .init(UInt8(truncatingIfNeeded: imm)))]
+				
+				case .set(.signedWord, .register(let dest), to: .immediate(let imm)):
 				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + imm)]
 				
 				case .set(.capability, .register, to: .immediate):
@@ -101,30 +104,33 @@ extension FO {
 				case .set(let type, .register(let dest), to: .location(.frameCell(let src))):
 				return try [.load(type, into: dest.lowered(), from: src)]
 				
-				case .set(.word, .frameCell(let dest), to: .immediate(let imm)):
-				return [
-					.compute(into: .t1, value: .zero + imm),
-					.store(.word, into: dest, from: .t1)
-				]
-				
 				case .set(.capability, .frameCell, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
+				
+				case .set(let type, .frameCell(let dest), to: .immediate(let imm)):
+				return [
+					.compute(into: .t1, value: .zero + imm),
+					.store(type, into: dest, from: .t1),
+				]
 				
 				case .set(let type, .frameCell(let dest), to: .location(.register(let src))):
 				return try [.store(type, into: dest, from: src.lowered())]
 				
 				case .set(let type, .frameCell(let dest), to: .location(.frameCell(let src))):
-				return [.load(type, into: .t1, from: src), .store(type, into: dest, from: .t1)]
+				return [
+					.load(type, into: .t1, from: src),
+					.store(type, into: dest, from: .t1),
+				]
 				
 				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2, type: .word)
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t2, type: .signedWord)
 				return lhsPrep + [.compute(into: resReg, value: .registerImmediate(lhsReg, operation, rhs))] + resFinalise
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .word)
-				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: .word)
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
+				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .signedWord)
+				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: .signedWord)
 				return lhsPrep + rhsPrep + [.compute(into: resReg, value: .registerRegister(lhsReg, operation, rhsReg))] + resFinalise
 				
 				case .allocateVector(let type, count: let count, into: let vector):
@@ -135,17 +141,17 @@ extension FO {
 				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
 				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
 				let (resFinalise, resReg) = try finalise(destination: destination, using: .t3, type: type)
-				return vecPrep + idxPrep + [.loadElement(.word, into: resReg, vector: vecReg, index: idxReg)] + resFinalise
+				return vecPrep + idxPrep + [.loadElement(type, into: resReg, vector: vecReg, index: idxReg)] + resFinalise
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
 				let (vecPrep, vecReg) = try prepare(source: .location(vector), using: .t1, type: type)
 				let (idxPrep, idxReg) = try prepare(source: index, using: .t2, type: type)
 				let (elemPrep, elemReg) = try prepare(source: element, using: .t3, type: type)
-				return vecPrep + idxPrep + elemPrep + [.storeElement(.word, vector: vecReg, index: idxReg, from: elemReg)]
+				return vecPrep + idxPrep + elemPrep + [.storeElement(type, vector: vecReg, index: idxReg, from: elemReg)]
 				
-				case .push(let dataType, let source):
-				let (prep, reg) = try prepare(source: source, using: .t1, type: dataType)
-				return prep + [.push(dataType, reg)]
+				case .push(let type, let source):
+				let (prep, reg) = try prepare(source: source, using: .t1, type: type)
+				return prep + [.push(type, reg)]
 				
 				case .pop(bytes: let bytes):
 				return [.pop(bytes: bytes)]
@@ -157,8 +163,8 @@ extension FO {
 				return [.popFrame]
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
-				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .word)
-				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .word)
+				let (lhsPrep, lhsReg) = try prepare(source: lhs, using: .t1, type: .signedWord)
+				let (rhsPrep, rhsReg) = try prepare(source: rhs, using: .t2, type: .signedWord)
 				return lhsPrep + rhsPrep + [.branch(to: target, lhsReg, relation, rhsReg)]
 				
 				case .jump(to: let target):

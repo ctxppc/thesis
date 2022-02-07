@@ -12,8 +12,11 @@ extension RV {
 	/// * a datum is *copied from* a register *to* a register.
 	public enum Instruction : Codable, Equatable, SimplyLowerable {
 		
-		/// An instruction that copies the datum from `source` to `destination`.
-		case copy(DataType, destination: Register, source: Register)
+		/// An instruction that copies the word from `source` to `destination`.
+		case copyWord(destination: Register, source: Register)
+		
+		/// An instruction that copies the capability from `source` to `destination`.
+		case copyCapability(destination: Register, source: Register)
 		
 		/// An instruction that performs *x* `operation` *y* and puts the result in `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case registerRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
@@ -21,16 +24,22 @@ extension RV {
 		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
 		case registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
-		/// An instruction that loads the word of type `type` from memory at the address in `address`, with the address offset by `offset`.
-		case loadWord(destination: Register, address: Register)
+		/// An instruction that loads the word byte memory at the address in `address`, with the address offset by `offset`.
+		case loadByte(destination: Register, address: Register)
 		
-		/// An instruction that loads the capability of type `type` from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
+		/// An instruction that loads the word from memory at the address in `address`, with the address offset by `offset`.
+		case loadSignedWord(destination: Register, address: Register)
+		
+		/// An instruction that loads the capability from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
 		case loadCapability(destination: Register, address: Register, offset: Int)
 		
-		/// An instruction that retrieves the word of type `type` from `source` and stores it in memory at the address in `address`.
-		case storeWord(source: Register, address: Register)
+		/// An instruction that retrieves the byte from `source` and stores it in memory at the address in `address`.
+		case storeByte(source: Register, address: Register)
 		
-		/// An instruction that retrieves the capability of type `type` from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
+		/// An instruction that retrieves the word from `source` and stores it in memory at the address in `address`.
+		case storeSignedWord(source: Register, address: Register)
+		
+		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
 		case storeCapability(source: Register, address: Register, offset: Int)
 		
 		/// An instruction that offsets the capability in `source` by the offset in `offset` and puts it in `destination`.
@@ -73,10 +82,10 @@ extension RV {
 			let tabs = String((0..<context.tabIndentation).map { _ in "\t" })
 			switch self {
 				
-				case .copy(.word, destination: let destination, source: let source):
+				case .copyWord(destination: let destination, source: let source):
 				return "\(tabs)mv \(destination.x), \(source.x)"
 				
-				case .copy(.capability, destination: let destination, source: let source):
+				case .copyCapability(destination: let destination, source: let source):
 				return "\(tabs)cmove \(destination.c), \(source.c)"
 				
 				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
@@ -91,13 +100,19 @@ extension RV {
 				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(tabs)\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
-				case .loadWord(destination: let rd, address: let address):
+				case .loadByte(destination: let rd, address: let address):
+				return "\(tabs)lbu.cap \(rd.x), 0(\(address.c))"
+				
+				case .loadSignedWord(destination: let rd, address: let address):
 				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
 				
 				case .loadCapability(destination: let cd, address: let address, offset: let offset):
 				return "\(tabs)clc \(cd.x), \(offset)(\(address.c))"
 				
-				case .storeWord(source: let rs, address: let address):
+				case .storeByte(source: let rs, address: let address):
+				return "\(tabs)sbu.cap \(rs.x), 0(\(address.c))"
+				
+				case .storeSignedWord(source: let rs, address: let address):
 				return "\(tabs)sw.cap \(rs.x), 0(\(address.c))"
 				
 				case .storeCapability(source: let cs, address: let address, offset: let offset):
