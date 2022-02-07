@@ -32,15 +32,15 @@ extension ALA {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int, analysisAtEntry: Analysis)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack.
+		/// Pushes a new scope (i.e., call frame) to the scope stack (i.e., call stack).
 		///
-		/// This effect must be executed exactly once before any effects accessing the call frame.
-		case pushFrame(bytes: Int, analysisAtEntry: Analysis)
+		/// This effect must be executed exactly once before any location defined in the current scope is accessed.
+		case pushScope(analysisAtEntry: Analysis)
 		
-		/// Pops a frame from the call stack.
+		/// Pops a scope (i.e., call frame) from the scope stack (i.e., call stack).
 		///
-		/// This effect must be executed exactly once before any effects accessing the previous call frame.
-		case popFrame(analysisAtEntry: Analysis)
+		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
+		case popScope(analysisAtEntry: Analysis)
 		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
@@ -84,10 +84,10 @@ extension ALA {
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				Lowered.pop(bytes: bytes)
 				
-				case .pushFrame(bytes: let bytes, analysisAtEntry: _):
-				Lowered.pushFrame(bytes: bytes)
+				case .pushScope(analysisAtEntry: _):
+				Lowered.pushFrame(bytes: 0)	// TODO: Pass spill size.
 				
-				case .popFrame(analysisAtEntry: _):
+				case .popScope(analysisAtEntry: _):
 				Lowered.popFrame
 				
 				case .call(let name, _, analysisAtEntry: _):
@@ -178,11 +178,11 @@ extension ALA {
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				return .pop(bytes: bytes, analysisAtEntry: analysis)
 				
-				case .pushFrame(bytes: let bytes, analysisAtEntry: _):
-				return .pushFrame(bytes: bytes, analysisAtEntry: analysis)
+				case .pushScope(bytes: let bytes, analysisAtEntry: _):
+				return .pushScope(bytes: bytes, analysisAtEntry: analysis)
 				
-				case .popFrame(analysisAtEntry: _):
-				return .popFrame(analysisAtEntry: analysis)
+				case .popScope(analysisAtEntry: _):
+				return .popScope(analysisAtEntry: analysis)
 				
 				case .call(let name, let locations, analysisAtEntry: _):
 				return .call(name, locations, analysisAtEntry: analysis)
@@ -208,8 +208,8 @@ extension ALA {
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.push(_, _, analysisAtEntry: let analysis),
 					.pop(bytes: _, analysisAtEntry: let analysis),
-					.pushFrame(bytes: _, analysisAtEntry: let analysis),
-					.popFrame(analysisAtEntry: let analysis),
+					.pushScope(bytes: _, analysisAtEntry: let analysis),
+					.popScope(analysisAtEntry: let analysis),
 					.call(_, _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -220,7 +220,7 @@ extension ALA {
 		private func definedLocations() -> Set<Location> {
 			switch self {
 				
-				case .do, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
+				case .do, .setElement, .if, .push, .pop, .pushScope, .popScope, .call, .return:
 				return []
 				
 				case .set(_, let destination, to: _, analysisAtEntry: _),
@@ -243,8 +243,8 @@ extension ALA {
 					.if,
 					.push(_, .constant, analysisAtEntry: _),
 					.pop,
-					.pushFrame,
-					.popFrame,
+					.pushScope,
+					.popScope,
 					.return:
 				return []
 				
@@ -290,7 +290,7 @@ extension ALA {
 					where analysis.safelyCoalescable(destination, .abstract(source)):
 				return (source, destination)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushScope, .popScope, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -334,7 +334,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pop, .pushFrame, .popFrame, .call, .return:
+				case .do, .if, .pop, .pushScope, .popScope, .call, .return:
 				return self
 				
 				case .set(_, .abstract(removedLocation), to: .location(retainedLocation), analysisAtEntry: let analysis),

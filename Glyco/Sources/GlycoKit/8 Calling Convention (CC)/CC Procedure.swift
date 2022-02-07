@@ -40,6 +40,12 @@ extension CC {
 				Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(location))
 			}
 			
+			@EffectBuilder<Lower.Effect>
+			var prologue: Lower.Effect {
+				Lower.Effect.pushScope
+				// TODO
+			}
+			
 			return try .init(name, .do(
 				[
 					.push(.capability, .location(.register(.fp))),

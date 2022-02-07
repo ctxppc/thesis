@@ -424,8 +424,8 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>popFrame</strong></code></dd>
+	<dd><code><strong>pushScope</strong></code></dd>
+	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -483,8 +483,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>popFrame</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Location], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>

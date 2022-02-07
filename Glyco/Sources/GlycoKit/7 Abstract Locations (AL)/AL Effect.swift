@@ -32,15 +32,15 @@ extension AL {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack.
+		/// Pushes a new scope (i.e., call frame) to the scope stack (i.e., call stack).
 		///
-		/// This effect must be executed exactly once before any effects accessing the call frame.
-		case pushFrame(bytes: Int)
+		/// This effect must be executed exactly once before any location defined in the current scope is accessed.
+		case pushScope
 		
-		/// Pops a frame from the call stack.
+		/// Pops a scope (i.e., call frame) from the scope stack (i.e., call stack).
 		///
-		/// This effect must be executed exactly once before any effects accessing the previous call frame.
-		case popFrame
+		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
+		case popScope
 		
 		/// An effect that invokes the labelled procedure and uses given locations.
 		///
@@ -86,11 +86,11 @@ extension AL {
 				case .pop(bytes: let bytes):
 				return .pop(bytes: bytes, analysisAtEntry: .init())
 				
-				case .pushFrame(bytes: let bytes):
+				case .pushScope:
 				return .pushFrame(bytes: bytes, analysisAtEntry: .init())
 				
-				case .popFrame:
-				return .popFrame(analysisAtEntry: .init())
+				case .popScope:
+				return .popScope(analysisAtEntry: .init())
 				
 				case .call(let name, let parameters):
 				return .call(name, parameters, analysisAtEntry: .init())
