@@ -3,7 +3,7 @@
 extension DF {
 	
 	/// An effect on a DF machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs given effects.
 		case `do`([Effect])
@@ -15,17 +15,19 @@ extension DF {
 		case setElement(of: Location, at: Source, to: Source)
 		
 		// See protocol.
+		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context))
+				Lowered.do(try effects.lowered(in: &context))
 				
 				case .let(let definitions, in: let effect):
-				return try .do(definitions.lowered(in: &context) + [effect.lowered(in: &context)])
+				try Lowered.do(definitions.lowered(in: &context))
+				try effect.lowered(in: &context)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				return .setElement(of: vector, at: index, to: element)
+				Lowered.setElement(of: vector, at: index, to: element)
 				
 			}
 		}

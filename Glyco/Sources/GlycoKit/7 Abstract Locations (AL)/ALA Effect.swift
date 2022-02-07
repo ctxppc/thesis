@@ -53,47 +53,48 @@ extension ALA {
 		case `return`(analysisAtEntry: Analysis)
 		
 		// See protocol.
+		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects, analysisAtEntry: _):
-				return .do(try effects.lowered(in: &context))
+				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let type, let destination, to: let source, analysisAtEntry: _):
-				return try .set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
-				return try .compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
+				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: _):
-				return .allocateVector(type, count: count, into: try vector.lowered(in: &context))
+				Lowered.allocateVector(type, count: count, into: try vector.lowered(in: &context))
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
-				return try .getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				try Lowered.getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: _):
-				return try .setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let dataType, let source, analysisAtEntry: _):
-				return .push(dataType, try source.lowered(in: &context))
+				Lowered.push(dataType, try source.lowered(in: &context))
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
-				return .pop(bytes: bytes)
+				Lowered.pop(bytes: bytes)
 				
 				case .pushFrame(bytes: let bytes, analysisAtEntry: _):
-				return .pushFrame(bytes: bytes)
+				Lowered.pushFrame(bytes: bytes)
 				
 				case .popFrame(analysisAtEntry: _):
-				return .popFrame
+				Lowered.popFrame
 				
 				case .call(let name, _, analysisAtEntry: _):
-				return .call(name)
+				Lowered.call(name)
 				
 				case .return(analysisAtEntry: _):
-				return .return
+				Lowered.return
 				
 			}
 		}

@@ -3,7 +3,7 @@
 extension CA {
 	
 	/// An effect on a CA machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])
@@ -24,35 +24,36 @@ extension CA {
 		case `return`(Source)
 		
 		// See protocol.
+		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context))
+				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: .source(let source)):
-				return .set(.signedWord, destination, to: source)
+				Lowered.set(.signedWord, destination, to: source)
 				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
-				return .compute(lhs, op, rhs, to: destination)
+				Lowered.compute(lhs, op, rhs, to: destination)
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
-				return .getElement(.signedWord, of: vector, at: index, to: destination)
+				Lowered.getElement(.signedWord, of: vector, at: index, to: destination)
 				
 				case .set(let destination, to: .vector(let dataType, count: let count)):
-				return .allocateVector(dataType, count: count, into: destination)
+				Lowered.allocateVector(dataType, count: count, into: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				return .setElement(.signedWord, of: vector, at: index, to: element)
+				Lowered.setElement(.signedWord, of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let name, let arguments):
-				return .call(name, arguments, result: "result")	// TODO
+				Lowered.call(name, arguments, result: "result")	// TODO
 				
 				case .return(let result):
-				return .return(.signedWord, result)
+				Lowered.return(.signedWord, result)
 				
 			}
 		}

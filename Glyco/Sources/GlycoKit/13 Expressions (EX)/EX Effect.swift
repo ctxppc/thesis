@@ -3,7 +3,7 @@
 extension EX {
 	
 	/// An effect on an EX machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs given effects.
 		case `do`([Effect])
@@ -15,20 +15,21 @@ extension EX {
 		case setElement(of: Value, at: Value, to: Value)
 		
 		// See protocol.
+		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context))
+				Lowered.do(try effects.lowered(in: &context))
 				
 				case .let(let definitions, in: let effect):
-				return try .let(definitions.lowered(in: &context), in: effect.lowered(in: &context))
+				try Lowered.let(definitions.lowered(in: &context), in: effect.lowered(in: &context))
 				
 				case .setElement(of: let vector, at: let index, to: let element):
 				let vec = context.bag.uniqueName(from: "vec")
 				let idx = context.bag.uniqueName(from: "idx")
 				let elem = context.bag.uniqueName(from: "elem")
-				return try .let([
+				try Lowered.let([
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context)),
 					.init(elem, element.lowered(in: &context)),

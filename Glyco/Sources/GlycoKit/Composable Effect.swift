@@ -1,6 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-protocol Composable {
+/// An effect that can be composed out of effects.
+protocol ComposableEffect {
 	
 	/// Builds a value of type `Self` consisting of `elements`.
 	static func `do`(_ elements: [Self]) -> Self
@@ -8,7 +9,7 @@ protocol Composable {
 }
 
 @resultBuilder
-enum EffectBuilder<Effect : Composable> {
+enum EffectBuilder<Effect : ComposableEffect> {
 	
 	static func buildBlock(_ effects: Effect...) -> Effect {
 		.do(effects)
@@ -28,15 +29,6 @@ enum EffectBuilder<Effect : Composable> {
 	
 	static func buildEither(second effect: Effect) -> Effect {
 		effect
-	}
-	
-}
-
-extension Composable {
-	
-	/// Creates a value of type `Self` using `builder`.
-	static func from(@EffectBuilder<Self> _ builder: () throws -> Self) rethrows -> Self {
-		try builder()
 	}
 	
 }
