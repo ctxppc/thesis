@@ -81,6 +81,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -112,8 +113,8 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
@@ -151,8 +152,8 @@ A language that introduces lexical scopes of definitions
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
-	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
@@ -178,8 +179,8 @@ A language that introduces lexical scopes of definitions
 <dl>
 	<dt><code>LS.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
@@ -193,7 +194,6 @@ A language that introduces definitions with function-wide namespacing.
 **Inherited from CV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Context</code>, 
 <code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
@@ -234,14 +234,17 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
-	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>DF.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>DF.Context</code></dt>
 </dl>
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
@@ -273,7 +276,6 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
@@ -286,9 +288,9 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
 </dl>
 
 <h2 id="CA">Grammar for CA (Canonical Assignments)</h2>
@@ -316,8 +318,8 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
@@ -585,6 +587,7 @@ A language that introduces predicates in branches.
 	<dt><code>PR.Continuation</code></dt>
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -626,6 +629,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dt><code>BB.Continuation</code></dt>
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(Source, BranchRelation, Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>

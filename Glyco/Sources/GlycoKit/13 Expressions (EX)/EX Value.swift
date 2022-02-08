@@ -19,6 +19,9 @@ extension EX {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value that evaluates to a function evaluated with given arguments.
+		case evaluate(Label, [Value])
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
@@ -56,6 +59,15 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
 				], in: .element(of: vec, at: .symbol(idx)))
+				
+				case .evaluate(let name, let arguments):
+				let argumentNamesAndLoweredValues = try arguments.map {
+					(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+				}
+				return .let(
+					argumentNamesAndLoweredValues.map { .init($0.0, $0.1) },
+					in: .evaluate(name, argumentNamesAndLoweredValues.map { .symbol($0.0) })
+				)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

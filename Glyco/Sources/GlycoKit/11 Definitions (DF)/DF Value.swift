@@ -16,11 +16,11 @@ extension DF {
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(DataType, count: Int)
 		
-		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
-		indirect case `if`(Predicate, then: Value, else: Value)
-		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
+		
+		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
+		indirect case `if`(Predicate, then: Value, else: Value)
 		
 		/// A value that evaluates to given value after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Value)
@@ -44,11 +44,11 @@ extension DF {
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)
 				
+				case .evaluate(let name, let arguments):
+				return .evaluate(name, arguments)
+				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
-				
-				case .evaluate(let name, let arguments):
-				return .call(name, arguments)
 				
 				case .let(let definitions, in: let body):
 				return try .do(definitions.lowered(in: &context), then: body.lowered(in: &context))

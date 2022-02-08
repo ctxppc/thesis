@@ -20,27 +20,28 @@ extension DF {
 		indirect case `do`([Effect], then: Result)
 		
 		// See protocol.
+		@EffectBuilder<Lower.Effect>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
 			switch self {
 				
 				case .value(let value):
-				let result = Lower.Location(rawValue: "result")
-				return .do([
-					.set(result, to: try value.lowered(in: &context)),
-					.return(.location(result))
-				])
+				let result = context.bag.uniqueName(from: "result")
+				Lowered.set(result, to: try value.lowered(in: &context))
+				Lowered.return(.location(result))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
-				return .call(name, arguments)
+				let result = context.bag.uniqueName(from: "result")
+				Lowered.set(result, to: .evaluate(name, arguments))
+				Lowered.return(.location(result))
 				
 				case .let(let definitions, in: let result):
-				return try .do(definitions.lowered(in: &context) + [result.lowered(in: &context)])
+				try Lowered.do(definitions.lowered(in: &context) + [result.lowered(in: &context)])
 				
 				case .do(let effects, then: let result):
-				return try .do(effects.lowered(in: &context) + [result.lowered(in: &context)])
+				try Lowered.do(effects.lowered(in: &context) + [result.lowered(in: &context)])
 				
 			}
 		}

@@ -1,7 +1,5 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-import Foundation
-
 extension CV {
 	
 	/// An effect on a CV machine.
@@ -18,9 +16,6 @@ extension CV {
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
-		
-		/// An effect that invokes the labelled procedure passing given arguments.
-		case call(Label, [Source])
 		
 		/// An effect that terminates the program with `result`.
 		case `return`(Source)
@@ -45,6 +40,9 @@ extension CV {
 				case .set(let destination, to: .vector(let dataType, count: let count)):
 				Lowered.set(destination, to: .vector(dataType, count: count))
 				
+				case .set(let destination, to: .evaluate(let procedure, let arguments)):
+				Lowered.call(procedure, arguments, result: destination)
+				
 				case .set(let destination, to: .if(let predicate, then: let affirmative, else: let negative)):
 				try Lowered.if(
 					predicate.lowered(in: &context),
@@ -56,30 +54,15 @@ extension CV {
 				try Lowered.do(effects.lowered(in: &context))
 				try Self.set(destination, to: source).lowered(in: &context)
 				
-				case .set(_, to: .call):
-				throw LoweringError.intermediateCall
-				
 				case .setElement(of: let vector, at: let index, to: let element):
 				Lowered.setElement(of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .call(let name, let arguments):
-				Lowered.call(name, arguments)
-				
 				case .return(let result):
 				Lowered.return(result)
 				
-			}
-		}
-		
-		enum LoweringError : LocalizedError {
-			case intermediateCall
-			var errorDescription: String? {
-				switch self {
-					case .intermediateCall:	return "Procedure call assignments are currently not supported by Glyco"
-				}
 			}
 		}
 		

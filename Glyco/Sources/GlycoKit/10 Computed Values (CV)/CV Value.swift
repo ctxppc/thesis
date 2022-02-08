@@ -16,14 +16,14 @@ extension CV {
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(DataType, count: Int)
 		
+		/// A value that performs the procedure with given name and evaluates to that procedure's result.
+		case evaluate(Label, [Source])
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
 		/// A value that performs some effect then evaluates to the value of `then`.
 		indirect case `do`([Effect], then: Value)
-		
-		/// A value that performs the procedure with given name and evaluates to that procedure's result.
-		case call(Label, [Source])
 		
 	}
 	

@@ -7,11 +7,11 @@ extension EX {
 		/// A result that evaluates to given value.
 		case value(Value)
 		
-		/// A result that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
-		indirect case `if`(Predicate, then: Result, else: Result)
-		
 		/// A result that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Value])
+		
+		/// A result that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
+		indirect case `if`(Predicate, then: Result, else: Result)
 		
 		/// A result provided by given result after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Result)
@@ -26,15 +26,15 @@ extension EX {
 				case .value(let value):
 				return try .value(value.lowered(in: &context))
 				
-				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
-				
 				case .evaluate(let name, let arguments):
 				let namesAndDefinitions = try arguments.enumerated().map { (n, argument) -> (Lower.Symbol, Lower.Definition) in
 					let name = Lower.Symbol(rawValue: "arg\(n)")
 					return (name, .init(name, try argument.lowered(in: &context)))
 				}
 				return .let(namesAndDefinitions.map(\.1), in: .evaluate(name, namesAndDefinitions.map { .symbol($0.0) }))
+				
+				case .if(let predicate, then: let affirmative, else: let negative):
+				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let result):
 				return try .let(definitions.lowered(in: &context), in: result.lowered(in: &context))

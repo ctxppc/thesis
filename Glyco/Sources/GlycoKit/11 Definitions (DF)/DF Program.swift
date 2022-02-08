@@ -20,15 +20,14 @@ public enum DF : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			try .init(result.lowered(), procedures: functions.lowered())
+			var context = Context()
+			return try .init(result.lowered(in: &context), procedures: functions.lowered(in: &context))
 		}
 		
 	}
 	
 	// See protocol.
 	public typealias Lower = CV
-	
-	typealias Context = ()
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
