@@ -46,7 +46,7 @@ extension ALA {
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope(analysisAtEntry: Analysis)
 		
-		/// An effect that invokes the labelled procedure and uses given locations.
+		/// An effect that invokes the labelled procedure and uses given physical locations.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis.
 		case call(Label, [Location], analysisAtEntry: Analysis)
@@ -282,7 +282,7 @@ extension ALA {
 				]
 				
 				case .call(_, let arguments, analysisAtEntry: _):
-				TODO.unimplemented
+				return arguments.map { .init(location: $0, dataType: nil) }
 				
 			}
 		}

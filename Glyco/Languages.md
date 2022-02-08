@@ -444,6 +444,12 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.TypedLocation</code></dt>
+	<dd><code><strong>abstract</strong>(AbstractLocation, DataType?)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, DataType?)</code></dd>
+</dl>
+<dl>
 	<dt><code>ALA.Register</code></dt>
 	<dd><code><strong>sp</strong></code></dd>
 	<dd><code><strong>fp</strong></code></dd>
@@ -471,9 +477,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dt><code>ALA.TypeAssignments</code></dt>
 	<dd><code>()</code></dd>
 	<dd><code>([TypedLocation])</code></dd>
-</dl>
-<dl>
-	<dt><code>ALA.TypedLocation</code></dt>
 </dl>
 <dl>
 	<dt><code>ALA.Source</code></dt>

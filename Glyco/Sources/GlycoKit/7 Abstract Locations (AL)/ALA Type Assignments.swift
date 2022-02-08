@@ -23,18 +23,18 @@ extension ALA {
 		
 		/// Inserts given typed location to the assignment.
 		///
-		/// - Throws: An inconsistent
+		/// - Throws: An inconsistent typing error if `self` contains a type for the same location that is different than `typedLocation`'s type.
 		mutating func insert(_ typedLocation: TypedLocation) throws {
-			let previous = typesByLocation.updateValue(typedLocation.dataType, forKey: typedLocation.location)
-			if let previous = previous, previous != typedLocation.dataType {
-				throw TypeError.inconsistentTyping(typedLocation.location, previous, typedLocation.dataType)
+			guard let newType = typedLocation.dataType else { return }
+			let previousType = typesByLocation.updateValue(newType, forKey: typedLocation.location)
+			if let previousType = previousType, previousType != newType {
+				throw TypeError.inconsistentTyping(typedLocation.location, previousType, newType)
 			}
 		}
 		
 		/// Accesses the typed location associated with `location`.
-		subscript (location: Location) -> TypedLocation? {
-			typesByLocation[location]
-				.map { .init(location: location, dataType: $0) }
+		subscript (location: Location) -> TypedLocation {
+			.init(location: location, dataType: typesByLocation[location])
 		}
 		
 		enum TypeError : LocalizedError {
@@ -51,17 +51,6 @@ extension ALA {
 			}
 			
 		}
-		
-	}
-	
-	/// A location with an associated data type.
-	public struct TypedLocation : Equatable, Codable {
-		
-		/// The location.
-		var location: Location
-		
-		/// The location's data type.
-		var dataType: DataType
 		
 	}
 	
