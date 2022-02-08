@@ -29,7 +29,7 @@ extension ALA {
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {	// procedures don't take a context
-			var context = ALA.Context(assignments: .init(from: effect.analysisAtEntry))
+			var context = ALA.Context(assignments: try .init(from: effect.analysisAtEntry))
 			return .init(name, in: try effect.lowered(in: &context))
 		}
 		

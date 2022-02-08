@@ -108,14 +108,13 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.allExecutionPathsTerminate)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame:
-				// TODO: Add .call to this case when it becomes applicable.
+				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
 				
-				case .call, .return:	// TODO: Remove .call from this case when no longer applicable.
+				case .return:
 				return true
 				
 			}

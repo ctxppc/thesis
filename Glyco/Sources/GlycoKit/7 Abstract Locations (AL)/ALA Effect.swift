@@ -240,8 +240,7 @@ extension ALA {
 				return [.init(location: destination, dataType: .capability)]
 				
 				case .pushScope:
-				// TODO: Define all callee-saved registers.
-				TODO.unimplemented
+				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
 				
 			}
 		}
@@ -287,8 +286,7 @@ extension ALA {
 				]
 				
 				case .popScope:
-				// TODO: Use all callee-saved registers.
-				TODO.unimplemented
+				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
 				
 				case .call(_, let arguments, analysisAtEntry: _):
 				return arguments.map { .init(location: $0, dataType: nil) }

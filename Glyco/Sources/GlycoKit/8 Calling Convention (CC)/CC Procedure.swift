@@ -33,7 +33,10 @@ extension CC {
 				// Prepare new scope.
 				Lower.Effect.pushScope
 				
-				// TODO: Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
+				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
+				for register in Lower.Register.defaultCalleeSavedRegisters {
+					Lower.Effect.set(.capability, .abstract(context.calleeSaveLocation(for: register)), to: .location(.register(register)))
+				}
 				
 				// Compute parameter assignments.
 				let assignments = parameterAssignments(in: context.configuration)

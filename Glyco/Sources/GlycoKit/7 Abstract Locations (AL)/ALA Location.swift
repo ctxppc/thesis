@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Foundation
+
 extension ALA {
 	
 	/// A location.
@@ -17,7 +19,7 @@ extension ALA {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Location {
 			switch self {
-				case .abstract(let location):	return location.lowered(in: &context)
+				case .abstract(let location):	return try location.lowered(in: &context)
 				case .register(let register):	return .register(register)
 				case .frame(let location):		return .frameCell(location)
 			}
@@ -29,18 +31,18 @@ extension ALA {
 			/// Determines an assignment using given analysis of the root effect.
 			///
 			/// The initialiser assigns homes to all used locations, by increasing degree of conflict.
-			init(from analysis: Analysis) {
+			init(from analysis: Analysis) throws {
 				self.analysis = analysis
 				for location in analysis.locationsOrderedByIncreasingNumberOfConflicts() {
 					guard case .abstract(let location) = location else { continue }
-					addAssignment(for: location)
+					try addAssignment(for: location)
 				}
 			}
 			
 			/// Returns `location`'s assigned physical location.
 			subscript (location: AbstractLocation) -> Lower.Location {
-				mutating get {
-					guard let home = homesByLocation[location] else { return addAssignment(for: location) }
+				mutating get throws {
+					guard let home = homesByLocation[location] else { return try addAssignment(for: location) }
 					return home
 				}
 			}
@@ -59,13 +61,15 @@ extension ALA {
 			
 			/// Adds an assignment for `location` and returns the assigned physical location.
 			@discardableResult
-			private mutating func addAssignment(for location: AbstractLocation) -> Lower.Location {
+			private mutating func addAssignment(for location: AbstractLocation) throws -> Lower.Location {
 				let home: Lower.Location
 				if let register = assignableRegister(for: location) {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
+				} else if let type = analysis.typeAssignments[.abstract(location)].dataType {
+					home = .frameCell(frame.allocate(type))
 				} else {
-					home = .frameCell(frame.allocate(.signedWord))	// TODO: Generalise if locations become typed.
+					throw AssignmentError.unknownType(location)
 				}
 				homesByLocation[location] = home
 				return home
@@ -77,6 +81,21 @@ extension ALA {
 					guard let assignedLocations = locationsByRegister[register] else { return true }
 					return !analysis.containsConflict(.abstract(location), assignedLocations)
 				}
+			}
+			
+			enum AssignmentError : LocalizedError {
+				
+				/// An error indicating that given location cannot be placed on the call frame since its data type can't be determined.
+				case unknownType(AbstractLocation)
+				
+				// See protocol.
+				var errorDescription: String? {
+					switch self {
+						case .unknownType(let location):
+						return "“\(location)” cannot be placed on the call frame since its data type can't be determined."
+					}
+				}
+				
 			}
 			
 		}

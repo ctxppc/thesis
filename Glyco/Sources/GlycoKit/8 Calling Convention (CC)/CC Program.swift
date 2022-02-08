@@ -21,7 +21,15 @@ public enum CC : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(procedures: procedures, configuration: configuration)
-			return try .init(effect.lowered(in: &context), procedures: procedures.lowered(in: &context))
+			return try .init(try .do {
+				
+				// Prepare new scope.
+				Lower.Effect.pushScope
+				
+				// Execute main effect.
+				try effect.lowered(in: &context)
+				
+			}, procedures: procedures.lowered(in: &context))
 		}
 		
 	}

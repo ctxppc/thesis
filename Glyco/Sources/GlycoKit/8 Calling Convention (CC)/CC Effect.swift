@@ -115,10 +115,17 @@ extension CC {
 				
 				case .return(let type, let result):
 				do {
+					
 					Lowered.set(type, .register(.a0), to: try result.lowered(in: &context))
-					// TODO: Copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
+					
+					// Copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
+					for register in Lower.Register.defaultCalleeSavedRegisters {
+						Lowered.set(.capability, .register(register), to: .location(.abstract(context.calleeSaveLocation(for: register))))
+					}
+					
 					Lowered.popScope
 					Lowered.return
+					
 				}
 				
 			}
