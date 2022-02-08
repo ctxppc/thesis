@@ -42,7 +42,7 @@ extension BB {
 				}
 				
 				case .call(let name, returnPoint: let returnPoint):
-				TODO.unimplemented
+				return [.call(name), .jump(to: returnPoint)]
 				
 				case .return:
 				if let (first, tail) = try effects.lowered().splittingFirst() {
