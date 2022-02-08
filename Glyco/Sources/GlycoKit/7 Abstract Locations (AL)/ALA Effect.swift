@@ -112,16 +112,16 @@ extension ALA {
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
-		func updated(using transform: Transformation, analysis: inout Analysis) -> Self {
+		func updated(using transform: Transformation, analysis: inout Analysis) throws -> Self {
 			let transformed = transform(self)
-			analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
+			try analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
 			switch transformed {
 				
 				case .do(let effects, analysisAtEntry: _):
 				return .do(
-					effects
+					try effects
 						.reversed()
-						.map { $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
+						.map { try $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
 						.reversed(),												// reverse back to normal order
 					analysisAtEntry: analysis
 				)
@@ -165,12 +165,12 @@ extension ALA {
 					 */
 					
 					var analysisAtAffirmativeEntry = analysis
-					let updatedAffirmative = affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = try affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
 					
-					let updatedNegative = negative.updated(using: transform, analysis: &analysis)
+					let updatedNegative = try negative.updated(using: transform, analysis: &analysis)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					let updatedPredicate = predicate.updated(using: transform, analysis: &analysis)
+					let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis)
 					
 					return .if(updatedPredicate, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					
@@ -221,23 +221,27 @@ extension ALA {
 		}
 		
 		/// Returns the locations defined by `self`.
-		private func definedLocations() -> Set<Location> {
+		private func definedLocations() -> [TypedLocation] {
 			switch self {
 				
 				case .do, .setElement, .if, .push, .pop, .pushScope, .popScope, .call, .return:
 				return []
 				
-				case .set(_, let destination, to: _, analysisAtEntry: _),
-					.compute(_, _, _, to: let destination, analysisAtEntry: _),
-					.allocateVector(_, count: _, into: let destination, analysisAtEntry: _),
-					.getElement(_, of: _, at: _, to: let destination, analysisAtEntry: _):
-				return [destination]
+				case .set(let type, let destination, to: _, analysisAtEntry: _),
+					.getElement(let type, of: _, at: _, to: let destination, analysisAtEntry: _):
+				return [.init(location: destination, dataType: type)]
+				
+				case .compute(_, _, _, to: let destination, analysisAtEntry: _):
+				return [.init(location: destination, dataType: .signedWord)]
+				
+				case .allocateVector(_, count: _, into: let destination, analysisAtEntry: _):
+				return [.init(location: destination, dataType: .capability)]
 				
 			}
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> Set<Location> {
+		private func possiblyUsedLocations() -> [TypedLocation] {
 			switch self {
 				
 				case .do,
@@ -252,25 +256,33 @@ extension ALA {
 					.return:
 				return []
 				
-				case .set(_, _, to: .location(let source), analysisAtEntry: _),
-					.compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
-					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _),
-					.push(_, .location(let source), analysisAtEntry: _):
-				return [source]
+				case .set(let type, _, to: .location(let source), analysisAtEntry: _),
+					.push(let type, .location(let source), analysisAtEntry: _):
+				return [.init(location: source, dataType: type)]
+				
+				case .compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
+					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _):
+				return [.init(location: source, dataType: .signedWord)]
 				
 				case .compute(.location(let lhs), _, .location(let rhs), to: _, analysisAtEntry: _):
-				return [lhs, rhs]
+				return [
+					.init(location: lhs, dataType: .signedWord),
+					.init(location: rhs, dataType: .signedWord)
+				]
 				
 				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
 					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
-				return [vector]
+				return [.init(location: vector, dataType: .capability)]
 				
 				case .getElement(_, of: let vector, at: .location(let index), to: _, analysisAtEntry: _),
 					.setElement(_, of: let vector, at: .location(let index), to: _, analysisAtEntry: _):
-				return [vector, index]
+				return [
+					.init(location: vector, dataType: .capability),
+					.init(location: index, dataType: .signedWord)
+				]
 				
 				case .call(_, let arguments, analysisAtEntry: _):
-				return .init(arguments.map { $0 })
+				TODO.unimplemented
 				
 			}
 		}
@@ -313,8 +325,8 @@ extension ALA {
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
-		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) -> Self {
-			updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
+			try updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
 		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.

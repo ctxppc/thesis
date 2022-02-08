@@ -21,9 +21,9 @@ public enum CD : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public mutating func optimise() -> Bool {
-			let effectOptimised = effect.optimise()
-			let proceduresOptimised = procedures.optimise()
+		public mutating func optimise() throws -> Bool {
+			let effectOptimised = try effect.optimise()
+			let proceduresOptimised = try procedures.optimise()
 			return effectOptimised || proceduresOptimised
 		}
 		

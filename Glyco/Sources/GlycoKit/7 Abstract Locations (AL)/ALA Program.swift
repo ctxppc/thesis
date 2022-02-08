@@ -19,10 +19,10 @@ public enum ALA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public mutating func optimise() {
+		public mutating func optimise() throws {
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				var analysis = Analysis()
-				effect = effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
+				effect = try effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
 			}
 		}
 		

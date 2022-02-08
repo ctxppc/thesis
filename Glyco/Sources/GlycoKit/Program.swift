@@ -89,7 +89,7 @@ extension Program {
 	public func processedLowering(configuration: CompilationConfiguration) throws -> LowerProgram {
 		var copy = self
 		if configuration.optimise {
-			copy.optimiseUntilFixedPoint()
+			try copy.optimiseUntilFixedPoint()
 		}
 		if configuration.validate {
 			try copy.validate()

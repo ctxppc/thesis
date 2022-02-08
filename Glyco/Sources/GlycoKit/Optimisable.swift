@@ -4,15 +4,15 @@ public protocol Optimisable {
 	
 	/// Optimises `self` and returns a Boolean value indicating whether any changes have been made.
 	@discardableResult
-	mutating func optimise() -> Bool
+	mutating func optimise() throws -> Bool
 	
 }
 
 extension Optimisable {
 	
 	/// Optimises `self` until it cannot be optimised more.
-	mutating func optimiseUntilFixedPoint() {
-		while optimise() {}
+	mutating func optimiseUntilFixedPoint() throws {
+		while try optimise() {}
 	}
 	
 }
@@ -21,10 +21,10 @@ extension MutableCollection where Element : Optimisable {
 	
 	/// Optimises the elements in `self` and returns a Boolean value indicating whether any changes have been made.
 	@discardableResult
-	mutating func optimise() -> Bool {
+	mutating func optimise() throws -> Bool {
 		var optimised = false
 		for index in indices {
-			if self[index].optimise() {
+			if try self[index].optimise() {
 				optimised = true
 			}
 		}
@@ -32,8 +32,8 @@ extension MutableCollection where Element : Optimisable {
 	}
 	
 	/// Optimises the elements in `self` until they cannot be optimised more.
-	mutating func optimiseUntilFixedPoint() {
-		while optimise() {}
+	mutating func optimiseUntilFixedPoint() throws {
+		while try optimise() {}
 	}
 	
 }

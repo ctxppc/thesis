@@ -24,8 +24,8 @@ extension CD {
 		}
 		
 		// See protocol.
-		public mutating func optimise() -> Bool {
-			effect.optimise()
+		public mutating func optimise() throws -> Bool {
+			try effect.optimise()
 		}
 		
 	}

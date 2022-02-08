@@ -6,39 +6,81 @@ extension ALA {
 	public struct Analysis : Equatable, Codable {
 		
 		/// Constructs an analysis value.
-		public init(conflicts: ConflictSet = .init([]), possiblyLiveLocations: Set<Location> = []) {
-			self.conflicts = conflicts
-			self.possiblyLiveLocations = possiblyLiveLocations
+		public init(
+			conflicts:						ConflictSet = .init([]),
+			possiblyLiveLocations:			Set<Location> = [],
+			definedLocations:				Set<Location> = [],
+			possiblyUsedUndefinedLocations:	Set<Location> = [],
+			typeAssignments:				TypeAssignments = .init()
+		) {
+			self.conflicts						= conflicts
+			self.possiblyLiveLocations			= possiblyLiveLocations
+			self.definedLocations				= definedLocations
+			self.possiblyUsedUndefinedLocations	= possiblyUsedUndefinedLocations
+			self.typeAssignments				= typeAssignments
 		}
 		
 		/// The conflict set.
+		///
+		/// The conflict set grows while traversing a program in reverse order. A location that is defined conflicts with all locations (except itself) that are marked as possibly used at the time.
 		public private(set) var conflicts: ConflictSet
 		
 		/// The locations whose values are possibly used by a successor.
+		///
+		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used is added to the set.
 		public private(set) var possiblyLiveLocations: Set<Location>
+		
+		/// The locations that are defined by a successor.
+		///
+		/// This set grows while traversing a program (in either order). A location that is defined is added to this set.
+		public private(set) var definedLocations: Set<Location>
+		
+		/// The locations that are possibly used by a successor but not defined by a successor.
+		///
+		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used and not in `definedLocations` is added to the set.
+		///
+		/// An *undefined use* error is thrown during lowering if this set is nonempty at a push-scope effect's entry.
+		public private(set) var possiblyUsedUndefinedLocations: Set<Location>
+		
+		/// The type assignments of any locations used or defined by a successor.
+		public private(set) var typeAssignments: TypeAssignments
 		
 		/// Updates the analysis with information about an effect or predicate.
 		///
 		/// - Parameters:
-		///    - defined: The locations that are defined by the effect.
-		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.
-		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) where D.Element == Location, U.Element == Location {
+		///    - defined: The (typed) locations that are defined by the effect.
+		///    - possiblyUsed: The (typed) locations that are (possibly) used by the effect or predicate.    
+		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws where D.Element == TypedLocation, U.Element == TypedLocation {
+			
 			let possiblyLiveLocationsAtExit = possiblyLiveLocations
-			markAsDefinitelyDiscarded(defined)
-			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
-			for definedLocation in defined {
+			markAsDefinitelyDiscarded(defined.lazy.map(\.location))
+			markAsPossiblyUsedLater(possiblyUsed.lazy.map(\.location))	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
+			for definedLocation in defined.lazy.map(\.location) {
 				insertConflict(definedLocation, possiblyLiveLocationsAtExit)
 			}
+			
+			definedLocations.formUnion(defined.lazy.map(\.location))
+			
+			possiblyUsedUndefinedLocations.subtract(defined.lazy.map(\.location))
+			possiblyUsedUndefinedLocations.formUnion(Set(possiblyUsed.lazy.map(\.location)).subtracting(definedLocations))	// TODO: Optimise Set initialiser
+			
+			for location in defined {
+				try typeAssignments.insert(location)
+			}
+			for location in possiblyUsed {
+				try typeAssignments.insert(location)
+			}
+			
 		}
 		
 		/// Returns a copy of `self` with additional information about an effect or predicate applied to it.
 		///
 		/// - Parameters:
-		///    - defined: The locations that are defined by the effect.
-		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.
-		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) -> Self where D.Element == Location, U.Element == Location {
+		///    - defined: The (typed) locations that are defined by the effect.
+		///    - possiblyUsed: The (typed) locations that are (possibly) used by the effect or predicate.
+		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws -> Self where D.Element == TypedLocation, U.Element == TypedLocation {
 			var copy = self
-			copy.update(defined: defined, possiblyUsed: possiblyUsed)
+			try copy.update(defined: defined, possiblyUsed: possiblyUsed)
 			return copy
 		}
 		

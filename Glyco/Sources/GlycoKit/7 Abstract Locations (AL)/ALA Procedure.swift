@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, SimplyLowerable {
+	public struct Procedure : Codable, Equatable, SimplyLowerable, Optimisable {
 		
 		public init(_ name: Label, in effect: Effect) {
 			self.name = name
@@ -16,12 +16,15 @@ extension ALA {
 		/// The procedure's effect when invoked.
 		public var effect: Effect
 		
-		/// Optimises the procedure.
-		public mutating func optimise() {
+		// See protocol.
+		public mutating func optimise() throws -> Bool {
+			var coalesced = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
+				coalesced = true
 				var analysis = Analysis()
-				effect = effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
+				effect = try effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
 			}
+			return coalesced
 		}
 		
 		// See protocol.

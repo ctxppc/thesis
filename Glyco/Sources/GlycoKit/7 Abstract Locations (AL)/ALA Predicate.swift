@@ -45,8 +45,8 @@ extension ALA {
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
 		/// - Returns: A copy of `self` where any contained effects have been transformed using `transform` and with updated analysis at entry.
-		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis) -> Self {
-			analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
+		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis) throws -> Self {
+			try analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
 				case .constant(let holds, analysisAtEntry: _):
@@ -59,22 +59,22 @@ extension ALA {
 				do {
 					
 					var analysisAtAffirmativeEntry = analysis
-					let updatedAffirmative = affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = try affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
 					
-					let updatedNegative = negative.updated(using: transform, analysis: &analysis)
+					let updatedNegative = try negative.updated(using: transform, analysis: &analysis)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					let updatedCondition = condition.updated(using: transform, analysis: &analysis)
+					let updatedCondition = try condition.updated(using: transform, analysis: &analysis)
 					
 					return .if(updatedCondition, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					
 				}
 				
 				case .do(let effects, then: let predicate, analysisAtEntry: _):
-				return .do(
+				return try .do(
 					effects
 						.reversed()
-						.map { $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
+						.map { try $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
 						.reversed(),												// reverse back to normal order
 					then: predicate.updated(using: transform, analysis: &analysis),
 					analysisAtEntry: analysis
@@ -84,7 +84,7 @@ extension ALA {
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> Set<Location> {
+		private func possiblyUsedLocations() -> [TypedLocation] {
 			switch self {
 				
 				case .constant,
@@ -95,10 +95,13 @@ extension ALA {
 				
 				case .relation(.constant, _, .location(let location), analysisAtEntry: _),
 					.relation(.location(let location), _, .constant, analysisAtEntry: _):
-				return [location]
+				return [.init(location: location, dataType: .signedWord)]
 				
 				case .relation(.location(let lhs), _, .location(let rhs), analysisAtEntry: _):
-				return [lhs, rhs]
+				return [
+					.init(location: lhs, dataType: .signedWord),
+					.init(location: rhs, dataType: .signedWord)
+				]
 				
 			}
 		}
@@ -133,8 +136,8 @@ extension ALA {
 		///   - removedLocation: The location that is replaced by `retainedLocation`.
 		///   - retainedLocation: The location that remains.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) -> Self {
-			updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
+			try updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
 	}

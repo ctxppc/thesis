@@ -83,10 +83,7 @@ extension ALA.ConflictSet : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
-		var container = try decoder.unkeyedContainer()
-		while let conflict = try container.decodeIfPresent(ALA.Conflict.self) {
-			insert(conflict)
-		}
+		try self.init(decoder.singleValueContainer().decode([ALA.Conflict].self))
 	}
 	
 	public func encode(to encoder: Encoder) throws {

@@ -141,11 +141,11 @@ extension CD {
 		
 		// See protocol.
 		@discardableResult
-		public mutating func optimise() -> Bool {
+		public mutating func optimise() throws -> Bool {
 			switch self {
 				
 				case .do(var effects):
-				let optimised = effects.optimise()
+				let optimised = try effects.optimise()
 				self = .do(effects)
 				return optimised
 				
@@ -158,19 +158,19 @@ extension CD {
 				return true
 				
 				case .if(.constant(true), then: var affirmative, else: _):
-				affirmative.optimise()
+				try affirmative.optimise()
 				self = affirmative
 				return true
 				
 				case .if(.constant(false), then: _, else: var negative):
-				negative.optimise()
+				try negative.optimise()
 				self = negative
 				return true
 				
 				case .if(var predicate, then: var affirmative, else: var negative):
-				let conditionOptimised = predicate.optimise()
-				let affirmativeOptimised = affirmative.optimise()
-				let negativeOptimised = negative.optimise()
+				let conditionOptimised = try predicate.optimise()
+				let affirmativeOptimised = try affirmative.optimise()
+				let negativeOptimised = try negative.optimise()
 				self = .if(predicate, then: affirmative, else: negative)
 				return conditionOptimised || affirmativeOptimised || negativeOptimised
 				

@@ -468,6 +468,14 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.TypeAssignments</code></dt>
+	<dd><code>()</code></dd>
+	<dd><code>([TypedLocation])</code></dd>
+</dl>
+<dl>
+	<dt><code>ALA.TypedLocation</code></dt>
+</dl>
+<dl>
 	<dt><code>ALA.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
@@ -503,7 +511,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
-	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
+	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>, <strong>typeAssignments:</strong> TypeAssignments)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.ConflictSet</code></dt>
