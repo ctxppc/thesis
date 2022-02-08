@@ -28,8 +28,12 @@ public enum CD : Language {
 		}
 		
 		// See protocol.
+		public func validate() throws {
+			guard effect.returns else { throw LoweringError.someExecutionPathsDoNotTerminate }
+		}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			guard effect.allExecutionPathsTerminate else { throw LoweringError.someExecutionPathsDoNotTerminate }
 			var context = Context()
 			return .init(try (procedures + [.init(.programEntry, in: effect)]).lowered(in: &context))
 		}

@@ -38,14 +38,14 @@ extension ALA {
 		///
 		/// A push scope effect "defines" all callee-saved registers with the value from the previous scope. If nothing else is done, callee-saved registers will conflict with every location that is live at any point until the pop scope effect and will not be used for assignment.
 		///
-		/// To make the registers available for assignment, they should be copied into abstract locations after pushing the scope, and copied back into the register prior to popping the scope. The latter copy will cause the registers to be marked as definitely discarded between the two copies, thereby making them available for assignment. Any register not used for assignment will be coalesced with its abstract location, thereby eliding the copy effects to and from the abstract location.
+		/// To make callee-saved registers available for assignment, they should be copied into abstract locations after pushing the scope, and copied back into the register prior to popping the scope. The latter copy will cause the registers to be marked as definitely discarded between the two copies, thereby making them available for assignment. Any register not used for assignment will be coalesced with its abstract location, thereby eliding the copy effects to and from the abstract location.
 		case pushScope(analysisAtEntry: Analysis)
 		
 		/// Pops a scope from the scope stack, restoring any physical locations (registers and frame locations) previously saved using `pushScope`.
 		///
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		///
-		/// A pop scope effect "uses" the values of callee-saved registers, as defined during the preceding push scope effect so that it can "return" them to the previous scope. If those values were copied into abstract locations after their definition by the push scope effect, they must be copied back to the callee-saved registers before the pop scope effect, which will "use" them.
+		/// A pop scope effect "uses" the values of callee-saved registers, as defined during the preceding push scope effect so that it can "return" them to the previous scope. If those values were copied into abstract locations after their definition by the push scope effect, they should be copied back to the callee-saved registers before the pop scope effect so that the registers become available for other assignments.
 		case popScope(analysisAtEntry: Analysis)
 		
 		/// An effect that invokes the labelled procedure and uses given physical locations.
@@ -124,7 +124,7 @@ extension ALA {
 					try effects
 						.reversed()
 						.map { try $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
-						.reversed(),												// reverse back to normal order
+						.reversed(),													// reverse back to normal order
 					analysisAtEntry: analysis
 				)
 				

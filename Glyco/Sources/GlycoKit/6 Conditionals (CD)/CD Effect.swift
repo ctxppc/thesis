@@ -79,14 +79,14 @@ extension CD {
 			}
 		}
 		
-		/// A Boolean value indicating whether `self` is confirmed to have no effect.
+		/// A Boolean value indicating whether `self` is known to have no effect.
 		///
-		/// - Returns: `true` if `self` has no effect; `false` if it cannot be determined that `self` has no effect.
+		/// - Returns: `true` if `self` has no effect, or `false` if this cannot be determined.
 		var doesNothing: Bool {
 			switch self {
 				
 				case .do(let effects):
-				return effects.allSatisfy(\.doesNothing)
+				return effects.doesNothing
 				
 				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.doesNothing && negative.doesNothing
@@ -97,22 +97,22 @@ extension CD {
 			}
 		}
 		
-		/// A Boolean value indicating whether `self` always terminates the program or procedure.
+		/// A Boolean value indicating whether every execution path in `self` contains a return effect.
 		///
-		/// - Returns: `true` if `self` always terminates the program or procedure; `false` otherwise.
-		var allExecutionPathsTerminate: Bool {
+		/// - Returns: `true` if every execution path in `self` contains a return effect; `false` otherwise.
+		var returns: Bool {
 			switch self {
 				
 				case .do(let effects):
 				return effects
 						.reversed()	// optimisation: it's most likely at the end
-						.contains(where: \.allExecutionPathsTerminate)
+						.contains(where: \.returns)
 				
 				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
-				return affirmative.allExecutionPathsTerminate && negative.allExecutionPathsTerminate
+				return affirmative.returns && negative.returns
 				
 				case .return:
 				return true
@@ -204,12 +204,12 @@ extension CD {
 	
 }
 
-private extension RandomAccessCollection where Element == CD.Effect {
+fileprivate extension RandomAccessCollection where Element == CD.Effect {
 	
 	/// A Boolean value indicating whether the effects in `self` are confirmed to have no effect.
 	///
 	/// - Returns: `true` if the effects in `self` have no effect; `false` if it cannot be determined that the effects in `self` have no effect.
-	private var doesNothing: Bool {
+	var doesNothing: Bool {
 		allSatisfy(\.doesNothing)
 	}
 	

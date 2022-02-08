@@ -60,9 +60,8 @@ extension ALA {
 			}
 			
 			definedLocations.formUnion(defined.lazy.map(\.location))
-			
-			possiblyUsedUndefinedLocations.subtract(defined.lazy.map(\.location))
-			possiblyUsedUndefinedLocations.formUnion(Set(possiblyUsed.lazy.map(\.location)).subtracting(definedLocations))	// TODO: Optimise Set initialiser
+			possiblyUsedUndefinedLocations.formUnion(possiblyUsed.lazy.map(\.location))
+			possiblyUsedUndefinedLocations.subtract(definedLocations)
 			
 			for location in defined {
 				try typeAssignments.insert(location)
