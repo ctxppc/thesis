@@ -28,34 +28,30 @@ extension CC {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			
-			let assignments = parameterAssignments(in: context.configuration)
-			
-			let parameterLocationPairs = chain(
-				assignments.viaRegisters.map { ($0.parameter, Lower.Location.register($0.register)) },
-				assignments.viaCallFrame.map { ($0.parameter, Lower.Location.frame($0.location)) }
-			)
-			
-			let setArgumentLocations = parameterLocationPairs.map { parameter, location in
-				Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(location))
-			}
-			
-			@EffectBuilder<Lower.Effect>
-			var prologue: Lower.Effect {
+			.init(name, try .do {
+				
+				// Prepare new scope.
 				Lower.Effect.pushScope
-				// TODO
-			}
-			
-			return try .init(name, .do(
-				[
-					.push(.capability, .location(.register(.fp))),
-					.set(.capability, .register(.fp), to: .location(.register(.sp))),
-					
-				] + setArgumentLocations + [
-					effect.lowered(in: &context)
-				]
-			))
-			
+				
+				// Compute parameter assignments.
+				let assignments = parameterAssignments(in: context.configuration)
+				
+				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
+				for assignment in assignments.viaRegisters {
+					let parameter = assignment.parameter
+					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.register(assignment.register)))
+				}
+				
+				// Bind local names to frame-resident arguments.
+				for assignment in assignments.viaCallFrame {
+					let parameter = assignment.parameter
+					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.frame(assignment.location)))
+				}
+				
+				// Execute main effect.
+				try effect.lowered(in: &context)
+				
+			})
 		}
 		
 		/// Returns the assignments of the procedure's parameters to physical locations.

@@ -32,3 +32,12 @@ enum EffectBuilder<Effect : ComposableEffect> {
 	}
 	
 }
+
+extension ComposableEffect {
+	
+	/// Creates a value of type `Self` using `builder`.
+	static func `do`(@EffectBuilder<Self> _ builder: () throws -> Self) rethrows -> Self {
+		try builder()
+	}
+	
+}

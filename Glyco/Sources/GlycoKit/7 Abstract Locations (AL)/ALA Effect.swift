@@ -32,12 +32,16 @@ extension ALA {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int, analysisAtEntry: Analysis)
 		
-		/// Pushes a new scope (i.e., call frame) to the scope stack (i.e., call stack).
+		/// Pushes a new scope to the scope stack.
+		///
+		/// This effect protects callee-saved physical locations (registers and frame locations) from the previous scope that may be defined in the new scope.
 		///
 		/// This effect must be executed exactly once before any location defined in the current scope is accessed.
 		case pushScope(analysisAtEntry: Analysis)
 		
-		/// Pops a scope (i.e., call frame) from the scope stack (i.e., call stack).
+		/// Pops a scope from the scope stack.
+		///
+		/// This effect restores physical locations (registers and frame locations) previously saved using `pushScope(_:)`.
 		///
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope(analysisAtEntry: Analysis)
@@ -178,8 +182,8 @@ extension ALA {
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				return .pop(bytes: bytes, analysisAtEntry: analysis)
 				
-				case .pushScope(bytes: let bytes, analysisAtEntry: _):
-				return .pushScope(bytes: bytes, analysisAtEntry: analysis)
+				case .pushScope(analysisAtEntry: _):
+				return .pushScope(analysisAtEntry: analysis)
 				
 				case .popScope(analysisAtEntry: _):
 				return .popScope(analysisAtEntry: analysis)
@@ -208,7 +212,7 @@ extension ALA {
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.push(_, _, analysisAtEntry: let analysis),
 					.pop(bytes: _, analysisAtEntry: let analysis),
-					.pushScope(bytes: _, analysisAtEntry: let analysis),
+					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
 					.call(_, _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
