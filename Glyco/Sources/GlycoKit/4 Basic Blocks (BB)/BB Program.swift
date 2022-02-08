@@ -19,7 +19,7 @@ public enum BB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			.init(try blocks.lowered())
+			.init(try blocks.lowered())	// TODO: Implement optimal trace.
 		}
 		
 	}

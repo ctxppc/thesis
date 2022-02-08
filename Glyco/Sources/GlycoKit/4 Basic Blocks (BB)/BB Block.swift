@@ -41,6 +41,9 @@ extension BB {
 					return [.labelled(name, .branch(to: affirmative, lhs, relation, rhs)), .jump(to: negative)]
 				}
 				
+				case .call(let name, returnPoint: let returnPoint):
+				TODO.unimplemented
+				
 				case .return:
 				if let (first, tail) = try effects.lowered().splittingFirst() {
 					return [.labelled(name, first)] + tail + [.return]

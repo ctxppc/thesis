@@ -11,6 +11,9 @@ extension BB {
 		/// A continuation that jumps to the block labelled `then` if *x* *R* *y*, or to the block labelled `else` otherwise, where *x* is the value of the first source, *y* is the value of the second source, and *R* is the relation.
 		case branch(Source, BranchRelation, Source, then: Label, else: Label)
 		
+		/// A continuation that jumps to the procedure with given label then returns to the block labelled `returnPoint`.
+		case call(Label, returnPoint: Label)
+		
 		/// A continuation that returns to the caller, by jumping to the return capability.
 		case `return`
 		

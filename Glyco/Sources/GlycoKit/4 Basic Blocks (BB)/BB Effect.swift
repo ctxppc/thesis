@@ -37,7 +37,7 @@ extension BB {
 		case popFrame
 		
 		// See protocol.
-		public func lowered(in context: inout ()) -> [Lower.Effect] {
+		func lowered(in context: inout ()) -> [Lower.Effect] {
 			switch self {
 				
 				case .set(let type, let destination, to: let source):

@@ -69,12 +69,8 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .return:
+				case .set, .compute, .allocateVector, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
-				
-				case .call(let procedure):
-				guard exitLabel == .programExit else { throw LoweringError.effectAfterInvocation }
-				return [.init(name: entryLabel, do: previousEffects, then: .continue(to: procedure))]
 				
 			}
 		}
@@ -122,17 +118,14 @@ extension CD {
 		
 		enum LoweringError : LocalizedError {
 			
-			/// An error indicating that some execution paths contain an intermediate invocation effect.
-			case effectAfterInvocation
-			
 			/// An error indicating that some execution paths contain an intermediate return effect.
 			case effectAfterReturn
 			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
-					case .effectAfterInvocation:	return "Some execution paths contain an intermediate invocation effect."
-					case .effectAfterReturn:		return "Some execution paths contain an intermediate return effect."
+					case .effectAfterReturn:
+					return "Some execution paths contain an intermediate return effect."
 				}
 			}
 			
@@ -347,7 +340,9 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			)
 			
 			case .call(let procedure):
-			return [.init(name: entryLabel, do: previousEffects, then: .continue(to: procedure))]
+			let returnPoint = context.bag.uniqueName(from: "ret")
+			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
+				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			
 			case .return:
 			return [.init(name: entryLabel, do: previousEffects, then: .return)]
