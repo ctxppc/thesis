@@ -65,7 +65,7 @@ extension CF {
 			let temp = Lower.Register.t0
 			switch self {
 				
-				case .copy(.byte, into: let destination, from: let source):
+				case .copy(.byte, into: _, from: _):
 				TODO.unimplemented
 				
 				case .copy(.signedWord, into: let destination, from: let source):

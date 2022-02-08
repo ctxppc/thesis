@@ -18,7 +18,7 @@ extension ALA {
 		func lowered(in context: inout Context) throws -> Lower.Location {
 			switch self {
 				case .abstract(let location):	return location.lowered(in: &context)
-				case .register(let register):	return .register(try register.lowered())
+				case .register(let register):	return .register(register)
 				case .frame(let location):		return .frameCell(location)
 			}
 		}
@@ -55,7 +55,7 @@ extension ALA {
 			private var locationsByRegister = [Lower.Register : Set<Location>]()
 			
 			/// The frame on which spilled data are stored.
-			private var frame = Lower.Frame()
+			private(set) var frame = Lower.Frame()
 			
 			/// Adds an assignment for `location` and returns the assigned physical location.
 			@discardableResult

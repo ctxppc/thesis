@@ -8,6 +8,7 @@ extension ALA {
 	/// A mapping from locations to data types.
 	public struct TypeAssignments : Equatable {
 		
+		//sourcery: isInternalForm
 		/// Creates an empty mapping.
 		public init() {}
 		

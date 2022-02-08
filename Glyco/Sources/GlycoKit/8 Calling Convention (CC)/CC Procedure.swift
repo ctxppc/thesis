@@ -33,6 +33,8 @@ extension CC {
 				// Prepare new scope.
 				Lower.Effect.pushScope
 				
+				// TODO: Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
+				
 				// Compute parameter assignments.
 				let assignments = parameterAssignments(in: context.configuration)
 				
@@ -45,7 +47,7 @@ extension CC {
 				// Bind local names to frame-resident arguments.
 				for assignment in assignments.viaCallFrame {
 					let parameter = assignment.parameter
-					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.frame(assignment.location)))
+					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.frame(assignment.calleeLocation)))
 				}
 				
 				// Execute main effect.
@@ -71,8 +73,14 @@ extension CC {
 			
 			// Assign remaining parameters to the call frame, in reverse order to ensure stack order — cf. `Frame.addParameter(_:count:)`.
 			var frame = Lower.Frame()
+			var callerOffset = 0
 			while let parameter = parameters.popLast() {
-				assignments.viaCallFrame.append(.init(parameter: parameter, location: frame.addParameter(parameter.type)))
+				assignments.viaCallFrame.append(.init(
+					parameter:		parameter,
+					calleeLocation:	frame.addParameter(parameter.type),
+					callerOffset:	callerOffset
+				))
+				callerOffset += parameter.type.byteSize
 			}
 			assignments.viaCallFrame.reverse()	// ensure parameter order
 			

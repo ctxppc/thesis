@@ -42,5 +42,6 @@ public enum ALA : Language {
 	public typealias DataType = Lower.DataType
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
+	public typealias Register = Lower.Register
 	
 }

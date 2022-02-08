@@ -87,8 +87,8 @@ extension CC {
 					for (assignment, argument) in assignmentArgumentPairsViaFrame {
 						Lowered.setElement(
 							assignment.parameter.type,
-							of:	.register(.sp),
-							at:	.constant(assignment.location.offset),
+							of:	argumentsStructure,
+							at:	.constant(assignment.callerOffset),
 							to:	argument
 						)
 					}
@@ -99,7 +99,7 @@ extension CC {
 					}
 					
 					// Invoke procedure.
-					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) } + assignments.viaCallFrame.map { .frame($0.location) })
+					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) } + assignments.viaCallFrame.map { .frame($0.calleeLocation) })
 					
 					// Deallocate frame-resident arguments, if any.
 					if argumentsStructureSize > 0 {
