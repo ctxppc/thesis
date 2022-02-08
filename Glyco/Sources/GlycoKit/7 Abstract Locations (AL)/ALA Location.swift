@@ -73,7 +73,7 @@ extension ALA {
 			
 			/// Returns a register that `location` can be assigned to, or `nil` if no register is available.
 			private func assignableRegister(for location: AbstractLocation) -> Lower.Register? {
-				Lower.Register.assignableRegisters.first { register in
+				Lower.Register.defaultAssignableRegisters.first { register in
 					guard let assignedLocations = locationsByRegister[register] else { return true }
 					return !analysis.containsConflict(.abstract(location), assignedLocations)
 				}

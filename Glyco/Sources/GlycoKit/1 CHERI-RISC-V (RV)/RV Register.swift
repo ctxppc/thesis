@@ -8,6 +8,9 @@ extension RV {
 		/// The always-zero register.
 		case zero
 		
+		/// The return address register.
+		case ra
+		
 		/// The stack pointer register.
 		case sp
 		

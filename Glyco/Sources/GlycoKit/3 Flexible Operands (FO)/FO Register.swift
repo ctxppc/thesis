@@ -7,19 +7,28 @@ extension FO {
 	/// A machine register.
 	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {
 		
-		/// Registers that can be used for storing values.
+		/// The default set of registers that can be used for storing data.
 		///
 		/// The order is semantically insignificant but it's fixed to make assignment more deterministic.
-		static let assignableRegisters: OrderedSet = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6]
+		static let defaultAssignableRegisters: OrderedSet = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6]
 		
-		/// Registers that are by default used for passing arguments to procedures, in argument order.
+		/// The default set of registers that are used for passing arguments to procedures, in argument order.
 		public static let defaultArgumentRegisters = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
 		
-		/// Registers that can be used for passing results from procedures, in result value order.
-		static let resultRegisters: OrderedSet = [Self.a0, .a1]
+		/// The default set of registers that can be used for passing results from procedures, in result value order.
+		public static let defaultResultRegisters: OrderedSet = [Self.a0, .a1]
+		
+		/// The default set of registers that a procedure must discard or save before calling another procedure.
+		public static let defaultCallerSavedRegisters = defaultArgumentRegisters + [.ra, .t4, .t5, .t6]
+		
+		/// The default set of registers that a procedure must save before using.
+		public static let defaultCalleeSavedRegisters = [Self.fp, .s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
 		
 		/// The always-zero register.
 		case zero
+		
+		/// The return address register.
+		case ra
 		
 		/// The stack pointer register.
 		case sp
@@ -46,6 +55,7 @@ extension FO {
 		func lowered(in context: inout ()) -> Lower.Register {
 			switch self {
 				case .zero:	return .zero
+				case .ra:	return .ra
 				case .sp:	return .sp
 				case .fp:	return .fp
 				case .s1:	return .s1
@@ -71,30 +81,6 @@ extension FO {
 				case .t5:	return .t5
 				case .t6:	return .t6
 			}
-		}
-		
-		/// The party that must save `self` before or after a function invocation.
-		var saver: Saver {
-			switch self {
-				case .zero, .sp:											return .nobody
-				case .fp, .s1:												return .callee
-				case .a0, .a1, .a2, .a3, .a4, .a5, .a6, .a7:				return .caller
-				case .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11:	return .callee
-				case .t4, .t5, .t6:											return .caller
-			}
-		}
-		
-		enum Saver {
-			
-			/// The caller must save this register before invoking a function.
-			case caller
-			
-			/// The callee must save this register before using it.
-			case callee
-			
-			/// This register cannot be used as a location and therefore does not need saving before or after invocation.
-			case nobody
-			
 		}
 		
 	}

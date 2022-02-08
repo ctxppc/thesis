@@ -114,10 +114,12 @@ extension CC {
 				}
 				
 				case .return(let type, let result):
-				Lowered.set(type, .register(.a0), to: try result.lowered(in: &context))
-				// TODO: Write callee-saved register locations back to registers (inverse of prologue sequence).
-				Lowered.popScope
-				Lowered.return
+				do {
+					Lowered.set(type, .register(.a0), to: try result.lowered(in: &context))
+					// TODO: Copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
+					Lowered.popScope
+					Lowered.return
+				}
 				
 			}
 		}
