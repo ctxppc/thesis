@@ -132,6 +132,12 @@ extension CD {
 		}
 		
 		// See protocol.
+		var subeffects: [Self]? {
+			guard case .do(let subeffects) = self else { return nil }
+			return subeffects
+		}
+		
+		// See protocol.
 		@discardableResult
 		public mutating func optimise() throws -> Bool {
 			switch self {
@@ -168,27 +174,6 @@ extension CD {
 				
 				default:
 				return false
-				
-			}
-		}
-		
-		/// Flattens nested `do` effects in `self`.
-		func flattened() -> Self {
-			switch self {
-				
-				case .do(effects: let effects):
-				return .do(effects.flatMap { subeffect -> [Effect] in
-					switch subeffect.flattened() {
-						case .do(let nested):	return nested
-						case let flattened:		return [flattened]
-					}
-				})
-				
-				case .if(let predicate, then: let affirmative, else: let negative):
-				return .if(predicate, then: affirmative.flattened(), else: negative.flattened())
-				
-				default:
-				return self
 				
 			}
 		}

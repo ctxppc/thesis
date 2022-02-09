@@ -17,14 +17,7 @@ extension EX {
 		/// A predicate that evaluates to given predicate after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Predicate)
 		
-		/// Lowers `self` to an effect in the lower language.
-		///
-		/// - Parameters:
-		///   - context: The context wherein to lower `self`.
-		///   - affirmative: The effect to execute when `self` holds.
-		///   - negative: The effect to execute when `self` doesn't hold.
-		///
-		/// - Returns: An effect in the lower language implementing `self`.
+		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Predicate {
 			switch self {
 				

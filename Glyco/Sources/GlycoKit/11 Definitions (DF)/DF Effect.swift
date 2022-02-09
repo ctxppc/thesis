@@ -32,6 +32,12 @@ extension DF {
 			}
 		}
 		
+		// See protocol.
+		var subeffects: [Self]? {
+			guard case .do(let subeffects) = self else { return nil }
+			return subeffects
+		}
+		
 	}
 	
 }
