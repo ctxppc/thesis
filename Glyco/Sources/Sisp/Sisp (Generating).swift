@@ -42,7 +42,7 @@ extension Sisp {
 			
 			serialisation.write(.leadingParenthesis)
 			
-			if let (head, (_, last)) = children.elements.splittingLast() {
+			if let (head, last) = children.elements.splittingLast() {
 				if hasMultilineSerialisation() {
 					
 					serialisation.beginIndentedLine()
@@ -52,7 +52,7 @@ extension Sisp {
 						serialisation.write(.separator)
 						serialisation.beginLine()
 					}
-					last.serialise(into: &serialisation)
+					serialise(last)
 					
 					serialisation.beginOutdentedLine()
 					
@@ -62,7 +62,7 @@ extension Sisp {
 						serialisation.write(.separator)
 						serialisation.writeSpace()
 					}
-					last.serialise(into: &serialisation)
+					serialise(last)
 				}
 			}
 			
