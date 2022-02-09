@@ -47,8 +47,8 @@ extension Sisp {
 					
 					serialisation.beginIndentedLine()
 					
-					for (_, element) in head {
-						element.serialise(into: &serialisation)
+					for child in head {
+						serialise(child)
 						serialisation.write(.separator)
 						serialisation.beginLine()
 					}
@@ -57,8 +57,8 @@ extension Sisp {
 					serialisation.beginOutdentedLine()
 					
 				} else {
-					for (_, element) in head {
-						element.serialise(into: &serialisation)
+					for child in head {
+						serialise(child)
 						serialisation.write(.separator)
 						serialisation.writeSpace()
 					}
