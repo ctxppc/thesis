@@ -41,13 +41,7 @@ final class GenerationTests : XCTestCase {
 		
 		let actual = sisp.serialised()
 		let expected = """
-			person(
-				name: John,
-				kids:
-					Bob
-					Sarah
-			)
-			person(name: Ellis, kids: )
+			person(name: John, kids: Bob Sarah) person(name: Ellis, kids: )
 			"""
 		
 		XCTAssertEqual(actual, expected)
@@ -64,13 +58,7 @@ final class GenerationTests : XCTestCase {
 		
 		let actual = sisp.serialised()
 		let expected = """
-			app(
-				name: Glyco,
-				categories:
-					"Developer Tools"
-					Productivity,
-				price: 99999
-			)
+			app(name: Glyco, categories: "Developer Tools" Productivity, price: 99999)
 			"""
 		
 		XCTAssertEqual(actual, expected)
@@ -86,13 +74,26 @@ final class GenerationTests : XCTestCase {
 		
 		let actual = sisp.serialised()
 		let expected = """
+			topics(interesting: Compilers "Type Theory", boring: Blockchain "whatever the f Web3 is")
+			"""
+		
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
+	func testTightLists() {
+		
+		let sisp = Sisp.structure(type: "topics", children: [
+			"interesting":	["Compilers", "Type Theory"],
+			"boring":		["Blockchain", "whatever the f Web3 is"],
+		])
+		
+		let actual = sisp.serialised(maxLineLength: 25)
+		let expected = """
 			topics(
-				interesting:
-					Compilers
-					"Type Theory",
-				boring:
-					Blockchain
-					"whatever the f Web3 is"
+				interesting: Compilers
+				"Type Theory",
+				boring: Blockchain "whatever the f Web3 is"
 			)
 			"""
 		
@@ -115,13 +116,7 @@ final class GenerationTests : XCTestCase {
 		
 		let actual = sisp.serialised()
 		let expected = """
-			fruit(
-				
-					apples
-					bananas
-					cherries
-					grapes(colour: green)
-			)
+			fruit(apples bananas cherries grapes(colour: green))
 			"""
 		
 		XCTAssertEqual(actual, expected)
