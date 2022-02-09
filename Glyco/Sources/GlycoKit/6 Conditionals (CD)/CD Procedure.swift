@@ -18,9 +18,7 @@ extension CD {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> [Lower.Block] {
-			try effect
-				.flattened()
-				.lowered(in: &context, entryLabel: name, previousEffects: [], exitLabel: .programExit)
+			try effect.lowered(in: &context, entryLabel: name, previousEffects: [], exitLabel: .programExit)
 		}
 		
 		// See protocol.

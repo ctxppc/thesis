@@ -16,71 +16,73 @@ extension Sisp {
 	/// Serialises `self` to `serialisation`.
 	private func serialise(into serialisation: inout Serialisation) {
 		
-		func serialise(label: Label, child: Self, isMultilineStructure: Bool, isLast: Bool) {
-			if isMultilineStructure {
-				if child.hasMultilineSerialisation() {
-					serialisation.write(.lexeme(for: label), then: .indentedNewline)
-					child.serialise(into: &serialisation)
-					if isLast {
-						serialisation.write(.outdentedNewline)
-					} else {
-						serialisation.write(.separator, then: .outdentedNewline)
-					}
-				} else {
-					serialisation.write(.lexeme(for: label), then: .spaceOrNewline)
-					child.serialise(into: &serialisation)
-					if isLast {
-						serialisation.write(.newline())
-					} else {
-						serialisation.write(.separator, then: .newline())
-					}
-				}
-			} else {
-				serialisation.write(.lexeme(for: label), then: .spaceOrNewline)
-				child.serialise(into: &serialisation)
-				if !isLast {
-					serialisation.write(.separator, then: .spaceOrNewline)
-				}
+		func serialiseList(_ elements: [Sisp]) {
+			guard let (head, last) = elements.splittingLast() else { return }
+			let multiline = hasMultilineSerialisation()
+			for element in head {
+				element.serialise(into: &serialisation)
+				multiline ? serialisation.beginLine() : serialisation.writeSpace()
 			}
+			last.serialise(into: &serialisation)
 		}
 		
-		func serialiseStructureChildren(_ children: StructureChildren, isMultilineStructure: Bool) {
-			guard let (children, (label, child)) = children.elements.splittingLast() else { return }
-			for (label, child) in children {
-				serialise(label: label, child: child, isMultilineStructure: isMultilineStructure, isLast: false)
+		func serialise(_ child: StructureChild) {
+			if let label = Lexeme.lexeme(for: child.0) {
+				serialisation.write(label)
+				serialisation.writeSpace()
 			}
-			serialise(label: label, child: child, isMultilineStructure: isMultilineStructure, isLast: true)
+			child.1.serialise(into: &serialisation)
+		}
+		
+		func serialiseStructure(type: String?, children: StructureChildren) {
+			
+			if let type = type {
+				serialisation.write(.lexeme(for: type))
+			}
+			
+			serialisation.write(.leadingParenthesis)
+			
+			if let (head, (_, last)) = children.elements.splittingLast() {
+				if hasMultilineSerialisation() {
+					
+					serialisation.beginIndentedLine()
+					
+					for (_, element) in head {
+						element.serialise(into: &serialisation)
+						serialisation.write(.separator)
+						serialisation.beginLine()
+					}
+					last.serialise(into: &serialisation)
+					
+					serialisation.beginOutdentedLine()
+					
+				} else {
+					for (_, element) in head {
+						element.serialise(into: &serialisation)
+						serialisation.write(.separator)
+						serialisation.writeSpace()
+					}
+					last.serialise(into: &serialisation)
+				}
+			}
+			
+			serialisation.write(.trailingParenthesis)
+			
 		}
 		
 		switch self {
 			
 			case .integer(let value):
-			serialisation.write(.integer(value), then: nil)
+			serialisation.write(.integer(value))
 			
 			case .string(let value):
-				serialisation.write(.lexeme(for: value), then: nil)
+			serialisation.write(.lexeme(for: value))
 			
 			case .list(let elements):
-			guard let (elements, last) = elements.splittingLast() else { return }
-			for element in elements {
-				element.serialise(into: &serialisation)
-				serialisation.write(.newline())
-			}
-			last.serialise(into: &serialisation)
-			
-			case .structure(type: let type, children: let children) where hasMultilineSerialisation():
-			serialisation.write(type.map { .lexeme(for: $0) }, then: nil)
-			serialisation.write(.leadingParenthesis, then: nil)
-			serialisation.write(.indentedNewline)
-			serialiseStructureChildren(children, isMultilineStructure: true)
-			serialisation.write(.outdentedNewline)
-			serialisation.write(.trailingParenthesis, then: nil)
+			serialiseList(elements)
 			
 			case .structure(type: let type, children: let children):
-			serialisation.write(type.map { .lexeme(for: $0) }, then: nil)
-			serialisation.write(.leadingParenthesis, then: nil)
-			serialiseStructureChildren(children, isMultilineStructure: false)
-			serialisation.write(.trailingParenthesis, then: nil)
+			serialiseStructure(type: type, children: children)
 			
 		}
 		
@@ -88,24 +90,30 @@ extension Sisp {
 	
 	private struct Serialisation {
 		
-		/// The serialised representation.
-		private var serialised = ""
+		/// The previous lines.
+		private var previousLines = [Line]()
 		
-		/// The indentation to use per level.
-		private let indentation = "\t"
+		/// The current line.
+		private var currentLine = Line()
 		
-		/// The level of indentation.
-		private var indentationLevel = 0 {
-			willSet { precondition(indentationLevel >= 0, "Indentation level must be nonnegative") }
-		}
-		
-		/// A value indicating what kind of whitespace is required after the last lexeme.
-		private var requiredTrailingWhitespace: Whitespace?
-		enum Whitespace {
-			case spaceOrNewline
-			case newline(indentationChange: Int = 0)
-			static var indentedNewline: Self { .newline(indentationChange: 1) }
-			static var outdentedNewline: Self { .newline(indentationChange: -1) }
+		private struct Line {
+			
+			/// The line's indentation level.
+			var indentationLevel = 0 {
+				willSet { precondition(indentationLevel >= 0, "Indentation level must be nonnegative") }
+			}
+			
+			/// The line's text, without indentation.
+			var text: String = ""
+			
+			/// Returns the string representation of `self`.
+			func stringRepresentation(depth: Int, indentation: String) -> String {
+				let indentation = (0..<(indentationLevel + depth))
+					.map { _ in indentation }
+					.joined()
+				return "\(indentation)\(text)"
+			}
+			
 		}
 		
 		/// Writes a lexeme in the serialisation.
@@ -113,58 +121,41 @@ extension Sisp {
 		/// - Parameters:
 		///   - lexeme: The lexeme to write, or `nil` to write no lexeme.
 		///   - trailingWhitespace: The kind of whitespace that is required after the lexeme, or `nil` if no whitespace is required.
-		mutating func write(_ lexeme: Lexeme?, then trailingWhitespace: Whitespace?) {
-			
-			switch requiredTrailingWhitespace {
-				
-				case nil:
-				break
-				
-				case .spaceOrNewline?:
-				serialised += " "
-				requiredTrailingWhitespace = nil
-				
-				case .newline(indentationChange: let change)?:
-				indentationLevel += change
-				serialised += "\n" + indentation.cycled(times: indentationLevel)
-				requiredTrailingWhitespace = nil
-				
-			}
-			
-			if let lexeme = lexeme {
-				serialised += "\(lexeme)"
-			}
-			
-			if let whitespace = trailingWhitespace {
-				write(whitespace)
-			}
-			
+		mutating func write(_ lexeme: Lexeme) {
+			currentLine.text += "\(lexeme)"
 		}
 		
-		/// Writes whitespace in the serialisation.
-		///
-		/// To keep the serialisation trimmed and to avoid redundant whitespace, the whitespace is only effectively added just before the next lexeme is written.
-		mutating func write(_ whitespace: Whitespace) {
-			switch (requiredTrailingWhitespace, whitespace) {
-				
-				case (nil, _), (.spaceOrNewline, _):
-				requiredTrailingWhitespace = whitespace
-				
-				case (.newline, .spaceOrNewline):
-				break
-				
-				case (.newline(indentationChange: let d1), .newline(indentationChange: let d2)):
-				requiredTrailingWhitespace = .newline(indentationChange: d1 + d2)
-				
-			}
+		/// Writes a horizontal space character in the serialisation.
+		mutating func writeSpace() {
+			currentLine.text += " "
+		}
+		
+		/// Begins a line with the same indentation level.
+		mutating func beginLine() {
+			previousLines.append(currentLine)
+			currentLine.text = ""
+		}
+		
+		/// Begins a line with a deeper indentation level.
+		mutating func beginIndentedLine() {
+			beginLine()
+			currentLine.indentationLevel += 1
+		}
+		
+		/// Begins a line with a less deep indentation level.
+		mutating func beginOutdentedLine() {
+			beginLine()
+			currentLine.indentationLevel -= 1
 		}
 		
 		/// Returns the serialisation.
 		///
 		/// - Requires: Every `indent()` is balanced with an `outdent()`.
-		mutating func serialisation() -> String {
-			precondition(indentationLevel == 0, "Cannot finalise serialisation with indentation")
-			return serialised
+		func serialisation(indentation: String = "\t") -> String {
+			chain(previousLines, [currentLine])
+				.lazy
+				.map { $0.stringRepresentation(depth: 0, indentation: indentation) }
+				.joined(separator: "\n")
 		}
 		
 	}
@@ -173,7 +164,7 @@ extension Sisp {
 	private func hasMultilineSerialisation() -> Bool {
 		switch self {
 			case .integer, .string:						return false
-			case .list(let elements):					return elements.count >= 2
+			case .list(let elements):					return elements.count >= 2 || elements.contains(where: { $0.hasMultilineSerialisation() })
 			case .structure(type: _, children: let c):	return c.values.contains(where: { $0.hasMultilineSerialisation() })
 		}
 	}

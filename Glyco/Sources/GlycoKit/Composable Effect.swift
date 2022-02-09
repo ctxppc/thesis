@@ -21,7 +21,7 @@ enum EffectBuilder<Effect : ComposableEffect> {
 	}
 	
 	static func buildArray(_ effects: [Effect]) -> Effect {
-		.do(effects).flattened2()
+		.do(effects).flattened()
 	}
 	
 	static func buildOptional(_ effect: Effect?) -> Effect {
@@ -46,9 +46,9 @@ extension ComposableEffect {
 	}
 	
 	/// Returns a copy of `self` where no `do` effect is directly nested in another `do` effect.
-	fileprivate func flattened2() -> Self {
+	fileprivate func flattened() -> Self {
 		guard let subeffects = subeffects else { return self }
-		let flattenedSubeffects = subeffects.map { $0.flattened2() }
+		let flattenedSubeffects = subeffects.map { $0.flattened() }
 		if let (subeffect, tail) = flattenedSubeffects.splittingFirst(), tail.isEmpty {
 			return subeffect
 		} else {
