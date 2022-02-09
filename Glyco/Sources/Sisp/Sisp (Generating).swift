@@ -164,8 +164,8 @@ extension Sisp {
 	private func hasMultilineSerialisation() -> Bool {
 		switch self {
 			case .integer, .string:						return false
-			case .list(let elements):					return elements.count >= 2 || elements.contains(where: { $0.hasMultilineSerialisation() })
-			case .structure(type: _, children: let c):	return c.values.contains(where: { $0.hasMultilineSerialisation() })
+			case .list(let elements):					return elements.count >= 3 || elements.contains(where: { $0.hasMultilineSerialisation() })
+			case .structure(type: _, children: let c):	return c.count >= 3 || c.values.contains(where: { $0.hasMultilineSerialisation() })
 		}
 	}
 	
