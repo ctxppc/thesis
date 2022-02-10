@@ -5,7 +5,7 @@ import Foundation
 extension ALA {
 	
 	/// A data type that can be inferred from context.
-	public enum InferrableDataType : Codable, Equatable {
+	public enum InferrableDataType : String, Codable, Equatable {
 		
 		/// Converts given concrete type to an inferrable concrete type.
 		init(_ concrete: DataType) {
@@ -28,6 +28,16 @@ extension ALA {
 		/// An 8-byte capability.
 		case capability
 		
+		/// The concrete type of `self`, or `nil` if it is to be inferred.
+		var concreteType: DataType? {
+			switch self {
+				case .inferred:		return nil
+				case .byte:			return .byte
+				case .signedWord:	return .signedWord
+				case .capability:	return .capability
+			}
+		}
+		
 		/// Infers a concrete data type.
 		///
 		/// - Parameters:
@@ -36,12 +46,7 @@ extension ALA {
 		///
 		/// - Returns: A concrete data type representing `self`.
 		func lowered<Locations : Collection>(in context: Context, associatedWith locations: Locations) throws -> Lower.DataType where Locations.Element == Location {
-			switch self {
-				case .inferred:		return try context.assignments.type(of: locations)
-				case .byte:			return .byte
-				case .signedWord:	return .signedWord
-				case .capability:	return .capability
-			}
+			try concreteType ?? context.assignments.type(of: locations)
 		}
 		
 		/// Infers a concrete data type.

@@ -27,7 +27,7 @@ extension AL {
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source)
+		case push(InferrableDataType, Source)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)

@@ -11,7 +11,7 @@ extension CC {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source)
+		case set(InferrableDataType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -20,10 +20,10 @@ extension CC {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		case getElement(InferrableDataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		case setElement(InferrableDataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -43,7 +43,7 @@ extension CC {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let type, let location, to: let source):
-				Lowered.set(.init(type), .abstract(location), to: try source.lowered(in: &context))
+				Lowered.set(type, .abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
@@ -52,10 +52,10 @@ extension CC {
 				Lowered.allocateVector(type, count: count, into: .abstract(vector))
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				Lowered.getElement(.init(type), of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
+				Lowered.getElement(type, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				try Lowered.setElement(.init(type), of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				try Lowered.setElement(type, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

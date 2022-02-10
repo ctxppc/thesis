@@ -27,7 +27,7 @@ extension ALA {
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source, analysisAtEntry: Analysis)
+		case push(InferrableDataType, Source, analysisAtEntry: Analysis)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int, analysisAtEntry: Analysis)
@@ -99,7 +99,7 @@ extension ALA {
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let dataType, let source, analysisAtEntry: _):
-				Lowered.push(dataType, try source.lowered(in: &context))
+				try Lowered.push(dataType.lowered(in: context, associatedWith: source.location), source.lowered(in: &context))
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				Lowered.pop(bytes: bytes)
@@ -245,7 +245,7 @@ extension ALA {
 				
 				case .set(let type, let destination, to: _, analysisAtEntry: _),
 					.getElement(let type, of: _, at: _, to: let destination, analysisAtEntry: _):
-				return [.init(location: destination, dataType: type)]
+				return [.init(location: destination, dataType: type.concreteType)]
 				
 				case .compute(_, _, _, to: let destination, analysisAtEntry: _):
 				return [.init(location: destination, dataType: .signedWord)]
@@ -276,7 +276,7 @@ extension ALA {
 				
 				case .set(let type, _, to: .location(let source), analysisAtEntry: _),
 					.push(let type, .location(let source), analysisAtEntry: _):
-				return [.init(location: source, dataType: type)]
+				return [.init(location: source, dataType: type.concreteType)]
 				
 				case .compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
 					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _):

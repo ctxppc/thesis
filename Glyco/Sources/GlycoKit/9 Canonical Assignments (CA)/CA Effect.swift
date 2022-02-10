@@ -32,19 +32,19 @@ extension CA {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: .source(let source)):
-				Lowered.set(.signedWord, destination, to: source)	// FIXME: Let AL infer data type?
+				Lowered.set(.inferred, destination, to: source)
 				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
 				Lowered.compute(lhs, op, rhs, to: destination)
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
-				Lowered.getElement(.signedWord, of: vector, at: index, to: destination)
+				Lowered.getElement(.inferred, of: vector, at: index, to: destination)	// FIXME: Typed vectors?
 				
 				case .set(let destination, to: .vector(let dataType, count: let count)):
 				Lowered.allocateVector(dataType, count: count, into: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(.signedWord, of: vector, at: index, to: element)	// FIXME: Typed vectors?
+				Lowered.setElement(.inferred, of: vector, at: index, to: element)	// FIXME: Typed vectors?
 				
 				case .call(let name, let arguments, result: let result):
 				Lowered.call(name, arguments, result: result)
