@@ -16,8 +16,10 @@ struct Bag<NameType : Name> {
 	
 	mutating func uniqueName(from prefix: String) -> NameType {
 		
-		let prefix = prefix.split(separator: "$", maxSplits: 1, omittingEmptySubsequences: true).first.map(String.init) ?? prefix
-		usesByPrefix[prefix, default: 0] += 1
+		let prefix = prefix
+			.split(separator: "$", maxSplits: 1, omittingEmptySubsequences: true)
+			.first
+			.map(String.init) ?? prefix
 		
 		if let uses = usesByPrefix[prefix] {
 			defer { usesByPrefix[prefix] = uses + 1 }

@@ -10,7 +10,13 @@ extension LS {
 		
 		/// Returns the location associated for given symbol.
 		mutating func location(for symbol: Symbol) -> Lower.Location {
-			locationsBySymbol[symbol, default: bag.uniqueName(from: symbol.rawValue)]
+			if let location = locationsBySymbol[symbol] {
+				return location
+			} else {
+				let location = bag.uniqueName(from: symbol.rawValue)
+				locationsBySymbol[symbol] = location
+				return location
+			}
 		}
 		
 		/// The location bag.

@@ -3,7 +3,7 @@
 import Foundation
 import Sisp
 
-public protocol Program : Codable, Equatable, Optimisable {
+public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertible {
 	
 	/// Validates `self`.
 	func validate() throws
@@ -102,6 +102,14 @@ extension Program {
 			.encode(self)
 			.serialised()
 			.write(to: url, atomically: false, encoding: .utf8)
+	}
+	
+	public var description: String {
+		do {
+			return try SispEncoder().encode(self).serialised()
+		} catch {
+			return "Could not serialise program: \(error)"
+		}
 	}
 	
 }

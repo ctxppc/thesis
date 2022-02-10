@@ -24,7 +24,7 @@ extension CC {
 			if let location = calleeSaveLocationByRegister[register] {
 				return location
 			} else {
-				let location = locations.uniqueName(from: "saved_\(register.rawValue)")
+				let location = locations.uniqueName(from: "saved\(register.rawValue.uppercased())")
 				calleeSaveLocationByRegister[register] = location
 				return location
 			}
