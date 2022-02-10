@@ -47,13 +47,24 @@ extension ComposableEffect {
 	
 	/// Returns a copy of `self` where no `do` effect is directly nested in another `do` effect.
 	fileprivate func flattened() -> Self {
+		
 		guard let subeffects = subeffects else { return self }
-		let flattenedSubeffects = subeffects.map { $0.flattened() }
-		if let (subeffect, tail) = flattenedSubeffects.splittingFirst(), tail.isEmpty {
+		
+		let effects = subeffects.flatMap { subeffect -> [Self] in
+			let flattened = subeffect.flattened()
+			if let nestedEffects = flattened.subeffects {
+				return nestedEffects
+			} else {
+				return [flattened]
+			}
+		}
+		
+		if let (subeffect, tail) = effects.splittingFirst(), tail.isEmpty {
 			return subeffect
 		} else {
-			return .do(subeffects)
+			return .do(effects)
 		}
+		
 	}
 	
 }
