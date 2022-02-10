@@ -54,9 +54,13 @@ A program written in some language `XY` should be stored in a file with extensio
 	<dt><code>idstart</code></dt>
 	<dd>A character from Unicode General Category L* or M*.</dd>
 	<dd><kbd>_</kbd></dd>
+	<dd><kbd>$</kbd></dd>
+	<dd><kbd>%</kbd></dd>
 	<dt><code>idtail</code></dt>
 	<dd>A character from Unicode General Category L*, M*, or N*.</dd>
 	<dd><kbd>_</kbd></dd>
+	<dd><kbd>$</kbd></dd>
+	<dd><kbd>%</kbd></dd>
 </dl>
 
 
