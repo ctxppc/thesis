@@ -348,7 +348,6 @@ A language that introduces parameters & result values in procedures via the low-
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
-<code>InferrableDataType</code>, 
 <code>Label</code>, 
 <code>Location</code>
 <dl>
@@ -377,11 +376,11 @@ A language that introduces parameters & result values in procedures via the low-
 <dl>
 	<dt><code>CC.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(InferrableDataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -401,11 +400,11 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>Context</code>, 
 <code>DataType</code>, 
 <code>Frame</code>, 
-<code>InferrableDataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>Source</code>
+<code>Source</code>, 
+<code>TypeAssignments</code>
 <dl>
 	<dt><code>AL.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -419,18 +418,18 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 	<dt><code>AL.Procedure</code></dt>
-	<dd><code>(Label, Effect)</code></dd>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>AL.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(InferrableDataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(InferrableDataType, Source)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -470,13 +469,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.InferrableDataType</code></dt>
-	<dd><code><strong>inferred</strong></code></dd>
-	<dd><code><strong>byte</strong></code></dd>
-	<dd><code><strong>signedWord</strong></code></dd>
-	<dd><code><strong>capability</strong></code></dd>
-</dl>
-<dl>
 	<dt><code>ALA.TypeAssignments</code></dt>
 	<dd><code>([TypedLocation])</code></dd>
 </dl>
@@ -488,13 +480,13 @@ A language that introduces abstract locations, annotated with liveness and confl
 <dl>
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>set</strong>(InferrableDataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>getElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>setElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>push</strong>(InferrableDataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>push</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>

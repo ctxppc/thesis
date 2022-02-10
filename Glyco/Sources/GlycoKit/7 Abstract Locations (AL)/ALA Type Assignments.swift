@@ -22,6 +22,32 @@ extension ALA {
 		/// A mapping from locations to data types.
 		private var typesByLocation = [Location : DataType]()
 		
+		/// Accesses the type for given location.
+		public subscript (location: Location) -> DataType {
+			get throws {
+				guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
+				return type
+			}
+		}
+		
+		/// Accesses the type for given location.
+		public subscript (source: Source) -> DataType {
+			get throws {
+				switch source {
+					case .constant:					return .signedWord
+					case .location(let location):	return try self[location]
+				}
+			}
+		}
+		
+		/// Assigns given type to given location.
+		public mutating func assign(_ newType: DataType, to location: Location) throws {
+			let previousType = typesByLocation.updateValue(newType, forKey: location)
+			if let previousType = previousType, previousType != newType {
+				throw TypeError.inconsistentTyping(location, previousType, newType)
+			}
+		}
+		
 		/// Inserts given typed location to the assignment.
 		///
 		/// - Throws: An inconsistent typing error if `self` contains a type for the same location that is different than `typedLocation`'s type.
@@ -40,14 +66,22 @@ extension ALA {
 		
 		enum TypeError : LocalizedError {
 			
+			/// An error indicating that the type of given location cannot be determined.
+			case unknownType(Location)
+			
 			/// An error indicating that given locations is simultaneously bound to two given different data types.
 			case inconsistentTyping(Location, DataType, DataType)
 			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
+					
+					case .unknownType(let location):
+					return "No known type for “\(location)”"
+					
 					case .inconsistentTyping(let location, let firstType, let otherType):
 					return "“\(location)” is simultaneously typed \(firstType) and \(otherType)"
+					
 				}
 			}
 			

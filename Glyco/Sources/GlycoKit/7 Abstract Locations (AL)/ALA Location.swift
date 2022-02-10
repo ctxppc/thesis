@@ -54,20 +54,6 @@ extension ALA {
 				return type
 			}
 			
-			/// Determines the type of `locations`.
-			///
-			/// - Requires: `locations` contains at least one abstract location.
-			func type<Locations : Collection>(of locations: Locations) throws -> DataType where Locations.Element == Location {
-				guard let type = locations
-						.lazy
-						.compactMap({ location -> TypedLocation? in
-							return analysisAtScopeEntry.typeAssignments[location]
-						})
-						.first?
-						.dataType else { throw AssignmentError.unknownType(locations.first !! "Cannot determine type of no locations") }
-				return type
-			}
-			
 			/// The analysis at the scope's entry.
 			let analysisAtScopeEntry: Analysis
 			

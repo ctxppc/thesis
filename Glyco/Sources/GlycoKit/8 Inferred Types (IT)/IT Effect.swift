@@ -1,15 +1,15 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension AL {
+extension IT {
 	
-	/// An effect on an AL machine.
+	/// An effect on an IT machine.
 	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source)
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -18,16 +18,16 @@ extension AL {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		case getElement(of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		case setElement(of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source)
+		case push(Source)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
@@ -55,52 +55,52 @@ extension AL {
 		case `return`
 		
 		// See protocol.
+		@EffectBuilder<Lower.Effect>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
+			let type = DataType.signedWord	// TODO
 			switch self {
 				
 				case .do(let effects):
-				return .do(try effects.lowered(in: &context), analysisAtEntry: .init())
+				Lowered.do(try effects.lowered(in: &context))
 				
-				case .set(let type, let destination, to: let source):
-				return .set(type, destination, to: source, analysisAtEntry: .init())
+				case .set(let destination, to: let source):
+				let type = try context.typeAssignments[source]
+				Lowered.set(type, destination, to: source)
+				try context.typeAssignments.assign(type, to: destination)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: .init())
+				Lowered.compute(lhs, operation, rhs, to: destination)
+				try context.typeAssignments.assign(.signedWord, to: destination)
 				
 				case .allocateVector(let type, count: let count, into: let vector):
-				return .allocateVector(type, count: count, into: vector, analysisAtEntry: .init())
+				Lowered.allocateVector(type, count: count, into: vector)	// TODO: Compound types
 				
-				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				return .getElement(type, of: vector, at: index, to: destination, analysisAtEntry: .init())
+				case .getElement(of: let vector, at: let index, to: let destination):
+				Lowered.getElement(type, of: vector, at: index, to: destination)	// TODO
 				
-				case .setElement(let type, of: let vector, at: let index, to: let element):
-				return .setElement(type, of: vector, at: index, to: element, analysisAtEntry: .init())
+				case .setElement(of: let vector, at: let index, to: let element):
+				Lowered.setElement(type, of: vector, at: index, to: element)	// TODO
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(
-					predicate.lowered(in: &context),
-					then:				affirmative.lowered(in: &context),
-					else:				negative.lowered(in: &context),
-					analysisAtEntry:	.init()
-				)
+				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .push(let dataType, let source):
-				return .push(dataType, source, analysisAtEntry: .init())
+				case .push(let source):
+				Lowered.push(try context.typeAssignments[source], source)
 				
 				case .pop(bytes: let bytes):
-				return .pop(bytes: bytes, analysisAtEntry: .init())
+				Lowered.pop(bytes: bytes)
 				
 				case .pushScope:
-				return .pushScope(analysisAtEntry: .init())
+				Lowered.pushScope
 				
 				case .popScope:
-				return .popScope(analysisAtEntry: .init())
+				Lowered.popScope
 				
 				case .call(let name, let parameters):
-				return .call(name, parameters, analysisAtEntry: .init())
+				Lowered.call(name, parameters)
 				
 				case .return:
-				return .return(analysisAtEntry: .init())
+				Lowered.return
 				
 			}
 		}

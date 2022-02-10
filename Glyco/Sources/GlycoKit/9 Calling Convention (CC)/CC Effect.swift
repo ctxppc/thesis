@@ -11,7 +11,7 @@ extension CC {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(InferrableDataType, Location, to: Source)
+		case set(DataType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -20,10 +20,10 @@ extension CC {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(InferrableDataType, of: Location, at: Source, to: Location)
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(InferrableDataType, of: Location, at: Source, to: Source)
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -84,18 +84,13 @@ extension CC {
 					let assignmentArgumentPairsViaFrame = Array(zip(assignments.viaCallFrame, arguments))
 					
 					// Pass frame-resident arguments first.
-					for (assignment, argument) in assignmentArgumentPairsViaFrame {
-						Lowered.setElement(
-							.init(assignment.parameter.type),
-							of:	argumentsStructure,
-							at:	.constant(assignment.callerOffset),
-							to:	argument
-						)
+					for (a, arg) in assignmentArgumentPairsViaFrame {
+						Lowered.setElement(a.parameter.type, of: argumentsStructure, at: .constant(a.callerOffset), to: arg)
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
-					for (assignment, argument) in assignmentArgumentPairsViaRegisters {
-						Lowered.set(.init(assignment.parameter.type), .register(assignment.register), to: argument)
+					for (a, arg) in assignmentArgumentPairsViaRegisters {
+						Lowered.set(a.parameter.type, .register(a.register), to: arg)
 					}
 					
 					// Invoke procedure.
@@ -107,7 +102,7 @@ extension CC {
 					}
 					
 					// Write result.
-					Lowered.set(.init(procedure.resultType), .abstract(result), to: .location(.register(.a0)))
+					Lowered.set(procedure.resultType, .abstract(result), to: .location(.register(.a0)))
 					
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
@@ -117,7 +112,7 @@ extension CC {
 				do {
 					
 					// Write result to a0. If lowering the initial scope, infer result type to be a signed word.
-					Lowered.set(.init(context.loweredProcedure?.resultType ?? .signedWord), .register(.a0), to: try result.lowered(in: &context))
+					Lowered.set(context.loweredProcedure?.resultType ?? .signedWord, .register(.a0), to: try result.lowered(in: &context))
 					
 					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
 					if context.loweredProcedure != nil {

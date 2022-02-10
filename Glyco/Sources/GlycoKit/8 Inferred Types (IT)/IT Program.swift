@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Calling Convention
-//sourcery: description = A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
-public enum CC : Language {
+//sourcery: longname = Inferred Types
+//sourcery: description = "A language that introduces data type inference."
+public enum IT : Language {
 	
-	/// A program on a CC machine.
+	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {
@@ -20,16 +20,8 @@ public enum CC : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(procedures: procedures, configuration: configuration)
-			return try .init(try .do {
-				
-				// Prepare new scope.
-				Lower.Effect.pushScope
-				
-				// Execute main effect.
-				try effect.lowered(in: &context)
-				
-			}, procedures: procedures.lowered(in: &context))
+			var context = Context()
+			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		
 	}
@@ -37,11 +29,15 @@ public enum CC : Language {
 	// See protocol.
 	public typealias Lower = AL
 	
+	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
-	public typealias InferrableDataType = Lower.InferrableDataType
+	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
-	public typealias Location = Lower.AbstractLocation
+	public typealias Location = Lower.Location
+	public typealias Register = Lower.Register
+	public typealias Source = Lower.Source
+	public typealias TypeAssignments = Lower.TypeAssignments
 	
 }

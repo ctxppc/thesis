@@ -11,7 +11,7 @@ extension AL.Program {
 extension AL.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case effect = "_1"
+		case effect = "in"
 	}
 }
 
@@ -191,6 +191,20 @@ extension FO.HaltEffect {
 	public enum CodingKeys : String, CodingKey {
 		case result = "result"
 		case type = "type"
+	}
+}
+
+extension IT.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "_0"
+		case procedures = "procedures"
+	}
+}
+
+extension IT.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case effect = "in"
 	}
 }
 

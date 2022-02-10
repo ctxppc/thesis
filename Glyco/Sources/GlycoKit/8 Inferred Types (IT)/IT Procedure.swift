@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension AL {
+extension IT {
 	
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
@@ -18,8 +18,8 @@ extension AL {
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
-			var analysis = Lower.Analysis()
-			return .init(name, in: try effect.lowered().updated(using: { $0 }, analysis: &analysis))
+			var context = IT.Context()
+			return .init(name, in: try effect.lowered(in: &context))
 		}
 		
 	}

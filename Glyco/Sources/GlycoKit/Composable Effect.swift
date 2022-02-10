@@ -36,6 +36,14 @@ enum EffectBuilder<Effect : ComposableEffect> {
 		effect
 	}
 	
+	static func buildExpression(_ effect: Effect) -> Effect {
+		effect
+	}
+	
+	static func buildExpression(_: ()) -> Effect {
+		.do([])
+	}
+	
 }
 
 extension ComposableEffect {
