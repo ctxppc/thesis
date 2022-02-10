@@ -116,12 +116,14 @@ extension CC {
 				case .return(let result):
 				do {
 					
-					// Write result to a0. If lowering the main scope, infer result type to be a signed word.
+					// Write result to a0. If lowering the initial scope, infer result type to be a signed word.
 					Lowered.set(.init(context.loweredProcedure?.resultType ?? .signedWord), .register(.a0), to: try result.lowered(in: &context))
 					
-					// Copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
-					for register in Lower.Register.defaultCalleeSavedRegisters {
-						Lowered.set(.capability, .register(register), to: .location(.abstract(context.calleeSaveLocation(for: register))))
+					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
+					if context.loweredProcedure != nil {
+						for register in Lower.Register.defaultCalleeSavedRegisters {
+							Lowered.set(.capability, .register(register), to: .location(.abstract(context.calleeSaveLocation(for: register))))
+						}
 					}
 					
 					// We're done.
