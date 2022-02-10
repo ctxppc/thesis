@@ -1,19 +1,32 @@
 (
-	evaluate(fib, constant(30)),
+	evaluate(fib, constant(1) constant(1)),
 	functions:
 		
-		(fib, takes: (n, signedWord), returns: signedWord, in:
-			let(
-				(lastIndex, binary(named(n), sub, constant(1))),
-				in: evaluate(genFib, constant(0) named(lastIndex) vector(signedWord, count: 30))
-			)
+		(fib,
+			takes: (first, signedWord) (second, signedWord),
+			returns: signedWord,
+			in: evaluate(recFib, constant(2) constant(29) vector(signedWord, count: 30))
 		)
 		
-		(genFib, takes: (index, signedWord) (lastIndex, signedWord) (nums, capability), returns: signedWord, in:
-			if(relation(named(index), gt, named(endIndex))
+		(recFib, 
+			takes: (index, signedWord) (lastIndex, signedWord) (nums, capability),
+			returns: signedWord,
+			in: if(relation(named(index), gt, named(lastIndex))
 				then: value(element(of: named(nums), at: named(lastIndex))),
-				else: value(constant(1050))
+				else: let(
+					(indexOfFirst, binary(named(index), sub, constant(2)))
+					(indexOfSecond, binary(named(index), sub, constant(1)))
+					(nextIndex, binary(named(index), add, constant(1)))
+					(fibNum, binary(
+						element(of: named(nums), at: named(indexOfFirst)),
+						add,
+						element(of: named(nums), at: named(indexOfSecond)),
+					)),
+					in: do(
+						setElement(of: named(nums), at: named(index), to: named(fibNum)),
+						then: evaluate(recFib, named(nextIndex) named(lastIndex) named(nums))
+					)
+				)
 			)
 		)
-		
 )
