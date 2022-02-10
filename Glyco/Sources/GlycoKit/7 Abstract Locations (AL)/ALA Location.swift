@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
 import Foundation
 
 extension ALA {
@@ -28,12 +29,12 @@ extension ALA {
 		/// A mapping from abstract locations to physical locations.
 		struct Assignments {
 			
-			/// Determines an assignment using given analysis of the root effect.
+			/// Determines an assignment using given analysis at the scope's entry.
 			///
 			/// The initialiser assigns homes to all used locations, by increasing degree of conflict.
-			init(from analysis: Analysis) throws {
-				self.analysis = analysis
-				for location in analysis.locationsOrderedByIncreasingNumberOfConflicts() {
+			init(analysisAtScopeEntry: Analysis) throws {
+				self.analysisAtScopeEntry = analysisAtScopeEntry
+				for location in analysisAtScopeEntry.locationsOrderedByIncreasingNumberOfConflicts() {
 					guard case .abstract(let location) = location else { continue }
 					try addAssignment(for: location)
 				}
@@ -47,8 +48,28 @@ extension ALA {
 				}
 			}
 			
-			/// The conflict graph.
-			private let analysis: Analysis
+			/// Determines the type of `location`.
+			func type(of location: Location) throws -> DataType {
+				guard let type = analysisAtScopeEntry.typeAssignments[location].dataType else { throw AssignmentError.unknownType(location) }
+				return type
+			}
+			
+			/// Determines the type of `locations`.
+			///
+			/// - Requires: `locations` contains at least one abstract location.
+			func type<Locations : Collection>(of locations: Locations) throws -> DataType where Locations.Element == Location {
+				guard let type = locations
+						.lazy
+						.compactMap({ location -> TypedLocation? in
+							return analysisAtScopeEntry.typeAssignments[location]
+						})
+						.first?
+						.dataType else { throw AssignmentError.unknownType(locations.first !! "Cannot determine type of no locations") }
+				return type
+			}
+			
+			/// The analysis at the scope's entry.
+			let analysisAtScopeEntry: Analysis
 			
 			/// A mapping from abstract locations to physical locations.
 			private var homesByLocation = [AbstractLocation : Lower.Location]()
@@ -66,10 +87,8 @@ extension ALA {
 				if let register = assignableRegister(for: location) {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
-				} else if let type = analysis.typeAssignments[.abstract(location)].dataType {
-					home = .frameCell(frame.allocate(type))
 				} else {
-					throw AssignmentError.unknownType(location)
+					home = .frameCell(frame.allocate(try type(of: .abstract(location))))
 				}
 				homesByLocation[location] = home
 				return home
@@ -79,14 +98,14 @@ extension ALA {
 			private func assignableRegister(for location: AbstractLocation) -> Lower.Register? {
 				Lower.Register.defaultAssignableRegisters.first { register in
 					guard let assignedLocations = locationsByRegister[register] else { return true }
-					return !analysis.containsConflict(.abstract(location), assignedLocations)
+					return !analysisAtScopeEntry.containsConflict(.abstract(location), assignedLocations)
 				}
 			}
 			
 			enum AssignmentError : LocalizedError {
 				
 				/// An error indicating that given location cannot be placed on the call frame since its data type can't be determined.
-				case unknownType(AbstractLocation)
+				case unknownType(Location)
 				
 				// See protocol.
 				var errorDescription: String? {

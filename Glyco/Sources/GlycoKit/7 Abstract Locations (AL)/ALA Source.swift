@@ -19,6 +19,11 @@ extension ALA {
 			}
 		}
 		
+		var location: Location? {
+			guard case .location(let location) = self else { return nil }
+			return location
+		}
+		
 	}
 	
 }

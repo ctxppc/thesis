@@ -40,7 +40,7 @@ extension CC {
 				
 				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
 				for register in Lower.Register.defaultCalleeSavedRegisters {
-					Lower.Effect.set(.capability, .abstract(context.calleeSaveLocation(for: register)), to: .location(.register(register)))
+					Lower.Effect.set(.init(.capability), .abstract(context.calleeSaveLocation(for: register)), to: .location(.register(register)))
 				}
 				
 				// Compute parameter assignments.
@@ -49,13 +49,13 @@ extension CC {
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
 				for assignment in assignments.viaRegisters {
 					let parameter = assignment.parameter
-					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.register(assignment.register)))
+					Lower.Effect.set(.init(parameter.type), .abstract(parameter.location), to: .location(.register(assignment.register)))
 				}
 				
 				// Bind local names to frame-resident arguments.
 				for assignment in assignments.viaCallFrame {
 					let parameter = assignment.parameter
-					Lower.Effect.set(parameter.type, .abstract(parameter.location), to: .location(.frame(assignment.calleeLocation)))
+					Lower.Effect.set(.init(parameter.type), .abstract(parameter.location), to: .location(.frame(assignment.calleeLocation)))
 				}
 				
 				// Execute main effect.

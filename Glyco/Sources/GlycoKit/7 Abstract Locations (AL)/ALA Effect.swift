@@ -9,7 +9,7 @@ extension ALA {
 		case `do`([Effect], analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source, analysisAtEntry: Analysis)
+		case set(InferrableDataType, Location, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
@@ -18,10 +18,10 @@ extension ALA {
 		case allocateVector(DataType, count: Int = 1, into: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
+		case getElement(InferrableDataType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source, analysisAtEntry: Analysis)
+		case setElement(InferrableDataType, of: Location, at: Source, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
@@ -67,7 +67,11 @@ extension ALA {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let type, let destination, to: let source, analysisAtEntry: _):
-				try Lowered.set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.set(
+					type.lowered(in: context, associatedWith: destination, source.location),
+					destination.lowered(in: &context),
+					to: source.lowered(in: &context)
+				)
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
@@ -76,10 +80,20 @@ extension ALA {
 				Lowered.allocateVector(type, count: count, into: try vector.lowered(in: &context))
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
-				try Lowered.getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				try Lowered.getElement(
+					type.lowered(in: context, associatedWith: destination),	// TODO: Also type-check against vector
+					of: vector.lowered(in: &context),
+					at: index.lowered(in: &context),
+					to: destination.lowered(in: &context)
+				)
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: _):
-				try Lowered.setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.setElement(
+					type.lowered(in: context, associatedWith: source.location),	// TODO: Also type-check against vector
+					of: vector.lowered(in: &context),
+					at: index.lowered(in: &context),
+					to: source.lowered(in: &context)
+				)
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

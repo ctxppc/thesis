@@ -36,6 +36,7 @@ public enum AL : Language {
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Frame = Lower.Frame
+	public typealias InferrableDataType = Lower.InferrableDataType
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register

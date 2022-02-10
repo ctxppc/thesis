@@ -28,7 +28,7 @@ public enum ALA : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(assignments: try .init(from: effect.analysisAtEntry))
+			var context = Context(assignments: try .init(analysisAtScopeEntry: effect.analysisAtEntry))
 			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		

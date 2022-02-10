@@ -400,6 +400,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>Context</code>, 
 <code>DataType</code>, 
 <code>Frame</code>, 
+<code>InferrableDataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
@@ -422,11 +423,11 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dl>
 	<dt><code>AL.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(InferrableDataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
@@ -468,6 +469,13 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.InferrableDataType</code></dt>
+	<dd><code><strong>inferred</strong></code></dd>
+	<dd><code><strong>byte</strong></code></dd>
+	<dd><code><strong>signedWord</strong></code></dd>
+	<dd><code><strong>capability</strong></code></dd>
+</dl>
+<dl>
 	<dt><code>ALA.TypeAssignments</code></dt>
 	<dd><code>([TypedLocation])</code></dd>
 </dl>
@@ -479,11 +487,11 @@ A language that introduces abstract locations, annotated with liveness and confl
 <dl>
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>set</strong>(InferrableDataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>getElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>setElement</strong>(InferrableDataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
