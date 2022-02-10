@@ -13,6 +13,9 @@ extension CC {
 		/// The program's procedures.
 		let procedures: [Procedure]
 		
+		/// The procedure being lowered, or `nil` if no procedure is being lowered.
+		var loweredProcedure: Procedure? = nil
+		
 		/// The compilation configuration.
 		let configuration: CompilationConfiguration
 		

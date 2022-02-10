@@ -28,7 +28,12 @@ extension CC {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
-			.init(name, try .do {
+			
+			let previousProcedure = context.loweredProcedure
+			context.loweredProcedure = self
+			defer { context.loweredProcedure = previousProcedure }
+			
+			return .init(name, try .do {
 				
 				// Prepare new scope.
 				Lower.Effect.pushScope
@@ -57,6 +62,7 @@ extension CC {
 				try effect.lowered(in: &context)
 				
 			})
+			
 		}
 		
 		/// Returns the assignments of the procedure's parameters to physical locations.

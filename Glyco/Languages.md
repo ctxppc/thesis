@@ -383,7 +383,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
-	<dd><code><strong>return</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Procedure</code></dt>

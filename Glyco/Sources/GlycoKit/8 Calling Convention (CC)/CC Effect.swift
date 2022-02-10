@@ -32,7 +32,7 @@ extension CC {
 		case call(Label, [Source], result: Location)
 		
 		/// An effect that returns given result to the caller.
-		case `return`(DataType, Source)
+		case `return`(Source)
 		
 		// See protocol.
 		@EffectBuilder<Lowered>
@@ -113,10 +113,10 @@ extension CC {
 					throw LoweringError.unrecognisedProcedure(name: name)
 				}
 				
-				case .return(let type, let result):
+				case .return(let result):
 				do {
 					
-					Lowered.set(type, .register(.a0), to: try result.lowered(in: &context))
+					Lowered.set(context.loweredProcedure?.resultType ?? .signedWord, .register(.a0), to: try result.lowered(in: &context))
 					
 					// Copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
 					for register in Lower.Register.defaultCalleeSavedRegisters {

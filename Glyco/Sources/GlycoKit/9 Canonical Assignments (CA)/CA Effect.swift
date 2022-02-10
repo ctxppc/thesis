@@ -32,7 +32,7 @@ extension CA {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: .source(let source)):
-				Lowered.set(.signedWord, destination, to: source)
+				Lowered.set(.signedWord, destination, to: source)	// FIXME: Let AL infer data type?
 				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
 				Lowered.compute(lhs, op, rhs, to: destination)
@@ -44,7 +44,7 @@ extension CA {
 				Lowered.allocateVector(dataType, count: count, into: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(.signedWord, of: vector, at: index, to: element)
+				Lowered.setElement(.signedWord, of: vector, at: index, to: element)	// FIXME: Typed vectors?
 				
 				case .call(let name, let arguments, result: let result):
 				Lowered.call(name, arguments, result: result)
@@ -53,7 +53,7 @@ extension CA {
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .return(let result):
-				Lowered.return(.signedWord, result)
+				Lowered.return(result)
 				
 			}
 		}
