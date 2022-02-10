@@ -17,23 +17,25 @@ struct CompileCommand : ParsableCommand {
 	private static let discussion = """
 	Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the CHERITOOLCHAIN environment variable; if omitted, Glyco assumes it‘s in ~/cheri. The path to the system root can be provided through the CHERISYSROOT environment variable; if omitted, Glyco assumes it‘s in output/rootfs-riscv64-purecap within the toolchain.
 	
-	When an intermediate language is specified with the -l option, Glyco lowers the source file to that language and, by default, emits the lowered program to standard out. When no intermediate language is specified, Glyco lowers the source file to an ELF binary without emitting it by default. Pass -o to output the lowered program or binary to a file in the source file‘s directory with the same basename as the source file, or specify a path (relative to the current directory) using -O. When both -o and -O are passed, -O takes precedence. Both -o and -O overwrite files.
+	When one or more intermediate languages are specified with the -l option, Glyco lowers the source file to those languages. When no intermediate language is specified, Glyco lowers the source file to an ELF binary.
+	
+	Pass -O to output the programs in the specified intermediate languages to standard out. Pass -o to write the programs in the specified intermediate languages or the binary to disk. The -o option accepts paths relative to the current directory, one path per corresponding intermediate language or one path for the ELF binary. For any language for which no corresponding path is defined or if -o is omitted, a filename is derived from the source file and the file is stored in the same directory as the source file. Any files specified with or derived by -o are overwritten.
 	"""
 	
-	@Argument(help: "A Gly or intermediate file (relative to the current directory). The file‘s extension must be .gly or the name of an intermediate language: .S, .rv, .fl, etc.")
+	@Argument(help: "A Gly or intermediate file, relative to the current directory. The file‘s extension must be .gly or the name of an intermediate language: .S, .rv, .fl, etc.")
 	var source: URL
 	
-	@Option(name: .shortAndLong, help: "The intermediate language (S, FL, FO, etc.) to emit. (Omit to build an ELF file.)")
-	var language: String?
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The intermediate languages (S, FL, FO, etc.) to emit. (Omit to build an ELF file.)")
+	var languages: [String] = []
 	
 	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(CompilationConfiguration.Target.sail) and \(CompilationConfiguration.Target.cheriBSD).")
 	var target: CompilationConfiguration.Target = .sail
 	
-	@Flag(name: .shortAndLong, help: "Output to a file (to be overwritten) with a derived filename in the source file‘s directory.")
-	var outputsWithDerivedName: Bool = false
+	@Option(name: [.short, .customLong("output")], parsing: .upToNextOption, help: "Output programs to disk at specified locations, to be overwritten and relative to the current directory. (Omit to write in the source file‘s directory.)")
+	var outputURLs: [URL] = []
 	
-	@Option(name: [.customShort("O"), .long], help: "Output to a file (to be overwritten) at a specified location (relative to the current directory).")
-	var outputPath: URL?
+	@Flag(name: [.customShort("O"), .long], help: "Output intermediate programs to standard out.")
+	var outputsToStandardOut: Bool = false
 	
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The registers to use for passing arguments, in parameter order.")
 	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
@@ -88,31 +90,45 @@ struct CompileCommand : ParsableCommand {
 	}
 	
 	private func compile(sourceString: String, configuration: CompilationConfiguration, sourceLanguage: String) throws {
-		if let language = language {
-			let ir = try HighestSupportedLanguage.loweredProgramRepresentation(
-				fromSispString:	sourceString,
-				sourceLanguage:	sourceLanguage,
-				targetLanguage:	language.uppercased(),
-				configuration:	configuration
-			)
-			if let outputURL = outputURL {
-				try ir.write(to: outputURL, atomically: false, encoding: .utf8)
-				print("Exported \(language.uppercased()) representation to \(outputURL.absoluteString).")
-			} else {
-				print(ir)
-			}
-		} else {
+		if languages.isEmpty {
+			
 			let elf = try HighestSupportedLanguage.elfFromProgram(
 				fromSispString:	sourceString,
 				sourceLanguage:	sourceLanguage,
 				configuration:	configuration
 			)
-			if let outputURL = outputURL {
+			if let outputURL = outputURLs.first {
 				try elf.write(to: outputURL)
 				print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
 			} else {
 				print("The ELF executable is \(elf.count) bytes long. Re-run this command with the -o flag or -O <file> option to save the binary to disk.")
 			}
+			
+		} else {
+			
+			let normalisedLanguageNames = languages.map { $0.uppercased() }
+			let urlsByLanguage = Dictionary(uniqueKeysWithValues: zip(normalisedLanguageNames, outputURLs))
+			let programsByLanguage = try HighestSupportedLanguage.loweredProgramRepresentation(
+				fromSispString:		sourceString,
+				sourceLanguage:		sourceLanguage,
+				targetLanguages:	.init(normalisedLanguageNames),
+				configuration:		configuration
+			)
+			
+			for (language, program) in programsByLanguage {
+				let url = urlsByLanguage[language] ?? derivedOutputURL(language: language)
+				try program.write(to: url, atomically: false, encoding: .utf8)
+				print("Exported \(language.uppercased()) program to \(url.absoluteString).")
+			}
+			
+			if outputsToStandardOut {
+				for language in normalisedLanguageNames {
+					print("<language name='\(language)'><![CDATA[")
+					print(programsByLanguage[language]!)
+					print("]]></language>")
+				}
+			}
+			
 		}
 	}
 	
@@ -125,22 +141,16 @@ struct CompileCommand : ParsableCommand {
 		}
 	}
 	
-	private var outputURL: URL? {
-		if let outputURL = outputPath {
-			return outputURL
-		} else if outputsWithDerivedName {
-			let base = source
-				.deletingLastPathComponent()
-				.appendingPathComponent(
-					source
-						.deletingPathExtension()
-						.lastPathComponent,
-					isDirectory: false
-				)
-			return language.map(base.appendingPathExtension) ?? base
-		} else {
-			return nil
-		}
+	private func derivedOutputURL(language: String?) -> URL {
+		let base = source
+			.deletingLastPathComponent()
+			.appendingPathComponent(
+				source
+					.deletingPathExtension()
+					.lastPathComponent,
+				isDirectory: false
+			)
+		return language.map { base.appendingPathExtension($0.lowercased()) } ?? base
 	}
 	
 	private enum DecodingError : Error {

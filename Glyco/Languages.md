@@ -896,5 +896,4 @@ The ground language as provided to Clang for assembly and linking.
 <dl>
 	<dt><code>S.LoweringError</code></dt>
 	<dd><code><strong>unknownLanguage</strong>(String)</code></dd>
-	<dd><code><strong>invalidEncoding</strong></code></dd>
 </dl>
