@@ -688,8 +688,6 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dt><code>FO.Register</code></dt>
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
-	<dd><code><strong>sp</strong></code></dd>
-	<dd><code><strong>fp</strong></code></dd>
 	<dd><code><strong>s1</strong></code></dd>
 	<dd><code><strong>a0</strong></code></dd>
 	<dd><code><strong>a1</strong></code></dd>
@@ -754,10 +752,8 @@ A language that introduces call frames and operations for managing the call fram
 	<dt><code>CF.Register</code></dt>
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
-	<dd><code><strong>sp</strong></code></dd>
 	<dd><code><strong>t1</strong></code></dd>
 	<dd><code><strong>t2</strong></code></dd>
-	<dd><code><strong>fp</strong></code></dd>
 	<dd><code><strong>s1</strong></code></dd>
 	<dd><code><strong>a0</strong></code></dd>
 	<dd><code><strong>a1</strong></code></dd>

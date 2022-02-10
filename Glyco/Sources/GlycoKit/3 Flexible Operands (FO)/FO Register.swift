@@ -22,19 +22,13 @@ extension FO {
 		public static let defaultCallerSavedRegisters = defaultArgumentRegisters + [.ra, .t4, .t5, .t6]
 		
 		/// The default set of registers that a procedure must save before using.
-		public static let defaultCalleeSavedRegisters = [Self.fp, .s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
+		public static let defaultCalleeSavedRegisters = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
 		
 		/// The always-zero register.
 		case zero
 		
 		/// The return address register.
 		case ra
-		
-		/// The stack pointer register.
-		case sp
-		
-		/// The frame pointer register.
-		case fp
 		
 		/// A saved register.
 		case s1
@@ -56,8 +50,6 @@ extension FO {
 			switch self {
 				case .zero:	return .zero
 				case .ra:	return .ra
-				case .sp:	return .sp
-				case .fp:	return .fp
 				case .s1:	return .s1
 				case .a0:	return .a0
 				case .a1:	return .a1
