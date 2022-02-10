@@ -41,13 +41,14 @@ extension Sisp : SingleLineSerialisable {
 				
 				serialisation.write(.leadingParenthesis)
 				
-				guard let (head, last) = children.elements.splittingLast() else { return }
-				for element in head {
-					try serialise(element)
-					serialisation.write(.separator)
-					serialisation.writeSpace()
+				if let (head, last) = children.elements.splittingLast() {
+					for element in head {
+						try serialise(element)
+						serialisation.write(.separator)
+						serialisation.writeSpace()
+					}
+					try serialise(last)
 				}
-				try serialise(last)
 				
 				serialisation.write(.trailingParenthesis)
 				
@@ -101,13 +102,14 @@ extension Sisp : SingleLineSerialisable {
 				serialisation.write(.leadingParenthesis)
 				serialisation.beginIndentedLine()
 
-				guard let (head, last) = children.elements.splittingLast() else { return }
-				for element in head {
-					serialise(element)
-					serialisation.write(.separator)
-					serialisation.beginLine()
+				if let (head, last) = children.elements.splittingLast() {
+					for element in head {
+						serialise(element)
+						serialisation.write(.separator)
+						serialisation.beginLine()
+					}
+					serialise(last)
 				}
-				serialise(last)
 				
 				serialisation.beginOutdentedLine()
 				serialisation.write(.trailingParenthesis)
