@@ -49,8 +49,8 @@ extension ALA {
 			}
 			
 			/// Determines the type of `location`.
-			func type(of location: Location) throws -> DataType {
-				guard let type = analysisAtScopeEntry.typeAssignments[location].dataType else { throw AssignmentError.unknownType(location) }
+			func type(of location: Location) throws -> ValueType {
+				guard let type = analysisAtScopeEntry.typeAssignments[location].valueType else { throw AssignmentError.unknownType(location) }
 				return type
 			}
 			
@@ -74,7 +74,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frameCell(frame.allocate(try type(of: .abstract(location))))
+					home = .frameCell(frame.allocate(try type(of: .abstract(location)).lowered()))
 				}
 				homesByLocation[location] = home
 				return home

@@ -493,7 +493,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 **Inherited from CD:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Register</code>
@@ -503,9 +502,9 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.TypedLocation</code></dt>
-	<dd><code><strong>abstract</strong>(AbstractLocation, DataType?)</code></dd>
+	<dd><code><strong>abstract</strong>(AbstractLocation, ValueType?)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location, DataType?)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, ValueType?)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.AbstractLocation</code></dt>
@@ -519,6 +518,13 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.ValueType</code></dt>
+	<dd><code><strong>byte</strong></code></dd>
+	<dd><code><strong>signedWord</strong></code></dd>
+	<dd><code><strong>capability</strong>(ValueType)</code></dd>
+	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
 	<dt><code>ALA.TypeAssignments</code></dt>
 	<dd><code>([TypedLocation])</code></dd>
 </dl>
@@ -526,19 +532,19 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dt><code>ALA.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-	<dd><code><strong>register</strong>(Register, DataType)</code></dd>
+	<dd><code><strong>register</strong>(Register, ValueType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>set</strong>(ValueType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>getElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>setElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>push</strong>(ValueType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>

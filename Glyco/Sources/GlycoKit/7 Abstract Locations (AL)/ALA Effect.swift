@@ -9,25 +9,25 @@ extension ALA {
 		case `do`([Effect], analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source, analysisAtEntry: Analysis)
+		case set(ValueType, Location, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
-		case allocateVector(DataType, count: Int = 1, into: Location, analysisAtEntry: Analysis)
+		case allocateVector(ValueType, count: Int = 1, into: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
+		case getElement(ValueType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source, analysisAtEntry: Analysis)
+		case setElement(ValueType, of: Location, at: Source, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source, analysisAtEntry: Analysis)
+		case push(ValueType, Source, analysisAtEntry: Analysis)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int, analysisAtEntry: Analysis)
@@ -67,25 +67,25 @@ extension ALA {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let type, let destination, to: let source, analysisAtEntry: _):
-				try Lowered.set(type, destination.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.set(type.lowered(), destination.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: _):
-				Lowered.allocateVector(type, count: count, into: try vector.lowered(in: &context))
+				Lowered.allocateVector(type.lowered(), count: count, into: try vector.lowered(in: &context))
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
-				try Lowered.getElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
+				try Lowered.getElement(type.lowered(), of: vector.lowered(in: &context), at: index.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: _):
-				try Lowered.setElement(type, of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.setElement(type.lowered(), of: vector.lowered(in: &context), at: index.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let type, let source, analysisAtEntry: _):
-				Lowered.push(type, try source.lowered(in: &context))
+				Lowered.push(type.lowered(), try source.lowered(in: &context))
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				Lowered.pop(bytes: bytes)
@@ -236,8 +236,8 @@ extension ALA {
 				case .compute(_, _, _, to: let destination, analysisAtEntry: _):
 				return [.init(location: destination, dataType: .signedWord)]
 				
-				case .allocateVector(_, count: _, into: let destination, analysisAtEntry: _):
-				return [.init(location: destination, dataType: .capability)]
+				case .allocateVector(let elementType, count: _, into: let destination, analysisAtEntry: _):
+				return [.init(location: destination, dataType: .capability(elementType))]
 				
 				case .pushScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
@@ -271,16 +271,16 @@ extension ALA {
 					.compactMap(\.location)
 					.map { .init(location: $0, dataType: .signedWord) }
 				
-				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
-				return [.init(location: vector, dataType: .capability)]
+				case .getElement(let elementType, of: let vector, at: .constant, to: _, analysisAtEntry: _),
+					.setElement(let elementType, of: let vector, at: .constant, to: _, analysisAtEntry: _):
+				return [.init(location: vector, dataType: .capability(elementType))]
 				
-				case .getElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _):
+				case .getElement(let elementType, of: let vector, at: let index, to: _, analysisAtEntry: _),
+					.setElement(let elementType, of: let vector, at: let index, to: _, analysisAtEntry: _):
 				return [index]
 					.compactMap(\.location)
 					.map { .init(location: $0, dataType: .signedWord) }
-					+ [.init(location: vector, dataType: .capability)]
+					+ [.init(location: vector, dataType: .capability(elementType))]
 				
 				case .popScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }

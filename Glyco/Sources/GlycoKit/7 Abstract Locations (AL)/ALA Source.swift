@@ -12,7 +12,7 @@ extension ALA {
 		case abstract(AbstractLocation)
 		
 		/// The operand is to be retrieved from given register, typed with given data type.
-		case register(Register, DataType)
+		case register(Register, ValueType)
 		
 		/// The operand is to be retrieved from given frame location.
 		case frame(Frame.Location)

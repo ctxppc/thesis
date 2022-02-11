@@ -10,7 +10,7 @@ extension ALA {
 		/// Creates a location associated with given data type.
 		///
 		/// `dataType` is ignored if `location` is a register location. Registers do not have a fixed type.
-		init(location: Location, dataType: DataType?) {
+		init(location: Location, dataType: ValueType?) {
 			switch location {
 				case .abstract(let location):	self = .abstract(location, dataType)
 				case .register(let register):	self = .register(register)
@@ -19,13 +19,13 @@ extension ALA {
 		}
 		
 		/// An abstract location, to be lowered to a physical location after register allocation.
-		case abstract(AbstractLocation, DataType?)
+		case abstract(AbstractLocation, ValueType?)
 		
 		/// A location fixed to given register.
 		case register(Register)
 		
 		/// A location fixed to given frame location.
-		case frame(Frame.Location, DataType?)
+		case frame(Frame.Location, ValueType?)
 		
 		/// The location.
 		var location: Location {
@@ -36,8 +36,8 @@ extension ALA {
 			}
 		}
 		
-		/// The location's data type, if fixed.
-		var dataType: DataType? {
+		/// The location's value type, if fixed.
+		var valueType: ValueType? {
 			switch self {
 				
 				case .abstract(_, let dataType), .frame(_, let dataType):

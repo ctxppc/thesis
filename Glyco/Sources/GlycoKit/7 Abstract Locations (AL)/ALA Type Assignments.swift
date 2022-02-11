@@ -19,19 +19,19 @@ extension ALA {
 			}
 		}
 		
-		/// A mapping from locations to data types.
-		private var typesByLocation = [Location : DataType]()
+		/// A mapping from locations to value types.
+		private var typesByLocation = [Location : ValueType]()
 		
 		/// Accesses the type for given location.
-		public subscript (location: Location) -> DataType {
+		public subscript (location: Location) -> ValueType {
 			get throws {
 				guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
 				return type
 			}
 		}
 		
-		/// Accesses the type for given location.
-		public subscript (source: Source) -> DataType {
+		/// Accesses the value type for given location.
+		public subscript (source: Source) -> ValueType {
 			get throws {
 				switch source {
 					case .constant:					return .signedWord
@@ -42,8 +42,8 @@ extension ALA {
 			}
 		}
 		
-		/// Assigns given type to given location.
-		public mutating func assign(_ newType: DataType, to location: Location) throws {
+		/// Assigns given value type to given location.
+		public mutating func assign(_ newType: ValueType, to location: Location) throws {
 			let previousType = typesByLocation.updateValue(newType, forKey: location)
 			if let previousType = previousType, previousType != newType {
 				throw TypeError.inconsistentTyping(location, previousType, newType)
@@ -52,9 +52,9 @@ extension ALA {
 		
 		/// Inserts given typed location to the assignment.
 		///
-		/// - Throws: An inconsistent typing error if `self` contains a type for the same location that is different than `typedLocation`'s type.
+		/// - Throws: An inconsistent typing error if `self` contains a value type for the same location that is different than `typedLocation`'s value type.
 		mutating func insert(_ typedLocation: TypedLocation) throws {
-			guard let newType = typedLocation.dataType else { return }
+			guard let newType = typedLocation.valueType else { return }
 			let previousType = typesByLocation.updateValue(newType, forKey: typedLocation.location)
 			if let previousType = previousType, previousType != newType {
 				throw TypeError.inconsistentTyping(typedLocation.location, previousType, newType)
@@ -68,11 +68,11 @@ extension ALA {
 		
 		enum TypeError : LocalizedError {
 			
-			/// An error indicating that the type of given location cannot be determined.
+			/// An error indicating that the value type of given location cannot be determined.
 			case unknownType(Location)
 			
-			/// An error indicating that given locations is simultaneously bound to two given different data types.
-			case inconsistentTyping(Location, DataType, DataType)
+			/// An error indicating that given location is bound to different value types.
+			case inconsistentTyping(Location, ValueType, ValueType)
 			
 			// See protocol.
 			var errorDescription: String? {
