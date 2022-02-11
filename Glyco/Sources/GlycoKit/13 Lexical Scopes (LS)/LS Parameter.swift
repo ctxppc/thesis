@@ -3,7 +3,7 @@
 extension LS {
 	public struct Parameter : Codable, Equatable, SimplyLowerable {
 		
-		public init(_ name: Symbol, _ type: DataType) {
+		public init(_ name: Symbol, _ type: ValueType) {
 			self.name = name
 			self.type = type
 		}
@@ -12,7 +12,7 @@ extension LS {
 		public let name: Symbol
 		
 		/// The data type of the argument.
-		public let type: DataType
+		public let type: ValueType
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Parameter {

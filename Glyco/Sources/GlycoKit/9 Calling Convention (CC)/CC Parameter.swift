@@ -3,7 +3,7 @@
 extension CC {
 	public struct Parameter : Codable, Equatable {
 		
-		public init(_ location: Location, _ type: DataType) {
+		public init(_ location: Location, _ type: ValueType) {
 			self.location = location
 			self.type = type
 		}
@@ -12,7 +12,7 @@ extension CC {
 		public let location: Location
 		
 		/// The data type of the argument.
-		public let type: DataType
+		public let type: ValueType
 		
 		/// An assignment of parameters to physical locations.
 		struct Assignments {

@@ -8,7 +8,7 @@ extension EX {
 		case constant(Int)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(DataType, count: Int)
+		case vector(ValueType, count: Int)
 		
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)

@@ -17,7 +17,7 @@ extension CC {
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in `into`.
-		case allocateVector(DataType, count: Int = 1, into: Location)
+		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, at: Source, to: Location)

@@ -14,7 +14,7 @@ extension CV {
 		case element(of: Location, at: Source)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(DataType, count: Int)
+		case vector(ValueType, count: Int)
 		
 		/// A value that performs the procedure with given name and evaluates to that procedure's result.
 		case evaluate(Label, [Source])

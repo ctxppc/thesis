@@ -15,17 +15,17 @@ extension IT {
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
-		case allocateVector(DataType, count: Int = 1, into: Location)
+		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		///
 		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
-		case getElement(DataType? = nil, of: Location, at: Source, to: Location)
+		case getElement(ValueType? = nil, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		///
 		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
-		case setElement(DataType? = nil, of: Location, at: Source, to: Source)
+		case setElement(ValueType? = nil, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)

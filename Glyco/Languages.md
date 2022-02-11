@@ -71,10 +71,10 @@ A language that introduces expression semantics for values, thereby abstracting 
 **Inherited from LS:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
-<code>Symbol</code>
+<code>Symbol</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>EX.Program</code></dt>
 	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
@@ -82,7 +82,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Value</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
@@ -107,7 +107,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 	<dt><code>EX.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>EX.Effect</code></dt>
@@ -130,8 +130,8 @@ A language that introduces lexical scopes of definitions
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
-<code>Label</code>
+<code>Label</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>LS.Program</code></dt>
 	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
@@ -149,14 +149,14 @@ A language that introduces lexical scopes of definitions
 </dl>
 <dl>
 	<dt><code>LS.Parameter</code></dt>
-	<dd><code>(Symbol, DataType)</code></dd>
+	<dd><code>(Symbol, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
-	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -164,7 +164,7 @@ A language that introduces lexical scopes of definitions
 </dl>
 <dl>
 	<dt><code>LS.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Source</code></dt>
@@ -199,11 +199,11 @@ A language that introduces definitions with function-wide namespacing.
 **Inherited from CV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Source</code>
+<code>Source</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>DF.Program</code></dt>
 	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
@@ -238,7 +238,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
-	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -246,7 +246,7 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 <dl>
 	<dt><code>DF.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Result)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>DF.Context</code></dt>
@@ -259,11 +259,11 @@ A language that allows a computation to be attached to a value.
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Context</code>, 
-<code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Source</code>
+<code>Source</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>CV.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -285,14 +285,14 @@ A language that allows a computation to be attached to a value.
 </dl>
 <dl>
 	<dt><code>CV.Procedure</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>CV.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
-	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -305,18 +305,18 @@ A language that groups all effects that write to a location under one canonical 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Context</code>, 
-<code>DataType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
-<code>Source</code>
+<code>Source</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>CA.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
 	<dt><code>CA.Procedure</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>CA.Effect</code></dt>
@@ -339,7 +339,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
-	<dd><code><strong>vector</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
@@ -348,9 +348,9 @@ A language that introduces parameters & result values in procedures via the low-
 **Inherited from IT:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Label</code>, 
-<code>Location</code>
+<code>Location</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>CC.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -360,7 +360,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Parameter</code></dt>
-	<dd><code>(Location, DataType)</code></dd>
+	<dd><code>(Location, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Predicate</code></dt>
@@ -379,7 +379,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -388,7 +388,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Procedure</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
 <h2 id="IT">Grammar for IT (Inferred Types)</h2>
@@ -398,13 +398,13 @@ A language that introduces data type inference.
 <code>AbstractLocation</code>, 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>, 
-<code>TypeAssignments</code>
+<code>TypeAssignments</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>IT.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -421,9 +421,9 @@ A language that introduces data type inference.
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(ValueType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(ValueType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>push</strong>(Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
@@ -448,13 +448,13 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Context</code>, 
-<code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>, 
-<code>TypeAssignments</code>
+<code>TypeAssignments</code>, 
+<code>ValueType</code>
 <dl>
 	<dt><code>AL.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -473,13 +473,13 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dl>
 	<dt><code>AL.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(ValueType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
+	<dd><code><strong>push</strong>(ValueType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>

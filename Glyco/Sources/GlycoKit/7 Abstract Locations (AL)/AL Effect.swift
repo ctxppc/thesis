@@ -9,25 +9,25 @@ extension AL {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source)
+		case set(ValueType, Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
-		case allocateVector(DataType, count: Int = 1, into: Location)
+		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		case getElement(ValueType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		case setElement(ValueType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source)
+		case push(ValueType, Source)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)

@@ -8,7 +8,7 @@ extension CC {
 	public struct Procedure : Codable, Equatable, Named, SimplyLowerable {
 		
 		/// Creates a procedure with given name, parameters, result type, and effect.
-		public init(_ name: Label, takes parameters: [Parameter], returns resultType: DataType, in effect: Effect) {
+		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in effect: Effect) {
 			self.name = name
 			self.parameters = parameters
 			self.resultType = resultType
@@ -22,7 +22,7 @@ extension CC {
 		public var parameters: [Parameter]
 		
 		/// The procedure's result type.
-		public var resultType: DataType
+		public var resultType: ValueType
 		
 		/// The procedure's effect when invoked.
 		public var effect: Effect

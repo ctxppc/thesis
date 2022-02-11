@@ -14,7 +14,7 @@ extension DF {
 		case element(of: Location, at: Source)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(DataType, count: Int)
+		case vector(ValueType, count: Int)
 		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])

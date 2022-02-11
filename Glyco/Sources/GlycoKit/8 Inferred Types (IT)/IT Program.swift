@@ -32,7 +32,7 @@ public enum IT : Language {
 	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias DataType = Lower.DataType
+	public typealias ValueType = Lower.ValueType
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location

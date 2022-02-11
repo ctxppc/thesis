@@ -6,7 +6,7 @@ extension EX {
 	public struct Function : Codable, Equatable, SimplyLowerable {
 		
 		/// Creates a function with given name, parameters, result type, and effect.
-		public init(_ name: Label, takes parameters: [Parameter], returns resultType: DataType, in result: Result) {
+		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
 			self.name = name
 			self.parameters = parameters
 			self.resultType = resultType
@@ -20,7 +20,7 @@ extension EX {
 		public var parameters: [Parameter]
 		
 		/// The function's result type.
-		public var resultType: DataType
+		public var resultType: ValueType
 		
 		/// The function's result, in terms of its parameters.
 		public var result: Result
