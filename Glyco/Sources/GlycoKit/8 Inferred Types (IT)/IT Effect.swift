@@ -68,21 +68,27 @@ extension IT {
 				
 				case .set(let destination, to: let source):
 				let type = try context.typeAssignments[source]
-				Lowered.set(type, destination, to: source)
 				try context.typeAssignments.assign(type, to: destination)
+				Lowered.set(type, destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				Lowered.compute(lhs, operation, rhs, to: destination)
+				try context.typeAssignments.assign(.signedWord, to: lhs)
+				try context.typeAssignments.assign(.signedWord, to: rhs)
 				try context.typeAssignments.assign(.signedWord, to: destination)
+				Lowered.compute(lhs, operation, rhs, to: destination)
 				
-				case .allocateVector(let type, count: let count, into: let vector):
-				Lowered.allocateVector(type, count: count, into: vector)	// TODO: Compound types
+				case .allocateVector(let elementType, count: let count, into: let vector):
+				try context.typeAssignments.assign(.capability(elementType), to: vector)
+				Lowered.allocateVector(elementType, count: count, into: vector)
 				
-				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				Lowered.getElement(type ?? .signedWord, of: vector, at: index, to: destination)	// TODO
+				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
+				let elementType = try elementType ?? context.typeAssignments.elementType(vector: vector)	// TODO: Check compatibility
+				try context.typeAssignments.assign(elementType, to: destination)
+				Lowered.getElement(elementType, of: vector, at: index, to: destination)
 				
-				case .setElement(let type, of: let vector, at: let index, to: let element):
-				Lowered.setElement(type ?? .signedWord, of: vector, at: index, to: element)	// TODO
+				case .setElement(let elementType, of: let vector, at: let index, to: let element):
+				let elementType = try elementType ?? context.typeAssignments.elementType(vector: vector)	// TODO: Check compatibility
+				Lowered.setElement(elementType, of: vector, at: index, to: element)	// TODO
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

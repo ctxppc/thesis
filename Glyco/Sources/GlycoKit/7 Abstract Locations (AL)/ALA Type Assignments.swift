@@ -50,6 +50,18 @@ extension ALA {
 			}
 		}
 		
+		/// Assigns given value type to given location.
+		public mutating func assign(_ type: ValueType, to source: Source) throws {
+			guard let location = source.location else { return }
+			try assign(type, to: location)
+		}
+		
+		/// Returns the element type for given vector location.
+		public func elementType(vector: Location) throws -> ValueType {
+			guard case .capability(let elementType) = try self[vector] else { throw TypeError.noVectorType(vector) }
+			return elementType
+		}
+		
 		/// Inserts given typed location to the assignment.
 		///
 		/// - Throws: An inconsistent typing error if `self` contains a value type for the same location that is different than `typedLocation`'s value type.
@@ -71,6 +83,9 @@ extension ALA {
 			/// An error indicating that the value type of given location cannot be determined.
 			case unknownType(Location)
 			
+			/// An error indicating given location is not a vector type.
+			case noVectorType(Location)
+			
 			/// An error indicating that given location is bound to different value types.
 			case inconsistentTyping(Location, ValueType, ValueType)
 			
@@ -80,6 +95,9 @@ extension ALA {
 					
 					case .unknownType(let location):
 					return "No known type for “\(location)”"
+					
+					case .noVectorType(let location):
+					return "“\(location)” is not a vector type"
 					
 					case .inconsistentTyping(let location, let firstType, let otherType):
 					return "“\(location)” is simultaneously typed \(firstType) and \(otherType)"
