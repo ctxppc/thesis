@@ -84,24 +84,16 @@ extension ALA {
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [TypedLocation] {
+		private func possiblyUsedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
 			switch self {
 				
-				case .constant,
-					.relation(.constant, _, .constant, analysisAtEntry: _),
-					.if,
-					.do:
+				case .constant, .if, .do:
 				return []
 				
-				case .relation(.constant, _, .location(let location), analysisAtEntry: _),
-					.relation(.location(let location), _, .constant, analysisAtEntry: _):
-				return [.init(location: location, dataType: .signedWord)]
-				
-				case .relation(.location(let lhs), _, .location(let rhs), analysisAtEntry: _):
-				return [
-					.init(location: lhs, dataType: .signedWord),
-					.init(location: rhs, dataType: .signedWord)
-				]
+				case .relation(let lhs, _, let rhs, analysisAtEntry: _):
+				return [lhs, rhs]
+					.compactMap(\.location)
+					.map { .init(location: $0, dataType: .signedWord) }
 				
 			}
 		}
@@ -137,7 +129,7 @@ extension ALA {
 		///   - retainedLocation: The location that remains.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
-			try updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
 	}

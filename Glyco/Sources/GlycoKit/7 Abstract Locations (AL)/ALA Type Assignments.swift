@@ -35,7 +35,9 @@ extension ALA {
 			get throws {
 				switch source {
 					case .constant:					return .signedWord
-					case .location(let location):	return try self[location]
+					case .abstract(let location):	return try self[Location.abstract(location)]
+					case .register(_, let type):	return type
+					case .frame(let location):		return try self[Location.frame(location)]
 				}
 			}
 		}

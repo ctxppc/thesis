@@ -5,6 +5,7 @@ extension IT {
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
+		/// Creates a procedure with given name and effect.
 		public init(_ name: Label, in effect: Effect) {
 			self.name = name
 			self.effect = effect

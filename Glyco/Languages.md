@@ -9,6 +9,7 @@ The pipeline, from high-level to low-level is:
 [`CV`](#CV) →
 [`CA`](#CA) →
 [`CC`](#CC) →
+[`IT`](#IT) →
 [`AL`](#AL) →
 [`ALA`](#ALA) →
 [`CD`](#CD) →
@@ -344,7 +345,7 @@ A language that groups all effects that write to a location under one canonical 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
 A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
 
-**Inherited from AL:**
+**Inherited from IT:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -376,11 +377,11 @@ A language that introduces parameters & result values in procedures via the low-
 <dl>
 	<dt><code>CC.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -388,6 +389,55 @@ A language that introduces parameters & result values in procedures via the low-
 <dl>
 	<dt><code>CC.Procedure</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> DataType, <strong>in:</strong> Effect)</code></dd>
+</dl>
+
+<h2 id="IT">Grammar for IT (Inferred Types)</h2>
+A language that introduces data type inference.
+
+**Inherited from AL:**
+<code>AbstractLocation</code>, 
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Frame</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Register</code>, 
+<code>Source</code>, 
+<code>TypeAssignments</code>
+<dl>
+	<dt><code>IT.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+	<dt><code>IT.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>IT.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType?, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>push</strong>(Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushScope</strong></code></dd>
+	<dd><code><strong>popScope</strong></code></dd>
+	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>IT.Procedure</code></dt>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
+</dl>
+<dl>
+	<dt><code>IT.Context</code></dt>
 </dl>
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>
@@ -475,7 +525,9 @@ A language that introduces abstract locations, annotated with liveness and confl
 <dl>
 	<dt><code>ALA.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>location</strong>(Location)</code></dd>
+	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+	<dd><code><strong>register</strong>(Register, DataType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Effect</code></dt>

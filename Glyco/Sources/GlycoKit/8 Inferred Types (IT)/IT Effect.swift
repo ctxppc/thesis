@@ -18,10 +18,14 @@ extension IT {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		///
+		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
+		case getElement(DataType? = nil, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		///
+		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
+		case setElement(DataType? = nil, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -57,7 +61,6 @@ extension IT {
 		// See protocol.
 		@EffectBuilder<Lower.Effect>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
-			let type = DataType.signedWord	// TODO
 			switch self {
 				
 				case .do(let effects):
@@ -75,11 +78,11 @@ extension IT {
 				case .allocateVector(let type, count: let count, into: let vector):
 				Lowered.allocateVector(type, count: count, into: vector)	// TODO: Compound types
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(type, of: vector, at: index, to: destination)	// TODO
+				case .getElement(let type, of: let vector, at: let index, to: let destination):
+				Lowered.getElement(type ?? .signedWord, of: vector, at: index, to: destination)	// TODO
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(type, of: vector, at: index, to: element)	// TODO
+				case .setElement(let type, of: let vector, at: let index, to: let element):
+				Lowered.setElement(type ?? .signedWord, of: vector, at: index, to: element)	// TODO
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

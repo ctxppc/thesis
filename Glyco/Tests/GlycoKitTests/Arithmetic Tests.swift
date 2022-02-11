@@ -12,8 +12,8 @@ final class ArithmeticTests : XCTestCase {
 		let program = AL.Program(
 			.do([
 				.set(.signedWord, .abstract(location), to: .constant(1)),
-				.compute(.constant(2), .add, .location(.abstract(location)), to: .abstract(location)),
-				.set(.signedWord, .register(.a0), to: .location(.abstract(location))),
+				.compute(.constant(2), .add, .abstract(location), to: .abstract(location)),
+				.set(.signedWord, .register(.a0), to: .abstract(location)),
 				.return,
 			]),
 			procedures: []
@@ -75,11 +75,11 @@ final class ArithmeticTests : XCTestCase {
 			.do([
 				.compute(.constant(12), .sub, .constant(11), to: .abstract(testedNumber)),
 				.if(
-					.relation(.location(.abstract(testedNumber)), .eq, .constant(1)),
+					.relation(.abstract(testedNumber), .eq, .constant(1)),
 					then:	.set(.signedWord, .abstract(isEven), to: .constant(1)),
 					else:	.set(.signedWord, .abstract(isEven), to: .constant(0))
 				),
-				.set(.signedWord, .register(.a0), to: .location(.abstract(isEven))),
+				.set(.signedWord, .register(.a0), to: .abstract(isEven)),
 				.return,
 			]),
 			procedures:	[]

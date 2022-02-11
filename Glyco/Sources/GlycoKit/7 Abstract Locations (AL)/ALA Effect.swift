@@ -115,7 +115,7 @@ extension ALA {
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
 		func updated(using transform: Transformation, analysis: inout Analysis) throws -> Self {
-			let transformed = transform(self)
+			let transformed = try transform(self)
 			try analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
 			switch transformed {
 				
@@ -200,7 +200,7 @@ extension ALA {
 		}
 		
 		/// A function that transforms an effect into the same effect or different effect.
-		typealias Transformation = (Self) -> Self
+		typealias Transformation = (Self) throws -> Self
 		
 		/// The analysis of `self` at entry.
 		var analysisAtEntry: Analysis {
@@ -223,7 +223,7 @@ extension ALA {
 		}
 		
 		/// Returns the locations defined by `self`.
-		private func definedLocations() -> [TypedLocation] {
+		private func definedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
 			switch self {
 				
 				case .do, .setElement, .if, .push, .pop, .popScope, .call, .return:
@@ -246,7 +246,7 @@ extension ALA {
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [TypedLocation] {
+		private func possiblyUsedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
 			switch self {
 				
 				case .do,
@@ -260,30 +260,27 @@ extension ALA {
 					.return:
 				return []
 				
-				case .set(let type, _, to: .location(let source), analysisAtEntry: _),
-					.push(let type, .location(let source), analysisAtEntry: _):
-				return [.init(location: source, dataType: type)]
+				case .set(let type, _, to: let source, analysisAtEntry: _),
+					.push(let type, let source, analysisAtEntry: _):
+				return [source]
+					.compactMap(\.location)
+					.map { .init(location: $0, dataType: type) }
 				
-				case .compute(.constant, _, .location(let source), to: _, analysisAtEntry: _),
-					.compute(.location(let source), _, .constant, to: _, analysisAtEntry: _):
-				return [.init(location: source, dataType: .signedWord)]
-				
-				case .compute(.location(let lhs), _, .location(let rhs), to: _, analysisAtEntry: _):
-				return [
-					.init(location: lhs, dataType: .signedWord),
-					.init(location: rhs, dataType: .signedWord)
-				]
+				case .compute(let lhs, _, let rhs, to: _, analysisAtEntry: _):
+				return [lhs, rhs]
+					.compactMap(\.location)
+					.map { .init(location: $0, dataType: .signedWord) }
 				
 				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
 					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
 				return [.init(location: vector, dataType: .capability)]
 				
-				case .getElement(_, of: let vector, at: .location(let index), to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: .location(let index), to: _, analysisAtEntry: _):
-				return [
-					.init(location: vector, dataType: .capability),
-					.init(location: index, dataType: .signedWord)
-				]
+				case .getElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _),
+					.setElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _):
+				return [index]
+					.compactMap(\.location)
+					.map { .init(location: $0, dataType: .signedWord) }
+					+ [.init(location: vector, dataType: .capability)]
 				
 				case .popScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
@@ -305,12 +302,12 @@ extension ALA {
 						.compactMap { $0.safelyCoalescableLocations() }
 						.first
 				
-				case .set(_, .abstract(let destination), to: .location(let source), analysisAtEntry: let analysis)
-					where analysis.safelyCoalescable(.abstract(destination), source):
+				case .set(_, .abstract(let destination), to: let source, analysisAtEntry: let analysis):
+				guard let source = source.location, analysis.safelyCoalescable(source, .abstract(destination)) else { return nil }
 				return (destination, source)
 					
-				case .set(_, let destination, to: .location(.abstract(let source)), analysisAtEntry: let analysis)
-					where analysis.safelyCoalescable(destination, .abstract(source)):
+				case .set(_, let destination, to: .abstract(let source), analysisAtEntry: let analysis):
+				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
 				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushScope, .popScope, .call, .return:
@@ -333,7 +330,7 @@ extension ALA {
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
 		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
-			try updated(using: { $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
 		}
 		
 		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.
@@ -345,14 +342,26 @@ extension ALA {
 		///   - retainedLocation: The location that is retained.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
-		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location) -> Self {
+		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location) throws -> Self {
 			
 			func substitute(_ location: Location) -> Location {
 				location == .abstract(removedLocation) ? retainedLocation : location
 			}
 			
-			func substitute(_ source: Source) -> Source {
-				source == .location(.abstract(removedLocation)) ? .location(retainedLocation) : source
+			func substitute(_ source: Source) throws -> Source {
+				guard source == .abstract(removedLocation) else { return source }
+				switch retainedLocation {
+					
+					case .abstract(let location):
+					return .abstract(location)
+					
+					case .register(let register):
+					return try .register(register, analysisAtEntry.typeAssignments[Location.abstract(removedLocation)])
+					
+					case .frame(let location):
+					return .frame(location)
+					
+				}
 			}
 			
 			switch self {
@@ -360,32 +369,36 @@ extension ALA {
 				case .do, .if, .pop, .pushScope, .popScope, .call, .return:
 				return self
 				
-				case .set(_, .abstract(removedLocation), to: .location(retainedLocation), analysisAtEntry: let analysis),
-					.set(_, retainedLocation, to: .location(.abstract(removedLocation)), analysisAtEntry: let analysis),
-					.set(_, retainedLocation, to: .location(retainedLocation), analysisAtEntry: let analysis),
-					.set(_, .abstract(removedLocation), to: .location(.abstract(removedLocation)), analysisAtEntry: let analysis):
+				case .set(_, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis)
+					where source.location == retainedLocation || source.location == .abstract(removedLocation):
 				return .do([], analysisAtEntry: analysis)
 				
 				case .set(let type, .abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
 				return .set(type, retainedLocation, to: source, analysisAtEntry: analysis)
 				
+				case .set(_, retainedLocation, to: .abstract(removedLocation), analysisAtEntry: let analysis):
+				return .do([], analysisAtEntry: analysis)
+				
+				case .set(_, retainedLocation, to: let source, analysisAtEntry: let analysis) where source.location == retainedLocation:
+				return .do([], analysisAtEntry: analysis)
+				
 				case .set:
 				return self
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
-				return .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
+				return try .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
 				
 				case .allocateVector(let type, count: let count, into: let vector, analysisAtEntry: let analysis):
 				return .allocateVector(type, count: count, into: substitute(vector), analysisAtEntry: analysis)
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination, analysisAtEntry: let analysis):
-				return .getElement(type, of: substitute(vector), at: substitute(index), to: substitute(destination), analysisAtEntry: analysis)
+				return try .getElement(type, of: substitute(vector), at: substitute(index), to: substitute(destination), analysisAtEntry: analysis)
 				
 				case .setElement(let type, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
-				return .setElement(type, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
+				return try .setElement(type, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
 				
 				case .push(let dataType, let source, analysisAtEntry: let analysis):
-				return .push(dataType, substitute(source), analysisAtEntry: analysis)
+				return .push(dataType, try substitute(source), analysisAtEntry: analysis)
 				
 			}
 			

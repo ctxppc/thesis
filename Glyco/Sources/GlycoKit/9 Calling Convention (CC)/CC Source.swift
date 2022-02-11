@@ -8,14 +8,14 @@ extension CC {
 		/// The operand is given value.
 		case constant(Int)
 		
-		/// The operand is to be retrieved from a given location.
+		/// The operand is to be retrieved from given abstract location.
 		case location(Location)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .constant(let imm):		return .constant(imm)
-				case .location(let location):	return .location(.abstract(location))
+				case .location(let location):	return .abstract(location)
 			}
 		}
 		

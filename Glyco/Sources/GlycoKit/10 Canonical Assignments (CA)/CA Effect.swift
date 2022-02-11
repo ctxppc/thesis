@@ -26,26 +26,25 @@ extension CA {
 		// See protocol.
 		@EffectBuilder<Lowered>
 		func lowered(in context: inout Context) throws -> Lower.Effect {
-			let type = DataType.signedWord	// TODO
 			switch self {
 				
 				case .do(let effects):
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: .source(let source)):
-				Lowered.set(type, destination, to: source)
+				Lowered.set(destination, to: source)
 				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
 				Lowered.compute(lhs, op, rhs, to: destination)
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
-				Lowered.getElement(type, of: vector, at: index, to: destination)	// FIXME: Typed vectors?
+				Lowered.getElement(of: vector, at: index, to: destination)
 				
 				case .set(let destination, to: .vector(let type, count: let count)):
 				Lowered.allocateVector(type, count: count, into: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(type, of: vector, at: index, to: element)	// FIXME: Typed vectors?
+				Lowered.setElement(of: vector, at: index, to: element)
 				
 				case .call(let name, let arguments, result: let result):
 				Lowered.call(name, arguments, result: result)

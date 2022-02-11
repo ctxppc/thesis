@@ -11,7 +11,7 @@ extension CC {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(DataType, Location, to: Source)
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
@@ -20,10 +20,10 @@ extension CC {
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		case getElement(of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		case setElement(of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -42,8 +42,8 @@ extension CC {
 				case .do(let effects):
 				Lowered.do(try effects.lowered(in: &context))
 				
-				case .set(let type, let location, to: let source):
-				Lowered.set(type, .abstract(location), to: try source.lowered(in: &context))
+				case .set(let location, to: let source):
+				Lowered.set(.abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
@@ -51,11 +51,11 @@ extension CC {
 				case .allocateVector(let type, count: let count, into: let vector):
 				Lowered.allocateVector(type, count: count, into: .abstract(vector))
 				
-				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				Lowered.getElement(type, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
+				case .getElement(of: let vector, at: let index, to: let destination):
+				Lowered.getElement(of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
 				
-				case .setElement(let type, of: let vector, at: let index, to: let element):
-				try Lowered.setElement(type, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				case .setElement(of: let vector, at: let index, to: let element):
+				try Lowered.setElement(of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -90,7 +90,7 @@ extension CC {
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
 					for (a, arg) in assignmentArgumentPairsViaRegisters {
-						Lowered.set(a.parameter.type, .register(a.register), to: arg)
+						Lowered.set(.register(a.register), to: arg)
 					}
 					
 					// Invoke procedure.
@@ -102,7 +102,7 @@ extension CC {
 					}
 					
 					// Write result.
-					Lowered.set(procedure.resultType, .abstract(result), to: .location(.register(.a0)))
+					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType))
 					
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
@@ -111,13 +111,14 @@ extension CC {
 				case .return(let result):
 				do {
 					
-					// Write result to a0. If lowering the initial scope, infer result type to be a signed word.
-					Lowered.set(context.loweredProcedure?.resultType ?? .signedWord, .register(.a0), to: try result.lowered(in: &context))
+					// Write result to a0.
+					Lowered.set(.register(.a0), to: try result.lowered(in: &context))
+					// TODO: Write to a global abstract location to ensure consistent return type, and infer return type from that.
 					
 					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
 					if context.loweredProcedure != nil {
 						for register in Lower.Register.defaultCalleeSavedRegisters {
-							Lowered.set(.capability, .register(register), to: .location(.abstract(context.calleeSaveLocation(for: register))))
+							Lowered.set(.register(register), to: .abstract(context.calleeSaveLocation(for: register)))
 						}
 					}
 					
