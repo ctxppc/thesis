@@ -18,14 +18,10 @@ extension IT {
 		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		///
-		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
-		case getElement(ValueType? = nil, of: Location, at: Source, to: Location)
+		case getElement(of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		///
-		/// When a data type is provided, it must be compatible with the vector's element type. When no data type is provided, it is inferred from the vector's type.
-		case setElement(ValueType? = nil, of: Location, at: Source, to: Source)
+		case setElement(of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -68,27 +64,28 @@ extension IT {
 				
 				case .set(let destination, to: let source):
 				let type = try context.typeAssignments[source]
-				try context.typeAssignments.assign(type, to: destination)
+				try context.typeAssignments.type(destination, as: type)
 				Lowered.set(type, destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				try context.typeAssignments.assign(.signedWord, to: lhs)
-				try context.typeAssignments.assign(.signedWord, to: rhs)
-				try context.typeAssignments.assign(.signedWord, to: destination)
+				try context.typeAssignments.require(lhs, beTyped: .signedWord)
+				try context.typeAssignments.require(rhs, beTyped: .signedWord)
+				try context.typeAssignments.type(destination, as: .signedWord)
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				try context.typeAssignments.assign(.capability(elementType), to: vector)
+				try context.typeAssignments.type(vector, as: .capability(elementType))
 				Lowered.allocateVector(elementType, count: count, into: vector)
 				
-				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
-				let elementType = try elementType ?? context.typeAssignments.elementType(vector: vector)	// TODO: Check compatibility
-				try context.typeAssignments.assign(elementType, to: destination)
+				case .getElement(of: let vector, at: let index, to: let destination):
+				let elementType = try context.typeAssignments.elementType(vector: vector)
+				try context.typeAssignments.type(destination, as: elementType)
 				Lowered.getElement(elementType, of: vector, at: index, to: destination)
 				
-				case .setElement(let elementType, of: let vector, at: let index, to: let element):
-				let elementType = try elementType ?? context.typeAssignments.elementType(vector: vector)	// TODO: Check compatibility
-				Lowered.setElement(elementType, of: vector, at: index, to: element)	// TODO
+				case .setElement(of: let vector, at: let index, to: let element):
+				let elementType = try context.typeAssignments.elementType(vector: vector)
+				try context.typeAssignments.require(element, beTyped: elementType)
+				Lowered.setElement(elementType, of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

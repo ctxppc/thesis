@@ -85,7 +85,8 @@ extension CC {
 					
 					// Pass frame-resident arguments first.
 					for (a, arg) in assignmentArgumentPairsViaFrame {
-						Lowered.setElement(a.parameter.type, of: argumentsStructure, at: .constant(a.callerOffset), to: arg)
+						// TODO: Reimplement using records.
+						Lowered.setElement(of: argumentsStructure, at: .constant(a.callerOffset), to: arg)
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
