@@ -63,9 +63,8 @@ extension IT {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: let source):
-				let type = try context.declarations[source]
-				try context.declarations.declare(destination, type: type)
-				Lowered.set(type, destination, to: source)
+				try context.declarations.declare(destination, type: context.declarations[source])
+				Lowered.set(destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				try context.declarations.require(lhs, type: .signedWord)
@@ -75,23 +74,22 @@ extension IT {
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
 				try context.declarations.declare(vector, type: .capability(elementType))
-				Lowered.allocateVector(elementType, count: count, into: vector)
+				Lowered.allocateVector(count: count, into: vector)
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
 				let elementType = try context.declarations.elementType(vector: vector)
 				try context.declarations.declare(destination, type: elementType)
-				Lowered.getElement(elementType, of: vector, at: index, to: destination)
+				Lowered.getElement(of: vector, at: index, to: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				let elementType = try context.declarations.elementType(vector: vector)
-				try context.declarations.require(element, type: elementType)
-				Lowered.setElement(elementType, of: vector, at: index, to: element)
+				try context.declarations.require(element, type: context.declarations.elementType(vector: vector))
+				Lowered.setElement(of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let source):
-				Lowered.push(try context.declarations[source], source)
+				Lowered.push(source)
 				
 				case .pop(bytes: let bytes):
 				Lowered.pop(bytes: bytes)

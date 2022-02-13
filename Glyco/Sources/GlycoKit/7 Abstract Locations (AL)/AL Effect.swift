@@ -9,25 +9,25 @@ extension AL {
 		case `do`([Effect])
 		
 		/// An effect that retrieves the value from given source and puts it in given location.
-		case set(ValueType, Location, to: Source)
+		case set(Location, to: Source)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
-		case allocateVector(ValueType, count: Int = 1, into: Location)
+		case allocateVector(count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(ValueType, of: Location, at: Source, to: Location)
+		case getElement(of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(ValueType, of: Location, at: Source, to: Source)
+		case setElement(of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(ValueType, Source)
+		case push(Source)
 		
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
@@ -61,20 +61,20 @@ extension AL {
 				case .do(let effects):
 				return .do(try effects.lowered(in: &context), analysisAtEntry: .init())
 				
-				case .set(let type, let destination, to: let source):
-				return .set(type, destination, to: source, analysisAtEntry: .init())
+				case .set(let destination, to: let source):
+				return .set(destination, to: source, analysisAtEntry: .init())
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: .init())
 				
-				case .allocateVector(let type, count: let count, into: let vector):
-				return .allocateVector(type, count: count, into: vector, analysisAtEntry: .init())
+				case .allocateVector(count: let count, into: let vector):
+				return .allocateVector(count: count, into: vector, analysisAtEntry: .init())
 				
-				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				return .getElement(type, of: vector, at: index, to: destination, analysisAtEntry: .init())
+				case .getElement(of: let vector, at: let index, to: let destination):
+				return .getElement(of: vector, at: index, to: destination, analysisAtEntry: .init())
 				
-				case .setElement(let type, of: let vector, at: let index, to: let element):
-				return .setElement(type, of: vector, at: index, to: element, analysisAtEntry: .init())
+				case .setElement(of: let vector, at: let index, to: let element):
+				return .setElement(of: vector, at: index, to: element, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(
@@ -84,8 +84,8 @@ extension AL {
 					analysisAtEntry:	.init()
 				)
 				
-				case .push(let dataType, let source):
-				return .push(dataType, source, analysisAtEntry: .init())
+				case .push(let source):
+				return .push(source, analysisAtEntry: .init())
 				
 				case .pop(bytes: let bytes):
 				return .pop(bytes: bytes, analysisAtEntry: .init())

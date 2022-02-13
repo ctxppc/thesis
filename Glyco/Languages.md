@@ -473,13 +473,13 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <dl>
 	<dt><code>AL.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
-	<dd><code><strong>set</strong>(ValueType, Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>allocateVector</strong>(<strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(ValueType, Source)</code></dd>
+	<dd><code><strong>push</strong>(Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -538,13 +538,13 @@ A language that introduces abstract locations, annotated with liveness and confl
 <dl>
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>set</strong>(ValueType, Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>getElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>setElement</strong>(ValueType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>allocateVector</strong>(<strong>count:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>push</strong>(ValueType, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>push</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
