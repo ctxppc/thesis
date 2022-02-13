@@ -26,10 +26,44 @@ extension ALA {
 		
 		/// Returns given location's declared value type.
 		///
-		/// Since registers cannot be assigned a type, this method throws an unknown type error if `location` represents a register.
+		/// If a register location is given, an unknown-type error is thrown since registers cannot have a fixed value type.
+		///
+		/// - Parameter location: The location whose type to determine.
+		///
+		/// - Returns: The value type of `location`.
 		public func type(of location: Location) throws -> ValueType {
 			guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
 			return type
+		}
+		
+		/// Returns given locations' declared value type.
+		///
+		/// The behaviour of this method depends on the kind of locations that are provided.
+		/// * If no non-register locations are given, an unknown-type error is thrown since registers cannot have a fixed value type.
+		/// * If exactly one non-register location is given, it determines the value type.
+		/// * If two non-register locations are given, both determine the value type and an error is thrown if either one doesn't have a type or if they have different value types.
+		///
+		/// - Parameters:
+		///   - location: The location whose type to determine.
+		///   - otherLocation: A location with the same value type as `location`.
+		///
+		/// - Returns: The value type of `location`, and `otherLocation`.
+		public func type(of location: Location, and otherLocation: Location) throws -> ValueType {
+			switch (location, otherLocation) {
+				
+				case (.register, .register):
+				throw TypeError.unknownType(location)
+				
+				case (.register, let location), (let location, .register):
+				return try type(of: location)
+				
+				case (let location, let otherLocation):
+				let type = try self.type(of: location)
+				let otherType = try self.type(of: otherLocation)
+				guard type == otherType else { throw TypeError.unequalTypes(location ~ type, otherLocation ~ otherType) }
+				return type
+				
+			}
 		}
 		
 		/// Returns given source's (widest supported) value type.
@@ -39,6 +73,29 @@ extension ALA {
 				case .abstract(let location):	return try type(of: Location.abstract(location))
 				case .register(_, let type):	return type
 				case .frame(let location):		return try type(of: Location.frame(location))
+			}
+		}
+		
+		/// Returns the value of given location and source.
+		public func type(of location: Location, and source: Source) throws -> ValueType {
+			switch source {
+				
+				case .constant(let value):
+				let locationType = try type(of: location)
+				guard locationType.supports(constant: value) else { throw TypeError.constantNotRepresentableByType(value, locationType) }
+				return locationType
+				
+				case .abstract(let sourceLocation):
+				return try type(of: location, and: Location.abstract(sourceLocation))
+				
+				case .register(let register, let sourceType):
+				let locationType = try type(of: location)
+				guard locationType == sourceType else { throw TypeError.unequalTypes(location ~ locationType, .register(register) ~ sourceType) }
+				return locationType
+				
+				case .frame(let sourceLocation):
+				return try type(of: location, and: Location.frame(sourceLocation))
+				
 			}
 		}
 		
@@ -107,6 +164,9 @@ extension ALA {
 			/// An error indicating that given location is bound to different value types.
 			case inconsistentTyping(Location, ValueType, ValueType)
 			
+			/// An error indicating that given typed locations have different value types when they should have the same value type.
+			case unequalTypes(TypedLocation, TypedLocation)
+			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
@@ -122,6 +182,9 @@ extension ALA {
 					
 					case .inconsistentTyping(let location, let firstType, let otherType):
 					return "“\(location)” is simultaneously typed \(firstType) and \(otherType)"
+					
+					case .unequalTypes(let first, let second):
+					return "\(first) does not have the same type as \(second)"
 					
 				}
 			}

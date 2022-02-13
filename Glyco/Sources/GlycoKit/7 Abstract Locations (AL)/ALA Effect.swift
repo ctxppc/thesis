@@ -68,7 +68,7 @@ extension ALA {
 				
 				case .set(let destination, to: let source, analysisAtEntry: _):
 				try Lowered.set(
-					context.declarations.type(of: destination).lowered(),
+					context.declarations.type(of: destination, and: source).lowered(),
 					destination.lowered(in: &context),
 					to: source.lowered(in: &context)
 				)
