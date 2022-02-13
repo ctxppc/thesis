@@ -52,3 +52,9 @@ extension ALA {
 	}
 	
 }
+
+infix operator ~ : ComparisonPrecedence
+
+public func ~ (location: ALA.Location, type: ALA.ValueType?) -> ALA.TypedLocation {
+	.init(location: location, dataType: type)
+}

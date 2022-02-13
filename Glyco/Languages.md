@@ -398,12 +398,12 @@ A language that introduces data type inference.
 <code>AbstractLocation</code>, 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Declarations</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>, 
-<code>TypeAssignments</code>, 
 <code>ValueType</code>
 <dl>
 	<dt><code>IT.Program</code></dt>
@@ -448,16 +448,16 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Context</code>, 
+<code>Declarations</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
 <code>Source</code>, 
-<code>TypeAssignments</code>, 
 <code>ValueType</code>
 <dl>
 	<dt><code>AL.Program</code></dt>
-	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dd><code>(<strong>locals:</strong> Declarations, <strong>in:</strong> Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
 	<dt><code>AL.Predicate</code></dt>
@@ -468,7 +468,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 	<dt><code>AL.Procedure</code></dt>
-	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(Label, <strong>locals:</strong> Declarations, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>AL.Effect</code></dt>
@@ -498,13 +498,17 @@ A language that introduces abstract locations, annotated with liveness and confl
 <code>Register</code>
 <dl>
 	<dt><code>ALA.Program</code></dt>
-	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+	<dd><code>(<strong>locals:</strong> Declarations, <strong>in:</strong> Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.TypedLocation</code></dt>
 	<dd><code><strong>abstract</strong>(AbstractLocation, ValueType?)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location, ValueType?)</code></dd>
+</dl>
+<dl>
+	<dt><code>ALA.Declarations</code></dt>
+	<dd><code>([TypedLocation])</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.AbstractLocation</code></dt>
@@ -523,10 +527,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>signedWord</strong></code></dd>
 	<dd><code><strong>capability</strong>(ValueType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
-</dl>
-<dl>
-	<dt><code>ALA.TypeAssignments</code></dt>
-	<dd><code>([TypedLocation])</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Source</code></dt>
@@ -562,11 +562,11 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Procedure</code></dt>
-	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(Label, <strong>locals:</strong> Declarations, <strong>in:</strong> Effect)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
-	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>, <strong>typeAssignments:</strong> TypeAssignments)</code></dd>
+	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>, <strong>declarations:</strong> Declarations)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.ConflictSet</code></dt>

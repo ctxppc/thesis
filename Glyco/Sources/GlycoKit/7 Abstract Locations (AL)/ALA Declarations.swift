@@ -5,14 +5,14 @@ import Foundation
 extension ALA {
 	
 	//sourcery: hasOpaqueRepresentation
-	/// A mapping from locations to data types.
-	public struct TypeAssignments : Equatable {
+	/// A list of defined typed locations.
+	public struct Declarations : Equatable {
 		
 		//sourcery: isInternalForm
-		/// Creates an empty mapping.
+		/// Creates an empty definitions list.
 		public init() {}
 		
-		/// Creates a mapping with given typed locations.
+		/// Creates a definitions list with given typed locations.
 		public init(_ locations: [TypedLocation]) throws {
 			for location in locations {
 				try insert(location)
@@ -34,7 +34,7 @@ extension ALA {
 			}
 		}
 		
-		/// Accesses the widest supported value type for given source.
+		/// Accesses the (widest supported) value type for given source.
 		public subscript (source: Source) -> ValueType {
 			get throws {
 				switch source {
@@ -49,7 +49,7 @@ extension ALA {
 		/// Assigns given value type to given location.
 		///
 		/// Since registers cannot be assigned a type, this method does nothing `location` represents a register.
-		public mutating func type(_ location: Location, as newType: ValueType) throws {
+		public mutating func define(_ location: Location, type newType: ValueType) throws {
 			
 			if case .register = location {
 				return
@@ -60,14 +60,6 @@ extension ALA {
 				throw TypeError.inconsistentTyping(location, previousType, newType)
 			}
 			
-		}
-		
-		/// Assigns given value type to given source's location.
-		///
-		/// This method does nothing if `source` does not represent a location.
-		public mutating func type(_ source: Source, as type: ValueType) throws {
-			guard let location = source.location else { return }
-			try self.type(location, as: type)
 		}
 		
 		/// Requires given location to be typed `requiredType`.
@@ -100,6 +92,11 @@ extension ALA {
 		public func elementType(vector: Location) throws -> ValueType {
 			guard case .capability(let elementType) = try self[vector] else { throw TypeError.noVectorType(vector) }
 			return elementType
+		}
+		
+		/// Removes given location.
+		public mutating func remove(_ location: Location) {
+			typesByLocation.removeValue(forKey: location)
 		}
 		
 		/// Inserts given typed location to the assignment.
@@ -157,7 +154,7 @@ extension ALA {
 	
 }
 
-extension ALA.TypeAssignments : Codable {
+extension ALA.Declarations : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {

@@ -5,8 +5,8 @@ extension IT {
 	/// A value used while lowering a procedure.
 	struct Context {
 		
-		/// The assignment of types to locations.
-		var typeAssignments = TypeAssignments()
+		/// The declared locations.
+		var declarations = Declarations()
 		
 	}
 	

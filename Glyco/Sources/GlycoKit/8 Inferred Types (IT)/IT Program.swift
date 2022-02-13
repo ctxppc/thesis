@@ -21,7 +21,8 @@ public enum IT : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
-			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
+			let effect = try effect.lowered(in: &context)	// first get declarations into context
+			return try .init(locals: context.declarations, in: effect, procedures: procedures.lowered())
 		}
 		
 	}
@@ -38,6 +39,6 @@ public enum IT : Language {
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
-	public typealias TypeAssignments = Lower.TypeAssignments
+	public typealias Declarations = Lower.Declarations
 	
 }

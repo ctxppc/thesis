@@ -3,7 +3,8 @@
 
 extension AL.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effect = "_0"
+		case locals = "locals"
+		case effect = "in"
 		case procedures = "procedures"
 	}
 }
@@ -11,13 +12,15 @@ extension AL.Program {
 extension AL.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
+		case locals = "locals"
 		case effect = "in"
 	}
 }
 
 extension ALA.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effect = "_0"
+		case locals = "locals"
+		case effect = "in"
 		case procedures = "procedures"
 	}
 }
@@ -25,6 +28,7 @@ extension ALA.Program {
 extension ALA.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
+		case locals = "locals"
 		case effect = "in"
 	}
 }
@@ -35,7 +39,7 @@ extension ALA.Analysis {
 		case possiblyLiveLocations = "possiblyLiveLocations"
 		case definedLocations = "definedLocations"
 		case possiblyUsedUndefinedLocations = "possiblyUsedUndefinedLocations"
-		case typeAssignments = "typeAssignments"
+		case declarations = "declarations"
 	}
 }
 

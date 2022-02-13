@@ -20,7 +20,8 @@ extension IT {
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
 			var context = IT.Context()
-			return .init(name, in: try effect.lowered(in: &context))
+			let effect = try effect.lowered(in: &context)	// first get declarations into context
+			return .init(name, locals: context.declarations, in: effect)
 		}
 		
 	}

@@ -356,7 +356,7 @@ extension ALA {
 					return .abstract(location)
 					
 					case .register(let register):
-					return try .register(register, analysisAtEntry.typeAssignments[Location.abstract(removedLocation)])
+					return try .register(register, analysisAtEntry.declarations[Location.abstract(removedLocation)])
 					
 					case .frame(let location):
 					return .frame(location)

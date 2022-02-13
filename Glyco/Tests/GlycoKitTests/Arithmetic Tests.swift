@@ -10,7 +10,8 @@ final class ArithmeticTests : XCTestCase {
 		let location = AL.AbstractLocation(rawValue: "a")
 		
 		let program = AL.Program(
-			.do([
+			locals: try .init([.abstract(location) ~ .signedWord]),
+			in: .do([
 				.set(.signedWord, .abstract(location), to: .constant(1)),
 				.compute(.constant(2), .add, .abstract(location), to: .abstract(location)),
 				.set(.signedWord, .register(.a0), to: .abstract(location)),
@@ -72,7 +73,8 @@ final class ArithmeticTests : XCTestCase {
 		let isEven = AL.AbstractLocation(rawValue: "b")
 		
 		let program = AL.Program(
-			.do([
+			locals: try .init([.abstract(testedNumber) ~ .signedWord, .abstract(isEven) ~ .signedWord]),
+			in: .do([
 				.compute(.constant(12), .sub, .constant(11), to: .abstract(testedNumber)),
 				.if(
 					.relation(.abstract(testedNumber), .eq, .constant(1)),

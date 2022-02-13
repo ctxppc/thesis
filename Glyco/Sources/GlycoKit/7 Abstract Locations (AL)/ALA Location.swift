@@ -50,7 +50,7 @@ extension ALA {
 			
 			/// Determines the type of `location`.
 			func type(of location: Location) throws -> ValueType {
-				guard let type = analysisAtScopeEntry.typeAssignments[location].valueType else { throw AssignmentError.unknownType(location) }
+				guard let type = analysisAtScopeEntry.declarations[location].valueType else { throw AssignmentError.unknownType(location) }
 				return type
 			}
 			

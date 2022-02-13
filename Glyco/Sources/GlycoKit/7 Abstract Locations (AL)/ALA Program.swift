@@ -7,10 +7,14 @@ public enum ALA : Language {
 	/// A program on an ALA machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ effect: Effect, procedures: [Procedure]) {
+		public init(locals: Declarations, in effect: Effect, procedures: [Procedure]) {
+			self.locals = locals
 			self.effect = effect
 			self.procedures = procedures
 		}
+		
+		/// The declared locations.
+		public var locals: Declarations
 		
 		/// The program's effect.
 		public var effect: Effect
@@ -21,6 +25,7 @@ public enum ALA : Language {
 		// See protocol.
 		public mutating func optimise() throws {
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
+				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
 				effect = try effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
 			}

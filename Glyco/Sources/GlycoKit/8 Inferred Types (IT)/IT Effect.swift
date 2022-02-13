@@ -63,35 +63,35 @@ extension IT {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: let source):
-				let type = try context.typeAssignments[source]
-				try context.typeAssignments.type(destination, as: type)
+				let type = try context.declarations[source]
+				try context.declarations.define(destination, type: type)
 				Lowered.set(type, destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				try context.typeAssignments.require(lhs, beTyped: .signedWord)
-				try context.typeAssignments.require(rhs, beTyped: .signedWord)
-				try context.typeAssignments.type(destination, as: .signedWord)
+				try context.declarations.require(lhs, beTyped: .signedWord)
+				try context.declarations.require(rhs, beTyped: .signedWord)
+				try context.declarations.define(destination, type: .signedWord)
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				try context.typeAssignments.type(vector, as: .capability(elementType))
+				try context.declarations.define(vector, type: .capability(elementType))
 				Lowered.allocateVector(elementType, count: count, into: vector)
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				let elementType = try context.typeAssignments.elementType(vector: vector)
-				try context.typeAssignments.type(destination, as: elementType)
+				let elementType = try context.declarations.elementType(vector: vector)
+				try context.declarations.define(destination, type: elementType)
 				Lowered.getElement(elementType, of: vector, at: index, to: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				let elementType = try context.typeAssignments.elementType(vector: vector)
-				try context.typeAssignments.require(element, beTyped: elementType)
+				let elementType = try context.declarations.elementType(vector: vector)
+				try context.declarations.require(element, beTyped: elementType)
 				Lowered.setElement(elementType, of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let source):
-				Lowered.push(try context.typeAssignments[source], source)
+				Lowered.push(try context.declarations[source], source)
 				
 				case .pop(bytes: let bytes):
 				Lowered.pop(bytes: bytes)

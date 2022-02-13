@@ -11,13 +11,13 @@ extension ALA {
 			possiblyLiveLocations:			Set<Location> = [],
 			definedLocations:				Set<Location> = [],
 			possiblyUsedUndefinedLocations:	Set<Location> = [],
-			typeAssignments:				TypeAssignments = .init()
+			declarations:					Declarations = .init()
 		) {
 			self.conflicts						= conflicts
 			self.possiblyLiveLocations			= possiblyLiveLocations
 			self.definedLocations				= definedLocations
 			self.possiblyUsedUndefinedLocations	= possiblyUsedUndefinedLocations
-			self.typeAssignments				= typeAssignments
+			self.declarations					= declarations
 		}
 		
 		/// The conflict set.
@@ -43,7 +43,7 @@ extension ALA {
 		public private(set) var possiblyUsedUndefinedLocations: Set<Location>
 		
 		/// The type assignments of any locations used or defined by a successor.
-		public private(set) var typeAssignments: TypeAssignments
+		public private(set) var declarations: Declarations
 		
 		/// Updates the analysis with information about an effect or predicate.
 		///
@@ -64,10 +64,10 @@ extension ALA {
 			possiblyUsedUndefinedLocations.subtract(definedLocations)
 			
 			for location in defined {
-				try typeAssignments.insert(location)
+				try declarations.insert(location)
 			}
 			for location in possiblyUsed {
-				try typeAssignments.insert(location)
+				try declarations.insert(location)
 			}
 			
 		}

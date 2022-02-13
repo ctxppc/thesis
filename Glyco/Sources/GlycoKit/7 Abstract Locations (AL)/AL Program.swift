@@ -7,10 +7,14 @@ public enum AL : Language {
 	/// A program on an AL machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ effect: Effect, procedures: [Procedure]) {
+		public init(locals: Declarations, in effect: Effect, procedures: [Procedure]) {
+			self.locals = locals
 			self.effect = effect
 			self.procedures = procedures
 		}
+		
+		/// The declared locations.
+		public var locals: Declarations
 		
 		/// The program's effect.
 		public var effect: Effect
@@ -21,7 +25,11 @@ public enum AL : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var analysis = Lower.Analysis()
-			return try .init(effect.lowered().updated(using: { $0 }, analysis: &analysis), procedures: procedures.lowered())
+			return try .init(
+				locals:		locals,
+				in:			effect.lowered().updated(using: { $0 }, analysis: &analysis),
+				procedures:	procedures.lowered()
+			)
 		}
 		
 	}
@@ -40,6 +48,6 @@ public enum AL : Language {
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
-	public typealias TypeAssignments = Lower.TypeAssignments
+	public typealias Declarations = Lower.Declarations
 	
 }
