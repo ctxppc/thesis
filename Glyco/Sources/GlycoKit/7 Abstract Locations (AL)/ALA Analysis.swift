@@ -10,14 +10,12 @@ extension ALA {
 			conflicts:						ConflictSet = .init([]),
 			possiblyLiveLocations:			Set<Location> = [],
 			definedLocations:				Set<Location> = [],
-			possiblyUsedUndefinedLocations:	Set<Location> = [],
-			declarations:					Declarations = .init()
+			possiblyUsedUndefinedLocations:	Set<Location> = []
 		) {
 			self.conflicts						= conflicts
 			self.possiblyLiveLocations			= possiblyLiveLocations
 			self.definedLocations				= definedLocations
 			self.possiblyUsedUndefinedLocations	= possiblyUsedUndefinedLocations
-			self.declarations					= declarations
 		}
 		
 		/// The conflict set.
@@ -33,51 +31,41 @@ extension ALA {
 		/// The locations that are defined by a successor.
 		///
 		/// This set grows while traversing a program (in either order). A location that is defined is added to this set.
-		public private(set) var definedLocations: Set<Location>
+		public private(set) var definedLocations: Set<Location>	// TODO: Needed?
 		
 		/// The locations that are possibly used by a successor but not defined by a successor.
 		///
 		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used and not in `definedLocations` is added to the set.
 		///
 		/// An *undefined use* error is thrown during lowering if this set is nonempty at a push-scope effect's entry.
-		public private(set) var possiblyUsedUndefinedLocations: Set<Location>
-		
-		/// The type assignments of any locations used or defined by a successor.
-		public private(set) var declarations: Declarations
+		public private(set) var possiblyUsedUndefinedLocations: Set<Location>	// TODO: Needed?
 		
 		/// Updates the analysis with information about an effect or predicate.
 		///
 		/// - Parameters:
-		///    - defined: The (typed) locations that are defined by the effect.
-		///    - possiblyUsed: The (typed) locations that are (possibly) used by the effect or predicate.    
-		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws where D.Element == TypedLocation, U.Element == TypedLocation {
+		///    - defined: The locations that are defined by the effect.
+		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.    
+		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws where D.Element == Location, U.Element == Location {
 			
 			let possiblyLiveLocationsAtExit = possiblyLiveLocations
-			markAsDefinitelyDiscarded(defined.lazy.map(\.location))
-			markAsPossiblyUsedLater(possiblyUsed.lazy.map(\.location))	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
-			for definedLocation in defined.lazy.map(\.location) {
+			markAsDefinitelyDiscarded(defined)
+			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
+			for definedLocation in defined {
 				insertConflict(definedLocation, possiblyLiveLocationsAtExit)
 			}
 			
-			definedLocations.formUnion(defined.lazy.map(\.location))
-			possiblyUsedUndefinedLocations.formUnion(possiblyUsed.lazy.map(\.location))
+			definedLocations.formUnion(defined)
+			possiblyUsedUndefinedLocations.formUnion(possiblyUsed)
 			possiblyUsedUndefinedLocations.subtract(definedLocations)
-			
-			for location in defined {
-				try declarations.insert(location)
-			}
-			for location in possiblyUsed {
-				try declarations.insert(location)
-			}
 			
 		}
 		
 		/// Returns a copy of `self` with additional information about an effect or predicate applied to it.
 		///
 		/// - Parameters:
-		///    - defined: The (typed) locations that are defined by the effect.
-		///    - possiblyUsed: The (typed) locations that are (possibly) used by the effect or predicate.
-		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws -> Self where D.Element == TypedLocation, U.Element == TypedLocation {
+		///    - defined: The locations that are defined by the effect.
+		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.
+		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws -> Self where D.Element == Location, U.Element == Location {
 			var copy = self
 			try copy.update(defined: defined, possiblyUsed: possiblyUsed)
 			return copy

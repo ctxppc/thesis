@@ -46,14 +46,12 @@ extension ALA {
 			}
 		}
 		
-		/// Assigns given value type to given location.
+		/// Declares given location and assigns it given type.
 		///
-		/// Since registers cannot be assigned a type, this method does nothing `location` represents a register.
-		public mutating func define(_ location: Location, type newType: ValueType) throws {
+		/// Since registers cannot be assigned a type, this method does nothing if `location` represents a register.
+		public mutating func declare(_ location: Location, type newType: ValueType) throws {
 			
-			if case .register = location {
-				return
-			}
+			if case .register = location { return }
 			
 			let previousType = typesByLocation.updateValue(newType, forKey: location)
 			if let previousType = previousType, previousType != newType {
@@ -62,28 +60,28 @@ extension ALA {
 			
 		}
 		
-		/// Requires given location to be typed `requiredType`.
-		public func require(_ location: Location, beTyped requiredType: ValueType) throws {
+		/// Requires given location to be declared and typed `requiredType`.
+		public func require(_ location: Location, type requiredType: ValueType) throws {
 			if let previousType = typesByLocation[location], previousType != requiredType {
 				throw TypeError.inconsistentTyping(location, previousType, requiredType)
 			}
 		}
 		
-		/// Requires given source to be typed `requiredType`.
-		public func require(_ source: Source, beTyped requiredType: ValueType) throws {
+		/// Requires given source to be typed `requiredType`, and if it represents a location, that location to be declared.
+		public func require(_ source: Source, type requiredType: ValueType) throws {
 			switch source {
 				
 				case .constant(let value):
 				guard requiredType.supports(constant: value) else { throw TypeError.constantNotRepresentableByType(value, requiredType) }
 				
 				case .abstract(let location):
-				try require(Location.abstract(location), beTyped: requiredType)
+				try require(Location.abstract(location), type: requiredType)
 				
 				case .register(let register, let type):
 				guard requiredType == type else { throw TypeError.inconsistentTyping(.register(register), type, requiredType) }
 				
 				case .frame(let location):
-				try require(Location.frame(location), beTyped: requiredType)
+				try require(Location.frame(location), type: requiredType)
 				
 			}
 		}

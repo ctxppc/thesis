@@ -27,13 +27,16 @@ public enum ALA : Language {
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
-				effect = try effect.coalescing(removedLocation, into: retainedLocation, analysis: &analysis)
+				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis)
 			}
 		}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(assignments: try .init(analysisAtScopeEntry: effect.analysisAtEntry))
+			var context = Context(
+				declarations:	locals,
+				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry)
+			)
 			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		

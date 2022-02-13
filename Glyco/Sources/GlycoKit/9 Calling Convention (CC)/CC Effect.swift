@@ -85,7 +85,7 @@ extension CC {
 					
 					// Pass frame-resident arguments first.
 					for (a, arg) in assignmentArgumentPairsViaFrame {
-						// TODO: Reimplement using records.
+						// TODO: Reimplement using records — which will also verify correct typing
 						Lowered.setElement(of: argumentsStructure, at: .constant(a.callerOffset), to: arg)
 					}
 					

@@ -64,27 +64,27 @@ extension IT {
 				
 				case .set(let destination, to: let source):
 				let type = try context.declarations[source]
-				try context.declarations.define(destination, type: type)
+				try context.declarations.declare(destination, type: type)
 				Lowered.set(type, destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				try context.declarations.require(lhs, beTyped: .signedWord)
-				try context.declarations.require(rhs, beTyped: .signedWord)
-				try context.declarations.define(destination, type: .signedWord)
+				try context.declarations.require(lhs, type: .signedWord)
+				try context.declarations.require(rhs, type: .signedWord)
+				try context.declarations.declare(destination, type: .signedWord)
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				try context.declarations.define(vector, type: .capability(elementType))
+				try context.declarations.declare(vector, type: .capability(elementType))
 				Lowered.allocateVector(elementType, count: count, into: vector)
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
 				let elementType = try context.declarations.elementType(vector: vector)
-				try context.declarations.define(destination, type: elementType)
+				try context.declarations.declare(destination, type: elementType)
 				Lowered.getElement(elementType, of: vector, at: index, to: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
 				let elementType = try context.declarations.elementType(vector: vector)
-				try context.declarations.require(element, beTyped: elementType)
+				try context.declarations.require(element, type: elementType)
 				Lowered.setElement(elementType, of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):

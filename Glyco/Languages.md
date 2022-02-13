@@ -566,7 +566,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
-	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>, <strong>declarations:</strong> Declarations)</code></dd>
+	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.ConflictSet</code></dt>

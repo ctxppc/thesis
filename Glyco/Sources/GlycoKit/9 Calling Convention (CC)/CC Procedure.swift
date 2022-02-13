@@ -56,6 +56,7 @@ extension CC {
 				// Bind local names to frame-resident arguments.
 				for assignment in assignments.viaCallFrame {
 					let parameter = assignment.parameter
+					// TODO: Reimplement using records — which will also provide type information
 					Lower.Effect.set(.abstract(parameter.location), to: .frame(assignment.calleeLocation))
 				}
 				

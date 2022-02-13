@@ -39,7 +39,6 @@ extension ALA.Analysis {
 		case possiblyLiveLocations = "possiblyLiveLocations"
 		case definedLocations = "definedLocations"
 		case possiblyUsedUndefinedLocations = "possiblyUsedUndefinedLocations"
-		case declarations = "declarations"
 	}
 }
 

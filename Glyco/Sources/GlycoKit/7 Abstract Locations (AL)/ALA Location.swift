@@ -32,7 +32,8 @@ extension ALA {
 			/// Determines an assignment using given analysis at the scope's entry.
 			///
 			/// The initialiser assigns homes to all used locations, by increasing degree of conflict.
-			init(analysisAtScopeEntry: Analysis) throws {
+			init(declarations: Declarations, analysisAtScopeEntry: Analysis) throws {
+				self.declarations = declarations
 				self.analysisAtScopeEntry = analysisAtScopeEntry
 				for location in analysisAtScopeEntry.locationsOrderedByIncreasingNumberOfConflicts() {
 					guard case .abstract(let location) = location else { continue }
@@ -50,9 +51,12 @@ extension ALA {
 			
 			/// Determines the type of `location`.
 			func type(of location: Location) throws -> ValueType {
-				guard let type = analysisAtScopeEntry.declarations[location].valueType else { throw AssignmentError.unknownType(location) }
+				guard let type = declarations[location].valueType else { throw AssignmentError.unknownType(location) }
 				return type
 			}
+			
+			/// The declarations.
+			let declarations: Declarations
 			
 			/// The analysis at the scope's entry.
 			let analysisAtScopeEntry: Analysis

@@ -223,21 +223,17 @@ extension ALA {
 		}
 		
 		/// Returns the locations defined by `self`.
-		private func definedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
+		private func definedLocations() -> [Location] {
 			switch self {
 				
 				case .do, .setElement, .if, .push, .pop, .popScope, .call, .return:
 				return []
 				
-				case .set(let type, let destination, to: _, analysisAtEntry: _),
-					.getElement(let type, of: _, at: _, to: let destination, analysisAtEntry: _):
-				return [.init(location: destination, dataType: type)]
-				
-				case .compute(_, _, _, to: let destination, analysisAtEntry: _):
-				return [.init(location: destination, dataType: .signedWord)]
-				
-				case .allocateVector(let elementType, count: _, into: let destination, analysisAtEntry: _):
-				return [.init(location: destination, dataType: .capability(elementType))]
+				case .set(_, let destination, to: _, analysisAtEntry: _),
+					.getElement(_, of: _, at: _, to: let destination, analysisAtEntry: _),
+					.compute(_, _, _, to: let destination, analysisAtEntry: _),
+					.allocateVector(_, count: _, into: let destination, analysisAtEntry: _):
+				return [destination]
 				
 				case .pushScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
@@ -246,7 +242,7 @@ extension ALA {
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
+		private func possiblyUsedLocations() -> [Location] {
 			switch self {
 				
 				case .do,
@@ -260,33 +256,26 @@ extension ALA {
 					.return:
 				return []
 				
-				case .set(let type, _, to: let source, analysisAtEntry: _),
-					.push(let type, let source, analysisAtEntry: _):
-				return [source]
-					.compactMap(\.location)
-					.map { .init(location: $0, dataType: type) }
+				case .set(_, _, to: let source, analysisAtEntry: _),
+					.push(_, let source, analysisAtEntry: _):
+				return [source].compactMap(\.location)
 				
 				case .compute(let lhs, _, let rhs, to: _, analysisAtEntry: _):
-				return [lhs, rhs]
-					.compactMap(\.location)
-					.map { .init(location: $0, dataType: .signedWord) }
+				return [lhs, rhs].compactMap(\.location)
 				
-				case .getElement(let elementType, of: let vector, at: .constant, to: _, analysisAtEntry: _),
-					.setElement(let elementType, of: let vector, at: .constant, to: _, analysisAtEntry: _):
-				return [.init(location: vector, dataType: .capability(elementType))]
+				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
+					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
+				return [vector]
 				
-				case .getElement(let elementType, of: let vector, at: let index, to: _, analysisAtEntry: _),
-					.setElement(let elementType, of: let vector, at: let index, to: _, analysisAtEntry: _):
-				return [index]
-					.compactMap(\.location)
-					.map { .init(location: $0, dataType: .signedWord) }
-					+ [.init(location: vector, dataType: .capability(elementType))]
+				case .getElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _),
+					.setElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _):
+				return [index].compactMap(\.location) + [vector]
 				
 				case .popScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
 				
 				case .call(_, let arguments, analysisAtEntry: _):
-				return arguments.map { .init(location: $0, dataType: nil) }
+				return arguments
 				
 			}
 		}
@@ -326,11 +315,19 @@ extension ALA {
 		/// - Parameters:
 		///   - removedLocation: The location that is replaced by `retainedLocation`.
 		///   - retainedLocation: The location that remains.
+		///   - declarations: The local declarations.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
-		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
-			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+		func coalescing(
+			_ removedLocation:		AbstractLocation,
+			into retainedLocation:	Location,
+			declarations:			Declarations,
+			analysis:				inout Analysis
+		) throws -> Self {
+			try updated(using: {
+				try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations)
+			}, analysis: &analysis)
 		}
 		
 		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.
@@ -342,7 +339,7 @@ extension ALA {
 		///   - retainedLocation: The location that is retained.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
-		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location) throws -> Self {
+		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location, declarations: Declarations) throws -> Self {
 			
 			func substitute(_ location: Location) -> Location {
 				location == .abstract(removedLocation) ? retainedLocation : location
@@ -356,7 +353,7 @@ extension ALA {
 					return .abstract(location)
 					
 					case .register(let register):
-					return try .register(register, analysisAtEntry.declarations[Location.abstract(removedLocation)])
+					return try .register(register, declarations[Location.abstract(removedLocation)])
 					
 					case .frame(let location):
 					return .frame(location)

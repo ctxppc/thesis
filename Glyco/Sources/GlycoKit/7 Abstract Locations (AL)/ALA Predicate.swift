@@ -84,16 +84,14 @@ extension ALA {
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [TypedLocation] {	// TODO: Change to [Location] ?
+		private func possiblyUsedLocations() -> [Location] {
 			switch self {
 				
 				case .constant, .if, .do:
 				return []
 				
 				case .relation(let lhs, _, let rhs, analysisAtEntry: _):
-				return [lhs, rhs]
-					.compactMap(\.location)
-					.map { .init(location: $0, dataType: .signedWord) }
+				return [lhs, rhs].compactMap(\.location)
 				
 			}
 		}
@@ -127,9 +125,15 @@ extension ALA {
 		/// - Parameters:
 		///   - removedLocation: The location that is replaced by `retainedLocation`.
 		///   - retainedLocation: The location that remains.
+		///   - declaration: The local declarations.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		func coalescing(_ removedLocation: AbstractLocation, into retainedLocation: Location, analysis: inout Analysis) throws -> Self {
-			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation) }, analysis: &analysis)
+		func coalescing(
+			_ removedLocation: AbstractLocation,
+			into retainedLocation: Location,
+			declarations: Declarations,
+			analysis: inout Analysis
+		) throws -> Self {
+			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations) }, analysis: &analysis)
 		}
 		
 	}
