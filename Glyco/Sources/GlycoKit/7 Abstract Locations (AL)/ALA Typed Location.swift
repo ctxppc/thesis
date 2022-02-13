@@ -4,48 +4,29 @@ import Foundation
 
 extension ALA {
 	
-	/// A location with possibly an associated data type.
+	/// A location with an associated value type.
 	public enum TypedLocation : Equatable, Codable {
 		
-		/// Creates a location associated with given data type.
-		///
-		/// `dataType` is ignored if `location` is a register location. Registers do not have a fixed type.
-		init(location: Location, dataType: ValueType?) {
-			switch location {
-				case .abstract(let location):	self = .abstract(location, dataType)
-				case .register(let register):	self = .register(register)
-				case .frame(let location):		self = .frame(location, dataType)
-			}
-		}
-		
 		/// An abstract location, to be lowered to a physical location after register allocation.
-		case abstract(AbstractLocation, ValueType?)
-		
-		/// A location fixed to given register.
-		case register(Register)
+		case abstract(AbstractLocation, ValueType)
 		
 		/// A location fixed to given frame location.
-		case frame(Frame.Location, ValueType?)
+		case frame(Frame.Location, ValueType)
 		
 		/// The location.
 		var location: Location {
 			switch self {
 				case .abstract(let location, _):	return .abstract(location)
-				case .register(let register):		return .register(register)
 				case .frame(let location, _):		return .frame(location)
 			}
 		}
 		
-		/// The location's value type, if fixed.
-		var valueType: ValueType? {
+		/// The location's value type.
+		var valueType: ValueType {
 			switch self {
-				
-				case .abstract(_, let dataType), .frame(_, let dataType):
+				case .abstract(_, let dataType),
+					.frame(_, let dataType):
 				return dataType
-				
-				case .register:
-				return nil
-				
 			}
 		}
 		
@@ -55,6 +36,10 @@ extension ALA {
 
 infix operator ~ : ComparisonPrecedence
 
-public func ~ (location: ALA.Location, type: ALA.ValueType?) -> ALA.TypedLocation {
-	.init(location: location, dataType: type)
+public func ~ (location: ALA.Location, type: ALA.ValueType) -> ALA.TypedLocation {
+	switch location {
+		case .abstract(let location):	return .abstract(location, type)
+		case .frame(let location):		return .frame(location, type)
+		case .register:					fatalError("Cannot associate a type with a register")
+	}
 }

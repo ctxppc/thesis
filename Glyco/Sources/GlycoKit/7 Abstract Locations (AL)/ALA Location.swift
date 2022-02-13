@@ -49,12 +49,6 @@ extension ALA {
 				}
 			}
 			
-			/// Determines the type of `location`.
-			func type(of location: Location) throws -> ValueType {
-				guard let type = declarations[location].valueType else { throw AssignmentError.unknownType(location) }
-				return type
-			}
-			
 			/// The declarations.
 			let declarations: Declarations
 			
@@ -78,7 +72,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frameCell(frame.allocate(try type(of: .abstract(location)).lowered()))
+					home = .frameCell(frame.allocate(try declarations.type(of: Location.abstract(location)).lowered()))
 				}
 				homesByLocation[location] = home
 				return home

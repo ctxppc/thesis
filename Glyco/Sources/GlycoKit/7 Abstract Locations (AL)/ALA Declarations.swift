@@ -14,8 +14,8 @@ extension ALA {
 		
 		/// Creates a definitions list with given typed locations.
 		public init(_ locations: [TypedLocation]) throws {
-			for location in locations {
-				try insert(location)
+			for typedLocation in locations {
+				try declare(typedLocation.location, type: typedLocation.valueType)
 			}
 		}
 		
@@ -24,25 +24,21 @@ extension ALA {
 		/// - Invariant: No location in the mapping represents a registers.
 		private var typesByLocation = [Location : ValueType]()
 		
-		/// Accesses the type for given location.
+		/// Returns given location's declared value type.
 		///
-		/// Since registers cannot be assigned a type, the getter throws an unknown type error if `location` represents a register.
-		public subscript (location: Location) -> ValueType {
-			get throws {
-				guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
-				return type
-			}
+		/// Since registers cannot be assigned a type, this method throws an unknown type error if `location` represents a register.
+		public func type(of location: Location) throws -> ValueType {
+			guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
+			return type
 		}
 		
-		/// Accesses the (widest supported) value type for given source.
-		public subscript (source: Source) -> ValueType {
-			get throws {
-				switch source {
-					case .constant:					return .signedWord
-					case .abstract(let location):	return try self[Location.abstract(location)]
-					case .register(_, let type):	return type
-					case .frame(let location):		return try self[Location.frame(location)]
-				}
+		/// Returns given source's (widest supported) value type.
+		public func type(of source: Source) throws -> ValueType {
+			switch source {
+				case .constant:					return .signedWord
+				case .abstract(let location):	return try type(of: Location.abstract(location))
+				case .register(_, let type):	return type
+				case .frame(let location):		return try type(of: Location.frame(location))
 			}
 		}
 		
@@ -88,29 +84,13 @@ extension ALA {
 		
 		/// Returns the element type for given vector location.
 		public func elementType(vector: Location) throws -> ValueType {
-			guard case .capability(let elementType) = try self[vector] else { throw TypeError.noVectorType(vector) }
+			guard case .capability(let elementType) = try type(of: vector) else { throw TypeError.noVectorType(vector) }
 			return elementType
 		}
 		
 		/// Removes given location.
 		public mutating func remove(_ location: Location) {
 			typesByLocation.removeValue(forKey: location)
-		}
-		
-		/// Inserts given typed location to the assignment.
-		///
-		/// - Throws: An inconsistent typing error if `self` contains a value type for the same location that is different than `typedLocation`'s value type.
-		mutating func insert(_ typedLocation: TypedLocation) throws {	// TODO: Remove?
-			guard let newType = typedLocation.valueType else { return }
-			let previousType = typesByLocation.updateValue(newType, forKey: typedLocation.location)
-			if let previousType = previousType, previousType != newType {
-				throw TypeError.inconsistentTyping(typedLocation.location, previousType, newType)
-			}
-		}
-		
-		/// Accesses the typed location associated with `location`.
-		subscript (location: Location) -> TypedLocation {	// TODO: Remove?
-			.init(location: location, dataType: typesByLocation[location])
 		}
 		
 		enum TypeError : LocalizedError {
@@ -161,9 +141,7 @@ extension ALA.Declarations : Codable {
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
-		try container.encode(
-			typesByLocation.map { ALA.TypedLocation(location: $0.key, dataType: $0.value) }
-		)
+		try container.encode(typesByLocation.map { $0.key ~ $0.value })
 	}
 	
 }

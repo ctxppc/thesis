@@ -502,9 +502,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.TypedLocation</code></dt>
-	<dd><code><strong>abstract</strong>(AbstractLocation, ValueType?)</code></dd>
-	<dd><code><strong>register</strong>(Register)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location, ValueType?)</code></dd>
+	<dd><code><strong>abstract</strong>(AbstractLocation, ValueType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Declarations</code></dt>

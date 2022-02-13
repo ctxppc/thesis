@@ -63,7 +63,7 @@ extension IT {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: let source):
-				try context.declarations.declare(destination, type: context.declarations[source])
+				try context.declarations.declare(destination, type: context.declarations.type(of: source))
 				Lowered.set(destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):

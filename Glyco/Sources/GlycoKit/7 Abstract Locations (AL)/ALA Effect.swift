@@ -67,13 +67,17 @@ extension ALA {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let destination, to: let source, analysisAtEntry: _):
-				try Lowered.set(context.declarations[destination].lowered(), destination.lowered(in: &context), to: source.lowered(in: &context))
+				try Lowered.set(
+					context.declarations.type(of: destination).lowered(),
+					destination.lowered(in: &context),
+					to: source.lowered(in: &context)
+				)
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: _):
-				try Lowered.allocateVector(context.declarations[vector].lowered(), count: count, into: vector.lowered(in: &context))
+				try Lowered.allocateVector(context.declarations.type(of: vector).lowered(), count: count, into: vector.lowered(in: &context))
 				
 				case .getElement(of: let vector, at: let index, to: let destination, analysisAtEntry: _):
 				try Lowered.getElement(
@@ -95,7 +99,7 @@ extension ALA {
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let source, analysisAtEntry: _):
-				try Lowered.push(context.declarations[source].lowered(), source.lowered(in: &context))
+				try Lowered.push(context.declarations.type(of: source).lowered(), source.lowered(in: &context))
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				Lowered.pop(bytes: bytes)
@@ -363,7 +367,7 @@ extension ALA {
 					return .abstract(location)
 					
 					case .register(let register):
-					return try .register(register, declarations[Location.abstract(removedLocation)])
+					return try .register(register, declarations.type(of: Location.abstract(removedLocation)))
 					
 					case .frame(let location):
 					return .frame(location)
