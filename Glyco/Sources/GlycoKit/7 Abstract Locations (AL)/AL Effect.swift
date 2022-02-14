@@ -17,9 +17,6 @@ extension AL {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in given location.
-		case allocateVector(count: Int = 1, into: Location)
-		
 		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
@@ -72,9 +69,6 @@ extension AL {
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
 				return .allocateBuffer(bytes: bytes, into: buffer, analysisAtEntry: .init())
-				
-				case .allocateVector(count: let count, into: let vector):
-				return .allocateVector(count: count, into: vector, analysisAtEntry: .init())
 				
 				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
 				return .getElement(elementType, of: vector, at: index, to: destination, analysisAtEntry: .init())

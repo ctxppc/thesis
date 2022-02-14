@@ -20,9 +20,6 @@ extension CF {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
 		case allocateBuffer(bytes: Int, into: Register)
 		
-		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given register.
-		case allocateVector(DataType, count: Int = 1, into: Register)	// TODO: Remove?
-		
 		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
 		case loadElement(DataType, into: Register, buffer: Register, offset: Register)
 		
@@ -112,15 +109,6 @@ extension CF {
 				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
-				let buffer = try buffer.lowered()
-				return [
-					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),	// compute tentative base
-					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),			// actual base may be lower, length may be greater
-					.getCapabilityAddress(destination: temp, source: buffer),							// move stack pointer to actual base
-					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
-				]
-				
-				case .allocateVector(let dataType, count: let count, into: let vector):
 				/*
 					 ┌──────────┐ high
 					 │          │
@@ -130,17 +118,16 @@ extension CF {
 					 │ │ 3    │ │
 					 │ │ 2    │ │
 					 │ │ 1    │ │
-					 │ │ 0    │ │◄───── vector & new sp
+					 │ │ 0    │ │◄───── buffer & new sp
 					 │ └──────┘ │
 					 │          │
 					 └──────────┘ low
 				 */
-				let vector = try vector.lowered()
-				let byteSize = dataType.byteSize * count
+				let buffer = try buffer.lowered()
 				return [
-					.offsetCapabilityWithImmediate(destination: vector, source: .sp, offset: -byteSize),	// compute tentative base
-					.setCapabilityBounds(destination: vector, source: vector, length: byteSize),			// actual base may be lower, length may be greater
-					.getCapabilityAddress(destination: temp, source: vector),								// move stack pointer to actual base
+					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),	// compute tentative base
+					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),			// actual base may be lower, length may be greater
+					.getCapabilityAddress(destination: temp, source: buffer),							// move stack capability to actual base
 					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				

@@ -17,9 +17,6 @@ extension IT {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(DataType, count: Int = 1, into: Location)
-		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
@@ -78,10 +75,6 @@ extension IT {
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
 				try context.declarations.declare(buffer, type: .capability)
 				Lowered.allocateBuffer(bytes: bytes, into: buffer)
-				
-				case .allocateVector(let elementType, count: let count, into: let vector):
-				try context.declarations.declare(vector, type: .capability)
-				Lowered.allocateVector(count: count, into: vector)
 				
 				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
 				try context.declarations.declare(destination, type: elementType)

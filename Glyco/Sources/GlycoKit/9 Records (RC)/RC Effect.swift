@@ -87,7 +87,7 @@ extension RC {
 				Lowered.do([])	// TODO
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				Lowered.allocateVector(elementType.lowered(), count: count, into: vector)
+				Lowered.allocateBuffer(bytes: 0, into: vector)	// TODO
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
 				Lowered.getElement(.signedWord, of: vector, at: index, to: destination)	// TODO: Element type

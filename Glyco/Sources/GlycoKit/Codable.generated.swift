@@ -190,13 +190,6 @@ extension FO.Program {
 	}
 }
 
-extension FO.HaltEffect {
-	public enum CodingKeys : String, CodingKey {
-		case result = "result"
-		case type = "type"
-	}
-}
-
 extension IT.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"

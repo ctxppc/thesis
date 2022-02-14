@@ -49,7 +49,7 @@ extension CC {
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
 				
 				case .allocateVector(let type, count: let count, into: let vector):
-				Lowered.allocateVector(type, count: count, into: .abstract(vector))
+				Lowered.do([])	// TODO
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
 				Lowered.getElement(.signedWord, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))	// TODO
@@ -71,7 +71,7 @@ extension CC {
 					let argumentsStructure = Lower.Location.register(.a0)
 					let argumentsStructureSize = assignments.viaCallFrame.lazy.map(\.parameter).totalByteSize()
 					if argumentsStructureSize > 0 {
-						Lowered.allocateVector(.byte, count: argumentsStructureSize, into: argumentsStructure)
+						Lowered.allocateBuffer(bytes: argumentsStructureSize, into: argumentsStructure)
 					}
 					
 					// Prepare arguments for lowering.

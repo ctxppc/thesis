@@ -19,9 +19,6 @@ extension CD {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(DataType, count: Int = 1, into: Location)
-		
 		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
@@ -72,7 +69,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .allocateBuffer, .allocateVector, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
+				case .set, .compute, .allocateBuffer, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -107,7 +104,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .allocateBuffer, .allocateVector, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call:
+				case .set, .compute, .allocateBuffer, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -245,14 +242,6 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				in:					&context,
 				entryLabel:			entryLabel,
 				previousEffects:	previousEffects + [.allocateBuffer(bytes: bytes, into: buffer)],
-				exitLabel:			exitLabel
-			)
-			
-			case .allocateVector(let type, count: let count, into: let vector):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.allocateVector(type, count: count, into: vector)],
 				exitLabel:			exitLabel
 			)
 			

@@ -23,9 +23,6 @@ extension FO {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(DataType, count: Int = 1, into: Location)
-		
 		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
@@ -143,10 +140,6 @@ extension FO {
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
 				let (storeBufferCap, bufferCap) = try store(.capability, to: buffer, using: temp1)
 				return [.allocateBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
-				
-				case .allocateVector(let elementType, count: let count, into: let vector):
-				let (storeVectorCap, vectorCap) = try store(.capability, to: vector, using: temp1)
-				return [.allocateVector(elementType, count: count, into: vectorCap)] + storeVectorCap
 				
 				case .getElement(let type, of: let buffer, at: let index, to: let destination):
 				let (loadBuffer, buffer) = try load(type, from: .location(buffer), using: temp1)
