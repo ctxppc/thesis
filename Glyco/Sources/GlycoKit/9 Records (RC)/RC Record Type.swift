@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
 import OrderedCollections
 
 extension RC {
@@ -24,6 +25,23 @@ extension RC {
 		/// Appends `field` if `self` doesn't contain a field with the same name as `field`, or replaces the field in `self` with the same name as `field` by `field`.
 		public mutating func appendOrReplace(_ field: Field) {
 			typesByFieldName[field.name] = field.valueType
+		}
+		
+		/// Returns the field named `name`, or `nil` if `self` doesn't such a field.
+		public func field(named name: Field.Name) -> Field? {
+			typesByFieldName[name]
+				.map { .init(name: name, valueType: $0) }
+		}
+		
+		/// Returns the byte offset of given field.
+		///
+		/// - Requires: `self` contains `field`.
+		public func byteOffset(of field: Field) -> Int {
+			let index = typesByFieldName.keys.firstIndex(of: field.name) !! "Expected field named “\(field.name)”"
+			return self[..<index]
+				.lazy
+				.map(\.valueType.byteSize)
+				.reduce(0, +)
 		}
 		
 		public struct Field : Named, Equatable, Codable {

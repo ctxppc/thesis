@@ -19,7 +19,8 @@ extension RC {
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
-			.init(name, in: try effect.lowered())
+			var context = RC.Context()
+			return .init(name, in: try effect.lowered(in: &context))
 		}
 		
 	}

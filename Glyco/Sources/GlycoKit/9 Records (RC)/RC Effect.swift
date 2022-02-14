@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Foundation
+
 extension RC {
 	
 	/// An effect on an RC machine.
@@ -21,7 +23,7 @@ extension RC {
 		case getField(RecordType.Field.Name, of: Location, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(RecordType.Field.Name, of: Location, to: Location)
+		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(ValueType, count: Int = 1, into: Location)
@@ -78,22 +80,57 @@ extension RC {
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateRecord(let recordType, into: let record):
+				context.recordTypesByRecordLocation[record] = recordType
 				Lowered.allocateBuffer(bytes: recordType.byteSize, into: record)
 				
 				case .getField(let name, of: let record, to: let destination):
-				Lowered.do([])	// TODO
+				if let recordType = context.recordTypesByRecordLocation[record] {
+					if let field = recordType.field(named: name) {
+						Lowered.getElement(
+							field.valueType.lowered(),
+							of:		record,
+							offset:	.constant(recordType.byteOffset(of: field)),
+							to:		destination
+						)
+					} else {
+						throw LoweringError.unknownFieldName(name, record, recordType)
+					}
+				} else {
+					throw LoweringError.noRecordType(record)
+				}
 				
 				case .setField(let name, of: let record, to: let source):
-				Lowered.do([])	// TODO
+				if let recordType = context.recordTypesByRecordLocation[record] {
+					if let field = recordType.field(named: name) {
+						Lowered.setElement(
+							field.valueType.lowered(),
+							of:		record,
+							offset:	.constant(recordType.byteOffset(of: field)),
+							to:		source
+						)
+					} else {
+						throw LoweringError.unknownFieldName(name, record, recordType)
+					}
+				} else {
+					throw LoweringError.noRecordType(record)
+				}
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				Lowered.allocateBuffer(bytes: 0, into: vector)	// TODO
+				Lowered.allocateBuffer(bytes: elementType.byteSize * count, into: vector)
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(.signedWord, of: vector, offset: index, to: destination)	// TODO: Element type
+				if let elementType = context.elementTypesByVectorLocation[vector] {
+					Lowered.getElement(elementType.lowered(), of: vector, offset: index, to: destination)
+				} else {
+					throw LoweringError.noVectorType(vector)
+				}
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(.signedWord, of: vector, offset: index, to: element)		// TODO: Element type
+				case .setElement(of: let vector, at: let index, to: let source):
+				if let elementType = context.elementTypesByVectorLocation[vector] {
+					Lowered.setElement(elementType.lowered(), of: vector, offset: index, to: source)
+				} else {
+					throw LoweringError.noVectorType(vector)
+				}
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -123,6 +160,35 @@ extension RC {
 		var subeffects: [Self]? {
 			guard case .do(let subeffects) = self else { return nil }
 			return subeffects
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating that no record type is known for given location.
+			case noRecordType(Location)
+			
+			/// An error indicating that given field name isn't part of the record type for given location.
+			case unknownFieldName(RecordType.Field.Name, Location, RecordType)
+			
+			/// An error indicating that no vector type is known for given location.
+			case noVectorType(Location)
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					
+					case .noRecordType(let record):
+					return "“\(record)” is not a record"
+					
+					case .unknownFieldName(let name, let record, let recordType):
+					return "“\(record)” of type \(recordType) does not have a field named “\(name)”"
+					
+					case .noVectorType(let vector):
+					return "“\(vector)” is not a vector"
+					
+				}
+			}
+			
 		}
 		
 	}

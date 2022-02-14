@@ -20,7 +20,8 @@ public enum RC : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			try .init(effect.lowered(), procedures: procedures.lowered())
+			var context = Context()
+			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
 		}
 		
 	}
@@ -28,12 +29,9 @@ public enum RC : Language {
 	// See protocol.
 	public typealias Lower = IT
 	
-	typealias Context = ()
-	
 	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias Declarations = Lower.Declarations
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
