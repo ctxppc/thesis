@@ -12,14 +12,16 @@ protocol Named {
 	
 }
 
-struct Bag<NameType : Name> {
+struct Bag<NameType : Name, Language : GlycoKit.Language> {
+	
+	private let languagePrefix = "\(Language.name.lowercased())."
 	
 	mutating func uniqueName(from prefix: String) -> NameType {
 		
-		let prefix = prefix
+		let prefix = languagePrefix + (prefix
 			.split(separator: "$", maxSplits: 1, omittingEmptySubsequences: true)
 			.first
-			.map(String.init) ?? prefix
+			.map(String.init) ?? prefix)
 		
 		if let uses = usesByPrefix[prefix] {
 			defer { usesByPrefix[prefix] = uses + 1 }

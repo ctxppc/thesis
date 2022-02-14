@@ -11,6 +11,9 @@ extension SV {
 		/// A mapping from record locations to record types.
 		var recordTypesByRecordLocation = [Location : RecordType]()
 		
+		/// A bag of locations.
+		var locations = Bag<AbstractLocation>()
+		
 	}
 	
 }

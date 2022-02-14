@@ -21,7 +21,7 @@ extension SV {
 		case registerDatum
 		
 		/// The size of a datum of this type, in bytes.
-		public var byteSize: Int {
+		var byteSize: Int {
 			lowered().byteSize
 		}
 		

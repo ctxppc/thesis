@@ -54,7 +54,7 @@ public enum Lexeme : Equatable {
 	private static let identifierPattern = identifierCharacters • (identifierCharacters | CharacterSet.alphanumerics)*
 	
 	/// The characters that can appear in any position in an identifier.
-	private static let identifierCharacters = CharacterSet.letters | "_" | "%" | "$"
+	private static let identifierCharacters = CharacterSet.letters | "_" | "%" | "$" | "."
 	
 	/// The characters that cannot appear in a string literal.
 	private static let illegalLiteralCharacters = CharacterSet.illegalCharacters | .controlCharacters

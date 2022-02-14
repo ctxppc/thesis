@@ -83,4 +83,6 @@ extension Language {
 	/// The language's name.
 	static var name: String { "\(self)" }
 	
+	typealias Bag<NameType : Name> = GlycoKit.Bag<NameType, Self>
+	
 }

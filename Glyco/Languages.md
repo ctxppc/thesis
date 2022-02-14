@@ -9,6 +9,7 @@ The pipeline, from high-level to low-level is:
 [`CV`](#CV) →
 [`CA`](#CA) →
 [`CC`](#CC) →
+[`SV`](#SV) →
 [`ID`](#ID) →
 [`AL`](#AL) →
 [`ALA`](#ALA) →
@@ -345,7 +346,7 @@ A language that groups all effects that write to a location under one canonical 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
 A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
 
-**Inherited from ID:**
+**Inherited from SV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Label</code>, 
@@ -389,6 +390,68 @@ A language that introduces parameters & result values in procedures via the low-
 <dl>
 	<dt><code>CC.Procedure</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Effect)</code></dd>
+</dl>
+
+<h2 id="SV">Grammar for SV (Structured Values)</h2>
+A language that introduces structured values (vectors and records).
+
+**Inherited from ID:**
+<code>AbstractLocation</code>, 
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Frame</code>, 
+<code>Label</code>, 
+<code>Location</code>, 
+<code>Register</code>, 
+<code>Source</code>
+<dl>
+	<dt><code>SV.Program</code></dt>
+	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+	<dt><code>SV.ValueType</code></dt>
+	<dd><code><strong>byte</strong></code></dd>
+	<dd><code><strong>signedWord</strong></code></dd>
+	<dd><code><strong>vectorCapability</strong>(ValueType)</code></dd>
+	<dd><code><strong>recordCapability</strong>(RecordType)</code></dd>
+	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>SV.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>allocateRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
+	<dd><code><strong>push</strong>(Source)</code></dd>
+	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushScope</strong></code></dd>
+	<dd><code><strong>popScope</strong></code></dd>
+	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>SV.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>SV.Context</code></dt>
+</dl>
+<dl>
+	<dt><code>SV.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>SV.Procedure</code></dt>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
 <h2 id="ID">Grammar for ID (Inferred Types)</h2>

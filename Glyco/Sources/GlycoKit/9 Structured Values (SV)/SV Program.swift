@@ -7,7 +7,7 @@ public enum SV : Language {
 	/// A program on an SV machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(effect: Effect, procedures: [Procedure]) {
+		public init(_ effect: Effect, procedures: [Procedure]) {
 			self.effect = effect
 			self.procedures = procedures
 		}

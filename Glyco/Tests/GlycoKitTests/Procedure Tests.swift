@@ -32,6 +32,7 @@ final class ProcedureTests : XCTestCase {
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 		
 		let expected = """
 						.text

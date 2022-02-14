@@ -262,7 +262,7 @@ extension S.Program {
 
 extension SV.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effect = "effect"
+		case effect = "_0"
 		case procedures = "procedures"
 	}
 }
