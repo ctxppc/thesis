@@ -50,14 +50,12 @@ extension CC {
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
 				for assignment in assignments.viaRegisters {
 					let parameter = assignment.parameter
-					Lower.Effect.set(.abstract(parameter.location), to: .register(assignment.register, parameter.type))
+					Lower.Effect.set(.abstract(parameter.location), to: .register(assignment.register, parameter.type.lowered()))
 				}
 				
 				// Bind local names to frame-resident arguments.
-				for assignment in assignments.viaCallFrame {
-					let parameter = assignment.parameter
-					// TODO: Reimplement using records — which will also provide type information
-					Lower.Effect.set(.abstract(parameter.location), to: .frame(assignment.calleeLocation))
+				for field in assignments.parameterRecordType {
+					// TODO
 				}
 				
 				// Execute main effect.
@@ -82,19 +80,16 @@ extension CC {
 				assignments.viaRegisters.append(.init(parameter: parameter, register: register))
 			}
 			
-			// Assign remaining parameters to the call frame, in reverse order to ensure stack order — cf. `Frame.addParameter(_:count:)`.
-			var frame = Lower.Frame()
-			var callerOffset = 0
-			while let parameter = parameters.popLast() {
-				assignments.viaCallFrame.append(.init(
-					parameter:		parameter,
-					calleeLocation:	frame.addParameter(parameter.type),
-					callerOffset:	callerOffset
-				))
-				callerOffset += parameter.type.byteSize
-			}
-			assignments.viaCallFrame.reverse()	// ensure parameter order
+			// Assign remaining parameters to the arguments record — ensure stack order by reversing the fields
+			assignments.parameterRecordType = .init(
+				parameters
+					.lazy
+					.map { parameter in
+						.init(name: .init(rawValue: parameter.location.rawValue), valueType: parameter.type)
+					}.reversed()
+			)
 			
+			// Done.
 			return assignments
 			
 		}

@@ -3,6 +3,7 @@
 extension CC {
 	public struct Parameter : Codable, Equatable {
 		
+		/// Creates a parameter with given location and value type.
 		public init(_ location: Location, _ type: ValueType) {
 			self.location = location
 			self.type = type
@@ -11,7 +12,7 @@ extension CC {
 		/// The location where the argument is stored and accessible from within the procedure.
 		public let location: Location
 		
-		/// The data type of the argument.
+		/// The value type of the argument.
 		public let type: ValueType
 		
 		/// An assignment of parameters to physical locations.
@@ -20,8 +21,10 @@ extension CC {
 			/// Assignments of parameters passed via registers, in parameter order.
 			var viaRegisters: [RegisterAssignment] = []
 			
-			/// Assignments of parameters passed via the call frame, in parameter order.
-			var viaCallFrame: [FrameAssignment] = []
+			/// The record type for parameters passed via the call frame, with each field named after its corresponding parameter.
+			///
+			/// The fields in the record type are laid out in stack order, i.e., the first frame-resident argument is the last element (highest address) of the parameter record.
+			var parameterRecordType = RecordType([])
 			
 		}
 		
@@ -35,24 +38,6 @@ extension CC {
 			///
 			/// The caller stores the argument to and the callee loads the argument from this location.
 			var register: Lower.Register
-			
-		}
-		
-		/// An assignment of a parameter to a call frame location.
-		struct FrameAssignment {
-			
-			/// The parameter being assigned to `location`.
-			var parameter: Parameter
-			
-			/// The location in callee's frame that `parameter` is assigned to.
-			///
-			/// The callee loads the argument from this location.
-			var calleeLocation: Lower.Frame.Location
-			
-			/// The offset in the caller's arguments structure that `parameter` is assigned to.
-			///
-			/// The caller stores the argument to this location.
-			var callerOffset: Int
 			
 		}
 		

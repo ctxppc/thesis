@@ -38,13 +38,13 @@ extension CA {
 				Lowered.compute(lhs, op, rhs, to: destination)
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
-				Lowered.getElement(of: vector, at: index, to: destination)
+				Lowered.getElement(of: vector, index: index, to: destination)
 				
 				case .set(let destination, to: .vector(let type, count: let count)):
 				Lowered.allocateVector(type, count: count, into: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(of: vector, at: index, to: element)
+				Lowered.setElement(of: vector, index: index, to: element)
 				
 				case .call(let name, let arguments, result: let result):
 				Lowered.call(name, arguments, result: result)
