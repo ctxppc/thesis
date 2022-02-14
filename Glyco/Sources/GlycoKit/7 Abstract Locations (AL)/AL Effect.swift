@@ -20,11 +20,11 @@ extension AL {
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in given location.
 		case allocateVector(count: Int = 1, into: Location)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `at`.
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -76,11 +76,11 @@ extension AL {
 				case .allocateVector(count: let count, into: let vector):
 				return .allocateVector(count: count, into: vector, analysisAtEntry: .init())
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				return .getElement(of: vector, at: index, to: destination, analysisAtEntry: .init())
+				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
+				return .getElement(elementType, of: vector, at: index, to: destination, analysisAtEntry: .init())
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				return .setElement(of: vector, at: index, to: element, analysisAtEntry: .init())
+				case .setElement(let elementType, of: let vector, at: let index, to: let element):
+				return .setElement(elementType, of: vector, at: index, to: element, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(

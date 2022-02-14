@@ -19,17 +19,21 @@ extension RC {
 		}
 		
 		/// An ordered mapping from field names to types.
-		private var typesByFieldName = OrderedDictionary<String, ValueType>()
+		private var typesByFieldName = OrderedDictionary<Field.Name, ValueType>()
 		
 		/// Appends `field` if `self` doesn't contain a field with the same name as `field`, or replaces the field in `self` with the same name as `field` by `field`.
 		public mutating func appendOrReplace(_ field: Field) {
 			typesByFieldName[field.name] = field.valueType
 		}
 		
-		public struct Field : Equatable, Codable {
+		public struct Field : Named, Equatable, Codable {
 			
 			/// The field's name.
-			public var name: String
+			public var name: Name
+			public struct Name : GlycoKit.Name {
+				public init(rawValue: String) { self.rawValue = rawValue }
+				public var rawValue: String
+			}
 			
 			/// The value type of the field.
 			public var valueType: ValueType

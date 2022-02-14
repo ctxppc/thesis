@@ -86,11 +86,12 @@ extension IT {
 				case .getElement(of: let vector, at: let index, to: let destination):
 				let elementType = try context.declarations.elementType(vector: vector)
 				try context.declarations.declare(destination, type: elementType)
-				Lowered.getElement(of: vector, at: index, to: destination)
+				Lowered.getElement(elementType.lowered(), of: vector, at: index, to: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				try context.declarations.require(element, type: context.declarations.elementType(vector: vector))
-				Lowered.setElement(of: vector, at: index, to: element)
+				let elementType = try context.declarations.elementType(vector: vector)
+				try context.declarations.require(element, type: elementType)
+				Lowered.setElement(elementType.lowered(), of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-protocol Name : RawRepresentable, Hashable, ExpressibleByStringLiteral where RawValue == String {
+protocol Name : RawCodable, Hashable, ExpressibleByStringLiteral where RawValue == String {
 	init(rawValue: RawValue)
 }
 

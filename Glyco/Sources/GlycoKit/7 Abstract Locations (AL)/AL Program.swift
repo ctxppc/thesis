@@ -42,12 +42,13 @@ public enum AL : Language {
 	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias ValueType = Lower.ValueType
+	public typealias DataType = Lower.DataType
+	public typealias Declarations = Lower.Declarations
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
-	public typealias Declarations = Lower.Declarations
+	public typealias ValueType = Lower.ValueType
 	
 }

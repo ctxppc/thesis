@@ -21,13 +21,13 @@ extension CF {
 		case allocateBuffer(bytes: Int, into: Register)
 		
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given register.
-		case allocateVector(DataType, count: Int = 1, into: Register)
+		case allocateVector(DataType, count: Int = 1, into: Register)	// TODO: Remove?
 		
-		/// An effect that loads the element of the vector at `vector` at the zero-based position in `index` and puts it in `into`.
-		case loadElement(DataType, into: Register, vector: Register, index: Register)
+		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
+		case loadElement(DataType, into: Register, buffer: Register, offset: Register)
 		
-		/// An effect that retrieves the datum from `from` and stores it as an element of the vector at `vector` at the zero-based position in `index`.
-		case storeElement(DataType, vector: Register, index: Register, from: Register)
+		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
+		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
 		
 		/// An effect that retrieves the value from given register and pushes it to the call frame.
 		case push(DataType, Register)
@@ -144,39 +144,39 @@ extension CF {
 					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				
-				case .loadElement(.byte, into: let destination, vector: let vector, index: let index):
+				case .loadElement(.byte, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadByte(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
-				case .loadElement(.signedWord, into: let destination, vector: let vector, index: let index):
+				case .loadElement(.signedWord, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadSignedWord(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
-				case .loadElement(.capability, into: let destination, vector: let vector, index: let index):
+				case .loadElement(.capability, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadCapability(destination: destination.lowered(), address: destination.lowered(), offset: 0),
 				]
 				
-				case .storeElement(.byte, vector: let vector, index: let index, from: let source):
+				case .storeElement(.byte, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeByte(source: source.lowered(), address: temp),
 				]
 				
-				case .storeElement(.signedWord, vector: let vector, index: let index, from: let source):
+				case .storeElement(.signedWord, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeSignedWord(source: source.lowered(), address: temp),
 				]
 				
-				case .storeElement(.capability, vector: let vector, index: let index, from: let source):
+				case .storeElement(.capability, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: vector.lowered(), offset: index.lowered()),
+					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeCapability(source: source.lowered(), address: temp, offset: 0),
 				]
 				

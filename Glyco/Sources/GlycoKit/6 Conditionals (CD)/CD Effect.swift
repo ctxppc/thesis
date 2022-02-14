@@ -22,10 +22,10 @@ extension CD {
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.

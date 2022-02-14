@@ -18,10 +18,10 @@ extension RC {
 		case allocateRecord(RecordType, into: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
-		case getField(String, of: Location, to: Location)
+		case getField(Field.Name, of: Location, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(String, of: Location, to: Location)
+		case setField(Field.Name, of: Location, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(ValueType, count: Int = 1, into: Location)
@@ -90,10 +90,10 @@ extension RC {
 				Lowered.allocateVector(elementType.lowered(), count: count, into: vector)
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(of: vector, at: index, to: destination)
+				Lowered.getElement(.signedWord, of: vector, at: index, to: destination)	// TODO: Element type
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(of: vector, at: index, to: element)
+				Lowered.setElement(.signedWord, of: vector, at: index, to: element)		// TODO: Element type
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

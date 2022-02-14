@@ -26,10 +26,10 @@ extension FO {
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
+		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, at: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `at`.
 		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
@@ -148,17 +148,17 @@ extension FO {
 				let (storeVectorCap, vectorCap) = try store(.capability, to: vector, using: temp1)
 				return [.allocateVector(elementType, count: count, into: vectorCap)] + storeVectorCap
 				
-				case .getElement(let type, of: let vector, at: let index, to: let destination):
-				let (loadVector, vector) = try load(type, from: .location(vector), using: temp1)
-				let (loadIndex, index) = try load(type, from: index, using: temp2)
+				case .getElement(let type, of: let buffer, at: let index, to: let destination):
+				let (loadBuffer, buffer) = try load(type, from: .location(buffer), using: temp1)
+				let (loadOffset, offset) = try load(type, from: index, using: temp2)
 				let (storeElement, dest) = try store(type, to: destination, using: temp3)
-				return loadVector + loadIndex + [.loadElement(type, into: dest, vector: vector, index: index)] + storeElement
+				return loadBuffer + loadOffset + [.loadElement(type, into: dest, buffer: buffer, offset: offset)] + storeElement
 				
 				case .setElement(let type, of: let vector, at: let index, to: let element):
-				let (loadVector, vector) = try load(type, from: .location(vector), using: temp1)
-				let (loadIndex, index) = try load(type, from: index, using: temp2)
+				let (loadBuffer, buffer) = try load(type, from: .location(vector), using: temp1)
+				let (loadOffset, offset) = try load(type, from: index, using: temp2)
 				let (loadElement, element) = try load(type, from: element, using: temp3)
-				return loadVector + loadIndex + loadElement + [.storeElement(type, vector: vector, index: index, from: element)]
+				return loadBuffer + loadOffset + loadElement + [.storeElement(type, buffer: buffer, offset: offset, from: element)]
 				
 				case .push(let type, let source):
 				let (loadElement, element) = try load(type, from: source, using: temp1)
