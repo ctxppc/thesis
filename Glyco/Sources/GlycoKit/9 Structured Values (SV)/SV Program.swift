@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Records
-//sourcery: description = "A language that introduces records, i.e., key-value pair values."
-public enum RC : Language {
+//sourcery: longname = Structured Values
+//sourcery: description = "A language that introduces structured values (vectors and records)."
+public enum SV : Language {
 	
-	/// A program on an RC machine.
+	/// A program on an SV machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(effect: Effect, procedures: [Procedure]) {
@@ -27,7 +27,7 @@ public enum RC : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = IT
+	public typealias Lower = ID
 	
 	public typealias AbstractLocation = Lower.AbstractLocation
 	public typealias BinaryOperator = Lower.BinaryOperator

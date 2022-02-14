@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension RC {
+extension SV {
 	
 	/// A value denoting the type of a value.
 	public enum ValueType : Equatable, Codable, SimplyLowerable {

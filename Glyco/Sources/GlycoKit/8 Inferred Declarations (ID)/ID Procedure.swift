@@ -1,11 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension RC {
+extension ID {
 	
 	/// A program element that can be invoked by name.
 	public struct Procedure : Codable, Equatable, SimplyLowerable {
 		
-		/// Creates a procedure with given name, locals, and effect.
+		/// Creates a procedure with given name and effect.
 		public init(_ name: Label, in effect: Effect) {
 			self.name = name
 			self.effect = effect
@@ -19,8 +19,9 @@ extension RC {
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Procedure {
-			var context = RC.Context()
-			return .init(name, in: try effect.lowered(in: &context))
+			var context = ID.Context()
+			let effect = try effect.lowered(in: &context)	// first get declarations into context
+			return .init(name, locals: context.declarations, in: effect)
 		}
 		
 	}

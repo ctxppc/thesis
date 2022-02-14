@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Inferred Types
-//sourcery: description = "A language that introduces data type inference."
-public enum IT : Language {
+//sourcery: description = "A language that infers declarations from definitions."
+public enum ID : Language {
 	
-	/// A program on an IT machine.
+	/// A program on an ID machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {

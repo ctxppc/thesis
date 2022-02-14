@@ -190,14 +190,14 @@ extension FO.Program {
 	}
 }
 
-extension IT.Program {
+extension ID.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
 		case procedures = "procedures"
 	}
 }
 
-extension IT.Procedure {
+extension ID.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case effect = "in"
@@ -248,26 +248,6 @@ extension PR.Block {
 	}
 }
 
-extension RC.Program {
-	public enum CodingKeys : String, CodingKey {
-		case effect = "effect"
-		case procedures = "procedures"
-	}
-}
-
-extension RC.Procedure {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case effect = "in"
-	}
-}
-
-extension RC.RecordType {
-	public enum CodingKeys : String, CodingKey {
-		case fields = "_0"
-	}
-}
-
 extension RV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case instructions = "_0"
@@ -277,6 +257,26 @@ extension RV.Program {
 extension S.Program {
 	public enum CodingKeys : String, CodingKey {
 		case assembly = "assembly"
+	}
+}
+
+extension SV.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "effect"
+		case procedures = "procedures"
+	}
+}
+
+extension SV.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension SV.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case effect = "in"
 	}
 }
 

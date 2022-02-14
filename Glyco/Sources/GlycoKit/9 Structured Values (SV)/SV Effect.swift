@@ -2,9 +2,9 @@
 
 import Foundation
 
-extension RC {
+extension SV {
 	
-	/// An effect on an RC machine.
+	/// An effect on an SV machine.
 	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.

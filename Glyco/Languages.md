@@ -9,7 +9,7 @@ The pipeline, from high-level to low-level is:
 [`CV`](#CV) →
 [`CA`](#CA) →
 [`CC`](#CC) →
-[`IT`](#IT) →
+[`ID`](#ID) →
 [`AL`](#AL) →
 [`ALA`](#ALA) →
 [`CD`](#CD) →
@@ -345,7 +345,7 @@ A language that groups all effects that write to a location under one canonical 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
 A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
 
-**Inherited from IT:**
+**Inherited from ID:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Label</code>, 
@@ -391,8 +391,8 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
-<h2 id="IT">Grammar for IT (Inferred Types)</h2>
-A language that introduces data type inference.
+<h2 id="ID">Grammar for ID (Inferred Types)</h2>
+A language that infers declarations from definitions.
 
 **Inherited from AL:**
 <code>AbstractLocation</code>, 
@@ -406,18 +406,18 @@ A language that introduces data type inference.
 <code>Register</code>, 
 <code>Source</code>
 <dl>
-	<dt><code>IT.Program</code></dt>
+	<dt><code>ID.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-	<dt><code>IT.Predicate</code></dt>
-	<dd><code><strong>constant</strong>(Bool)</code></dd>
-	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
-	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
-	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
+	<dt><code>ID.Context</code></dt>
 </dl>
 <dl>
-	<dt><code>IT.Effect</code></dt>
+	<dt><code>ID.Procedure</code></dt>
+	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
+</dl>
+<dl>
+	<dt><code>ID.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
@@ -433,11 +433,11 @@ A language that introduces data type inference.
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
-	<dt><code>IT.Procedure</code></dt>
-	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
-</dl>
-<dl>
-	<dt><code>IT.Context</code></dt>
+	<dt><code>ID.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate)</code></dd>
 </dl>
 
 <h2 id="AL">Grammar for AL (Abstract Locations)</h2>

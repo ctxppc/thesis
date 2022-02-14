@@ -1,8 +1,8 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension IT {
+extension ID {
 	
-	/// An effect on an IT machine.
+	/// An effect on an ID machine.
 	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that performs `effects`.

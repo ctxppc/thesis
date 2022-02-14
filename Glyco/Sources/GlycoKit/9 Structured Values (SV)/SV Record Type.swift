@@ -3,11 +3,11 @@
 import DepthKit
 import OrderedCollections
 
-extension RC {
+extension SV {
 	
 	/// A value denoting the type of a record.
 	///
-	/// Like vectors, records are always stored in memory and are created using allocation effects. Like vectors and unlike C structs, records are never implicitly copied in RC. Records can therefore not be assigned to or from a location, are always referred to by capability, and cannot directly contain other records.
+	/// Like vectors, records are always stored in memory and are created using allocation effects. Like vectors and unlike C structs, records are never implicitly copied in SV. Records can therefore not be assigned to or from a location, are always referred to by capability, and cannot directly contain other records.
 	public struct RecordType : Equatable {
 		
 		/// Creates a record type with given fields.
@@ -67,7 +67,7 @@ extension RC {
 	
 }
 
-extension RC.RecordType : Codable {
+extension SV.RecordType : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
@@ -81,7 +81,7 @@ extension RC.RecordType : Codable {
 	
 }
 
-extension RC.RecordType : RandomAccessCollection {
+extension SV.RecordType : RandomAccessCollection {
 	
 	public var startIndex: Int { typesByFieldName.elements.startIndex }
 	
