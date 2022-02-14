@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
 import Foundation
 
 extension CC {
@@ -16,14 +17,23 @@ extension CC {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a record of given type to the call frame and puts a capability for that record in given location.
+		case allocateRecord(RecordType, into: Location)
+		
+		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
+		case getField(RecordType.Field.Name, of: Location, to: Location)
+		
+		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
+		case setField(RecordType.Field.Name, of: Location, to: Source)
+		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
+		case getElement(of: Location, index: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `index`.
+		case setElement(of: Location, index: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -48,14 +58,23 @@ extension CC {
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
 				
+				case .allocateRecord(let type, into: let record):
+				Lowered.allocateRecord(type, into: .abstract(record))
+				
+				case .getField(let fieldName, of: let record, to: let destination):
+				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
+				
+				case .setField(let fieldName, of: let record, to: let source):
+				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
+				
 				case .allocateVector(let type, count: let count, into: let vector):
-				Lowered.do([])	// TODO
+				Lowered.allocateVector(type, count: count, into: .abstract(vector))
 				
-				case .getElement(of: let vector, at: let offset, to: let destination):
-				Lowered.getElement(.signedWord, of: .abstract(vector), offset: try offset.lowered(in: &context), to: .abstract(destination))	// TODO
+				case .getElement(of: let vector, index: let index, to: let destination):
+				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
 				
-				case .setElement(of: let vector, at: let offset, to: let element):
-				try Lowered.setElement(.signedWord, of: .abstract(vector), offset: offset.lowered(in: &context), to: element.lowered(in: &context))	// TODO
+				case .setElement(of: let vector, index: let index, to: let source):
+				try Lowered.setElement(of: .abstract(vector), index: index.lowered(in: &context), to: source.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -66,44 +85,38 @@ extension CC {
 					// Prepare assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
-					// Allocate structure for frame-resident arguments, if there are any.
+					// Allocate arguments record, if nonempty.
 					// a0 is overwritten with a register-resident arg after all frame-resident args have already been passed, so we can use it freely.
-					let argumentsStructure = Lower.Location.register(.a0)
-					let argumentsStructureSize = assignments.viaCallFrame.lazy.map(\.parameter).totalByteSize()
-					if argumentsStructureSize > 0 {
-						Lowered.allocateBuffer(bytes: argumentsStructureSize, into: argumentsStructure)
+					let argumentsRecord = Lower.Location.register(.a0)
+					if !assignments.parameterRecordType.isEmpty {
+						Lowered.allocateRecord(assignments.parameterRecordType, into: argumentsRecord)
 					}
 					
 					// Prepare arguments for lowering.
-					let arguments = try arguments.lowered(in: &context).makeIterator()
-					
-					// First arguments go via registers. Consume arguments iterator by eagerly evaluating the zip.
-					let assignmentArgumentPairsViaRegisters = Array(zip(assignments.viaRegisters, arguments))
-					
-					// Remaining arguments go via call frame. Consume arguments iterator by eagerly evaluating the zip.
-					let assignmentArgumentPairsViaFrame = Array(zip(assignments.viaCallFrame, arguments))
+					let arguments = try arguments.lowered(in: &context)
+					let parameterNames = procedure.parameters.map(\.location.rawValue)
+					let argumentsByParameterName = Dictionary(uniqueKeysWithValues: zip(parameterNames, arguments))
 					
 					// Pass frame-resident arguments first.
-					for (a, arg) in assignmentArgumentPairsViaFrame {
-						// TODO: Reimplement using records — which will also verify correct typing
-						Lowered.setElement(.signedWord, of: argumentsStructure, offset: .constant(a.callerOffset), to: arg)	// TODO
+					for field in assignments.parameterRecordType {
+						Lowered.setField(field.name, of: argumentsRecord, to: argumentsByParameterName[field.name.rawValue] !! "Missing argument")
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
-					for (a, arg) in assignmentArgumentPairsViaRegisters {
-						Lowered.set(.register(a.register), to: arg)
+					for (asn, arg) in zip(assignments.viaRegisters, arguments) {
+						Lowered.set(.register(asn.register), to: arg)
 					}
 					
 					// Invoke procedure.
-					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) } + assignments.viaCallFrame.map { .frame($0.calleeLocation) })
+					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) })	// FIXME: Pass used frame locations.
 					
 					// Deallocate frame-resident arguments, if any.
-					if argumentsStructureSize > 0 {
-						Lowered.pop(bytes: argumentsStructureSize)
+					if !assignments.parameterRecordType.isEmpty {
+						Lowered.pop(bytes: assignments.parameterRecordType.byteSize)
 					}
 					
 					// Write result.
-					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType))
+					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType.lowered()))
 					
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
