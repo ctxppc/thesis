@@ -19,11 +19,11 @@ extension CD {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
+		case getElement(DataType, of: Location, offset: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
+		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -245,19 +245,19 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .getElement(let type, of: let vector, at: let index, to: let destination):
+			case .getElement(let type, of: let vector, offset: let offset, to: let destination):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.getElement(type, of: vector, at: index, to: destination)],
+				previousEffects:	previousEffects + [.getElement(type, of: vector, offset: offset, to: destination)],
 				exitLabel:			exitLabel
 			)
 			
-			case .setElement(let type, of: let vector, at: let index, to: let element):
+			case .setElement(let type, of: let vector, offset: let offset, to: let element):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.setElement(type, of: vector, at: index, to: element)],
+				previousEffects:	previousEffects + [.setElement(type, of: vector, offset: offset, to: element)],
 				exitLabel:			exitLabel
 			)
 			

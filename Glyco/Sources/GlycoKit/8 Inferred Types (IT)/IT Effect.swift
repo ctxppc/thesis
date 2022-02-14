@@ -17,11 +17,11 @@ extension IT {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
+		case getElement(DataType, of: Location, offset: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
+		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -76,13 +76,13 @@ extension IT {
 				try context.declarations.declare(buffer, type: .capability)
 				Lowered.allocateBuffer(bytes: bytes, into: buffer)
 				
-				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
+				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination):
 				try context.declarations.declare(destination, type: elementType)
-				Lowered.getElement(elementType, of: vector, at: index, to: destination)
+				Lowered.getElement(elementType, of: buffer, offset: offset, to: destination)
 				
-				case .setElement(let elementType, of: let vector, at: let index, to: let element):
+				case .setElement(let elementType, of: let buffer, offset: let offset, to: let element):
 				try context.declarations.require(element, type: elementType)
-				Lowered.setElement(elementType, of: vector, at: index, to: element)
+				Lowered.setElement(elementType, of: buffer, offset: offset, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

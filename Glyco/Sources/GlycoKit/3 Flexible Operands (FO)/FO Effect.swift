@@ -23,11 +23,11 @@ extension FO {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location)
 		
-		/// An effect that retrieves the datum at offset `at` in the buffer in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location)
+		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
+		case getElement(DataType, of: Location, offset: Source, to: Location)
 		
-		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source)
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
+		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
 		/// An effect that retrieves the value from given source and pushes it to the call frame.
 		case push(DataType, Source)
@@ -141,15 +141,15 @@ extension FO {
 				let (storeBufferCap, bufferCap) = try store(.capability, to: buffer, using: temp1)
 				return [.allocateBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
 				
-				case .getElement(let type, of: let buffer, at: let index, to: let destination):
+				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
 				let (loadBuffer, buffer) = try load(type, from: .location(buffer), using: temp1)
-				let (loadOffset, offset) = try load(type, from: index, using: temp2)
+				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
 				let (storeElement, dest) = try store(type, to: destination, using: temp3)
 				return loadBuffer + loadOffset + [.loadElement(type, into: dest, buffer: buffer, offset: offset)] + storeElement
 				
-				case .setElement(let type, of: let vector, at: let index, to: let element):
+				case .setElement(let type, of: let vector, offset: let offset, to: let element):
 				let (loadBuffer, buffer) = try load(type, from: .location(vector), using: temp1)
-				let (loadOffset, offset) = try load(type, from: index, using: temp2)
+				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
 				let (loadElement, element) = try load(type, from: element, using: temp3)
 				return loadBuffer + loadOffset + loadElement + [.storeElement(type, buffer: buffer, offset: offset, from: element)]
 				

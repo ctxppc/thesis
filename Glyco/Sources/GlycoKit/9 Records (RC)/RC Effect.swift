@@ -90,10 +90,10 @@ extension RC {
 				Lowered.allocateBuffer(bytes: 0, into: vector)	// TODO
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(.signedWord, of: vector, at: index, to: destination)	// TODO: Element type
+				Lowered.getElement(.signedWord, of: vector, offset: index, to: destination)	// TODO: Element type
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				Lowered.setElement(.signedWord, of: vector, at: index, to: element)		// TODO: Element type
+				Lowered.setElement(.signedWord, of: vector, offset: index, to: element)		// TODO: Element type
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

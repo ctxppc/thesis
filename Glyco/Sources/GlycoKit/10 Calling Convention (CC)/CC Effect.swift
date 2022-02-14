@@ -51,11 +51,11 @@ extension CC {
 				case .allocateVector(let type, count: let count, into: let vector):
 				Lowered.do([])	// TODO
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(.signedWord, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))	// TODO
+				case .getElement(of: let vector, at: let offset, to: let destination):
+				Lowered.getElement(.signedWord, of: .abstract(vector), offset: try offset.lowered(in: &context), to: .abstract(destination))	// TODO
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				try Lowered.setElement(.signedWord, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))	// TODO
+				case .setElement(of: let vector, at: let offset, to: let element):
+				try Lowered.setElement(.signedWord, of: .abstract(vector), offset: offset.lowered(in: &context), to: element.lowered(in: &context))	// TODO
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -86,7 +86,7 @@ extension CC {
 					// Pass frame-resident arguments first.
 					for (a, arg) in assignmentArgumentPairsViaFrame {
 						// TODO: Reimplement using records — which will also verify correct typing
-						Lowered.setElement(.signedWord, of: argumentsStructure, at: .constant(a.callerOffset), to: arg)	// TODO
+						Lowered.setElement(.signedWord, of: argumentsStructure, offset: .constant(a.callerOffset), to: arg)	// TODO
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.

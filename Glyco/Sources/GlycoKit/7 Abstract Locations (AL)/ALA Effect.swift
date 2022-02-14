@@ -17,11 +17,11 @@ extension ALA {
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case allocateBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
 		
-		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(DataType, of: Location, at: Source, to: Location, analysisAtEntry: Analysis)
+		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
+		case getElement(DataType, of: Location, offset: Source, to: Location, analysisAtEntry: Analysis)
 		
-		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(DataType, of: Location, at: Source, to: Source, analysisAtEntry: Analysis)
+		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
+		case setElement(DataType, of: Location, offset: Source, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
@@ -79,20 +79,20 @@ extension ALA {
 				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
 				Lowered.allocateBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
 				
-				case .getElement(let elementType, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
+				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: _):
 				try Lowered.getElement(
 					elementType,
-					of: vector.lowered(in: &context),
-					at: index.lowered(in: &context),
-					to: destination.lowered(in: &context)
+					of:		buffer.lowered(in: &context),
+					offset:	offset.lowered(in: &context),
+					to:		destination.lowered(in: &context)
 				)
 				
-				case .setElement(let elementType, of: let vector, at: let index, to: let source, analysisAtEntry: _):
+				case .setElement(let elementType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: _):
 				try Lowered.setElement(
 					elementType,
-					of: vector.lowered(in: &context),
-					at: index.lowered(in: &context),
-					to: source.lowered(in: &context)
+					of:		buffer.lowered(in: &context),
+					offset:	offset.lowered(in: &context),
+					to:		source.lowered(in: &context)
 				)
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -151,11 +151,11 @@ extension ALA {
 				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
 				return .allocateBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
 				
-				case .getElement(let elementType, of: let vector, at: let index, to: let destination, analysisAtEntry: _):
-				return .getElement(elementType, of: vector, at: index, to: destination, analysisAtEntry: analysis)
+				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: _):
+				return .getElement(elementType, of: buffer, offset: offset, to: destination, analysisAtEntry: analysis)
 				
-				case .setElement(let elementType, of: let vector, at: let index, to: let element, analysisAtEntry: _):
-				return .setElement(elementType, of: vector, at: index, to: element, analysisAtEntry: analysis)
+				case .setElement(let elementType, of: let buffer, offset: let offset, to: let element, analysisAtEntry: _):
+				return .setElement(elementType, of: buffer, offset: offset, to: element, analysisAtEntry: analysis)
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				do {
@@ -223,8 +223,8 @@ extension ALA {
 					.set(_, to: _, analysisAtEntry: let analysis),
 					.compute(_, _, _, to: _, analysisAtEntry: let analysis),
 					.allocateBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
-					.getElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
-					.setElement(_, of: _, at: _, to: _, analysisAtEntry: let analysis),
+					.getElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
+					.setElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.push(_, analysisAtEntry: let analysis),
 					.pop(bytes: _, analysisAtEntry: let analysis),
@@ -244,7 +244,7 @@ extension ALA {
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
-					.getElement(_, of: _, at: _, to: let destination, analysisAtEntry: _),
+					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
 					.compute(_, _, _, to: let destination, analysisAtEntry: _),
 					.allocateBuffer(bytes: _, into: let destination, analysisAtEntry: _):
 				return [destination]
@@ -277,13 +277,13 @@ extension ALA {
 				case .compute(let lhs, _, let rhs, to: _, analysisAtEntry: _):
 				return [lhs, rhs].compactMap(\.location)
 				
-				case .getElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: .constant, to: _, analysisAtEntry: _):
-				return [vector]
+				case .getElement(_, of: let buffer, offset: .constant, to: _, analysisAtEntry: _),
+					.setElement(_, of: let buffer, offset: .constant, to: _, analysisAtEntry: _):
+				return [buffer]
 				
-				case .getElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _),
-					.setElement(_, of: let vector, at: let index, to: _, analysisAtEntry: _):
-				return [index].compactMap(\.location) + [vector]
+				case .getElement(_, of: let buffer, offset: let index, to: _, analysisAtEntry: _),
+					.setElement(_, of: let buffer, offset: let index, to: _, analysisAtEntry: _):
+				return [index].compactMap(\.location) + [buffer]
 				
 				case .popScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
@@ -402,11 +402,11 @@ extension ALA {
 				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
 				return .allocateBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)
 				
-				case .getElement(let dataType, of: let vector, at: let index, to: let destination, analysisAtEntry: let analysis):
-				return try .getElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(destination), analysisAtEntry: analysis)
+				case .getElement(let dataType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: let analysis):
+				return try .getElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(destination), analysisAtEntry: analysis)
 				
-				case .setElement(let dataType, of: let vector, at: let index, to: let source, analysisAtEntry: let analysis):
-				return try .setElement(dataType, of: substitute(vector), at: substitute(index), to: substitute(source), analysisAtEntry: analysis)
+				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
+				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
 				
 				case .push(let source, analysisAtEntry: let analysis):
 				return .push(try substitute(source), analysisAtEntry: analysis)
