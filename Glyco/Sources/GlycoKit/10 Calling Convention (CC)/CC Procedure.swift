@@ -48,14 +48,15 @@ extension CC {
 				let assignments = parameterAssignments(in: context.configuration)
 				
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
-				for assignment in assignments.viaRegisters {
-					let parameter = assignment.parameter
-					Lower.Effect.set(.abstract(parameter.location), to: .register(assignment.register, parameter.type.lowered()))
+				for asn in assignments.viaRegisters {
+					let parameter = asn.parameter
+					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type.lowered()))
 				}
 				
 				// Bind local names to frame-resident arguments.
+				var frame = Lower.Frame()
 				for field in assignments.parameterRecordType {
-					// TODO
+					Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(frame.addParameter(field.valueType.lowered())))
 				}
 				
 				// Execute main effect.
