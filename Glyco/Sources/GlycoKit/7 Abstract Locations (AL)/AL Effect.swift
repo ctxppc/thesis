@@ -14,7 +14,7 @@ extension AL {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
-		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in given location.
 		case allocateVector(count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.

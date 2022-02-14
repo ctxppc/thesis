@@ -4,7 +4,7 @@
 //sourcery: description = "A language that introduces data type inference."
 public enum IT : Language {
 	
-	/// A program on an AL machine.
+	/// A program on an IT machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {

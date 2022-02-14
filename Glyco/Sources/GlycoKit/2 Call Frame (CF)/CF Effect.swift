@@ -17,7 +17,7 @@ extension CF {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
-		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(DataType, count: Int = 1, into: Register)
 		
 		/// An effect that loads the element of the vector at `vector` at the zero-based position in `index` and puts it in `into`.

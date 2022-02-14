@@ -1,18 +1,18 @@
 {% for lang in types.enums|public|implements: "Language" %}
 	{% for type in lang.containedTypes %}
 		{% if type|!implements: "RawCodable"|implements: "Codable" %}
-		{% if type|!annotated: "hasOpaqueRepresentation" %}
-			{% for initialiser in type.initializers|public where initialiser.parameters.count > 0 and initialiser.parameters[0].argumentLabel != "integerLiteral" %}
+			{% if type|!annotated: "hasOpaqueRepresentation" %}
+				{% for initialiser in type.initializers|public where initialiser.parameters.count > 0 and initialiser.parameters[0].argumentLabel != "integerLiteral" and initialiser|!annotated: "isInternalForm" %}
 extension {{type.globalName}} {
 	public enum CodingKeys : String, CodingKey {
-		{% for par in initialiser.parameters %}
+					{% for par in initialiser.parameters %}
 		case {{par.name}} = {% if par.argumentLabel %}"{{par.argumentLabel}}"{% else %}"_{{ forloop.counter0 }}"{% endif %}
-		{% endfor %}
+					{% endfor %}
 	}
 }
 
-			{% endfor %}
-		{% endif %}
+				{% endfor %}
+			{% endif %}
 		{% endif %}
 	{% endfor %}
 {% endfor %}

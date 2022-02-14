@@ -14,7 +14,7 @@ extension ALA {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
 		
-		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in `into`.
+		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in given location.
 		case allocateVector(count: Int = 1, into: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
@@ -77,7 +77,11 @@ extension ALA {
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: _):
-				try Lowered.allocateVector(context.declarations.type(of: vector).lowered(), count: count, into: vector.lowered(in: &context))
+				try Lowered.allocateVector(
+					context.declarations.elementType(vector: vector).lowered(),
+					count:	count,
+					into:	vector.lowered(in: &context)
+				)
 				
 				case .getElement(of: let vector, at: let index, to: let destination, analysisAtEntry: _):
 				try Lowered.getElement(
