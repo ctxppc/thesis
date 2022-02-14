@@ -39,7 +39,7 @@ public enum CC : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias ValueType = Lower.ValueType
+	public typealias ValueType = Lower.DataType	// TODO
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.AbstractLocation
 	

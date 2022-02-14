@@ -18,13 +18,13 @@ extension IT {
 		case allocateBuffer(bytes: Int, into: Location)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(ValueType, count: Int = 1, into: Location)
+		case allocateVector(DataType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `at` in the vector in `of` and puts it in `to`.
-		case getElement(of: Location, at: Source, to: Location)
+		case getElement(DataType, of: Location, at: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
-		case setElement(of: Location, at: Source, to: Source)
+		case setElement(DataType, of: Location, at: Source, to: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -76,22 +76,20 @@ extension IT {
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
-				try context.declarations.declare(buffer, type: .capability(nil))
+				try context.declarations.declare(buffer, type: .capability)
 				Lowered.allocateBuffer(bytes: bytes, into: buffer)
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
-				try context.declarations.declare(vector, type: .capability(elementType))
+				try context.declarations.declare(vector, type: .capability)
 				Lowered.allocateVector(count: count, into: vector)
 				
-				case .getElement(of: let vector, at: let index, to: let destination):
-				let elementType = try context.declarations.elementType(vector: vector)
+				case .getElement(let elementType, of: let vector, at: let index, to: let destination):
 				try context.declarations.declare(destination, type: elementType)
-				Lowered.getElement(elementType.lowered(), of: vector, at: index, to: destination)
+				Lowered.getElement(elementType, of: vector, at: index, to: destination)
 				
-				case .setElement(of: let vector, at: let index, to: let element):
-				let elementType = try context.declarations.elementType(vector: vector)
+				case .setElement(let elementType, of: let vector, at: let index, to: let element):
 				try context.declarations.require(element, type: elementType)
-				Lowered.setElement(elementType.lowered(), of: vector, at: index, to: element)
+				Lowered.setElement(elementType, of: vector, at: index, to: element)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

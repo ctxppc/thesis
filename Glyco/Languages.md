@@ -398,13 +398,13 @@ A language that introduces data type inference.
 <code>AbstractLocation</code>, 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>DataType</code>, 
 <code>Declarations</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>Source</code>, 
-<code>ValueType</code>
+<code>Source</code>
 <dl>
 	<dt><code>IT.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -422,9 +422,9 @@ A language that introduces data type inference.
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
-	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>allocateVector</strong>(DataType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>push</strong>(Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
@@ -455,8 +455,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>Source</code>, 
-<code>ValueType</code>
+<code>Source</code>
 <dl>
 	<dt><code>AL.Program</code></dt>
 	<dd><code>(<strong>locals:</strong> Declarations, <strong>in:</strong> Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -506,8 +505,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.TypedLocation</code></dt>
-	<dd><code><strong>abstract</strong>(AbstractLocation, ValueType)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location, ValueType)</code></dd>
+	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Declarations</code></dt>
@@ -525,17 +524,10 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Predicate, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.ValueType</code></dt>
-	<dd><code><strong>byte</strong></code></dd>
-	<dd><code><strong>signedWord</strong></code></dd>
-	<dd><code><strong>capability</strong>(ValueType?)</code></dd>
-	<dd><code><strong>registerDatum</strong></code></dd>
-</dl>
-<dl>
 	<dt><code>ALA.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
-	<dd><code><strong>register</strong>(Register, ValueType)</code></dd>
+	<dd><code><strong>register</strong>(Register, DataType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>

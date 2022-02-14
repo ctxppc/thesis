@@ -15,40 +15,40 @@ extension ALA {
 		/// Creates a definitions list with given typed locations.
 		public init(_ locations: [TypedLocation]) throws {
 			for typedLocation in locations {
-				try declare(typedLocation.location, type: typedLocation.valueType)
+				try declare(typedLocation.location, type: typedLocation.dataType)
 			}
 		}
 		
-		/// A mapping from locations to value types.
+		/// A mapping from locations to data types.
 		///
 		/// - Invariant: No location in the mapping represents a registers.
-		private var typesByLocation = [Location : ValueType]()
+		private var typesByLocation = [Location : DataType]()
 		
-		/// Returns given location's declared value type.
+		/// Returns given location's declared data type.
 		///
 		/// If a register location is given, an unknown-type error is thrown since registers cannot have a fixed value type.
 		///
 		/// - Parameter location: The location whose type to determine.
 		///
-		/// - Returns: The value type of `location`.
-		public func type(of location: Location) throws -> ValueType {
+		/// - Returns: The data type of `location`.
+		public func type(of location: Location) throws -> DataType {
 			guard let type = typesByLocation[location] else { throw TypeError.unknownType(location) }
 			return type
 		}
 		
-		/// Returns given locations' declared value type.
+		/// Returns given locations' declared data type.
 		///
 		/// The behaviour of this method depends on the kind of locations that are provided.
-		/// * If no non-register locations are given, an unknown-type error is thrown since registers cannot have a fixed value type.
-		/// * If exactly one non-register location is given, it determines the value type.
-		/// * If two non-register locations are given, both determine the value type and an error is thrown if either one doesn't have a type or if they have different value types.
+		/// * If no non-register locations are given, an unknown-type error is thrown since registers cannot have a fixed data type.
+		/// * If exactly one non-register location is given, it determines the data type.
+		/// * If two non-register locations are given, both determine the data type and an error is thrown if either one doesn't have a data type or if they have different data types.
 		///
 		/// - Parameters:
-		///   - location: The location whose type to determine.
-		///   - otherLocation: A location with the same value type as `location`.
+		///   - location: The location whose data type to determine.
+		///   - otherLocation: A location with the same data type as `location`.
 		///
-		/// - Returns: The value type of `location`, and `otherLocation`.
-		public func type(of location: Location, and otherLocation: Location) throws -> ValueType {
+		/// - Returns: The data type of `location`, and `otherLocation`.
+		public func type(of location: Location, and otherLocation: Location) throws -> DataType {
 			switch (location, otherLocation) {
 				
 				case (.register, .register):
@@ -67,7 +67,7 @@ extension ALA {
 		}
 		
 		/// Returns given source's (widest supported) value type.
-		public func type(of source: Source) throws -> ValueType {
+		public func type(of source: Source) throws -> DataType {
 			switch source {
 				case .constant:					return .signedWord
 				case .abstract(let location):	return try type(of: Location.abstract(location))
@@ -76,8 +76,8 @@ extension ALA {
 			}
 		}
 		
-		/// Returns the value of given location and source.
-		public func type(of location: Location, and source: Source) throws -> ValueType {
+		/// Returns the data type of given location and source.
+		public func type(of location: Location, and source: Source) throws -> DataType {
 			switch source {
 				
 				case .constant(let value):
@@ -99,10 +99,10 @@ extension ALA {
 			}
 		}
 		
-		/// Declares given location and assigns it given type.
+		/// Declares given location and assigns it given data type.
 		///
 		/// Since registers cannot be assigned a type, this method does nothing if `location` represents a register.
-		public mutating func declare(_ location: Location, type newType: ValueType) throws {
+		public mutating func declare(_ location: Location, type newType: DataType) throws {
 			
 			if case .register = location { return }
 			
@@ -114,14 +114,14 @@ extension ALA {
 		}
 		
 		/// Requires given location to be declared and typed `requiredType`.
-		public func require(_ location: Location, type requiredType: ValueType) throws {
+		public func require(_ location: Location, type requiredType: DataType) throws {
 			if let previousType = typesByLocation[location], previousType != requiredType {
 				throw TypeError.inconsistentTyping(location, previousType, requiredType)
 			}
 		}
 		
 		/// Requires given source to be typed `requiredType`, and if it represents a location, that location to be declared.
-		public func require(_ source: Source, type requiredType: ValueType) throws {
+		public func require(_ source: Source, type requiredType: DataType) throws {
 			switch source {
 				
 				case .constant(let value):
@@ -139,12 +139,6 @@ extension ALA {
 			}
 		}
 		
-		/// Returns the element type for given vector location.
-		public func elementType(vector: Location) throws -> ValueType {
-			guard case .capability(let elementType?) = try type(of: vector) else { throw TypeError.noVectorType(vector) }
-			return elementType
-		}
-		
 		/// Removes given location.
 		public mutating func remove(_ location: Location) {
 			typesByLocation.removeValue(forKey: location)
@@ -156,15 +150,10 @@ extension ALA {
 			case unknownType(Location)
 			
 			/// An error indicating that given constant cannot be represented by a value of given type.
-			case constantNotRepresentableByType(Int, ValueType)
-			
-			/// An error indicating given location is not a vector type.
-			///
-			/// Vector types are capabilities with a specified element type.
-			case noVectorType(Location)
+			case constantNotRepresentableByType(Int, DataType)
 			
 			/// An error indicating that given location is bound to different value types.
-			case inconsistentTyping(Location, ValueType, ValueType)
+			case inconsistentTyping(Location, DataType, DataType)
 			
 			/// An error indicating that given typed locations have different value types when they should have the same value type.
 			case unequalTypes(TypedLocation, TypedLocation)
@@ -178,9 +167,6 @@ extension ALA {
 					
 					case .constantNotRepresentableByType(let value, let type):
 					return "\(value) cannot be represented by a value typed \(type)"
-					
-					case .noVectorType(let location):
-					return "“\(location)” is not a vector type"
 					
 					case .inconsistentTyping(let location, let firstType, let otherType):
 					return "“\(location)” is simultaneously typed \(firstType) and \(otherType)"

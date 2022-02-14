@@ -257,8 +257,7 @@ extension PR.Block {
 
 extension RC.Program {
 	public enum CodingKeys : String, CodingKey {
-		case locals = "locals"
-		case effect = "in"
+		case effect = "effect"
 		case procedures = "procedures"
 	}
 }
@@ -266,7 +265,6 @@ extension RC.Program {
 extension RC.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case locals = "locals"
 		case effect = "in"
 	}
 }

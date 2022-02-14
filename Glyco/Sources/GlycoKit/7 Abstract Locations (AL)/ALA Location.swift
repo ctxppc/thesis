@@ -72,7 +72,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frameCell(frame.allocate(try declarations.type(of: Location.abstract(location)).lowered()))
+					home = .frameCell(frame.allocate(try declarations.type(of: Location.abstract(location))))
 				}
 				homesByLocation[location] = home
 				return home
@@ -84,21 +84,6 @@ extension ALA {
 					guard let assignedLocations = locationsByRegister[register] else { return true }
 					return !analysisAtScopeEntry.containsConflict(.abstract(location), assignedLocations)
 				}
-			}
-			
-			enum AssignmentError : LocalizedError {
-				
-				/// An error indicating that given location cannot be placed on the call frame since its data type can't be determined.
-				case unknownType(Location)
-				
-				// See protocol.
-				var errorDescription: String? {
-					switch self {
-						case .unknownType(let location):
-						return "“\(location)” cannot be placed on the call frame since its data type can't be determined."
-					}
-				}
-				
 			}
 			
 		}

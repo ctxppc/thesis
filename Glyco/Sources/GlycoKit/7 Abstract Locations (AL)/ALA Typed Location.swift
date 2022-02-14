@@ -4,14 +4,14 @@ import Foundation
 
 extension ALA {
 	
-	/// A location with an associated value type.
+	/// A location with an associated data type.
 	public enum TypedLocation : Equatable, Codable {
 		
 		/// An abstract location, to be lowered to a physical location after register allocation.
-		case abstract(AbstractLocation, ValueType)
+		case abstract(AbstractLocation, DataType)
 		
 		/// A location fixed to given frame location.
-		case frame(Frame.Location, ValueType)
+		case frame(Frame.Location, DataType)
 		
 		/// The location.
 		var location: Location {
@@ -21,8 +21,8 @@ extension ALA {
 			}
 		}
 		
-		/// The location's value type.
-		var valueType: ValueType {
+		/// The location's data type.
+		var dataType: DataType {
 			switch self {
 				case .abstract(_, let dataType),
 					.frame(_, let dataType):
@@ -36,7 +36,7 @@ extension ALA {
 
 infix operator ~ : ComparisonPrecedence
 
-public func ~ (location: ALA.Location, type: ALA.ValueType) -> ALA.TypedLocation {
+public func ~ (location: ALA.Location, type: ALA.DataType) -> ALA.TypedLocation {
 	switch location {
 		case .abstract(let location):	return .abstract(location, type)
 		case .frame(let location):		return .frame(location, type)

@@ -25,6 +25,17 @@ extension CF {
 			}
 		}
 		
+		/// Returns a Boolean value indicating whether a constant with given value can be represented in a datum of type `self`.
+		///
+		/// Capabilities cannot be expressed using constants.
+		func supports(constant: Int) -> Bool {
+			switch self {
+				case .byte:			return UInt8(exactly: constant) != nil
+				case .signedWord:	return Int8(exactly: constant) != nil
+				case .capability:	return false
+			}
+		}
+		
 	}
 	
 }

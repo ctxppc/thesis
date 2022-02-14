@@ -41,7 +41,7 @@ extension CC {
 				
 				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
 				for register in Lower.Register.defaultCalleeSavedRegisters {
-					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .registerDatum))
+					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .capability))	// TODO
 				}
 				
 				// Compute parameter assignments.
@@ -88,7 +88,7 @@ extension CC {
 			while let parameter = parameters.popLast() {
 				assignments.viaCallFrame.append(.init(
 					parameter:		parameter,
-					calleeLocation:	frame.addParameter(parameter.type.lowered()),
+					calleeLocation:	frame.addParameter(parameter.type),
 					callerOffset:	callerOffset
 				))
 				callerOffset += parameter.type.byteSize

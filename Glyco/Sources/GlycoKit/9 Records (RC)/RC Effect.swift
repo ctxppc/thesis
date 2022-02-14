@@ -18,10 +18,10 @@ extension RC {
 		case allocateRecord(RecordType, into: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
-		case getField(Field.Name, of: Location, to: Location)
+		case getField(RecordType.Field.Name, of: Location, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(Field.Name, of: Location, to: Location)
+		case setField(RecordType.Field.Name, of: Location, to: Location)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(ValueType, count: Int = 1, into: Location)

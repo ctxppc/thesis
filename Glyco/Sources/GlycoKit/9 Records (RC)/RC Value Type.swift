@@ -26,29 +26,17 @@ extension RC {
 		}
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.ValueType {
+		func lowered(in context: inout Context) -> Lower.DataType {
 			lowered()
 		}
 		
 		/// Returns a representation of `self` in a lower language.
-		func lowered() -> Lower.ValueType {
+		func lowered() -> Lower.DataType {
 			switch self {
-				
-				case .byte:
-				return .byte
-				
-				case .signedWord:
-				return .signedWord
-				
-				case .vectorCapability(let elementType):
-				return .capability(elementType.lowered())
-					
-				case .recordCapability:
-				return .capability(nil)
-				
-				case .registerDatum:
-				return .registerDatum
-				
+				case .byte:									return .byte
+				case .signedWord:							return .signedWord
+				case .vectorCapability, .recordCapability:	return .capability
+				case .registerDatum:						return .capability
 			}
 		}
 		

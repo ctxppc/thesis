@@ -49,6 +49,5 @@ public enum AL : Language {
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
 	public typealias Source = Lower.Source
-	public typealias ValueType = Lower.ValueType
 	
 }

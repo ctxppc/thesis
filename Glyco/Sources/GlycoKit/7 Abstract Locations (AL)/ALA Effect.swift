@@ -71,7 +71,7 @@ extension ALA {
 				
 				case .set(let destination, to: let source, analysisAtEntry: _):
 				try Lowered.set(
-					context.declarations.type(of: destination, and: source).lowered(),
+					context.declarations.type(of: destination, and: source),
 					destination.lowered(in: &context),
 					to: source.lowered(in: &context)
 				)
@@ -84,7 +84,7 @@ extension ALA {
 				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: _):
 				try Lowered.allocateVector(
-					context.declarations.elementType(vector: vector).lowered(),
+					.signedWord,	// TODO
 					count:	count,
 					into:	vector.lowered(in: &context)
 				)
@@ -109,7 +109,7 @@ extension ALA {
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .push(let source, analysisAtEntry: _):
-				try Lowered.push(context.declarations.type(of: source).lowered(), source.lowered(in: &context))
+				try Lowered.push(context.declarations.type(of: source), source.lowered(in: &context))
 				
 				case .pop(bytes: let bytes, analysisAtEntry: _):
 				Lowered.pop(bytes: bytes)

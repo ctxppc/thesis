@@ -7,14 +7,10 @@ public enum RC : Language {
 	/// A program on an RC machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(locals: Declarations, in effect: Effect, procedures: [Procedure]) {
-			self.locals = locals
+		public init(effect: Effect, procedures: [Procedure]) {
 			self.effect = effect
 			self.procedures = procedures
 		}
-		
-		/// The declared locations.
-		public var locals: Declarations
 		
 		/// The program's effect.
 		public var effect: Effect
@@ -24,13 +20,13 @@ public enum RC : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			try .init(locals: locals, in: effect.lowered(), procedures: procedures.lowered())
+			try .init(effect.lowered(), procedures: procedures.lowered())
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = RC
+	public typealias Lower = IT
 	
 	typealias Context = ()
 	

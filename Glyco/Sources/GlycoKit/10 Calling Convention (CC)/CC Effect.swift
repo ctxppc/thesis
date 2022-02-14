@@ -52,10 +52,10 @@ extension CC {
 				Lowered.allocateVector(type, count: count, into: .abstract(vector))
 				
 				case .getElement(of: let vector, at: let index, to: let destination):
-				Lowered.getElement(of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))
+				Lowered.getElement(.signedWord, of: .abstract(vector), at: try index.lowered(in: &context), to: .abstract(destination))	// TODO
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				try Lowered.setElement(of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))
+				try Lowered.setElement(.signedWord, of: .abstract(vector), at: index.lowered(in: &context), to: element.lowered(in: &context))	// TODO
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -86,7 +86,7 @@ extension CC {
 					// Pass frame-resident arguments first.
 					for (a, arg) in assignmentArgumentPairsViaFrame {
 						// TODO: Reimplement using records — which will also verify correct typing
-						Lowered.setElement(of: argumentsStructure, at: .constant(a.callerOffset), to: arg)
+						Lowered.setElement(.signedWord, of: argumentsStructure, at: .constant(a.callerOffset), to: arg)	// TODO
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
