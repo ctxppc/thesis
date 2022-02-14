@@ -255,6 +255,26 @@ extension PR.Block {
 	}
 }
 
+extension RC.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effect = "_0"
+		case procedures = "procedures"
+	}
+}
+
+extension RC.Procedure {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case effect = "in"
+	}
+}
+
+extension RC.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
 extension RV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case instructions = "_0"
