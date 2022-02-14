@@ -11,6 +11,9 @@ extension BB {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, into: Location)
+		
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
@@ -45,6 +48,9 @@ extension BB {
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return [.compute(lhs, operation, rhs, to: destination)]
+				
+				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				return [.allocateBuffer(bytes: bytes, into: buffer)]
 				
 				case .allocateVector(let type, count: let count, into: let vector):
 				return [.allocateVector(type, count: count, into: vector)]

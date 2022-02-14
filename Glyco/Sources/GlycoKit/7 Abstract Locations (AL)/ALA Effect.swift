@@ -14,6 +14,9 @@ extension ALA {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
 		
+		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
+		
 		/// An effect that pushes a vector of `count` elements to the call frame and puts a capability for that vector in given location.
 		case allocateVector(count: Int = 1, into: Location, analysisAtEntry: Analysis)
 		
@@ -75,6 +78,9 @@ extension ALA {
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
+				
+				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
+				Lowered.allocateBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
 				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: _):
 				try Lowered.allocateVector(
@@ -152,6 +158,9 @@ extension ALA {
 				case .compute(let lhs, let operation, let rhs, to: let destination, analysisAtEntry: _):
 				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: analysis)
 				
+				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
+				return .allocateBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
+				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: _):
 				return .allocateVector(count: count, into: vector, analysisAtEntry: analysis)
 				
@@ -226,6 +235,7 @@ extension ALA {
 				case .do(_, analysisAtEntry: let analysis),
 					.set(_, to: _, analysisAtEntry: let analysis),
 					.compute(_, _, _, to: _, analysisAtEntry: let analysis),
+					.allocateBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
 					.allocateVector(count: _, into: _, analysisAtEntry: let analysis),
 					.getElement(of: _, at: _, to: _, analysisAtEntry: let analysis),
 					.setElement(of: _, at: _, to: _, analysisAtEntry: let analysis),
@@ -250,6 +260,7 @@ extension ALA {
 				case .set(let destination, to: _, analysisAtEntry: _),
 					.getElement(of: _, at: _, to: let destination, analysisAtEntry: _),
 					.compute(_, _, _, to: let destination, analysisAtEntry: _),
+					.allocateBuffer(bytes: _, into: let destination, analysisAtEntry: _),
 					.allocateVector(count: _, into: let destination, analysisAtEntry: _):
 				return [destination]
 				
@@ -266,6 +277,7 @@ extension ALA {
 				case .do,
 					.set(_, to: .constant, analysisAtEntry: _),
 					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
+					.allocateBuffer,
 					.allocateVector,
 					.if,
 					.push(.constant, analysisAtEntry: _),
@@ -317,7 +329,7 @@ extension ALA {
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
-				case .set, .compute, .allocateVector, .getElement, .setElement, .push, .pop, .pushScope, .popScope, .call, .return:
+				case .set, .compute, .allocateBuffer, .allocateVector, .getElement, .setElement, .push, .pop, .pushScope, .popScope, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -402,6 +414,9 @@ extension ALA {
 				
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
 				return try .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
+				
+				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
+				return .allocateBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)
 				
 				case .allocateVector(count: let count, into: let vector, analysisAtEntry: let analysis):
 				return .allocateVector(count: count, into: substitute(vector), analysisAtEntry: analysis)

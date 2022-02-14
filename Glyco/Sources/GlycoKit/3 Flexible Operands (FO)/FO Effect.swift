@@ -20,6 +20,9 @@ extension FO {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, into: Location)
+		
 		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(DataType, count: Int = 1, into: Location)
 		
@@ -137,9 +140,13 @@ extension FO {
 				let (storeResult, dest) = try store(.signedWord, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(into: dest, value: .registerRegister(lhs, operation, rhs))] + storeResult
 				
-				case .allocateVector(let type, count: let count, into: let vector):
-				let (storeVector, vector) = try store(type, to: vector, using: temp1)
-				return [.allocateVector(type, count: count, into: vector)] + storeVector
+				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				let (storeBufferCap, bufferCap) = try store(.capability, to: buffer, using: temp1)
+				return [.allocateBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
+				
+				case .allocateVector(let elementType, count: let count, into: let vector):
+				let (storeVectorCap, vectorCap) = try store(.capability, to: vector, using: temp1)
+				return [.allocateVector(elementType, count: count, into: vectorCap)] + storeVectorCap
 				
 				case .getElement(let type, of: let vector, at: let index, to: let destination):
 				let (loadVector, vector) = try load(type, from: .location(vector), using: temp1)

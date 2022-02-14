@@ -17,7 +17,10 @@ extension CF {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
-		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given location.
+		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
+		case allocateBuffer(bytes: Int, into: Register)
+		
+		/// An effect that pushes a vector of `count` elements of given data type to the call frame and puts a capability for that vector in given register.
 		case allocateVector(DataType, count: Int = 1, into: Register)
 		
 		/// An effect that loads the element of the vector at `vector` at the zero-based position in `index` and puts it in `into`.
@@ -107,6 +110,15 @@ extension CF {
 				
 				case .store(.capability, into: let destination, from: let source):
 				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
+				
+				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				let buffer = try buffer.lowered()
+				return [
+					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),	// compute tentative base
+					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),			// actual base may be lower, length may be greater
+					.getCapabilityAddress(destination: temp, source: buffer),							// move stack pointer to actual base
+					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
+				]
 				
 				case .allocateVector(let dataType, count: let count, into: let vector):
 				/*

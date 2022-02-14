@@ -14,6 +14,9 @@ extension IT {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
+		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, into: Location)
+		
 		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
 		case allocateVector(ValueType, count: Int = 1, into: Location)
 		
@@ -71,6 +74,10 @@ extension IT {
 				try context.declarations.require(rhs, type: .signedWord)
 				try context.declarations.declare(destination, type: .signedWord)
 				Lowered.compute(lhs, operation, rhs, to: destination)
+				
+				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				try context.declarations.declare(buffer, type: .capability(nil))
+				Lowered.allocateBuffer(bytes: bytes, into: buffer)
 				
 				case .allocateVector(let elementType, count: let count, into: let vector):
 				try context.declarations.declare(vector, type: .capability(elementType))

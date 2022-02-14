@@ -141,7 +141,7 @@ extension ALA {
 		
 		/// Returns the element type for given vector location.
 		public func elementType(vector: Location) throws -> ValueType {
-			guard case .capability(let elementType) = try type(of: vector) else { throw TypeError.noVectorType(vector) }
+			guard case .capability(let elementType?) = try type(of: vector) else { throw TypeError.noVectorType(vector) }
 			return elementType
 		}
 		
@@ -159,6 +159,8 @@ extension ALA {
 			case constantNotRepresentableByType(Int, ValueType)
 			
 			/// An error indicating given location is not a vector type.
+			///
+			/// Vector types are capabilities with a specified element type.
 			case noVectorType(Location)
 			
 			/// An error indicating that given location is bound to different value types.

@@ -11,8 +11,8 @@ extension ALA {
 		/// A signed 4-byte integer.
 		case signedWord
 		
-		/// A capability to elements of given type.
-		indirect case capability(ValueType)
+		/// A capability with a possibly associated element or target value type.
+		indirect case capability(ValueType?)
 		
 		/// A datum with unspecified interpretation that fits in a register.
 		case registerDatum
@@ -22,6 +22,12 @@ extension ALA {
 			lowered().byteSize
 		}
 		
+		// See protocol.
+		func lowered(in context: inout ()) -> Lower.DataType {
+			lowered()
+		}
+		
+		/// Returns a representation of `self` in a lower language.
 		func lowered() -> Lower.DataType {
 			switch self {
 				case .byte:				return .byte
@@ -29,11 +35,6 @@ extension ALA {
 				case .capability:		return .capability
 				case .registerDatum:	return .capability
 			}
-		}
-		
-		// See protocol.
-		func lowered(in context: inout ()) -> Lower.DataType {
-			lowered()
 		}
 		
 		/// Returns a Boolean value indicating whether a constant with given value can be represented in a value of type `self`.
