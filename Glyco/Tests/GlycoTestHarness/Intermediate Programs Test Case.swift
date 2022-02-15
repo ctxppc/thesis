@@ -3,13 +3,13 @@
 import GlycoKit
 import XCTest
 
-final class HarnessTestCase : XCTestCase {
+final class IntermediateProgramsTestCase : XCTestCase {
 	
 	override class var defaultTestSuite: XCTestSuite {
 		
 		let suite = XCTestSuite(forTestCaseClass: Self.self)
 		
-		if let path = ProcessInfo.processInfo.environment["HARNESS_BUNDLE"] {
+		if let path = ProcessInfo.processInfo.environment["intermediate_test_programs"] {
 			let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: path), includingPropertiesForKeys: nil)
 			let urlsByGroup = Dictionary(grouping: urls) { url in
 				url.deletingPathExtension().lastPathComponent
