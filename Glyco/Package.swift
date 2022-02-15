@@ -32,6 +32,8 @@ let package = Package(
 		]),
 		.testTarget(name: "GlycoKitTests", dependencies: ["GlycoKit"]),
 		
+		.testTarget(name: "GlycoTestHarness", dependencies: ["GlycoKit"]),
+		
 		.target(name: "Sisp", dependencies: [
 			.product(name: "Algorithms", package: "swift-algorithms"),
 			.product(name: "Collections", package: "swift-collections"),
