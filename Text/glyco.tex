@@ -2,7 +2,7 @@
 \begin{document}
 \onlyinsubfile{\mainmatter{}}
 
-\chapter{Glyco}
+\chapter{Glyco: A Nanopass Compiler for CHERI-RISC-V}
 
 Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
@@ -12,11 +12,11 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \nanopass{} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
 
-Glyco currently defines 14 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
+Glyco currently defines 15 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
 
 \section{Basic Abstractions over Assembly}
 
-The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI-RISC-V's assembly language that are useful in higher abstractions.
+The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI-RISC-V assembly language that are useful in higher abstractions.
 
 \paragraph{CHERI-RISC-V Assembly (S)} The ground language is a wrapper around the assembly representation of the program, as can been seen in \cref{bnf:s}. This language is compiled by adding some runtime code to this assembly before passing it to Clang.
 \begin{figure}[ht]
@@ -27,7 +27,10 @@ The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI
 	\label{bnf:s}
 \end{figure}
 
-\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{:compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \cref{bnf:rv}.
+\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{:compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \Cref{bnf:rv}.
+
+One important deviation from \cite{:compcourse} across the whole compiler pipeline is the support for multiple data types in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data.
+
 \begin{figure}[ht]
 	\begin{grammar}
 		
@@ -38,24 +41,24 @@ The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI
 		<Instruction> ::= copy(<DataType>, destination: <Register>, source: <Register>)
 			\alt registerRegister(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, rs2: <Register>)
 			\alt registerImmediate(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, imm: <Int>)
-			\alt loadWord(destination: <Register>, address: <Register>)
-			\alt storeWord(source: <Register>, address: <Register>)
+			\alt loadSignedWord(destination: <Register>, address: <Register>)
+			\alt storeSignedWord(source: <Register>, address: <Register>)
 			\alt offsetCapability(destination: <Register>, source: <Register>, offset: <Register>)
 			\alt branch(rs1: <Register>, relation: <BranchRelation>, rs2: <Register>, target: <Label>)
 			\alt jump(target: <Label>)
 			\alt labelled(<Label>, <Instruction>)
 			\alt $\cdots$
 			
-		<Register> ::= zero | ra | sp | gp | tp | t0 | t1 | t2 | fp | s1 | $\cdots$
+		<Register> ::= zero | ra | sp | fp | t0 | t1 | t2 | s1 | $\cdots$
 		
 	\end{grammar}
 	\caption{Abridged grammar for RV.}
 	\label{bnf:rv}
 \end{figure}
 
-\paragraph{Call Frame (CF)} This language introduces the call frame, hence its name, and restricts memory operations to either memory operations on the call frame or memory operations on statically allocated arrays.
+\paragraph{Call Frame (CF)} This language introduces the call frame, hence its name, as well as effects that operate on it, and restricts memory operations to either the call frame or allocated buffers. Its main purpose is to hide the stack and frame capability registers early on, i.e., from most abstractions in the compiler. An abridged grammar is shown in \Cref{bnf:cf}.
 
-It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few deviations due to the ISA. A first deviation is that a computation effect can write its result to a different register than the one used for one of its operands. A second deviation is that a computation effect cannot read from memory, since RISC-V requires an explicit load instruction before performing a computation. Additionally, CF introduces statically allocated arrays, a feature not present in the \cite{:compcourse} compiler. An abridged grammar is shown in \cref{bnf:cf}.
+CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, there are different load and store effects for data on the call frame and for data in a given buffer. Additionally, CF provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, CF introduces statically allocated buffers, a feature not present in the \cite{:compcourse} compiler.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -68,9 +71,9 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few 
 			\alt compute(into: <Register>, value: <BinaryExpression>)
 			\alt load(<DataType>, into: <Register>, from: <Frame.Location>)
 			\alt store(<DataType>, into: <Frame.Location>, from: <Register>)
-			\alt allocateVector(<DataType>, count: <Int>, into: <Register>)
-			\alt loadElement(<DataType>, into: <Register>, vector: <Register>, index: <Register>)
-			\alt storeElement(<DataType>, vector: <Register>, index: <Register>, from: <Register>)
+			\alt allocateBuffer(bytes: <Int>, into: <Register>)
+			\alt loadElement(<DataType>, into: <Register>, buffer: <Register>, offset: <Register>)
+			\alt storeElement(<DataType>, buffer: <Register>, offset: <Register>, from: <Register>)
 			\alt branch(to: <Label>, <Register>, <BranchRelation>, <Register>)
 			\alt jump(to: <Label>)
 			\alt labelled(<Label>, <Effect>)
@@ -86,7 +89,7 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few 
 	\label{bnf:cf}
 \end{figure}
 
-\paragraph{Flexible Operands (FO)} The next abstraction removes the explicit scalar load and store effects and enhances copy and computation effects to directly refer to the call frame, adapted from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \cref{bnf:fo}.
+\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to directly refer to the call frame. This is an adaptation from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \Cref{bnf:fo}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -95,9 +98,9 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few 
 		
 		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
 			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
-			\alt allocateVector(<DataType>, count: <Int>, into: <Location>)
-			\alt getElement(<DataType>, of: <Location>, at: <Source>, to: <Location>)
-			\alt setElement(<DataType>, of: <Location>, at: <Source>, to: <Source>)
+			\alt allocateBuffer(bytes: <Int>, into: <Location>)
+			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
+			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
 			\alt branch(to: <Label>, <Source>, <BranchRelation>, <Source>)
 			\alt $\cdots$
 		
@@ -110,9 +113,10 @@ It's an adaptation of \texttt{paren-x86-fvars} in \cite{:compcourse} with a few 
 	\label{bnf:fo}
 \end{figure}
 
-\section{Introducing Basic Blocks}
+\section{Structured Jumps \& Branches}
+The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're easier to reason about in optimisations and higher abstracts.
 
-% TODO
+\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exit at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch.
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}
