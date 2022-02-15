@@ -108,7 +108,7 @@ struct CompileCommand : ParsableCommand {
 			
 			let normalisedLanguageNames = languages.map { $0.uppercased() }
 			let urlsByLanguage = Dictionary(uniqueKeysWithValues: zip(normalisedLanguageNames, outputURLs))
-			let programsByLanguage = try HighestSupportedLanguage.loweredProgramRepresentation(
+			let programsByLanguage = try HighestSupportedLanguage.loweredProgramRepresentations(
 				fromSispString:		sourceString,
 				sourceLanguage:		sourceLanguage,
 				targetLanguages:	.init(normalisedLanguageNames),
