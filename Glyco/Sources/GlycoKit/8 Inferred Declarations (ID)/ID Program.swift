@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Inferred Types
+//sourcery: longname = Inferred Declarations
 //sourcery: description = "A language that infers declarations from definitions."
 public enum ID : Language {
 	

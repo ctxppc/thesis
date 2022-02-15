@@ -458,7 +458,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code>(Label, <strong>in:</strong> Effect)</code></dd>
 </dl>
 
-<h2 id="ID">Grammar for ID (Inferred Types)</h2>
+<h2 id="ID">Grammar for ID (Inferred Declarations)</h2>
 A language that infers declarations from definitions.
 
 **Inherited from AL:**
