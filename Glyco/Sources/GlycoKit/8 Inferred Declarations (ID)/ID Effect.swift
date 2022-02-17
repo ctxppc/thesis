@@ -67,13 +67,13 @@ extension ID {
 				Lowered.set(destination, to: source)
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				try context.declarations.require(lhs, type: .signedWord)
-				try context.declarations.require(rhs, type: .signedWord)
-				try context.declarations.declare(destination, type: .signedWord)
+				try context.declarations.require(lhs, type: .s32)
+				try context.declarations.require(rhs, type: .s32)
+				try context.declarations.declare(destination, type: .s32)
 				Lowered.compute(lhs, operation, rhs, to: destination)
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
-				try context.declarations.declare(buffer, type: .capability)
+				try context.declarations.declare(buffer, type: .cap)
 				Lowered.allocateBuffer(bytes: bytes, into: buffer)
 				
 				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination):

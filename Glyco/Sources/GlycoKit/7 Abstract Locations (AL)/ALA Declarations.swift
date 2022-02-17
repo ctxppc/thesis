@@ -69,7 +69,7 @@ extension ALA {
 		/// Returns given source's (widest supported) value type.
 		public func type(of source: Source) throws -> DataType {
 			switch source {
-				case .constant:					return .signedWord
+				case .constant:					return .s32
 				case .abstract(let location):	return try type(of: Location.abstract(location))
 				case .register(_, let type):	return type
 				case .frame(let location):		return try type(of: Location.frame(location))

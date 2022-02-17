@@ -41,7 +41,7 @@ extension CC {
 				
 				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
 				for register in Lower.Register.defaultCalleeSavedRegisters {
-					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .capability))	// TODO
+					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .cap))	// TODO
 				}
 				
 				// Compute parameter assignments.

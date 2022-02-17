@@ -414,10 +414,10 @@ A language that introduces structured values (vectors and records).
 </dl>
 <dl>
 	<dt><code>SV.ValueType</code></dt>
-	<dd><code><strong>byte</strong></code></dd>
-	<dd><code><strong>signedWord</strong></code></dd>
-	<dd><code><strong>vectorCapability</strong>(ValueType)</code></dd>
-	<dd><code><strong>recordCapability</strong>(RecordType)</code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
+	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
@@ -859,9 +859,9 @@ A language that introduces call frames and operations for managing the call fram
 </dl>
 <dl>
 	<dt><code>CF.DataType</code></dt>
-	<dd><code><strong>byte</strong></code></dd>
-	<dd><code><strong>signedWord</strong></code></dd>
-	<dd><code><strong>capability</strong></code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>CF.Register</code></dt>

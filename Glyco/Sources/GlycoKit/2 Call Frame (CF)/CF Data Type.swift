@@ -8,20 +8,20 @@ extension CF {
 	public enum DataType : String, Equatable, Codable {
 		
 		/// An unsigned byte or 1-byte integer.
-		case byte
+		case u8
 		
 		/// A signed 4-byte integer.
-		case signedWord
+		case s32
 		
 		/// An 8-byte capability.
-		case capability
+		case cap
 		
 		/// The size of a datum of this type, in bytes.
 		public var byteSize: Int {
 			switch self {
-				case .byte:			return 1
-				case .signedWord:	return 4
-				case .capability:	return 8
+				case .u8:			return 1
+				case .s32:			return 4
+				case .cap:	return 8
 			}
 		}
 		
@@ -30,9 +30,9 @@ extension CF {
 		/// Capabilities cannot be expressed using constants.
 		func supports(constant: Int) -> Bool {
 			switch self {
-				case .byte:			return UInt8(exactly: constant) != nil
-				case .signedWord:	return Int8(exactly: constant) != nil
-				case .capability:	return false
+				case .u8:			return UInt8(exactly: constant) != nil
+				case .s32:			return Int8(exactly: constant) != nil
+				case .cap:	return false
 			}
 		}
 		

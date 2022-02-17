@@ -11,7 +11,7 @@ final class ProcedureTests : XCTestCase {
 		let source = EX.Program(
 			.evaluate(fortyTwo, []),
 			functions:	[
-				.init(fortyTwo, takes: [], returns: .signedWord, in: .value(.constant(42)))
+				.init(fortyTwo, takes: [], returns: .s32, in: .value(.constant(42)))
 			]
 		)
 		

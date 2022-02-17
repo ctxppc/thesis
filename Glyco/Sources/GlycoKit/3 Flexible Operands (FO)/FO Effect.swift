@@ -93,13 +93,13 @@ extension FO {
 			
 			switch self {
 				
-				case .set(.byte, .register(let dest), to: .immediate(let imm)):
+				case .set(.u8, .register(let dest), to: .immediate(let imm)):
 				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + .init(UInt8(truncatingIfNeeded: imm)))]
 				
-				case .set(.signedWord, .register(let dest), to: .immediate(let imm)):
+				case .set(.s32, .register(let dest), to: .immediate(let imm)):
 				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + imm)]
 				
-				case .set(.capability, .register, to: .immediate):
+				case .set(.cap, .register, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
 				case .set(let type, .register(let dest), to: .location(.register(let src))):
@@ -108,7 +108,7 @@ extension FO {
 				case .set(let type, .register(let dest), to: .location(.frameCell(let src))):
 				return try [.load(type, into: dest.lowered(), from: src)]
 				
-				case .set(.capability, .frameCell, to: .immediate):
+				case .set(.cap, .frameCell, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
 				case .set(let type, .frameCell(let dest), to: .immediate(let imm)):
@@ -127,18 +127,18 @@ extension FO {
 				]
 				
 				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
-				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
-				let (storeResult, dest) = try store(.signedWord, to: destination, using: temp2)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
+				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
 				return loadLHS + [.compute(into: dest, value: .registerImmediate(lhs, operation, rhs))] + storeResult
 				
 				case .compute(let lhs, let operation, let rhs, to: let destination):
-				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
-				let (loadRHS, rhs) = try load(.signedWord, from: rhs, using: temp2)
-				let (storeResult, dest) = try store(.signedWord, to: destination, using: temp3)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
+				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
+				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(into: dest, value: .registerRegister(lhs, operation, rhs))] + storeResult
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
-				let (storeBufferCap, bufferCap) = try store(.capability, to: buffer, using: temp1)
+				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
 				return [.allocateBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
 				
 				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
@@ -167,8 +167,8 @@ extension FO {
 				return [.popFrame]
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
-				let (loadLHS, lhs) = try load(.signedWord, from: lhs, using: temp1)
-				let (loadRHS, rhs) = try load(.signedWord, from: rhs, using: temp2)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
+				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
 				return loadLHS + loadRHS + [.branch(to: target, lhs, relation, rhs)]
 				
 				case .jump(to: let target):

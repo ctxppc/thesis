@@ -9,7 +9,7 @@ extension CF {
 		
 		/// Creates an initial frame, containing no arguments and one allocated location for the caller's frame capability.
 		public init() {
-			_ = allocate(.capability)	// caller's frame capability
+			_ = allocate(.cap)	// caller's frame capability
 		}
 		
 		/// The number of bytes assigned to caller-provided arguments.

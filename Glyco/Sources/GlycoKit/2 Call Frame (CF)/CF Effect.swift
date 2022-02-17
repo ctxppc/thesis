@@ -65,11 +65,11 @@ extension CF {
 			let temp = Lower.Register.t0
 			switch self {
 				
-				case .copy(.byte, into: let destination, from: let source),	// TODO: Copy byte as word then mask out upper bits.
-					.copy(.signedWord, into: let destination, from: let source):
+				case .copy(.u8, into: let destination, from: let source),	// TODO: Copy u8 as s32 then mask out upper bits.
+					.copy(.s32, into: let destination, from: let source):
 				return try [.copyWord(destination: destination.lowered(), source: source.lowered())]
 				
-				case .copy(.capability, into: let destination, from: let source):
+				case .copy(.cap, into: let destination, from: let source):
 				return try [.copyCapability(destination: destination.lowered(), source: source.lowered())]
 				
 				case .compute(into: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
@@ -78,34 +78,34 @@ extension CF {
 				case .compute(into: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
 				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
-				case .load(.byte, into: let destination, from: let source):
+				case .load(.u8, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
 					.loadByte(destination: try destination.lowered(), address: temp)
 				]
 				
-				case .load(.signedWord, into: let destination, from: let source):
+				case .load(.s32, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
 					.loadSignedWord(destination: try destination.lowered(), address: temp)
 				]
 				
-				case .load(.capability, into: let destination, from: let source):
+				case .load(.cap, into: let destination, from: let source):
 				return [.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)]
 				
-				case .store(.byte, into: let destination, from: let source):
+				case .store(.u8, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
 					.storeByte(source: try source.lowered(), address: temp)
 				]
 				
-				case .store(.signedWord, into: let destination, from: let source):
+				case .store(.s32, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
 					.storeSignedWord(source: try source.lowered(), address: temp)
 				]
 				
-				case .store(.capability, into: let destination, from: let source):
+				case .store(.cap, into: let destination, from: let source):
 				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
 				
 				case .allocateBuffer(bytes: let bytes, into: let buffer):
@@ -131,45 +131,45 @@ extension CF {
 					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
 				]
 				
-				case .loadElement(.byte, into: let destination, buffer: let buffer, offset: let offset):
+				case .loadElement(.u8, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadByte(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
-				case .loadElement(.signedWord, into: let destination, buffer: let buffer, offset: let offset):
+				case .loadElement(.s32, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadSignedWord(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
-				case .loadElement(.capability, into: let destination, buffer: let buffer, offset: let offset):
+				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
 					.loadCapability(destination: destination.lowered(), address: destination.lowered(), offset: 0),
 				]
 				
-				case .storeElement(.byte, buffer: let buffer, offset: let offset, from: let source):
+				case .storeElement(.u8, buffer: let buffer, offset: let offset, from: let source):
 				return try [
 					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeByte(source: source.lowered(), address: temp),
 				]
 				
-				case .storeElement(.signedWord, buffer: let buffer, offset: let offset, from: let source):
+				case .storeElement(.s32, buffer: let buffer, offset: let offset, from: let source):
 				return try [
 					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeSignedWord(source: source.lowered(), address: temp),
 				]
 				
-				case .storeElement(.capability, buffer: let buffer, offset: let offset, from: let source):
+				case .storeElement(.cap, buffer: let buffer, offset: let offset, from: let source):
 				return try [
 					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeCapability(source: source.lowered(), address: temp, offset: 0),
 				]
 				
-				case .push(.capability, let source):
+				case .push(.cap, let source):
 				return try [
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.capability.byteSize),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.cap.byteSize),
 					.storeCapability(source: source.lowered(), address: .sp, offset: 0),
 				]
 				
@@ -183,7 +183,7 @@ extension CF {
 				return [.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: bytes)]
 				
 				case .pushFrame(bytes: let bytes):
-				let frameCapOffsetBeforeStackCapUpdate = -DataType.capability.byteSize
+				let frameCapOffsetBeforeStackCapUpdate = -DataType.cap.byteSize
 				return [
 					
 					// Push fp but defer sp update.
@@ -193,7 +193,7 @@ extension CF {
 					.offsetCapabilityWithImmediate(destination: .fp, source: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
 					
 					// Actually update sp, for both saved fp and requested frame size.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.capability.byteSize + bytes)),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.cap.byteSize + bytes)),
 					
 				]
 
@@ -201,7 +201,7 @@ extension CF {
 				return [
 					
 					// Pop frame and saved fp by moving sp one word above the saved fp's location.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.capability.byteSize),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.cap.byteSize),
 					
 					// Restore saved fp — follow the linked list.
 					.loadCapability(destination: .fp, address: .fp, offset: 0)
