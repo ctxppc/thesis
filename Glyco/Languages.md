@@ -170,7 +170,7 @@ A language that introduces lexical scopes of definitions
 <dl>
 	<dt><code>LS.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>symbol</strong>(Symbol)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Definition</code></dt>

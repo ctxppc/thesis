@@ -30,7 +30,7 @@ extension EX {
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))
-				], in: .relation(.symbol(l), relation, .symbol(r)))
+				], in: .relation(.named(l), relation, .named(r)))
 				
 				case .if(let holds, then: let affirmative, else: let negative):
 				return try .if(holds.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

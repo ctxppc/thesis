@@ -31,7 +31,7 @@ extension EX {
 					let name = Lower.Symbol(rawValue: "arg\(n)")
 					return (name, .init(name, try argument.lowered(in: &context)))
 				}
-				return .let(namesAndDefinitions.map(\.1), in: .evaluate(name, namesAndDefinitions.map { .symbol($0.0) }))
+				return .let(namesAndDefinitions.map(\.1), in: .evaluate(name, namesAndDefinitions.map { .named($0.0) }))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

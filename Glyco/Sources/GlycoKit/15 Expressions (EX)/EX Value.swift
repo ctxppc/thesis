@@ -42,7 +42,7 @@ extension EX {
 				return .vector(dataType, count: count)
 				
 				case .named(let symbol):
-				return .source(.symbol(symbol))
+				return .source(.named(symbol))
 				
 				case .binary(let lhs, let op, let rhs):
 				let l = context.bag.uniqueName(from: "lhs")
@@ -50,7 +50,7 @@ extension EX {
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))
-				], in: .binary(.symbol(l), op, .symbol(r)))
+				], in: .binary(.named(l), op, .named(r)))
 				
 				case .element(of: let vector, at: let index):
 				let vec = context.bag.uniqueName(from: "vec")
@@ -58,7 +58,7 @@ extension EX {
 				return try .let([
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
-				], in: .element(of: vec, at: .symbol(idx)))
+				], in: .element(of: vec, at: .named(idx)))
 				
 				case .evaluate(let name, let arguments):
 				let argumentNamesAndLoweredValues = try arguments.map {
@@ -66,7 +66,7 @@ extension EX {
 				}
 				return .let(
 					argumentNamesAndLoweredValues.map { .init($0.0, $0.1) },
-					in: .evaluate(name, argumentNamesAndLoweredValues.map { .symbol($0.0) })
+					in: .evaluate(name, argumentNamesAndLoweredValues.map { .named($0.0) })
 				)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):

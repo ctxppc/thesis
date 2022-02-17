@@ -8,7 +8,7 @@ final class LexicalScopesTests : XCTestCase {
 	func testDefinition() throws {
 		
 		let program = LS.Program(
-			.let([.init("answer", .source(.constant(42)))], in: .value(.source(.symbol("answer")))),
+			.let([.init("answer", .source(.constant(42)))], in: .value(.source(.named("answer")))),
 			functions: []
 		)
 		

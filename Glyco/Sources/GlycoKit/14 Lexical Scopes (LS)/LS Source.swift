@@ -9,13 +9,13 @@ extension LS {
 		case constant(Int)
 		
 		/// The operand is to be retrieved from a given location.
-		case symbol(Symbol)
+		case named(Symbol)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .constant(let value):	return .constant(value)
-				case .symbol(let symbol):	return .location(symbol.lowered(in: &context))
+				case .named(let symbol):	return .location(symbol.lowered(in: &context))
 			}
 		}
 		

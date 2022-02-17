@@ -33,7 +33,7 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context)),
 					.init(elem, element.lowered(in: &context)),
-				], in: .setElement(of: vec, at: .symbol(idx), to: .symbol(elem)))
+				], in: .setElement(of: vec, at: .named(idx), to: .named(elem)))
 				
 			}
 		}
