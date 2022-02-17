@@ -206,7 +206,11 @@ extension ALA.Declarations : Codable {
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
-		try container.encode(typesByLocation.map { $0.key ~ $0.value })
+		try container.encode(
+			typesByLocation
+				.map { $0.key ~ $0.value }
+				.sorted()	// ensure deterministic ordering by sorting
+		)
 	}
 	
 }

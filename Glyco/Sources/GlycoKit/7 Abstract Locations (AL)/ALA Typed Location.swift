@@ -5,7 +5,7 @@ import Foundation
 extension ALA {
 	
 	/// A location with an associated data type.
-	public enum TypedLocation : Equatable, Codable {
+	public enum TypedLocation : Comparable, Codable {
 		
 		/// An abstract location, to be lowered to a physical location after register allocation.
 		case abstract(AbstractLocation, DataType)

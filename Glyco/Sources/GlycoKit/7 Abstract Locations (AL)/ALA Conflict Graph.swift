@@ -88,22 +88,6 @@ extension ALA {
 		
 	}
 	
-	public struct Conflict : Hashable, Codable {
-		
-		/// Creates a conflict between two given locations.
-		public init(_ first: Location, _ second: Location) {
-			self.first = first
-			self.second = second
-		}
-		
-		/// The first location in the conflict.
-		public let first: Location
-		
-		/// The second location in the conflict.
-		public let second: Location
-		
-	}
-	
 }
 
 extension ALA.ConflictGraph : Codable {
@@ -116,7 +100,7 @@ extension ALA.ConflictGraph : Codable {
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.container(keyedBy: CodingKeys.self)
-		try container.encode(conflicts, forKey: .conflicts)
+		try container.encode(conflicts.sorted(), forKey: .conflicts)	// ensure deterministic ordering by sorting
 	}
 	
 }
