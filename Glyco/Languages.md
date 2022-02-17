@@ -674,7 +674,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
@@ -745,7 +745,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 </dl>
 <dl>
@@ -786,7 +786,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
@@ -849,7 +849,7 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>push</strong>(DataType, Register)</code></dd>
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
-	<dd><code><strong>pushFrame</strong>(<strong>bytes:</strong> Int)</code></dd>
+	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
@@ -900,7 +900,7 @@ A language that introduces call frames and operations for managing the call fram
 </dl>
 <dl>
 	<dt><code>CF.Frame</code></dt>
-	<dd><code>()</code></dd>
+	<dd><code>(<strong>argumentsByteSize:</strong> Int, <strong>allocatedByteSize:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>

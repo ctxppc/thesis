@@ -35,10 +35,10 @@ extension FO {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack.
+		/// Pushes given frame to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
-		case pushFrame(bytes: Int)
+		case pushFrame(Frame)
 		
 		/// Pops a frame from the call stack.
 		///
@@ -160,8 +160,8 @@ extension FO {
 				case .pop(bytes: let bytes):
 				return [.pop(bytes: bytes)]
 				
-				case .pushFrame(bytes: let bytes):
-				return [.pushFrame(bytes: bytes)]
+				case .pushFrame(let frame):
+				return [.pushFrame(frame)]
 				
 				case .popFrame:
 				return [.popFrame]

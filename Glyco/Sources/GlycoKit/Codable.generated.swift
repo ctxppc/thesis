@@ -128,6 +128,13 @@ extension CF.Program {
 	}
 }
 
+extension CF.Frame {
+	public enum CodingKeys : String, CodingKey {
+		case argumentsByteSize = "argumentsByteSize"
+		case allocatedByteSize = "allocatedByteSize"
+	}
+}
+
 extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"

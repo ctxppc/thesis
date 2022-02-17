@@ -105,7 +105,7 @@ extension ALA {
 				Lowered.pop(bytes: bytes)
 				
 				case .pushScope(analysisAtEntry: _):
-				Lowered.pushFrame(bytes: context.assignments.frame.allocatedByteSize)
+				Lowered.pushFrame(context.assignments.frame)
 				
 				case .popScope(analysisAtEntry: _):
 				Lowered.popFrame

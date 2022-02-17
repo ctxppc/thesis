@@ -32,10 +32,10 @@ extension CF {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` by `bytes` bytes downward.
+		/// Pushes given frame to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
-		case pushFrame(bytes: Int)
+		case pushFrame(Frame)
 		
 		/// Pops a frame by copying `cfp` to `csp` and popping `cfp` from the stack.
 		///
@@ -182,7 +182,7 @@ extension CF {
 				case .pop(bytes: let bytes):
 				return [.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: bytes)]
 				
-				case .pushFrame(bytes: let bytes):
+				case .pushFrame(let frame):
 				let frameCapOffsetBeforeStackCapUpdate = -DataType.cap.byteSize
 				return [
 					
@@ -193,7 +193,7 @@ extension CF {
 					.offsetCapabilityWithImmediate(destination: .fp, source: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
 					
 					// Actually update sp, for both saved fp and requested frame size.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.cap.byteSize + bytes)),
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.cap.byteSize + frame.allocatedByteSize)),
 					
 				]
 

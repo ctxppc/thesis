@@ -34,10 +34,10 @@ extension CD {
 		/// An effect that removes `bytes` bytes from the stack.
 		case pop(bytes: Int)
 		
-		/// Pushes a frame of size `bytes` bytes to the call stack.
+		/// Pushes given frame to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
-		case pushFrame(bytes: Int)
+		case pushFrame(Frame)
 		
 		/// Pops a frame from the call stack.
 		///
@@ -308,11 +308,11 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .pushFrame(bytes: let bytes):
+			case .pushFrame(let frame):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.pushFrame(bytes: bytes)],
+				previousEffects:	previousEffects + [.pushFrame(frame)],
 				exitLabel:			exitLabel
 			)
 			

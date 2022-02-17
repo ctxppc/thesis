@@ -1,21 +1,29 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
+
 extension CF {
 	
 	/// A value that keeps track of allocated frame cells in a single frame.
 	///
 	/// A call frame consists of two segments: a caller-managed segment for any provided arguments and a callee-managed segment for allocated frame locations. The first allocated frame location always contains the caller's frame capability.
-	public struct Frame {
+	public struct Frame : Codable, Equatable {
 		
-		/// Creates an initial frame, containing no arguments and one allocated location for the caller's frame capability.
-		public init() {
-			_ = allocate(.cap)	// caller's frame capability
+		/// An initial frame, containing no arguments and one allocated location for the caller's frame capability.
+		public static let initial: Self = with(Self()) {
+			_ = $0.allocate(.cap)	// caller's frame capability
+		}
+		
+		/// Creates a frame.
+		public init(argumentsByteSize: Int = 0, allocatedByteSize: Int = 0) {
+			self.argumentsByteSize = argumentsByteSize
+			self.allocatedByteSize = allocatedByteSize
 		}
 		
 		/// The number of bytes assigned to caller-provided arguments.
 		///
 		/// Arguments are not counted against the allocated byte size of the call frame.
-		private(set) var argumentsByteSize = 0
+		public private(set) var argumentsByteSize: Int
 		
 		/// Adds a parameter consisting of `count` data of type `type` and returns its location.
 		///
@@ -26,10 +34,10 @@ extension CF {
 		}
 		
 		/// The number of bytes that have been allocated on the frame.
-		private(set) var allocatedByteSize = 0
+		public private(set) var allocatedByteSize: Int
 		
 		/// The number of bytes in the memory region spanned by the call frame, including the space taken up by caller-provided arguments.
-		var totalByteSize: Int { argumentsByteSize + allocatedByteSize }
+		public var totalByteSize: Int { argumentsByteSize + allocatedByteSize }
 		
 		/// Allocates space for `count` data of type `type` and returns its location.
 		public mutating func allocate(_ type: DataType, count: Int = 1) -> Location {
