@@ -77,7 +77,20 @@ extension ALA {
 		}
 		
 		/// Returns the data type of given location and source.
+		///
+		/// The behaviour of this method depends on the kind of location and source that are provided.
+		///
+		/// - Parameters:
+		///   - location: The location whose data type to determine.
+		///   - otherLocation: A location with the same data type as `location`.
+		///
+		/// - Returns: The data type of `location`, and `otherLocation`.
 		public func type(of location: Location, and source: Source) throws -> DataType {
+			
+			if case .register = location {
+				return try type(of: source)
+			}
+			
 			switch source {
 				
 				case .constant(let value):
@@ -85,18 +98,19 @@ extension ALA {
 				guard locationType.supports(constant: value) else { throw TypeError.constantNotRepresentableByType(value, locationType) }
 				return locationType
 				
-				case .abstract(let sourceLocation):
-				return try type(of: location, and: Location.abstract(sourceLocation))
+				case .abstract(let abstractLocation):
+				return try type(of: location, and: Location.abstract(abstractLocation))
+				
+				case .frame(let frameLocation):
+				return try type(of: location, and: Location.frame(frameLocation))
 				
 				case .register(let register, let sourceType):
 				let locationType = try type(of: location)
 				guard locationType == sourceType else { throw TypeError.unequalTypes(location ~ locationType, .register(register) ~ sourceType) }
 				return locationType
 				
-				case .frame(let sourceLocation):
-				return try type(of: location, and: Location.frame(sourceLocation))
-				
 			}
+			
 		}
 		
 		/// Declares given location and assigns it given data type.
