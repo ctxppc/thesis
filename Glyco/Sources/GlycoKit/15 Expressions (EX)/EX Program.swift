@@ -19,6 +19,12 @@ public enum EX : Language {
 		public var functions: [Function]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = EX.Context()
 			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context))

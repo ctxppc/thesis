@@ -19,6 +19,12 @@ public enum CA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			try .init(effect.lowered(), procedures: procedures.lowered())
 		}

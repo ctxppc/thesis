@@ -22,6 +22,12 @@ public enum S : Language {
 		}
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func elf(configuration: CompilationConfiguration) throws -> Data {
 			
 			let tmpURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: configuration.toolchainURL, create: true)

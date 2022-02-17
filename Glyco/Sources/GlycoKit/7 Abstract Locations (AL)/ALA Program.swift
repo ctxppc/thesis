@@ -23,13 +23,19 @@ public enum ALA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public mutating func optimise() throws {
+		public mutating func optimise() throws -> Bool {
+			var optimised = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
 				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis)
+				optimised = true
 			}
+			return optimised
 		}
+		
+		// See protocol.
+		public func validate() {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

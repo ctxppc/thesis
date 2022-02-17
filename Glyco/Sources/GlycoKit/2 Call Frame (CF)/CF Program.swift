@@ -16,6 +16,12 @@ public enum CF : Language {
 		public var effects: [Effect] = []
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var frame = Frame()
 			return .init(try effects.lowered(in: &frame))

@@ -19,6 +19,12 @@ public enum CC : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(procedures: procedures, configuration: configuration)
 			return try .init(try .do {

@@ -16,6 +16,12 @@ public enum RV : Language {
 		public var instructions: [Instruction]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(tabIndentation: 4)
 			switch configuration.target {

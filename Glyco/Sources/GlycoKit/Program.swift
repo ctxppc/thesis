@@ -76,10 +76,6 @@ public struct CompilationConfiguration {
 
 extension Program {
 	
-	public func optimise() -> Bool { false }
-	
-	public func validate() {}
-	
 	public func elf(configuration: CompilationConfiguration) throws -> Data {
 		try processedLowering(configuration: configuration)
 			.elf(configuration: configuration)
@@ -121,6 +117,14 @@ extension Never : Program {
 	}
 	
 	public func encode(to encoder: Encoder) throws {
+		switch self {}
+	}
+	
+	public func optimise() -> Bool {
+		switch self {}
+	}
+	
+	public func validate() {
 		switch self {}
 	}
 	

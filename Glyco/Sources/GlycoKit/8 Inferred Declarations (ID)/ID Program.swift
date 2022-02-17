@@ -19,6 +19,12 @@ public enum ID : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
 			let effect = try effect.lowered(in: &context)	// first get declarations into context

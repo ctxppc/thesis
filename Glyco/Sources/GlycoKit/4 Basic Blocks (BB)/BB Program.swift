@@ -18,6 +18,12 @@ public enum BB : Language {
 		public var blocks: [Block]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			.init(try blocks.lowered())	// TODO: Implement optimal trace.
 		}

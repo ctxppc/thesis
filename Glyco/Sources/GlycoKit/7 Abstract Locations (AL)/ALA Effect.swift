@@ -50,7 +50,7 @@ extension ALA {
 		
 		/// An effect that invokes the labelled procedure and uses given physical locations.
 		///
-		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis.
+		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis. A call effect "uses" the values of caller-saved registers.
 		case call(Label, [Location], analysisAtEntry: Analysis)
 		
 		/// An effect that returns to the caller.
@@ -240,7 +240,7 @@ extension ALA {
 		private func definedLocations() -> [Location] {
 			switch self {
 				
-				case .do, .setElement, .if, .push, .pop, .popScope, .call, .return:
+				case .do, .setElement, .if, .push, .pop, .popScope, .return:
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
@@ -251,6 +251,9 @@ extension ALA {
 				
 				case .pushScope:
 				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
+				
+				case .call:
+				return Lower.Register.defaultCallerSavedRegisters.map { .register($0) }
 				
 			}
 		}

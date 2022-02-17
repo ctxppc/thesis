@@ -23,6 +23,12 @@ public enum AL : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
+		public func optimise() -> Bool { false }
+		
+		// See protocol.
+		public func validate() {}
+		
+		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var analysis = Lower.Analysis()
 			return try .init(
