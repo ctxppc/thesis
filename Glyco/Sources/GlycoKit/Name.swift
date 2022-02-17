@@ -14,14 +14,19 @@ protocol Named {
 
 struct Bag<NameType : Name, Language : GlycoKit.Language> {
 	
-	private let languagePrefix = "\(Language.name.lowercased())."
-	
 	mutating func uniqueName(from prefix: String) -> NameType {
 		
-		let prefix = languagePrefix + (prefix
+		let suffixlessPrefix = prefix
 			.split(separator: "$", maxSplits: 1, omittingEmptySubsequences: true)
 			.first
-			.map(String.init) ?? prefix)
+			.map(String.init) ?? prefix
+		
+		let langlessPrefix = suffixlessPrefix
+			.split(separator: ".", maxSplits: 1, omittingEmptySubsequences: true)
+			.splittingLast()
+			.map { String($0.tail) } ?? suffixlessPrefix
+		
+		let prefix = "\(Language.name.lowercased()).\(langlessPrefix)"
 		
 		if let uses = usesByPrefix[prefix] {
 			defer { usesByPrefix[prefix] = uses + 1 }
