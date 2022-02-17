@@ -8,7 +8,7 @@ extension ALA {
 		/// An effect that performs `effects`.
 		case `do`([Effect], analysisAtEntry: Analysis)
 		
-		/// An effect that retrieves the value from given source and puts it in given location.
+		/// An effect that retrieves the datum from given source and puts it in given location, effectively copying the datum.
 		case set(Location, to: Source, analysisAtEntry: Analysis)
 		
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.

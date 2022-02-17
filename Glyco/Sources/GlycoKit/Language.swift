@@ -51,31 +51,37 @@ extension Language {
 	
 	public static func loweredProgramRepresentations(_ program: Program, targetLanguages: Set<String>?, configuration: CompilationConfiguration) throws -> [String : String] {
 		
-		if let targetLanguages = targetLanguages, targetLanguages.isEmpty {
-			return [:]
-		}
-		
 		let isTargetLanguage: Bool
 		let remainingLanguages: Set<String>?
+		let continueLowering: Bool
 		if var targetLanguages = targetLanguages {
 			isTargetLanguage = targetLanguages.remove(name) != nil
 			remainingLanguages = targetLanguages
+			continueLowering = !targetLanguages.isEmpty
 		} else {
 			isTargetLanguage = true
 			remainingLanguages = nil
+			continueLowering = true
 		}
 		
 		let encodedTargetProgram = isTargetLanguage
 			? try SispEncoder().encode(program).serialised()
 			: nil
 		
-		var loweredPrograms = try Lower.loweredProgramRepresentations(
-			program.processedLowering(configuration: configuration),
-			targetLanguages:	remainingLanguages,
-			configuration:		configuration
-		)
+		var loweredPrograms: [String : String]
+		
+		if continueLowering {
+			loweredPrograms = try Lower.loweredProgramRepresentations(
+				program.processedLowering(configuration: configuration),
+				targetLanguages:	remainingLanguages,
+				configuration:		configuration
+			)
+		} else {
+			loweredPrograms = [:]
+		}
 		
 		loweredPrograms[name] = encodedTargetProgram
+		
 		return loweredPrograms
 		
 	}
