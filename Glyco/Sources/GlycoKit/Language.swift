@@ -64,23 +64,16 @@ extension Language {
 			continueLowering = true
 		}
 		
-		let encodedTargetProgram = isTargetLanguage
-			? try SispEncoder().encode(program).serialised()
-			: nil
-		
-		var loweredPrograms: [String : String]
-		
-		if continueLowering {
-			loweredPrograms = try Lower.loweredProgramRepresentations(
+		var loweredPrograms = continueLowering
+			? try Lower.loweredProgramRepresentations(
 				program.processedLowering(configuration: configuration),
 				targetLanguages:	remainingLanguages,
 				configuration:		configuration
-			)
-		} else {
-			loweredPrograms = [:]
-		}
+			) : [:]
 		
-		loweredPrograms[name] = encodedTargetProgram
+		if isTargetLanguage {
+			loweredPrograms[name] = try SispEncoder().encode(program).serialised()
+		}
 		
 		return loweredPrograms
 		

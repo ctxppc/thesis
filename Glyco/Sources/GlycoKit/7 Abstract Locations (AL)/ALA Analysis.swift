@@ -7,7 +7,7 @@ extension ALA {
 		
 		/// Constructs an analysis value.
 		public init(
-			conflicts:						ConflictSet = .init([]),
+			conflicts:						ConflictGraph = .init([]),
 			possiblyLiveLocations:			Set<Location> = [],
 			definedLocations:				Set<Location> = [],
 			possiblyUsedUndefinedLocations:	Set<Location> = []
@@ -21,7 +21,7 @@ extension ALA {
 		/// The conflict set.
 		///
 		/// The conflict set grows while traversing a program in reverse order. A location that is defined conflicts with all locations (except itself) that are marked as possibly used at the time.
-		public private(set) var conflicts: ConflictSet
+		public private(set) var conflicts: ConflictGraph
 		
 		/// The locations whose values are possibly used by a successor.
 		///
@@ -51,7 +51,7 @@ extension ALA {
 			markAsDefinitelyDiscarded(defined)
 			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
 			for definedLocation in defined {
-				insertConflict(definedLocation, possiblyLiveLocationsAtExit)
+				conflicts.insert(between: definedLocation, and: possiblyLiveLocationsAtExit)
 			}
 			
 			definedLocations.formUnion(defined)
@@ -69,20 +69,6 @@ extension ALA {
 			var copy = self
 			try copy.update(defined: defined, possiblyUsed: possiblyUsed)
 			return copy
-		}
-		
-		/// Adds conflicts between `firstLocation` and `otherLocations`.
-		///
-		/// This method does not add a conflict between a location and itself.
-		private mutating func insertConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) {
-			for otherLocation in otherLocations {
-				conflicts.insert(.init(firstLocation, otherLocation))
-			}
-		}
-		
-		/// Returns a Boolean value indicating whether the analysis' conflict graph contains a conflict between `firstLocation` and any location in `otherLocations`.
-		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
-			conflicts.containsConflict(firstLocation, otherLocations)
 		}
 		
 		/// Marks `locations` as being possibly used by a successor.

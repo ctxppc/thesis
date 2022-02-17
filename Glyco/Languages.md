@@ -569,6 +569,14 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(<strong>locals:</strong> Declarations, <strong>in:</strong> Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.ConflictGraph</code></dt>
+	<dd><code>([Conflict])</code></dd>
+</dl>
+<dl>
+	<dt><code>ALA.Conflict</code></dt>
+	<dd><code>(Location, Location)</code></dd>
+</dl>
+<dl>
 	<dt><code>ALA.TypedLocation</code></dt>
 	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
@@ -626,15 +634,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
-	<dd><code>(<strong>conflicts:</strong> ConflictSet, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>)</code></dd>
-</dl>
-<dl>
-	<dt><code>ALA.ConflictSet</code></dt>
-	<dd><code>([Conflict])</code></dd>
-</dl>
-<dl>
-	<dt><code>ALA.Conflict</code></dt>
-	<dd><code>(ALA.Location, ALA.Location)</code></dd>
+	<dd><code>(<strong>conflicts:</strong> ConflictGraph, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>)</code></dd>
 </dl>
 
 <h2 id="CD">Grammar for CD (Conditionals)</h2>

@@ -25,6 +25,19 @@ extension ALA.Program {
 	}
 }
 
+extension ALA.ConflictGraph {
+	public enum CodingKeys : String, CodingKey {
+		case conflicts = "_0"
+	}
+}
+
+extension ALA.Conflict {
+	public enum CodingKeys : String, CodingKey {
+		case first = "_0"
+		case second = "_1"
+	}
+}
+
 extension ALA.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -39,13 +52,6 @@ extension ALA.Analysis {
 		case possiblyLiveLocations = "possiblyLiveLocations"
 		case definedLocations = "definedLocations"
 		case possiblyUsedUndefinedLocations = "possiblyUsedUndefinedLocations"
-	}
-}
-
-extension ALA.Conflict {
-	public enum CodingKeys : String, CodingKey {
-		case first = "_0"
-		case second = "_1"
 	}
 }
 

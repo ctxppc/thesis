@@ -1,14 +1,16 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Algorithms
+import DepthKit
+
 extension ALA {
 	
-	//sourcery: hasOpaqueRepresentation
-	public struct ConflictSet : Equatable {
+	public struct ConflictGraph : Equatable {
 		
-		/// Creates a set with given conflicts.
+		/// Creates a graph with given conflicts.
 		public init(_ conflicts: [Conflict]) {
 			for conflict in conflicts {
-				insert(conflict)
+				insert(conflict.first, conflict.second)
 			}
 		}
 		
@@ -17,17 +19,37 @@ extension ALA {
 		/// - Invariant: The mapping is symmetric, i.e., for every location `a` and `b`, if `conflictingLocationsForLocation[a]!.contains(b)` then `conflictingLocationsForLocation[b]!.contains(a)`.
 		private var conflictingLocationsForLocation: [Location : Set<Location>] = [:]
 		
-		/// Inserts given conflict to the set.
-		///
-		/// This method does nothing if `conflict` is a self-conflict.
-		mutating func insert(_ conflict: Conflict) {
-			guard conflict.first != conflict.second else { return }
-			conflictingLocationsForLocation[conflict.first, default: []].insert(conflict.second)
-			conflictingLocationsForLocation[conflict.second, default: []].insert(conflict.first)
+		/// The graph's conflicts.
+		var conflicts: Set<Conflict> {
+			var conflicts = Set<Conflict>()
+			for (firstLocation, otherLocations) in conflictingLocationsForLocation {
+				for otherLocation in otherLocations {
+					guard !conflicts.contains(.init(otherLocation, firstLocation)) else { continue }
+					conflicts.insert(.init(firstLocation, otherLocation))
+				}
+			}
+			return conflicts
 		}
 		
+		/// Inserts a conflict between given locations to the graph.
+		///
+		/// This method does nothing if `conflict` is a self-conflict.
+		mutating func insert(_ firstLocation: Location, _ otherLocation: Location) {
+			guard firstLocation != otherLocation else { return }
+			conflictingLocationsForLocation[firstLocation, default: []].insert(otherLocation)
+			conflictingLocationsForLocation[otherLocation, default: []].insert(firstLocation)
+		}
+		
+		/// Adds conflicts between `firstLocation` and `otherLocations`.
+		///
+		/// This method does not add a conflict between a location and itself.
+		mutating func insert(between firstLocation: Location, and otherLocations: Set<Location>) {
+			for otherLocation in otherLocations {
+				insert(firstLocation, otherLocation)
+			}
+		}
 		/// Returns a Boolean value indicating whether the set contains a conflict between `firstLocation` and any location in `otherLocations`.
-		func containsConflict(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
+		func contains(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
 			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
 			return !conflictingLocations.isDisjoint(with: otherLocations)
 		}
@@ -42,7 +64,7 @@ extension ALA {
 		/// Returns a Boolean value indicating whether given locations used in a copy effect can be safely coalesced.
 		func safelyCoalescable(_ firstLocation: Location, _ otherLocation: Location) -> Bool {
 			
-			guard !containsConflict(firstLocation, [otherLocation]) else { return false }
+			guard !contains(firstLocation, [otherLocation]) else { return false }
 			
 			// Apply (conservative) heuristic by Briggs et al. to avoid turning a K-colourable conflict graph into non-K-colourable.
 			let conflictingLocationsOfUnion = conflictingLocationsForLocation[firstLocation, default: []]
@@ -61,10 +83,10 @@ extension ALA {
 		
 	}
 	
-	public struct Conflict : Equatable, Codable {
+	public struct Conflict : Hashable, Codable {
 		
 		/// Creates a conflict between two given locations.
-		public init(_ first: ALA.Location, _ second: ALA.Location) {
+		public init(_ first: Location, _ second: Location) {
 			self.first = first
 			self.second = second
 		}
@@ -79,20 +101,17 @@ extension ALA {
 	
 }
 
-extension ALA.ConflictSet : Codable {
+extension ALA.ConflictGraph : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
-		try self.init(decoder.singleValueContainer().decode([ALA.Conflict].self))
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		self.init(try container.decode(key: .conflicts))
 	}
 	
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.unkeyedContainer()
-		for (first, others) in conflictingLocationsForLocation {
-			for other in others {
-				try container.encode(ALA.Conflict(first, other))
-			}
-		}
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(conflicts, forKey: .conflicts)
 	}
 	
 }

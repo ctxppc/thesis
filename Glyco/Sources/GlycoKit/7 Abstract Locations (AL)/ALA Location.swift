@@ -82,7 +82,7 @@ extension ALA {
 			private func assignableRegister(for location: AbstractLocation) -> Lower.Register? {
 				Lower.Register.defaultAssignableRegisters.first { register in
 					guard let assignedLocations = locationsByRegister[register] else { return true }
-					return !analysisAtScopeEntry.containsConflict(.abstract(location), assignedLocations)
+					return !analysisAtScopeEntry.conflicts.contains(.abstract(location), assignedLocations)
 				}
 			}
 			
