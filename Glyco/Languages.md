@@ -900,7 +900,7 @@ A language that introduces call frames and operations for managing the call fram
 </dl>
 <dl>
 	<dt><code>CF.Frame</code></dt>
-	<dd><code>(<strong>argumentsByteSize:</strong> Int, <strong>allocatedByteSize:</strong> Int)</code></dd>
+	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>

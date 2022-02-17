@@ -19,8 +19,8 @@ extension CF {
 		/// The size of a datum of this type, in bytes.
 		public var byteSize: Int {
 			switch self {
-				case .u8:			return 1
-				case .s32:			return 4
+				case .u8:	return 1
+				case .s32:	return 4
 				case .cap:	return 8
 			}
 		}
@@ -30,8 +30,8 @@ extension CF {
 		/// Capabilities cannot be expressed using constants.
 		func supports(constant: Int) -> Bool {
 			switch self {
-				case .u8:			return UInt8(exactly: constant) != nil
-				case .s32:			return Int8(exactly: constant) != nil
+				case .u8:	return UInt8(exactly: constant) != nil
+				case .s32:	return Int8(exactly: constant) != nil
 				case .cap:	return false
 			}
 		}

@@ -108,7 +108,8 @@ extension CC {
 					}
 					
 					// Invoke procedure.
-					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) })	// FIXME: Pass used frame locations.
+					// Parameter registers are considered in use but no frame locations are used since frame-res. args. are passed via an allocated record.
+					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) })
 					
 					// Deallocate frame-resident arguments, if any.
 					if !assignments.parameterRecordType.isEmpty {

@@ -70,7 +70,7 @@ extension ALA {
 			private var locationsByRegister = [Lower.Register : Set<Location>]()
 			
 			/// The frame on which spilled data are stored.
-			private(set) var frame = Lower.Frame()
+			private(set) var frame = Lower.Frame.initial
 			
 			/// Adds an assignment for `location` and returns the assigned physical location.
 			@discardableResult

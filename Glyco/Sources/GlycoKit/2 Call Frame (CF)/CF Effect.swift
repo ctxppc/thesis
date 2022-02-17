@@ -61,7 +61,7 @@ extension CF {
 		static var nop: Self { .compute(into: .zero, value: Register.zero + .zero) }
 		
 		// See protocol.
-		func lowered(in context: inout Frame) throws -> [Lower.Instruction] {
+		func lowered(in context: inout ()) throws -> [Lower.Instruction] {
 			let temp = Lower.Register.t0
 			switch self {
 				

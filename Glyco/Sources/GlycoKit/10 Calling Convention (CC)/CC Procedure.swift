@@ -1,6 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 import Algorithms
+import DepthKit
 
 extension CC {
 	
@@ -54,9 +55,11 @@ extension CC {
 				}
 				
 				// Bind local names to frame-resident arguments.
-				var frame = Lower.Frame()
-				for field in assignments.parameterRecordType {
-					Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(frame.addParameter(field.valueType.lowered())))
+				let parameterRecordType = with(assignments.parameterRecordType) {
+					$0.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .vectorCap(.u8)))
+				}
+				for (field, offset) in parameterRecordType.fieldByteOffsetPairs().dropFirst() {
+					Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(.init(offset: offset)))
 				}
 				
 				// Execute main effect.

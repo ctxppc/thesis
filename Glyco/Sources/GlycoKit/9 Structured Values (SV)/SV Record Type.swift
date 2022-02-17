@@ -20,7 +20,13 @@ extension SV {
 		}
 		
 		/// An ordered mapping from field names to types.
-		private var typesByFieldName = OrderedDictionary<Field.Name, ValueType>()
+		private var typesByFieldName = TypesByFieldName()
+		typealias TypesByFieldName = OrderedDictionary<Field.Name, ValueType>
+		
+		/// Prepends `field` if `self` doesn't contain a field with the same name as `field`, or replaces the field in `self` with the same name as `field` by `field`.
+		public mutating func prependOrReplace(_ field: Field) {
+			typesByFieldName.updateValue(field.valueType, forKey: field.name, insertingAt: 0)
+		}
 		
 		/// Appends `field` if `self` doesn't contain a field with the same name as `field`, or replaces the field in `self` with the same name as `field` by `field`.
 		public mutating func appendOrReplace(_ field: Field) {
@@ -61,6 +67,15 @@ extension SV {
 		/// The number of bytes required to represent a record of type `self`.
 		var byteSize: Int {
 			typesByFieldName.elements.map(\.1.byteSize).reduce(0, +)
+		}
+		
+		/// Returns a sequence of field–byte offset pairs.
+		func fieldByteOffsetPairs() -> UnfoldSequence<(Field, offset: Int), (fields: TypesByFieldName.Elements.SubSequence, offset: Int)> {
+			sequence(state: (fields: typesByFieldName.elements[...], offset: 0)) { state -> (Field, offset: Int)? in
+				guard let (name, valueType) = state.fields.popFirst() else { return nil }
+				defer { state.offset += valueType.byteSize }
+				return (.init(name: name, valueType: valueType), state.offset)
+			}
 		}
 		
 	}

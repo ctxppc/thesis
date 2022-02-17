@@ -7,7 +7,7 @@ final class FlexibleOperandsTests : XCTestCase {
 	
 	func testPass() throws {
 		
-		var frame = FO.Frame()
+		var frame = FO.Frame.initial
 		let a = frame.allocate(.s32)
 		let b = frame.allocate(.s32)
 		let c = frame.allocate(.s32)
