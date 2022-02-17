@@ -5,6 +5,9 @@ import DepthKit
 
 extension ALA {
 	
+	/// A graph of locations where locations that may have different values in some execution paths are connected, i.e., they *conflict*.
+	///
+	/// Physical locations always conflict with all other physical locations. These conflicts are not explicitated in the graph but is encoded in `contains(_:_:)`.
 	public struct ConflictGraph : Equatable {
 		
 		/// Creates a graph with given conflicts.
@@ -33,9 +36,10 @@ extension ALA {
 		
 		/// Inserts a conflict between given locations to the graph.
 		///
-		/// This method does nothing if `conflict` is a self-conflict.
+		/// This method does nothing if `firstLocation` and `otherLocation` are equal or are both physical locations. Locations cannot conflict with themselves; physical locations implictly conflict with all other physical locations.
 		mutating func insert(_ firstLocation: Location, _ otherLocation: Location) {
 			guard firstLocation != otherLocation else { return }
+			if firstLocation.isPhysical && otherLocation.isPhysical { return }
 			conflictingLocationsForLocation[firstLocation, default: []].insert(otherLocation)
 			conflictingLocationsForLocation[otherLocation, default: []].insert(firstLocation)
 		}
@@ -48,8 +52,9 @@ extension ALA {
 				insert(firstLocation, otherLocation)
 			}
 		}
-		/// Returns a Boolean value indicating whether the set contains a conflict between `firstLocation` and any location in `otherLocations`.
+		/// Returns a Boolean value indicating whether the graph contains a conflict between `firstLocation` and any location in `otherLocations`.
 		func contains(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
+			if firstLocation.isPhysical && otherLocations.contains(where: \.isPhysical) { return true }
 			guard let conflictingLocations = conflictingLocationsForLocation[firstLocation] else { return false }
 			return !conflictingLocations.isDisjoint(with: otherLocations)
 		}

@@ -26,6 +26,14 @@ extension ALA {
 			}
 		}
 		
+		/// A Boolean value indicating whether `self` is a physical location.
+		var isPhysical: Bool {
+			switch self {
+				case .abstract:			return false
+				case .register, .frame:	return true
+			}
+		}
+		
 		/// A mapping from abstract locations to physical locations.
 		struct Assignments {
 			
