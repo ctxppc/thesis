@@ -29,7 +29,7 @@ The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI
 
 \paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{:compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \Cref{bnf:rv}.
 
-One important deviation from \cite{:compcourse} across the whole compiler pipeline is the support for multiple data types in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data.
+One important deviation from \cite{:compcourse} across the whole compiler pipeline is the support for multiple data types in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data. Another important deviation is the addition of a \texttt{call} instruction which provides additional hardware features that cannot be implemented using other instructions.\footnote{This is not true in the current version of Glyco which uses a simple calling convention but it's expected that it will be in a future version supporting a secure calling convention.}
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -45,6 +45,7 @@ One important deviation from \cite{:compcourse} across the whole compiler pipeli
 			\alt storeSignedWord(source: <Register>, address: <Register>)
 			\alt offsetCapability(destination: <Register>, source: <Register>, offset: <Register>)
 			\alt branch(rs1: <Register>, relation: <BranchRelation>, rs2: <Register>, target: <Label>)
+			\alt call(target: <Label>)
 			\alt jump(target: <Label>)
 			\alt labelled(<Label>, <Instruction>)
 			\alt $\cdots$
@@ -58,7 +59,7 @@ One important deviation from \cite{:compcourse} across the whole compiler pipeli
 
 \paragraph{Call Frame (CF)} This language introduces the call frame, hence its name, as well as effects that operate on it, and restricts memory operations to either the call frame or allocated buffers. Its main purpose is to hide the stack and frame capability registers early on, i.e., from most abstractions in the compiler. An abridged grammar is shown in \Cref{bnf:cf}.
 
-CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, there are different load and store effects for data on the call frame and for data in a given buffer. Additionally, CF provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, CF introduces statically allocated buffers, a feature not present in the \cite{:compcourse} compiler.
+CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, the load and store effects for data on the call frame are different from those for data in an allocated buffer. Additionally, CF provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, CF introduces statically allocated buffers, a feature not present in the \cite{:compcourse} compiler.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -74,6 +75,8 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 			\alt allocateBuffer(bytes: <Int>, into: <Register>)
 			\alt loadElement(<DataType>, into: <Register>, buffer: <Register>, offset: <Register>)
 			\alt storeElement(<DataType>, buffer: <Register>, offset: <Register>, from: <Register>)
+			\alt pushFrame(<Frame>)
+			\alt popFrame
 			\alt branch(to: <Label>, <Register>, <BranchRelation>, <Register>)
 			\alt jump(to: <Label>)
 			\alt labelled(<Label>, <Effect>)
@@ -82,6 +85,8 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 		<BinaryExpression> ::= registerRegister(<Register>, <BinaryOperator>, <Register>)
 			\alt registerImmediate(<Register>, <BinaryOperator>, <Int>)
 		
+		<Frame> ::= (allocatedByteSize: <Int>)
+		
 		<Frame.Location> ::= (offset: <Int>)
 		
 	\end{grammar}
@@ -89,7 +94,7 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 	\label{bnf:cf}
 \end{figure}
 
-\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to directly refer to the call frame. This is an adaptation from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \Cref{bnf:fo}.
+\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to refer directly to a location on the call frame besides referring to a register. This is an adaptation from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \Cref{bnf:fo}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -116,7 +121,97 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 \section{Structured Jumps \& Branches}
 The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're easier to reason about in optimisations and higher abstracts.
 
-\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exit at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch.
+\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exited at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch. The initial block is named using a dedicated program entry label. The \il{} adapts \texttt{block-asm-lang} from \cite{:compcourse} with similar deviations from FO, including a special \texttt{call} continuation. An abridged grammar is shown in \Cref{bnf:bb}.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (<Blocks>)
+		
+		<Blocks> ::= <Block> <Blocks> | <Block>
+		
+		<Block> ::= (name: <Label>, do: <Effects>, then: <Continuation>)
+		
+		<Continuation> ::= continue(to: <Label>)
+			\alt branch(<Source>, <BranchRelation>, <Source>, then: <Label>, else: <Label>)
+			\alt call(<Label>, returnPoint: <Label>)
+			\alt return
+		
+		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
+			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
+			\alt allocateBuffer(bytes: <Int>, into: <Location>)
+			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
+			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
+			\alt $\cdots$
+		
+	\end{grammar}
+	\caption{Abridged grammar for BB.}
+	\label{bnf:bb}
+\end{figure}
+
+\paragraph{Predicates (PR)} The next language removes the fixed relation specification from \texttt{branch} continuations and replaces it with a basic predicate syntax. It adapts \texttt{block-pred-lang} from \cite{:compcourse} with similar deviations from BB. An abridged grammar is presented in \Cref{bnf:pr}.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (<Blocks>)
+		
+		<Block> ::= (name: <Label>, do: <Effects>, then: <Continuation>)
+		
+		<Continuation> ::= continue(to: <Label>)
+			\alt branch(if: <Predicate>, then: <Label>, else: <Label>)
+			\alt call(<Label>, returnPoint: <Label>)
+			\alt return
+			
+		<Predicate> ::= constant(<Bool>)
+			\alt not(<Predicate>)
+			\alt relation(<Source>, <BranchRelation>, <Source>)
+			
+		<Bool> ::= false | true
+		
+	\end{grammar}
+	\caption{Abridged grammar for PR.}
+	\label{bnf:pr}
+\end{figure}
+
+\paragraph{Conditionals (CD)} With primitive predicates now available in PR, the next abstraction extends their power by allowing \texttt{if(_:then:else:)} conditionals in predicates and effects alike, thereby moulding effects into tree structures. CD includes support for procedures, which are modelled as an (effect) tree for each procedure, as well as support for (recursively) invoking them, which is modelled with the \texttt{call} and \texttt{return} effects. Control flows in pre-order, skipping nodes from false branches in conditionals, with control temporarily flowing to another (effect) tree when encountering a \texttt{call} effect and back to the previous tree when encountering a \texttt{return} effect.
+
+With these more deterministic control flows, CD can abstract basic blocks away. A program in CD consists of a main effect and zero or more procedures. Each procedure has a unique name and a main effect. An abridged grammar is presented in \Cref{bnf:cd}.
+
+CD is a partial adaptation of \texttt{nested-asm-lang} from \cite{:compcourse}. CD does not define a \texttt{return-point} effect and instead relies on the \texttt{call} and \texttt{return} effects to push and pop a return address on the call stack. The underlying language defines a \texttt{call} effect which cannot be implemented using a combination of \texttt{jump} and other effects.
+
+\begin{figure}[ht]
+	\begin{grammar}
+		
+		<Program> ::= (<Effect>, procedures: <Procedures>)
+		
+		<Procedures> ::= <Procedure> <Procedures> | <Procedure>
+		
+		<Procedure> ::= (<Label>, in: <Effect>)
+		
+		<Predicate> ::= constant(<Bool>)
+			\alt relation(<Source>, <BranchRelation>, <Source>)
+			\alt if(<Predicate>, then: <Predicate>, else: <Predicate>)
+			\alt do(<Effects>, then: <Predicate>)
+		
+		<Effect> ::= do(<Effects>)
+			\alt set(<DataType>, <Location>, to: <Source>)
+			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
+			\alt allocateBuffer(bytes: <Int>, into: <Location>)
+			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
+			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
+			\alt call(<Label>)
+			\alt $\cdots$
+		
+	\end{grammar}
+	\caption{Abridged grammar for CD.}
+	\label{bnf:cd}
+\end{figure}
+
+\section{Abstract Locations}
+The next 2 \ils{}, AL and ALA, introduce an abstraction over physical locations, whether on the call frame or in registers. The two \ils{} are tightly coupled.
+
+% TODO
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}
