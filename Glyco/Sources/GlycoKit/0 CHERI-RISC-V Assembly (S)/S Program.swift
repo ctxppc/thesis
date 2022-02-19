@@ -27,7 +27,7 @@ public enum S : Language {
 			fatalError("Cannot lower S to another language; use `elf(configuration:)` to encode the assembly representation and link the executable.")
 		}
 		
-		// See protocol.
+		/// Encodes `self` into an object and links the object into an ELF executable.
 		public func elf(configuration: CompilationConfiguration) throws -> Data {
 			
 			let tmpURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: configuration.toolchainURL, create: true)

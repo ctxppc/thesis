@@ -14,31 +14,9 @@ public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertib
 	/// A program in the lower language.
 	associatedtype LowerProgram : Program
 	
-	/// Lowers `self` to S, encodes it into an object, and links it into an ELF executable.
-	///
-	/// This method must be implemented by languages that cannot be lowered. The default implementation lowers `self` and invokes `elf(configuration:)` on the lower language.
-	func elf(configuration: CompilationConfiguration) throws -> Data
-	
 }
 
 extension Program {
-	
-	public func elf(configuration: CompilationConfiguration) throws -> Data {
-		try processedLowering(configuration: configuration)
-			.elf(configuration: configuration)
-	}
-	
-	/// Optionally optimises and validates `self`, then returns a representation of `self` in a lower language.
-	public func processedLowering(configuration: CompilationConfiguration) throws -> LowerProgram {
-		var copy = self
-		if configuration.optimise {
-			try copy.optimiseUntilFixedPoint()
-		}
-		if configuration.validate {
-			try copy.validate()
-		}
-		return try copy.lowered(configuration: configuration)
-	}
 	
 	public func write(to url: URL) throws {
 		try SispEncoder()

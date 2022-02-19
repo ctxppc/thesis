@@ -90,7 +90,7 @@ private struct LoweredRepresentationsReductor : Reductor {
 	
 	mutating func update<L : Language>(language: L.Type, program: L.Program) throws -> Result? {
 		if targetLanguages.remove(language) {
-			programSispsByLanguageName[language.name] = try SispEncoder().encode(program).serialised()
+			programSispsByLanguageName[language.name] = try (program as? S.Program)?.assembly ?? SispEncoder().encode(program).serialised()
 		}
 		return targetLanguages.isEmpty ? programSispsByLanguageName : nil
 	}

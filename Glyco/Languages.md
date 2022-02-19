@@ -1008,7 +1008,3 @@ The ground language as provided to Clang for assembly and linking.
 	<dt><code>S.CompilationError</code></dt>
 	<dd><code><strong>clangError</strong></code></dd>
 </dl>
-<dl>
-	<dt><code>S.LoweringError</code></dt>
-	<dd><code><strong>unknownLanguage</strong>(String)</code></dd>
-</dl>
