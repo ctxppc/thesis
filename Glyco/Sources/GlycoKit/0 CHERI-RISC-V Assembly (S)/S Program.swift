@@ -17,15 +17,15 @@ public enum S : Language {
 		public let assembly: String
 		
 		// See protocol.
-		public func lowered(configuration: CompilationConfiguration) -> Never {
-			fatalError("Cannot lower S to another language; use `elf(configuration:)` to encode the assembly representation and link the executable.")
-		}
-		
-		// See protocol.
 		public func optimise() -> Bool { false }
 		
 		// See protocol.
 		public func validate() {}
+		
+		// See protocol.
+		public func lowered(configuration: CompilationConfiguration) -> Never {
+			fatalError("Cannot lower S to another language; use `elf(configuration:)` to encode the assembly representation and link the executable.")
+		}
 		
 		// See protocol.
 		public func elf(configuration: CompilationConfiguration) throws -> Data {
@@ -95,40 +95,9 @@ public enum S : Language {
 	public typealias Lower = Never
 	
 	// See protocol.
-	public static func loweredProgramRepresentation(fromSispString sispString: String, sourceLanguage: String, targetLanguages: Set<String>, configuration: CompilationConfiguration) throws -> [String : String] {
-		guard let targetLanguage = targetLanguages.first else { return [:] }
-		guard sourceLanguage == name else { throw LoweringError.unknownLanguage(sourceLanguage) }
-		guard targetLanguage == name, targetLanguages.count == 1 else { throw LoweringError.unknownLanguage(targetLanguage) }
-		return [name: sispString]
-	}
-	
-	// See protocol.
-	public static func loweredProgramRepresentation(_ program: Program, targetLanguages: Set<String>, configuration: CompilationConfiguration) throws -> [String : String] {
-		guard let targetLanguage = targetLanguages.first else { return [:] }
-		guard targetLanguage == name, targetLanguages.count == 1 else { throw LoweringError.unknownLanguage(targetLanguage) }
-		return [name: program.assembly]
-	}
-	
-	// See protocol.
-	public static func elfFromProgram(fromSispString sispString: String, sourceLanguage: String, configuration: CompilationConfiguration) throws -> Data {
-		guard sourceLanguage == self.name else { throw LoweringError.unknownLanguage(sourceLanguage) }
-		return try Program(assembly: sispString)
-			.elf(configuration: configuration)
-	}
-	
-	enum LoweringError : LocalizedError {
-		
-		/// An error indicating that the language with given name is not supported by Glyco.
-		case unknownLanguage(String)
-		
-		// See protocol.
-		var errorDescription: String? {
-			switch self {
-				case .unknownLanguage(let language):
-				return "“\(language)” is not a language supported by Glyco."
-			}
-		}
-		
+	public static func reduce<R : Reductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result {
+		var reductor = reductor
+		return try reductor.update(language: self, program: program) ?? reductor.result()
 	}
 	
 }

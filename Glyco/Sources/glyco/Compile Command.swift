@@ -111,7 +111,7 @@ struct CompileCommand : ParsableCommand {
 			let programsByLanguage = try HighestSupportedLanguage.loweredProgramRepresentations(
 				fromSispString:		sourceString,
 				sourceLanguage:		sourceLanguage,
-				targetLanguages:	.init(normalisedLanguageNames),
+				targetLanguages:	.some(.init(normalisedLanguageNames)),
 				configuration:		configuration
 			)
 			
