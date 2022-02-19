@@ -15,7 +15,7 @@ final class LexicalScopesTests : XCTestCase {
 		let lowered = try program.lowered(configuration: .init(target: .sail))
 		
 		let expected = DF.Program(
-			.let([.init("answer", .source(.constant(42)))], in: .value(.source(.location("answer")))),
+			.let([.init("ls.answer", .source(.constant(42)))], in: .value(.source(.location("ls.answer")))),
 			functions: []
 		)
 		
