@@ -9,6 +9,13 @@ public enum S : Language {
 	/// A program in the S language.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		// See protocol.
+		//sourcery: isInternalForm
+		public init(fromEncoded encoded: String) throws {
+			self.init(assembly: encoded)
+		}
+		
+		/// Creates a program with given assembly.
 		public init(assembly: String) {
 			self.assembly = assembly
 		}
@@ -80,6 +87,9 @@ public enum S : Language {
 			
 		}
 		
+		// See protocol.
+		public func encoded() throws -> String { assembly }
+		
 	}
 	
 	enum CompilationError : LocalizedError {
@@ -95,9 +105,14 @@ public enum S : Language {
 	public typealias Lower = Never
 	
 	// See protocol.
-	public static func reduce<R : Reductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result {
+	public static func reduce<R : ProgramReductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result {
 		var reductor = reductor
 		return try reductor.update(language: self, program: program) ?? reductor.result()
+	}
+	
+	// See protocol.
+	public static func iterate<Action : LanguageAction, Result>(_ action: Action) throws -> Result? where Action.Result == Result? {
+		try action(language: self)
 	}
 	
 }

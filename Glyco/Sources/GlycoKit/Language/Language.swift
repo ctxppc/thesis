@@ -19,7 +19,10 @@ public protocol Language {
 	static func `do`<Action : LanguageAction>(inLanguageNamed name: String, _ action: Action) throws -> Action.Result
 	
 	/// Reduces a sequence of lowered programs beginning with `program` using `reductor` and returns the reductor's result.
-	static func reduce<R : Reductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result
+	static func reduce<R : ProgramReductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result
+	
+	/// Performs `action` in `Self` and all lower languages, stopping at either the ground language or the first language where the action produces a non-`nil` result.
+	static func iterate<Action : LanguageAction, Result>(_ action: Action) throws -> Result? where Action.Result == Result?
 	
 }
 
@@ -28,7 +31,7 @@ public protocol LanguageAction {
 	associatedtype Result
 }
 
-public protocol Reductor {
+public protocol ProgramReductor {
 	
 	/// The reductor's result.
 	associatedtype Result
@@ -74,11 +77,17 @@ enum LanguageError : LocalizedError {
 
 extension Language {
 	
+	/// The language's name.
+	public static var name: String { "\(self)" }
+	
+	/// A bag type suitable for use in `Self`.
+	typealias Bag<NameType : Name> = GlycoKit.Bag<NameType, Self>
+	
 	public static func `do`<Action : LanguageAction>(inLanguageNamed name: String, _ action: Action) throws -> Action.Result {
 		try "\(Self.self)" == name ? action(language: self) : Lower.do(inLanguageNamed: name, action)
 	}
 	
-	public static func reduce<R : Reductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result {
+	public static func reduce<R : ProgramReductor>(_ program: Program, using reductor: R, configuration: CompilationConfiguration) throws -> R.Result {
 		
 		var program = program
 		if configuration.optimise {
@@ -94,10 +103,8 @@ extension Language {
 		
 	}
 	
-	/// The language's name.
-	static var name: String { "\(self)" }
-	
-	/// A bag type suitable for use in `Self`.
-	typealias Bag<NameType : Name> = GlycoKit.Bag<NameType, Self>
+	public static func iterate<Action : LanguageAction, Result>(_ action: Action) throws -> Result? where Action.Result == Result? {
+		try action(language: self) ?? Lower.iterate(action)
+	}
 	
 }

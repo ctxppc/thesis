@@ -1,6 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 import GlycoKit
+import Sisp
 import XCTest
 
 final class IntermediateProgramsTestCase : XCTestCase {
@@ -33,21 +34,9 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	var urls = [URL]()
 	
 	func checkProgram() throws {
-		
-		print("Testing \(group)…")
-		
-		let urlsByLanguageName = Dictionary(uniqueKeysWithValues: urls.map { ($0.pathExtension.uppercased(), $0) })
-		
-		let sourceLanguageName = HighestSupportedLanguage.nameOfHighestLanguage(inUppercasedNameSet: urlsByLanguageName.keys)
-		let actualSispsByLanguageName = try HighestSupportedLanguage.loweredProgramRepresentations(
-			fromSispString:		.init(contentsOf: urlsByLanguageName[sourceLanguageName]!),
-			sourceLanguage:		sourceLanguageName,
-			targetLanguages:	nil,
-			configuration:		.init(target: .sail)
-		)
-		
-		// TODO
-		
+		print("Testing “\(group)” (\(urls.count) programs)…")
+		let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
+		try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
 	}
 	
 	struct TestError : Error {
@@ -57,8 +46,44 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	
 }
 
-private extension Language {
-	static func nameOfHighestLanguage<V>(inUppercasedNameSet languageNames: Dictionary<String, V>.Keys) -> String {
-		languageNames.contains("\(Self.self)") ? "\(Self.self)" : Lower.nameOfHighestLanguage(inUppercasedNameSet: languageNames)
+private struct DecodeSourceAndTestIntermediateProgramsAction : LanguageAction {
+	
+	let programSispsByLanguageName: [String : String]
+	
+	func callAsFunction<L : Language>(language: L.Type) throws -> ()? {
+		var programSispsByLanguageName = programSispsByLanguageName
+		guard let programSisp = programSispsByLanguageName.removeValue(forKey: language.name) else { return nil }
+		let sourceProgram = try SispDecoder(from: programSisp).decode(L.Program.self)
+		try L.reduce(sourceProgram, using: IntermediateProgramsTestReductor(programSispsByLanguageName: programSispsByLanguageName), configuration: .init(target: .sail))
+		return ()
 	}
+	
+}
+
+private struct IntermediateProgramsTestReductor : ProgramReductor {
+	
+	var programSispsByLanguageName: [String : String]
+	
+	mutating func update<L : Language>(language: L.Type, program actual: L.Program) throws -> ()? {
+		if programSispsByLanguageName.isEmpty {
+			return ()
+		} else if let expectedProgramSisp = programSispsByLanguageName.removeValue(forKey: language.name) {
+			let expected = try L.Program(fromEncoded: expectedProgramSisp)
+			XCTAssertEqual(actual, expected)
+			return nil
+		} else {
+			return nil
+		}
+	}
+	
+	func result() throws {
+		if !programSispsByLanguageName.isEmpty {
+			throw Error.unrecognisedLanguages(.init(programSispsByLanguageName.keys))
+		}
+	}
+	
+	enum Error : Swift.Error {
+		case unrecognisedLanguages(Set<String>)
+	}
+	
 }

@@ -77,7 +77,7 @@ public enum TargetLanguages {
 	
 }
 
-private struct LoweredRepresentationsReductor : Reductor {
+private struct LoweredRepresentationsReductor : ProgramReductor {
 	
 	init(targetLanguages: TargetLanguages) {
 		self.targetLanguages = targetLanguages
@@ -90,7 +90,7 @@ private struct LoweredRepresentationsReductor : Reductor {
 	
 	mutating func update<L : Language>(language: L.Type, program: L.Program) throws -> Result? {
 		if targetLanguages.remove(language) {
-			programSispsByLanguageName[language.name] = try (program as? S.Program)?.assembly ?? SispEncoder().encode(program).serialised()
+			programSispsByLanguageName[language.name] = try program.encoded()
 		}
 		return targetLanguages.isEmpty ? programSispsByLanguageName : nil
 	}
@@ -127,7 +127,7 @@ private struct DecodeSourceAndCompileELFAction : LanguageAction {
 	}
 }
 
-private struct CompileELFReductor : Reductor {
+private struct CompileELFReductor : ProgramReductor {
 	
 	init(configuration: CompilationConfiguration) {
 		self.configuration = configuration

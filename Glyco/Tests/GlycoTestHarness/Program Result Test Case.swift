@@ -13,7 +13,7 @@ final class ProgramResultTestCase : XCTestCase {
 		   let simulatorPath = ProcessInfo.processInfo.environment["simulator"] {
 			let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: programPath), includingPropertiesForKeys: nil)
 			for url in urls {
-				let test = Self(selector: #selector(testProgram))
+				let test = Self(selector: #selector(verifyProgram))
 				test.simulatorURL = .init(fileURLWithPath: simulatorPath)
 				test.programURL = url
 				test.expectedResult = Int(url.deletingPathExtension().pathExtension)!
@@ -29,7 +29,7 @@ final class ProgramResultTestCase : XCTestCase {
 	var programURL: URL!
 	var expectedResult = 0
 	
-	func testProgram() throws {
+	func verifyProgram() throws {
 		
 		let elf = try HighestSupportedLanguage.elfFromProgram(
 			fromSispString:	.init(contentsOf: programURL),

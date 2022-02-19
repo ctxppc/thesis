@@ -5,6 +5,9 @@ import Sisp
 
 public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertible {
 	
+	/// Creates a program from given encoded representation.
+	init(fromEncoded encoded: String) throws
+	
 	/// Validates `self`.
 	func validate() throws
 	
@@ -14,20 +17,26 @@ public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertib
 	/// A program in the lower language.
 	associatedtype LowerProgram : Program
 	
+	/// Returns an encoded representation of `self`.
+	func encoded() throws -> String
+	
 }
 
 extension Program {
 	
-	public func write(to url: URL) throws {
+	public init(fromEncoded encoded: String) throws {
+		self = try SispDecoder(from: encoded).decode(Self.self)
+	}
+	
+	public func encoded() throws -> String {
 		try SispEncoder()
 			.encode(self)
 			.serialised()
-			.write(to: url, atomically: false, encoding: .utf8)
 	}
 	
 	public var description: String {
 		do {
-			return try SispEncoder().encode(self).serialised()
+			return try encoded()
 		} catch {
 			return "Could not serialise program: \(error)"
 		}
