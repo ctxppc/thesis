@@ -6,7 +6,7 @@ extension RV {
 	public struct Label : Name, RawCodable {
 		
 		/// The program entry label.
-		public static let programEntry = Self(rawValue: "main")
+		public static let programEntry = Self(rawValue: "rv.main")
 		
 		/// The program exit label.
 		public static let programExit = Self(rawValue: "_exit")

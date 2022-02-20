@@ -107,7 +107,7 @@ extension RV {
 				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
 				
 				case .loadCapability(destination: let cd, address: let address, offset: let offset):
-				return "\(tabs)clc \(cd.x), \(offset)(\(address.c))"
+				return "\(tabs)clc \(cd.c), \(offset)(\(address.c))"
 				
 				case .storeByte(source: let rs, address: let address):
 				return "\(tabs)sbu.cap \(rs.x), 0(\(address.c))"
@@ -116,7 +116,7 @@ extension RV {
 				return "\(tabs)sw.cap \(rs.x), 0(\(address.c))"
 				
 				case .storeCapability(source: let cs, address: let address, offset: let offset):
-				return "\(tabs)clc \(cs.x), \(offset)(\(address.c))"
+				return "\(tabs)csc \(cs.c), \(offset)(\(address.c))"
 				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
 				return "\(tabs)cincoffset \(destination.c), \(source.c), \(offset.x)"
@@ -146,7 +146,7 @@ extension RV {
 				return "\(tabs)ccall \(target.rawValue)"
 				
 				case .return:
-				return "\(tabs)ret"
+				return "\(tabs)cret"
 				
 				case .labelled(let label, .labelled(let innerLabel, let instruction)):
 				let next = Self.labelled(innerLabel, instruction).lowered(in: &context)

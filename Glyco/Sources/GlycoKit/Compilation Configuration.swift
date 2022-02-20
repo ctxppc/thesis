@@ -31,10 +31,10 @@ public struct CompilationConfiguration {
 	public enum Target : String, CaseIterable {
 		
 		/// The target platform is CheriBSD.
-		case cheriBSD = "CheriBSD"
+		case cheriBSD
 		
 		/// The target platform is the CHERI-RISC-V Sail model.
-		case sail = "Sail"
+		case sail
 		
 	}
 	

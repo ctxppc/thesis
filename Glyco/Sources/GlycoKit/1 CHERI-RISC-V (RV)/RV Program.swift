@@ -38,9 +38,12 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-				\(try instructions.lowered(in: &context).joined(separator: "\n"))
+								ccall		rv.main
+								cret
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
+								
+				\(try instructions.lowered(in: &context).joined(separator: "\n"))
 								
 								.ident		"glyco version 0.1"
 								.section	".note.GNU-stack", "", @progbits
@@ -54,7 +57,7 @@ public enum RV : Language {
 								.globl _start
 				_start:			la t0, _trap_vector
 								csrw mtvec, t0
-								la t0, _main
+								la t0, main
 								csrw mepc, t0
 								mret
 								
@@ -66,7 +69,7 @@ public enum RV : Language {
 								sw gp, tohost, t5
 								j _exit
 								
-				_main:			la ra, main
+				main:			la ra, rv.main
 								jalr ra, ra
 								li gp, 1
 								j _exit

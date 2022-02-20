@@ -59,20 +59,19 @@ public enum S : Language {
 						"-target", "riscv64-unknown-freebsd",
 						"--sysroot=\(configuration.systemURL.path)",
 						"-fuse-ld=lld",
-						"-mabi=l64pc128d",
 					]
 					
 					case .sail:
 					return [
 						"-target", "riscv64-unknown-elf-64",
 						"-nostdlib",
-						"-march=rv64gcxcheri",
 						"-Ttext", "0x0000000080000000",
 					]
 					
 				}
 			}() + [
 				"-O2",
+				"-mabi=l64pc128d",
 				"-march=rv64gcxcheri",
 				"-mno-relax",
 				"-Wall", "-Wcheri",
@@ -81,7 +80,7 @@ public enum S : Language {
 			
 			try clang.run()
 			clang.waitUntilExit()
-			guard clang.terminationStatus == 0 else { throw CompilationError.clangError }
+			guard clang.terminationStatus == 0 else { throw CompilationError.clangError(code: clang.terminationStatus) }
 			
 			return try Data(contentsOf: elfURL)
 			
@@ -93,10 +92,10 @@ public enum S : Language {
 	}
 	
 	enum CompilationError : LocalizedError {
-		case clangError
+		case clangError(code: Int32)
 		var errorDescription: String? {
 			switch self {
-				case .clangError:	return "Clang exited with a nonzero code."
+				case .clangError(code: let code):	return "Clang exited with code \(code)."
 			}
 		}
 	}
