@@ -15,7 +15,7 @@ final class SispCodingTests : XCTestCase {
 		
 		let actual = try SispEncoder().encode(program).serialised()
 		let expected = """
-			(value(if(constant(true), then: constant(3), else: constant(4))))
+			(value(if(constant(true), then: constant(3), else: constant(4))), functions: )
 			"""
 		
 		XCTAssertEqual(actual, expected)

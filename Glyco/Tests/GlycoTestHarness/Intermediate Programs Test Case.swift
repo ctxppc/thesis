@@ -21,8 +21,8 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		for (groupName, urls) in urlsByGroupName {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
-				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
-				programSispsByLanguageName.removeValue(forKey: "out")
+				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension.uppercased(), try String(contentsOf: $0)) })
+				programSispsByLanguageName.removeValue(forKey: "OUT")
 				print("consisting of \(programSispsByLanguageName.count) intermediate programs… ", terminator: "")
 				try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
 				print("OK")
@@ -38,15 +38,17 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		
 	}
 	
-	struct TestErrors : Error {
-		var errors = [TestError]()
+	struct TestErrors : Error, CustomStringConvertible {
+		var errors = [TestGroupError]()
 		var isEmpty: Bool { errors.isEmpty }
-		mutating func add(_ error: TestError) { errors.append(error) }
+		mutating func add(_ error: TestGroupError) { errors.append(error) }
+		var description: String { "\n\(errors.lazy.map(\.description).joined(separator: "\n"))\n" }
 	}
 	
-	struct TestError : Error {
+	struct TestGroupError : Error, CustomStringConvertible {
 		let groupName: String
 		let error: Error
+		var description: String { "(*) Test for “\(groupName)” failed: \(error)" }
 	}
 	
 }
@@ -58,9 +60,20 @@ private struct DecodeSourceAndTestIntermediateProgramsAction : LanguageAction {
 	func callAsFunction<L : Language>(language: L.Type) throws -> ()? {
 		var programSispsByLanguageName = programSispsByLanguageName
 		guard let programSisp = programSispsByLanguageName.removeValue(forKey: language.name) else { return nil }
-		let sourceProgram = try SispDecoder(from: programSisp).decode(L.Program.self)
+		let sourceProgram: L.Program
+		do {
+			sourceProgram = try SispDecoder(from: programSisp).decode(L.Program.self)
+		} catch {
+			throw TestSourceError(languageName: language.name, error: error)
+		}
 		try L.reduce(sourceProgram, using: IntermediateProgramsTestReductor(programSispsByLanguageName: programSispsByLanguageName), configuration: .init(target: .sail))
 		return ()
+	}
+	
+	struct TestSourceError : Error, CustomStringConvertible {
+		let languageName: String
+		let error: Error
+		var description: String { "while decoding \(languageName) source program: \(error)" }
 	}
 	
 }
@@ -70,25 +83,41 @@ private struct IntermediateProgramsTestReductor : ProgramReductor {
 	var programSispsByLanguageName: [String : String]
 	
 	mutating func update<L : Language>(language: L.Type, program actual: L.Program) throws -> ()? {
-		if programSispsByLanguageName.isEmpty {
-			return ()
-		} else if let expectedProgramSisp = programSispsByLanguageName.removeValue(forKey: language.name) {
-			let expected = try L.Program(fromEncoded: expectedProgramSisp)
-			XCTAssertEqual(actual, expected)
-			return nil
-		} else {
-			return nil
+		do {
+			if programSispsByLanguageName.isEmpty {
+				return ()
+			} else if let expectedProgramSisp = programSispsByLanguageName.removeValue(forKey: language.name) {
+				let expected = try L.Program(fromEncoded: expectedProgramSisp)
+				XCTAssertEqual(actual, expected)
+				return nil
+			} else {
+				return nil
+			}
+		} catch {
+			throw IntermediateProgramError.decodingError(error, languageName: language.name)
 		}
 	}
 	
 	func result() throws {
 		if !programSispsByLanguageName.isEmpty {
-			throw Error.unrecognisedLanguages(.init(programSispsByLanguageName.keys))
+			throw IntermediateProgramError.unrecognisedLanguages(.init(programSispsByLanguageName.keys))
 		}
 	}
 	
-	enum Error : Swift.Error {
+	enum IntermediateProgramError : Error, CustomStringConvertible {
+		case decodingError(Error, languageName: String)
 		case unrecognisedLanguages(Set<String>)
+		var description: String {
+			switch self {
+				
+				case .decodingError(let error, languageName: let languageName):
+				return "while decoding intermediate \(languageName) program: \(error)"
+				
+				case .unrecognisedLanguages(let languages):
+				return "unrecognised languages \(languages.joined(separator: ", "))"
+				
+			}
+		}
 	}
 	
 }

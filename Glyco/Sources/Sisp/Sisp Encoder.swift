@@ -28,7 +28,8 @@ public final class SispEncoder : Encoder {
 	
 	// See protocol.
 	public func unkeyedContainer() -> UnkeyedEncodingContainer {
-		ListEncodingContainer(encoder: self, indexPath: indexPath, codingPath: codingPath)
+		sisp[indexPath] = .list([])
+		return ListEncodingContainer(encoder: self, indexPath: indexPath, codingPath: codingPath)
 	}
 	
 	// See protocol.
