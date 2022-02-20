@@ -9,8 +9,7 @@ extension ALA {
 		
 		/// Creates a conflict between two given locations.
 		public init(_ first: Location, _ second: Location) {
-			self.first = first
-			self.second = second
+			(self.first, self.second) = sorted(first, second)
 		}
 		
 		/// The first location in the conflict.
@@ -27,4 +26,8 @@ extension ALA.Conflict : Comparable {
 	public static func < (firstConflict: Self, laterConflict: Self) -> Bool {
 		(firstConflict.first, firstConflict.second) < (laterConflict.first, laterConflict.second)
 	}
+}
+
+private func sorted<T : Comparable>(_ first: T, _ second: T) -> (T, T) {
+	first < second ? (first, second) : (second, first)
 }
