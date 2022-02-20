@@ -104,7 +104,7 @@ private struct LoweredRepresentationsReductor : ProgramReductor {
 
 extension Language {
 	
-	/// Lowers the program in a language named `sourceLanguage` and encoded in `sispString` to S, encodes it into an object, and links it into an ELF executable.
+	/// Lowers the program in a language named `sourceLanguage` and encoded in `sispString` to S, encodes it into an object, links it into an ELF executable, and returns it.
 	public static func elfFromProgram(
 		fromSispString sispString:	String,
 		sourceLanguage:				String,
@@ -113,17 +113,18 @@ extension Language {
 		try self.do(inLanguageNamed: sourceLanguage, DecodeSourceAndCompileELFAction(sispString: sispString, configuration: configuration))
 	}
 	
+	/// Lowers `program` to S, encodes it into an object, links it into an ELF executable, and returns it.
+	public static func elf(from program: Program, configuration: CompilationConfiguration) throws -> Data {
+		try reduce(program, using: CompileELFReductor(configuration: configuration), configuration: configuration)
+	}
+	
 }
 
 private struct DecodeSourceAndCompileELFAction : LanguageAction {
 	let sispString:	String
 	let configuration: CompilationConfiguration
 	func callAsFunction<L : Language>(language: L.Type) throws -> Data {
-		try L.reduce(
-			SispDecoder(from: sispString).decode(L.Program.self),
-			using:			CompileELFReductor(configuration: configuration),
-			configuration:	configuration
-		)
+		try L.elf(from: SispDecoder(from: sispString).decode(L.Program.self), configuration: configuration)
 	}
 }
 

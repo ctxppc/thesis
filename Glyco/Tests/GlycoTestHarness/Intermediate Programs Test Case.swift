@@ -9,35 +9,39 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	func testPrograms() throws {
 		
 		guard
-			let urls = try? FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "Tests/Intermediate Programs"), includingPropertiesForKeys: nil)
-		else { throw XCTSkip("Tests/Intermediate Programs doesn't exist") }
+			let urls = try? FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "Tests/Test Programs"), includingPropertiesForKeys: nil)
+		else { throw XCTSkip("Tests/Test Programs doesn't exist") }
 		
 		let urlsByGroupName = Dictionary(grouping: urls) { url in
 			url.deletingPathExtension().lastPathComponent
 		}
 		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language>") }
 		
-		var errors = [TestError]()
+		var errors = TestErrors()
 		for (groupName, urls) in urlsByGroupName {
 			do {
-				print(">> Testing “\(groupName)”, consisting of \(urls.count) intermediate programs… ", terminator: "")
-				let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
+				print(">> Testing “\(groupName)”, ", terminator: "")
+				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
+				programSispsByLanguageName.removeValue(forKey: "out")
+				print("consisting of \(programSispsByLanguageName.count) intermediate programs… ", terminator: "")
 				try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
 				print("OK")
 			} catch {
 				print("failed")
-				errors.append(.init(groupName: groupName, error: error))
+				errors.add(.init(groupName: groupName, error: error))
 			}
 		}
 		
 		if !errors.isEmpty {
-			throw TestErrors(errors: errors)
+			throw errors
 		}
 		
 	}
 	
 	struct TestErrors : Error {
-		let errors: [TestError]
+		var errors = [TestError]()
+		var isEmpty: Bool { errors.isEmpty }
+		mutating func add(_ error: TestError) { errors.append(error) }
 	}
 	
 	struct TestError : Error {
