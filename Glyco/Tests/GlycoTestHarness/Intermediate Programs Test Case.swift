@@ -6,12 +6,13 @@ import XCTest
 
 final class IntermediateProgramsTestCase : XCTestCase {
 	
-	func testProgram() throws {
+	func testPrograms() throws {
 		
 		let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "."), includingPropertiesForKeys: nil)
 		let urlsByGroupName = Dictionary(grouping: urls) { url in
 			url.deletingPathExtension().lastPathComponent
 		}
+		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language>") }
 		
 		var errors = [TestError]()
 		for (groupName, urls) in urlsByGroupName {

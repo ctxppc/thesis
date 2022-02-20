@@ -5,57 +5,64 @@ import XCTest
 
 final class ProgramResultTestCase : XCTestCase {
 	
-	override class var defaultTestSuite: XCTestSuite {
+	func testPrograms() throws {
 		
-		let suite = XCTestSuite(forTestCaseClass: Self.self)
+		guard let simulatorPath = ProcessInfo.processInfo.environment["simulator"] else { throw XCTSkip("Missing “simulator” environment variable") }
 		
-		if let programPath = ProcessInfo.processInfo.environment["execution_test_programs"],
-		   let simulatorPath = ProcessInfo.processInfo.environment["simulator"] {
-			let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: programPath), includingPropertiesForKeys: nil)
-			for url in urls {
-				let test = Self(selector: #selector(verifyProgram))
-				test.simulatorURL = .init(fileURLWithPath: simulatorPath)
-				test.programURL = url
-				test.expectedResult = Int(url.deletingPathExtension().pathExtension)!
-				suite.addTest(test)
+		let sourceURLs = try FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "."), includingPropertiesForKeys: nil)
+		let sourceURLExpectedResultPairs = sourceURLs.compactMap { sourceURL in
+			Int(sourceURL.deletingPathExtension().pathExtension).map { (sourceURL, $0 ) }
+		}
+		guard !sourceURLExpectedResultPairs.isEmpty else { throw XCTSkip("No candidate programs named <name>.<expected-value>.<source-language>") }
+		
+		var errors = [TestError]()
+		for (sourceURL, expectedResult) in sourceURLExpectedResultPairs {
+			do {
+				
+				print(">> Testing “\(sourceURL.lastPathComponent)” in the simulator… ", terminator: "")
+				let elf = try HighestSupportedLanguage.elfFromProgram(
+					fromSispString:	.init(contentsOf: sourceURL),
+					sourceLanguage:	sourceURL.pathExtension,
+					configuration:	.init(target: .sail)
+				)
+				
+				let tempDirectoryURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+				defer { try! FileManager.default.removeItem(at: tempDirectoryURL) }
+				
+				let elfURL = tempDirectoryURL.appendingPathComponent("prog", isDirectory: false)
+				try elf.write(to: elfURL)
+				
+				let outputURL = tempDirectoryURL.appendingPathComponent("execution", isDirectory: false)
+				let outputHandle = try FileHandle(forWritingTo: outputURL)
+				
+				let sim = Process()
+				sim.executableURL = .init(fileURLWithPath: simulatorPath)
+				sim.arguments = [elfURL.path]
+				sim.standardOutput = outputHandle
+				try sim.run()
+				sim.waitUntilExit()
+				
+				let output = try String(contentsOf: outputURL)
+				XCTAssert(output.contains("\(expectedResult)"), "Simulator output doesn't contain expected result \(expectedResult)")	// TODO: Match string
+				
+			} catch {
+				errors.append(.init(sourceURL: sourceURL, error: error))
 			}
 		}
 		
-		return suite
+		if !errors.isEmpty {
+			throw TestErrors(errors: errors)
+		}
 		
 	}
 	
-	var simulatorURL: URL!
-	var programURL: URL!
-	var expectedResult = 0
+	struct TestErrors : Error {
+		let errors: [TestError]
+	}
 	
-	func verifyProgram() throws {
-		
-		let elf = try HighestSupportedLanguage.elfFromProgram(
-			fromSispString:	.init(contentsOf: programURL),
-			sourceLanguage:	programURL.pathExtension,
-			configuration:	.init(target: .sail)
-		)
-		
-		let tempDirectoryURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
-		defer { try! FileManager.default.removeItem(at: tempDirectoryURL) }
-		
-		let elfURL = tempDirectoryURL.appendingPathComponent("prog", isDirectory: false)
-		try elf.write(to: elfURL)
-		
-		let outputURL = tempDirectoryURL.appendingPathComponent("execution", isDirectory: false)
-		let outputHandle = try FileHandle(forWritingTo: outputURL)
-		
-		let sim = Process()
-		sim.executableURL = simulatorURL
-		sim.arguments = [elfURL.path]
-		sim.standardOutput = outputHandle
-		try sim.run()
-		sim.waitUntilExit()
-		
-		let output = try String(contentsOf: outputURL)
-		XCTAssert(output.contains("\(expectedResult)"), "Simulator output doesn't contain expected result \(expectedResult)")	// TODO: Match string
-		
+	struct TestError : Error {
+		let sourceURL: URL
+		let error: Error
 	}
 	
 }
