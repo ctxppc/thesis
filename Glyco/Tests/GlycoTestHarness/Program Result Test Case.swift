@@ -9,7 +9,10 @@ final class ProgramResultTestCase : XCTestCase {
 		
 		guard let simulatorPath = ProcessInfo.processInfo.environment["simulator"] else { throw XCTSkip("Missing “simulator” environment variable") }
 		
-		let sourceURLs = try FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "."), includingPropertiesForKeys: nil)
+		guard
+			let sourceURLs = try? FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "Tests/Simulated Programs"), includingPropertiesForKeys: nil)
+		else { throw XCTSkip("Tests/Simulated Programs doesn't exist") }
+		
 		let sourceURLExpectedResultPairs = sourceURLs.compactMap { sourceURL in
 			Int(sourceURL.deletingPathExtension().pathExtension).map { (sourceURL, $0 ) }
 		}
