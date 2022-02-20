@@ -436,7 +436,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -496,7 +496,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -550,7 +550,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>call</strong>(Label, [Location])</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 
@@ -616,7 +616,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Location], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>

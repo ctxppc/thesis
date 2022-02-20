@@ -60,30 +60,8 @@ final class ProcedureTests : XCTestCase {
 		fortytwo:		csc cfp, -8(csp)
 						cincoffsetimm cfp, csp, -8
 						cincoffsetimm csp, csp, -16
-						cmove cs2, cs1
-						cmove cs5, cs2
-						cmove cs6, cs3
-						cmove cs7, cs4
-						cmove cs8, cs5
-						cmove cs9, cs6
-						cmove cs10, cs7
-						cmove cs11, cs8
-						cmove ct4, cs9
-						cmove cs3, cs10
-						cmove cs4, cs11
 						addi s1, zero, 42
 						mv a0, s1
-						cmove cs1, cs2
-						cmove cs2, cs5
-						cmove cs3, cs6
-						cmove cs4, cs7
-						cmove cs5, cs8
-						cmove cs6, cs9
-						cmove cs7, cs10
-						cmove cs8, cs11
-						cmove cs9, ct4
-						cmove cs10, cs3
-						cmove cs11, cs4
 						cincoffsetimm csp, cfp, 8
 						clc cfp, 0(cfp)
 						cret
@@ -101,7 +79,7 @@ final class ProcedureTests : XCTestCase {
 						.align 6
 						.global tohost
 		tohost:			.dword 0
-		"""	// FIXME: Weird callee-saved register moves
+		"""
 		
 		XCTAssertEqual(loweredProgram.assembly, expected)
 		

@@ -109,7 +109,7 @@ extension CC {
 					
 					// Invoke procedure.
 					// Parameter registers are considered in use but no frame locations are used since frame-res. args. are passed via an allocated record.
-					Lowered.call(name, assignments.viaRegisters.map { .register($0.register) })
+					Lowered.call(name, parameters: assignments.viaRegisters.map(\.register))
 					
 					// Deallocate frame-resident arguments, if any.
 					if !assignments.parameterRecordType.isEmpty {
@@ -132,7 +132,7 @@ extension CC {
 					
 					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
 					if context.loweredProcedure != nil {
-						for register in Lower.Register.defaultCalleeSavedRegisters {
+						for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
 							Lowered.set(.register(register), to: .abstract(context.calleeSaveLocation(for: register)))
 						}
 					}

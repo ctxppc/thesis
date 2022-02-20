@@ -48,10 +48,12 @@ extension ALA {
 		/// A pop scope effect "uses" the values of callee-saved registers, as defined during the preceding push scope effect so that it can "return" them to the previous scope. If those values were copied into abstract locations after their definition by the push scope effect, they should be copied back to the callee-saved registers before the pop scope effect so that the registers become available for other assignments.
 		case popScope(analysisAtEntry: Analysis)
 		
-		/// An effect that invokes the labelled procedure and uses given physical locations.
+		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
-		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis. A call effect "uses" the values of caller-saved registers.
-		case call(Label, [Location], analysisAtEntry: Analysis)
+		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
+		///
+		/// A call effect "uses" the values of caller-saved registers.
+		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
 		/// An effect that returns to the caller.
 		///
@@ -110,7 +112,7 @@ extension ALA {
 				case .popScope(analysisAtEntry: _):
 				Lowered.popFrame
 				
-				case .call(let name, _, analysisAtEntry: _):
+				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
 				
 				case .return(analysisAtEntry: _):
@@ -204,8 +206,8 @@ extension ALA {
 				case .popScope(analysisAtEntry: _):
 				return .popScope(analysisAtEntry: analysis)
 				
-				case .call(let name, let locations, analysisAtEntry: _):
-				return .call(name, locations, analysisAtEntry: analysis)
+				case .call(let name, parameters: let parameters, analysisAtEntry: _):
+				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
 				case .return(analysisAtEntry: _):
 				return .return(analysisAtEntry: analysis)
@@ -230,7 +232,7 @@ extension ALA {
 					.pop(bytes: _, analysisAtEntry: let analysis),
 					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
-					.call(_, _, analysisAtEntry: let analysis),
+					.call(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
 			}
@@ -250,10 +252,10 @@ extension ALA {
 				return [destination]
 				
 				case .pushScope:
-				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
+				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
 				case .call:
-				return Lower.Register.defaultCallerSavedRegisters.map { .register($0) }
+				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
 				
 			}
 		}
@@ -289,10 +291,10 @@ extension ALA {
 				return [index].compactMap(\.location) + [buffer]
 				
 				case .popScope:
-				return Lower.Register.defaultCalleeSavedRegisters.map { .register($0) }
+				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
-				case .call(_, let arguments, analysisAtEntry: _):
-				return arguments
+				case .call(_, parameters: let parameters, analysisAtEntry: _):
+				return parameters.map { .register($0) }
 				
 			}
 		}

@@ -7,22 +7,31 @@ extension FO {
 	/// A machine register.
 	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {
 		
-		/// The default set of registers that can be used for storing data.
+		/// The set of registers that can be used for storing data.
 		///
 		/// The order is semantically insignificant but it's fixed to make assignment more deterministic.
-		static let defaultAssignableRegisters: OrderedSet = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11, .t4, .t5, .t6]
+		static let assignableRegisters = OrderedSet(allCases).subtracting([.zero, .ra])
 		
-		/// The default set of registers that are used for passing arguments to procedures, in argument order.
-		public static let defaultArgumentRegisters = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
+		/// The set of registers that are either caller-saved or callee-saved.
+		static let savedRegisters = OrderedSet(allCases).subtracting([.zero])
 		
-		/// The default set of registers that can be used for passing results from procedures, in result value order.
-		public static let defaultResultRegisters: OrderedSet = [Self.a0, .a1]
+		/// The set of registers that are used for passing arguments to procedures, in argument order, in RISC-V ABIs.
+		public static let argumentRegistersInRVABI = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
 		
-		/// The default set of registers that a procedure must discard or save before calling another procedure.
-		public static let defaultCallerSavedRegisters = defaultArgumentRegisters + [.ra, .t4, .t5, .t6]
+		/// The set of registers that can be used for passing results from procedures, in result value order, in RISC-V ABIs.
+		public static let resultRegistersInRVABI: OrderedSet = [Self.a0, .a1]
 		
-		/// The default set of registers that a procedure must save before using.
-		public static let defaultCalleeSavedRegisters = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
+		/// The set of registers that a procedure must save before invoking a procedure in RISC-V ABIs.
+		public static let callerSavedRegistersInRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInRVABI)
+		
+		/// The set of registers that a procedure must save before using in RISC-V ABIs.
+		public static let calleeSavedRegistersInRVABI = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
+		
+		/// The set of registers that a procedure must save before invoking a procedure in hybrid CHERI-RISC-V ABIs.
+		public static let callerSavedRegistersInCHERIRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInCHERIRVABI)
+		
+		/// The set of registers that a procedure must save before using in hybrid CHERI-RISC-V ABIs.
+		public static let calleeSavedRegistersInCHERIRVABI = [Self]()
 		
 		/// The always-zero register.
 		case zero

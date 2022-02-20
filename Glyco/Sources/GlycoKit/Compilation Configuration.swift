@@ -5,14 +5,7 @@ import Foundation
 public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
-	public init(
-		target:				Target,
-		toolchainURL:		URL? = nil,
-		systemURL:			URL? = nil,
-		argumentRegisters:	[AL.Register] = AL.Register.defaultArgumentRegisters,
-		optimise:			Bool = true,
-		validate:			Bool = true
-	) {
+	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil) {
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
 			.default
@@ -21,9 +14,6 @@ public struct CompilationConfiguration {
 		self.systemURL = systemURL ?? self.toolchainURL
 			.appendingPathComponent("output")
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
-		self.argumentRegisters = argumentRegisters
-		self.optimise = optimise
-		self.validate = validate
 	}
 	
 	/// The program's target platform.
@@ -45,12 +35,12 @@ public struct CompilationConfiguration {
 	public var systemURL: URL
 	
 	/// The registers used for passing arguments, in argument order.
-	public var argumentRegisters: [AL.Register]
+	public var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
 	
 	/// A Boolean value indicating whether programs are optimised in each language before lowering them.
-	public var optimise: Bool
+	public var optimise: Bool = true
 	
 	/// A Boolean value indicating whether programs are validated in each language before lowering them.
-	public var validate: Bool
+	public var validate: Bool = true
 	
 }

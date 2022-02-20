@@ -75,7 +75,7 @@ extension ALA {
 			let conflictingLocationsOfUnion = conflictingLocationsForLocation[firstLocation, default: []]
 				.union(conflictingLocationsForLocation[otherLocation, default: []])
 				.subtracting([firstLocation, otherLocation])
-			return conflictingLocationsOfUnion.count /* new conflict count */ < Lower.Register.defaultAssignableRegisters.count /* K */
+			return conflictingLocationsOfUnion.count /* new conflict count */ < Lower.Register.assignableRegisters.count /* K */
 			
 		}
 		

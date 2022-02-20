@@ -37,8 +37,8 @@ struct CompileCommand : ParsableCommand {
 	@Flag(name: [.customShort("O"), .long], help: "Output intermediate programs to standard out.")
 	var outputsToStandardOut: Bool = false
 	
-	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The registers to use for passing arguments, in parameter order.")
-	var argumentRegisters: [AL.Register] = AL.Register.defaultArgumentRegisters
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "Registers used for passing arguments, in parameter order.")
+	var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
 	
 	@Flag(name: .long, inversion: .prefixedNo, help: "Enable/disable intra-language optimisations.")
 	var optimise: Bool = true
@@ -57,14 +57,11 @@ struct CompileCommand : ParsableCommand {
 		let environment = ProcessInfo.processInfo.environment
 		let toolchainURL = environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:))
 		let systemURL = environment["CHERISYSROOT"].map(URL.init(fileURLWithPath:))
-		let configuration = CompilationConfiguration(
-			target:				target,
-			toolchainURL:		toolchainURL,
-			systemURL:			systemURL,
-			argumentRegisters:	argumentRegisters,
-			optimise:			optimise,
-			validate:			validate
-		)
+		let configuration = with(CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL)) {
+			$0.argumentRegisters = argumentRegisters
+			$0.optimise = optimise
+			$0.validate = validate
+		}
 		let sourceLanguage = source.pathExtension.uppercased()
 		
 		#if os(macOS)

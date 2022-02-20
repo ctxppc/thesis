@@ -46,10 +46,10 @@ extension ID {
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope
 		
-		/// An effect that invokes the labelled procedure and uses given locations.
+		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
-		/// This effect assumes a suitable calling convention has already been applied to the program. The locations are only used for the purposes of liveness analysis.
-		case call(Label, [Location])
+		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
+		case call(Label, parameters: [Register])
 		
 		/// An effect that returns to the caller.
 		case `return`
@@ -99,8 +99,8 @@ extension ID {
 				case .popScope:
 				Lowered.popScope
 				
-				case .call(let name, let parameters):
-				Lowered.call(name, parameters)
+				case .call(let name, parameters: let parameters):
+				Lowered.call(name, parameters: parameters)
 				
 				case .return:
 				Lowered.return
