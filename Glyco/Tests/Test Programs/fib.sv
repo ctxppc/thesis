@@ -8,7 +8,7 @@
 		set(register(a1), to: abstract(ls.arg1))
 		set(register(a2), to: abstract(ls.arg2))
 		call(fib, parameters: a0 a1 a2)
-		set(abstract(df.result), to: register(a0, s32))
+		set(abstract(df.result), to: register(a0, s32()))
 		set(register(a0), to: abstract(df.result))
 		popScope()
 		return()
@@ -17,9 +17,9 @@
 		fib,
 		in: do(
 			pushScope()
-			set(abstract(ls.prev), to: register(a0, s32))
-			set(abstract(ls.curr), to: register(a1, s32))
-			set(abstract(ls.iter), to: register(a2, s32))
+			set(abstract(ls.prev), to: register(a0, s32()))
+			set(abstract(ls.curr), to: register(a1, s32()))
+			set(abstract(ls.iter), to: register(a2, s32()))
 			if(
 				do(
 					set(abstract(ls.lhs), to: abstract(ls.iter)) set(abstract(ls.rhs), to: constant(0)),
@@ -43,7 +43,7 @@
 					set(register(a1), to: abstract(ls.arg1))
 					set(register(a2), to: abstract(ls.arg2))
 					call(fib, parameters: a0 a1 a2)
-					set(abstract(df.result$2), to: register(a0, s32))
+					set(abstract(df.result$2), to: register(a0, s32()))
 					set(register(a0), to: abstract(df.result$2))
 					popScope()
 					return()
