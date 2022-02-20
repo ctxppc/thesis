@@ -4,11 +4,14 @@
 	"tasks": [
 		{
 			"label": "swift-build",
-			"type": "shell",
-			"command": "swift build",
+			"type": "process",
+			"command": "swift",
 			"options": {
 				"cwd": "${workspaceFolder}/Glyco"
-			}
+			},
+			"args": [
+				"build"
+			]
 		},
 		{
 			"label": "swift-build-tests",
@@ -18,7 +21,26 @@
 				"cwd": "${workspaceFolder}/Glyco"
 			},
 			"group": "build",
-			"args": ["build", "--build-tests"]
+			"args": [
+				"build",
+				"--build-tests"
+			]
+		},
+		{
+			"label": "swift-test",
+			"type": "process",
+			"command": "swift",
+			"options": {
+				"cwd": "${workspaceFolder}/Glyco"
+			},
+			"group": {
+				"kind": "build",
+				"isDefault": true
+			},
+			"args": [
+				"test"
+			],
+			"problemMatcher": []
 		}
 	]
 }
