@@ -97,6 +97,15 @@ extension ALA {
 			conflicts.locationsOrderedByIncreasingNumberOfConflicts()
 		}
 		
+		// See protocol.
+		public func encode(to encoder: Encoder) throws {	// behaves like a derived conformance except for sorting to get deterministic ordering
+			var container = encoder.container(keyedBy: CodingKeys.self)
+			try container.encode(conflicts, forKey: .conflicts)
+			try container.encode(possiblyLiveLocations.sorted(), forKey: .possiblyLiveLocations)
+			try container.encode(definedLocations.sorted(), forKey: .definedLocations)
+			try container.encode(possiblyUsedUndefinedLocations.sorted(), forKey: .possiblyUsedUndefinedLocations)
+		}
+		
 	}
 	
 }
