@@ -6,42 +6,39 @@ import XCTest
 
 final class IntermediateProgramsTestCase : XCTestCase {
 	
-	override class var defaultTestSuite: XCTestSuite {
+	func testProgram() throws {
 		
-		let suite = XCTestSuite(forTestCaseClass: Self.self)
+		let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "."), includingPropertiesForKeys: nil)
+		let urlsByGroupName = Dictionary(grouping: urls) { url in
+			url.deletingPathExtension().lastPathComponent
+		}
 		
-		if let path = ProcessInfo.processInfo.environment["intermediate_test_programs"] {
-			let urls = try! FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: path), includingPropertiesForKeys: nil)
-			let urlsByGroup = Dictionary(grouping: urls) { url in
-				url.deletingPathExtension().lastPathComponent
-			}
-			for (group, urls) in urlsByGroup {
-				let test = Self(selector: #selector(checkProgram))
-				test.group = group
-				test.urls = urls
-				suite.addTest(test)
+		var errors = [TestError]()
+		for (groupName, urls) in urlsByGroupName {
+			do {
+				print(">> Testing “\(groupName)”, consisting of \(urls.count) intermediate programs… ", terminator: "")
+				let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
+				try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
+				print("OK")
+			} catch {
+				print("failed")
+				errors.append(.init(groupName: groupName, error: error))
 			}
 		}
 		
-		return suite
+		if !errors.isEmpty {
+			throw TestErrors(errors: errors)
+		}
 		
 	}
 	
-	/// The group's name.
-	var group = ""
-	
-	/// The program's urls.
-	var urls = [URL]()
-	
-	func checkProgram() throws {
-		print("Testing “\(group)” (\(urls.count) programs)…")
-		let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension, try String(contentsOf: $0)) })
-		try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
+	struct TestErrors : Error {
+		let errors: [TestError]
 	}
 	
 	struct TestError : Error {
 		let groupName: String
-		let underlyingError: Error
+		let error: Error
 	}
 	
 }

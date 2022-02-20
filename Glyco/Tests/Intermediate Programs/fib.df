@@ -1,0 +1,36 @@
+(
+	let(
+		(ls.arg0, source(constant(0))) (ls.arg1, source(constant(1))) (ls.arg2, source(constant(30))),
+		in: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+	),
+	functions: (
+		fib,
+		takes: (ls.prev, s32()) (ls.curr, s32()) (ls.iter, s32()),
+		returns: s32(),
+		in: if(
+			let(
+				(ls.lhs, source(location(ls.iter))) (ls.rhs, source(constant(0))),
+				in: relation(location(ls.lhs), le, location(ls.rhs))
+			),
+			then: value(source(location(ls.curr))),
+			else: let(
+				(ls.arg0, source(location(ls.curr)))
+				(
+					ls.arg1,
+					let(
+						(ls.lhs$1, source(location(ls.prev))) (ls.rhs$1, source(location(ls.curr))),
+						in: binary(location(ls.lhs$1), add, location(ls.rhs$1))
+					)
+				)
+				(
+					ls.arg2,
+					let(
+						(ls.lhs$2, source(location(ls.iter))) (ls.rhs$2, source(constant(1))),
+						in: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
+					)
+				),
+				in: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+			)
+		)
+	)
+)

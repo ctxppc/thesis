@@ -1,0 +1,40 @@
+(
+	do(
+		set(ls.arg0, to: source(constant(0)))
+		set(ls.arg1, to: source(constant(1)))
+		set(ls.arg2, to: source(constant(30)))
+		set(df.result, to: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2)))
+		return(location(df.result))
+	),
+	procedures: (
+		fib,
+		takes: (ls.prev, s32()) (ls.curr, s32()) (ls.iter, s32()),
+		returns: s32(),
+		in: if(
+			do(
+				set(ls.lhs, to: source(location(ls.iter))) set(ls.rhs, to: source(constant(0))),
+				then: relation(location(ls.lhs), le, location(ls.rhs))
+			),
+			then: do(set(df.result$1, to: source(location(ls.curr))) return(location(df.result$1))),
+			else: do(
+				set(ls.arg0, to: source(location(ls.curr)))
+				set(
+					ls.arg1,
+					to: do(
+						set(ls.lhs$1, to: source(location(ls.prev))) set(ls.rhs$1, to: source(location(ls.curr))),
+						then: binary(location(ls.lhs$1), add, location(ls.rhs$1))
+					)
+				)
+				set(
+					ls.arg2,
+					to: do(
+						set(ls.lhs$2, to: source(location(ls.iter))) set(ls.rhs$2, to: source(constant(1))),
+						then: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
+					)
+				)
+				set(df.result$2, to: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2)))
+				return(location(df.result$2))
+			)
+		)
+	)
+)
