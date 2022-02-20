@@ -1006,5 +1006,5 @@ The ground language as provided to Clang for assembly and linking.
 </dl>
 <dl>
 	<dt><code>S.CompilationError</code></dt>
-	<dd><code><strong>clangError</strong></code></dd>
+	<dd><code><strong>clangError</strong>(<strong>code:</strong> Int32)</code></dd>
 </dl>

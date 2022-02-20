@@ -40,7 +40,7 @@ final class ProcedureTests : XCTestCase {
 						.globl _start
 		_start:			la t0, _trap_vector
 						csrw mtvec, t0
-						la t0, _main
+						la t0, main
 						csrw mepc, t0
 						mret
 						
@@ -52,12 +52,12 @@ final class ProcedureTests : XCTestCase {
 						sw gp, tohost, t5
 						j _exit
 						
-		_main:			la ra, main
+		main:			la ra, rv.main
 						jalr ra, ra
 						li gp, 1
 						j _exit
 						
-		fortytwo:		clc fp, -8(csp)
+		fortytwo:		csc cfp, -8(csp)
 						cincoffsetimm cfp, csp, -8
 						cincoffsetimm csp, csp, -16
 						cmove cs2, cs1
@@ -85,9 +85,9 @@ final class ProcedureTests : XCTestCase {
 						cmove cs10, cs3
 						cmove cs11, cs4
 						cincoffsetimm csp, cfp, 8
-						clc fp, 0(cfp)
-						ret
-		main:			clc fp, -8(csp)
+						clc cfp, 0(cfp)
+						cret
+		rv.main:		csc cfp, -8(csp)
 						cincoffsetimm cfp, csp, -8
 						cincoffsetimm csp, csp, -16
 						ccall fortytwo
@@ -95,8 +95,8 @@ final class ProcedureTests : XCTestCase {
 		cd.ret:			mv s1, a0
 						mv a0, s1
 						cincoffsetimm csp, cfp, 8
-						clc fp, 0(cfp)
-						ret
+						clc cfp, 0(cfp)
+						cret
 						
 						.align 6
 						.global tohost

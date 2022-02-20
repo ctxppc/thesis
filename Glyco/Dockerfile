@@ -1,7 +1,7 @@
 # ================================
 # Build image
 # ================================
-FROM swift:5.5.1-focal as build
+FROM swift:5.5.3-focal as build
 
 # Install updates & dependencies.
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
@@ -32,7 +32,7 @@ RUN cp "$(swift build --package-path /build -c release --show-bin-path)/Glyco" .
 # ================================
 # Run image
 # ================================
-FROM swift:5.5.1-focal
+FROM swift:5.5.3-focal
 
 # Install any updates since the build image & runtime dependencies.
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \

@@ -35,7 +35,7 @@ final class ArithmeticTests : XCTestCase {
 						.globl _start
 		_start:			la t0, _trap_vector
 						csrw mtvec, t0
-						la t0, _main
+						la t0, main
 						csrw mepc, t0
 						mret
 						
@@ -47,16 +47,16 @@ final class ArithmeticTests : XCTestCase {
 						sw gp, tohost, t5
 						j _exit
 						
-		_main:			la ra, main
+		main:			la ra, rv.main
 						jalr ra, ra
 						li gp, 1
 						j _exit
 						
-		main:			addi s1, zero, 1
+		rv.main:		addi s1, zero, 1
 						addi t1, zero, 2
 						add s1, t1, s1
 						mv a0, s1
-						ret
+						cret
 						
 						.align 6
 						.global tohost
@@ -104,7 +104,7 @@ final class ArithmeticTests : XCTestCase {
 						.globl _start
 		_start:			la t0, _trap_vector
 						csrw mtvec, t0
-						la t0, _main
+						la t0, main
 						csrw mepc, t0
 						mret
 						
@@ -116,12 +116,12 @@ final class ArithmeticTests : XCTestCase {
 						sw gp, tohost, t5
 						j _exit
 						
-		_main:			la ra, main
+		main:			la ra, rv.main
 						jalr ra, ra
 						li gp, 1
 						j _exit
 						
-		main:			addi t1, zero, 12
+		rv.main:		addi t1, zero, 12
 						addi s1, t1, -11
 						addi t2, zero, 1
 						beq s1, t2, cd.then
@@ -131,7 +131,7 @@ final class ArithmeticTests : XCTestCase {
 		cd.else:		addi s1, zero, 0
 						j cd.endif
 		cd.endif:		mv a0, s1
-						ret
+						cret
 						
 						.align 6
 						.global tohost

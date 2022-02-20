@@ -1,5 +1,5 @@
 default:
-  image: swift:5.5.1-focal
+  image: swift:5.5.3-focal
   cache:
     key: "shared cache"
     paths:
