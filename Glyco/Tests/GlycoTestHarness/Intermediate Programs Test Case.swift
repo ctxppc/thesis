@@ -23,6 +23,10 @@ final class IntermediateProgramsTestCase : XCTestCase {
 				print(">> Testing “\(groupName)”, ", terminator: "")
 				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension.uppercased(), try String(contentsOf: $0)) })
 				programSispsByLanguageName.removeValue(forKey: "OUT")
+				if programSispsByLanguageName.count < 2 {
+					print("which does not have any additional intermediate programs to test against… skipped")
+					continue
+				}
 				print("consisting of \(programSispsByLanguageName.count) intermediate programs… ", terminator: "")
 				try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
 				print("OK")

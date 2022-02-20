@@ -406,8 +406,7 @@ A language that introduces structured values (vectors and records).
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>Register</code>, 
-<code>Source</code>
+<code>Register</code>
 <dl>
 	<dt><code>SV.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -419,6 +418,13 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
 	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>SV.Source</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
+	<dd><code><strong>register</strong>(Register, ValueType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>SV.Effect</code></dt>

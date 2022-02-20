@@ -25,7 +25,7 @@ extension SV {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				return .relation(lhs, relation, rhs)
+				return try .relation(lhs.lowered(in: &context), relation, rhs.lowered(in: &context))
 				
 				case .if(let condition, then: let affirmative, else: let negative):
 				return try .if(condition.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

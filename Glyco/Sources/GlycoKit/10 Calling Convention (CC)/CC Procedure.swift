@@ -42,7 +42,7 @@ extension CC {
 				
 				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
 				for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
-					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .cap))
+					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .registerDatum))
 				}
 				
 				// Compute parameter assignments.
@@ -51,7 +51,7 @@ extension CC {
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
 				for asn in assignments.viaRegisters {
 					let parameter = asn.parameter
-					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type.lowered()))
+					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type))
 				}
 				
 				// Bind local names to frame-resident arguments.

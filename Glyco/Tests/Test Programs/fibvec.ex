@@ -3,14 +3,14 @@
 	functions:
 		
 		(fib,
-			takes: (first, signedWord) (second, signedWord),
-			returns: signedWord,
-			in: evaluate(recFib, constant(2) constant(29) vector(signedWord, count: 30))
+			takes: (first, s32()) (second, s32()),
+			returns: s32(),
+			in: evaluate(recFib, constant(2) constant(29) vector(s32(), count: 30))
 		)
 		
 		(recFib, 
-			takes: (index, signedWord) (lastIndex, signedWord) (nums, capability),
-			returns: signedWord,
+			takes: (index, s32()) (lastIndex, s32()) (nums, vectorCap(s32())),
+			returns: s32(),
 			in: if(relation(named(index), gt, named(lastIndex))
 				then: value(element(of: named(nums), at: named(lastIndex))),
 				else: let(

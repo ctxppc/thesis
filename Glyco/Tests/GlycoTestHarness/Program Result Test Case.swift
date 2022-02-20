@@ -23,7 +23,7 @@ final class ProgramResultTestCase : XCTestCase {
 			do {
 				print(">> Testing “\(groupName)” ", terminator: "")
 				var sourceURLsByLanguageName = Dictionary(uniqueKeysWithValues: urls.map { ($0.pathExtension.uppercased(), $0) })
-				guard let expectedResultString = try sourceURLsByLanguageName.removeValue(forKey: "out").map(String.init(contentsOf:)) else { continue }
+				guard let expectedResultString = try sourceURLsByLanguageName.removeValue(forKey: "OUT").map(String.init(contentsOf:)) else { continue }
 				guard let expectedResult = Int(expectedResultString.trimmingCharacters(in: .whitespacesAndNewlines))
 				else { throw ProgramResultTestError.invalidExpectedResult(expectedResultString) }
 				print("with expected result \(expectedResult)… ", terminator: "")

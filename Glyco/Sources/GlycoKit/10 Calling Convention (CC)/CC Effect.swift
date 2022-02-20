@@ -117,7 +117,7 @@ extension CC {
 					}
 					
 					// Write result.
-					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType.lowered()))
+					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType))
 					
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
