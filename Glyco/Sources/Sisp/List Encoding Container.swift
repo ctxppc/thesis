@@ -21,7 +21,6 @@ struct ListEncodingContainer : UnkeyedEncodingContainer {
 	private var sisp: Sisp {
 		get { encoder.sisp[indexPath] }
 		nonmutating set { encoder.sisp[indexPath] = newValue }
-		nonmutating _modify { yield &encoder.sisp[indexPath] }
 	}
 	
 	func encodeNil() throws {

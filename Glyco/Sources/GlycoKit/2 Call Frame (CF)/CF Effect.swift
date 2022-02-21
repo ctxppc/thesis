@@ -18,19 +18,18 @@ extension CF {
 		case store(DataType, into: Frame.Location, from: Register)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
-		case allocateBuffer(bytes: Int, into: Register)
+		case pushBuffer(bytes: Int, into: Register)
+		
+		/// An effect that pops the buffer referred by the capability in given register.
+		///
+		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic.
+		case popBuffer(Register)
 		
 		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
 		case loadElement(DataType, into: Register, buffer: Register, offset: Register)
 		
 		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
 		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
-		
-		/// An effect that retrieves the value from given register and pushes it to the call frame.
-		case push(DataType, Register)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int)
 		
 		/// Pushes given frame to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
 		///
@@ -108,7 +107,7 @@ extension CF {
 				case .store(.cap, into: let destination, from: let source):
 				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				case .pushBuffer(bytes: let bytes, into: let buffer):
 				/*
 					 ┌──────────┐ high
 					 │          │
@@ -127,8 +126,14 @@ extension CF {
 				return [
 					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),	// compute tentative base
 					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),			// actual base may be lower, length may be greater
-					.getCapabilityAddress(destination: temp, source: buffer),							// move stack capability to actual base
-					.setCapabilityAddress(destination: .sp, source: .sp, address: .t0),
+					.getCapabilityAddress(destination: temp, source: buffer),							// move stack capability
+					.setCapabilityAddress(destination: .sp, source: .sp, address: temp),				//   to actual base
+				]
+				
+				case .popBuffer(let buffer):
+				return [
+					.getCapabilityLength(destination: temp, source: try buffer.lowered()),
+					.offsetCapability(destination: .sp, source: .sp, offset: temp),
 				]
 				
 				case .loadElement(.u8, into: let destination, buffer: let buffer, offset: let offset):
@@ -166,21 +171,6 @@ extension CF {
 					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
 					.storeCapability(source: source.lowered(), address: temp, offset: 0),
 				]
-				
-				case .push(.cap, let source):
-				return try [
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -DataType.cap.byteSize),
-					.storeCapability(source: source.lowered(), address: .sp, offset: 0),
-				]
-				
-				case .push(let type, let source):
-				return try [
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -type.byteSize),
-					.storeByte(source: source.lowered(), address: .sp),
-				]
-				
-				case .pop(bytes: let bytes):
-				return [.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: bytes)]
 				
 				case .pushFrame(let frame):
 				let frameCapOffsetBeforeStackCapUpdate = -DataType.cap.byteSize

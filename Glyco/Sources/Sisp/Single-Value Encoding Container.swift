@@ -15,7 +15,6 @@ struct SingleValueEncodingContainer : Swift.SingleValueEncodingContainer {
 	private var sisp: Sisp {
 		get { encoder.sisp[indexPath] }
 		nonmutating set { encoder.sisp[indexPath] = newValue }
-		nonmutating _modify { yield &encoder.sisp[indexPath] }
 	}
 	
 	// See protocol.

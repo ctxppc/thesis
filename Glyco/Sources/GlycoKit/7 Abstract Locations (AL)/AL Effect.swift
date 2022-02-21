@@ -14,8 +14,13 @@ extension AL {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
-		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, into: Location)
+		/// An effect that pushes a buffer of `bytes` bytes to the call scope and puts a capability for that buffer in given location.
+		case pushBuffer(bytes: Int, into: Location)
+		
+		/// An effect that pops the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with buffers allocated in the current call scope. For any two buffers *a* and *b* allocated in the current call scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call scope; in that case, deallocation is automatic.
+		case popBuffer(Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
@@ -25,12 +30,6 @@ extension AL {
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
-		
-		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(Source)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int)
 		
 		/// Pushes a new scope to the scope stack.
 		///
@@ -67,8 +66,11 @@ extension AL {
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: .init())
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer):
-				return .allocateBuffer(bytes: bytes, into: buffer, analysisAtEntry: .init())
+				case .pushBuffer(bytes: let bytes, into: let buffer):
+				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: .init())
+				
+				case .popBuffer(let buffer):
+				return .popBuffer(buffer, analysisAtEntry: .init())
 				
 				case .getElement(let elementType, of: let vector, offset: let offset, to: let destination):
 				return .getElement(elementType, of: vector, offset: offset, to: destination, analysisAtEntry: .init())
@@ -83,12 +85,6 @@ extension AL {
 					else:				negative.lowered(in: &context),
 					analysisAtEntry:	.init()
 				)
-				
-				case .push(let source):
-				return .push(source, analysisAtEntry: .init())
-				
-				case .pop(bytes: let bytes):
-				return .pop(bytes: bytes, analysisAtEntry: .init())
 				
 				case .pushScope:
 				return .pushScope(analysisAtEntry: .init())

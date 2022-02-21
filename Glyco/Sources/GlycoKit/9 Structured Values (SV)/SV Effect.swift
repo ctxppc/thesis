@@ -16,8 +16,8 @@ extension SV {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
-		/// An effect that pushes a record of given type to the call frame and puts a capability for that record in given location.
-		case allocateRecord(RecordType, into: Location)
+		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
+		case pushRecord(RecordType, into: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -25,8 +25,8 @@ extension SV {
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
-		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(ValueType, count: Int = 1, into: Location)
+		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
+		case pushVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
@@ -34,14 +34,13 @@ extension SV {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `index`.
 		case setElement(of: Location, index: Source, to: Source)
 		
+		/// An effect that pops the vector or record referred by the capability from given source.
+		///
+		/// This effect must only be used with values allocated in the current scope. For any two values *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the scope; in that case, deallocation is automatic.
+		case popValue(capability: Source)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
-		
-		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(Source)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int)
 		
 		/// Pushes a new scope to the scope stack.
 		///
@@ -94,9 +93,9 @@ extension SV {
 				case .compute(let lhs, let operation, let rhs, to: let destination):
 				try Lowered.compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination)
 				
-				case .allocateRecord(let recordType, into: let record):
+				case .pushRecord(let recordType, into: let record):
 				context.recordTypesByRecordLocation[record] = recordType
-				Lowered.allocateBuffer(bytes: recordType.byteSize, into: record)
+				Lowered.pushBuffer(bytes: recordType.byteSize, into: record)
 				
 				case .getField(let name, of: let record, to: let destination):
 				if let recordType = context.recordTypesByRecordLocation[record] {
@@ -130,8 +129,8 @@ extension SV {
 					throw LoweringError.noRecordType(record)
 				}
 				
-				case .allocateVector(let elementType, count: let count, into: let vector):
-				Lowered.allocateBuffer(bytes: elementType.byteSize * count, into: vector)
+				case .pushVector(let elementType, count: let count, into: let vector):
+				Lowered.pushBuffer(bytes: elementType.byteSize * count, into: vector)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
@@ -151,14 +150,11 @@ extension SV {
 					throw LoweringError.noVectorType(vector)
 				}
 				
+				case .popValue(capability: let capability):
+				Lowered.popBuffer(try capability.lowered(in: &context))
+				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
-				
-				case .push(let source):
-				Lowered.push(try source.lowered(in: &context))
-				
-				case .pop(bytes: let bytes):
-				Lowered.pop(bytes: bytes)
 				
 				case .pushScope:
 				Lowered.pushScope

@@ -17,8 +17,8 @@ extension CC {
 		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
-		/// An effect that pushes a record of given type to the call frame and puts a capability for that record in given location.
-		case allocateRecord(RecordType, into: Location)
+		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
+		case pushRecord(RecordType, into: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -26,14 +26,19 @@ extension CC {
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
-		/// An effect that pushes a vector of `count` elements of given value type to the call frame and puts a capability for that vector in given location.
-		case allocateVector(ValueType, count: Int = 1, into: Location)
+		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
+		case pushVector(ValueType, count: Int = 1, into: Location)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `index`.
 		case setElement(of: Location, index: Source, to: Source)
+		
+		/// An effect that pops the vector or record referred by the capability from given source.
+		///
+		/// This effect must only be used with values allocated in the current scope. For any two values *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before returning; in that case, deallocation is automatic.
+		case popValue(capability: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -42,6 +47,8 @@ extension CC {
 		case call(Label, [Source], result: Location)
 		
 		/// An effect that returns given result to the caller.
+		///
+		/// This effect also pops any values pushed to the current scope.
 		case `return`(Source)
 		
 		// See protocol.
@@ -58,8 +65,8 @@ extension CC {
 				case .compute(let lhs, let op, let rhs, to: let destination):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
 				
-				case .allocateRecord(let type, into: let record):
-				Lowered.allocateRecord(type, into: .abstract(record))
+				case .pushRecord(let type, into: let record):
+				Lowered.pushRecord(type, into: .abstract(record))
 				
 				case .getField(let fieldName, of: let record, to: let destination):
 				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
@@ -67,14 +74,17 @@ extension CC {
 				case .setField(let fieldName, of: let record, to: let source):
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
-				case .allocateVector(let type, count: let count, into: let vector):
-				Lowered.allocateVector(type, count: count, into: .abstract(vector))
+				case .pushVector(let type, count: let count, into: let vector):
+				Lowered.pushVector(type, count: count, into: .abstract(vector))
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
 				
 				case .setElement(of: let vector, index: let index, to: let source):
 				try Lowered.setElement(of: .abstract(vector), index: index.lowered(in: &context), to: source.lowered(in: &context))
+				
+				case .popValue(capability: let capability):
+				Lowered.popValue(capability: try capability.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -86,10 +96,9 @@ extension CC {
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
 					// Allocate arguments record, if nonempty.
-					// a0 is overwritten with a register-resident arg after all frame-resident args have already been passed, so we can use it freely.
-					let argumentsRecord = Lower.Location.register(.a0)
+					let argumentsRecord = context.locations.uniqueName(from: "args")
 					if !assignments.parameterRecordType.isEmpty {
-						Lowered.allocateRecord(assignments.parameterRecordType, into: argumentsRecord)
+						Lowered.pushRecord(assignments.parameterRecordType, into: .abstract(argumentsRecord))
 					}
 					
 					// Prepare arguments for lowering.
@@ -99,7 +108,7 @@ extension CC {
 					
 					// Pass frame-resident arguments first.
 					for field in assignments.parameterRecordType {
-						Lowered.setField(field.name, of: argumentsRecord, to: argumentsByParameterName[field.name.rawValue] !! "Missing argument")
+						Lowered.setField(field.name, of: .abstract(argumentsRecord), to: argumentsByParameterName[field.name.rawValue] !! "Missing argument")
 					}
 					
 					// Pass register-resident arguments last to limit liveness range of registers.
@@ -113,7 +122,7 @@ extension CC {
 					
 					// Deallocate frame-resident arguments, if any.
 					if !assignments.parameterRecordType.isEmpty {
-						Lowered.pop(bytes: assignments.parameterRecordType.byteSize)
+						Lowered.popValue(capability: .abstract(argumentsRecord))
 					}
 					
 					// Write result.

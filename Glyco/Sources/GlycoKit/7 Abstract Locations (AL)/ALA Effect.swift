@@ -15,7 +15,12 @@ extension ALA {
 		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
+		case pushBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
+		
+		/// An effect that pops the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with buffers allocated in the current scope. For any two buffers *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the scope; in that case, deallocation is automatic.
+		case popBuffer(Source, analysisAtEntry: Analysis)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location, analysisAtEntry: Analysis)
@@ -25,12 +30,6 @@ extension ALA {
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
-		
-		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(Source, analysisAtEntry: Analysis)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int, analysisAtEntry: Analysis)
 		
 		/// Pushes a new scope to the scope stack, protecting any callee-saved physical locations (registers and frame locations) from the previous scope that may be defined in the new scope.
 		///
@@ -78,8 +77,11 @@ extension ALA {
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
 				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
-				Lowered.allocateBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
+				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
+				Lowered.pushBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
+				
+				case .popBuffer(let buffer, analysisAtEntry: _):
+				Lowered.popBuffer(try buffer.lowered(in: &context))
 				
 				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: _):
 				try Lowered.getElement(
@@ -99,12 +101,6 @@ extension ALA {
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
-				
-				case .push(let source, analysisAtEntry: _):
-				try Lowered.push(context.declarations.type(of: source), source.lowered(in: &context))
-				
-				case .pop(bytes: let bytes, analysisAtEntry: _):
-				Lowered.pop(bytes: bytes)
 				
 				case .pushScope(analysisAtEntry: _):
 				Lowered.pushFrame(context.assignments.frame)
@@ -150,8 +146,11 @@ extension ALA {
 				case .compute(let lhs, let operation, let rhs, to: let destination, analysisAtEntry: _):
 				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: analysis)
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
-				return .allocateBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
+				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
+				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
+				
+				case .popBuffer(let buffer, analysisAtEntry: _):
+				return .popBuffer(buffer, analysisAtEntry: analysis)
 				
 				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: _):
 				return .getElement(elementType, of: buffer, offset: offset, to: destination, analysisAtEntry: analysis)
@@ -194,12 +193,6 @@ extension ALA {
 					
 				}
 				
-				case .push(let source, analysisAtEntry: _):
-				return .push(source, analysisAtEntry: analysis)
-				
-				case .pop(bytes: let bytes, analysisAtEntry: _):
-				return .pop(bytes: bytes, analysisAtEntry: analysis)
-				
 				case .pushScope(analysisAtEntry: _):
 				return .pushScope(analysisAtEntry: analysis)
 				
@@ -224,12 +217,11 @@ extension ALA {
 				case .do(_, analysisAtEntry: let analysis),
 					.set(_, to: _, analysisAtEntry: let analysis),
 					.compute(_, _, _, to: _, analysisAtEntry: let analysis),
-					.allocateBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
+					.pushBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
+					.popBuffer(_, analysisAtEntry: let analysis),
 					.getElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.setElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
-					.push(_, analysisAtEntry: let analysis),
-					.pop(bytes: _, analysisAtEntry: let analysis),
 					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
@@ -242,13 +234,13 @@ extension ALA {
 		private func definedLocations() -> [Location] {
 			switch self {
 				
-				case .do, .setElement, .if, .push, .pop, .popScope, .return:
+				case .do, .popBuffer, .setElement, .if, .popScope, .return:
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
 					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
 					.compute(_, _, _, to: let destination, analysisAtEntry: _),
-					.allocateBuffer(bytes: _, into: let destination, analysisAtEntry: _):
+					.pushBuffer(bytes: _, into: let destination, analysisAtEntry: _):
 				return [destination]
 				
 				case .pushScope:
@@ -267,16 +259,14 @@ extension ALA {
 				case .do,
 					.set(_, to: .constant, analysisAtEntry: _),
 					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
-					.allocateBuffer,
+					.pushBuffer,
 					.if,
-					.push(.constant, analysisAtEntry: _),
-					.pop,
 					.pushScope,
 					.return:
 				return []
 				
-				case .set(_, to: let source, analysisAtEntry: _),
-					.push(let source, analysisAtEntry: _):
+				case .popBuffer(let source, analysisAtEntry: _),
+					.set(_, to: let source, analysisAtEntry: _):
 				return [source].compactMap(\.location)
 				
 				case .compute(let lhs, _, let rhs, to: _, analysisAtEntry: _):
@@ -318,7 +308,7 @@ extension ALA {
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
-				case .set, .compute, .allocateBuffer, .getElement, .setElement, .push, .pop, .pushScope, .popScope, .call, .return:
+				case .set, .compute, .pushBuffer, .popBuffer, .getElement, .setElement, .pushScope, .popScope, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -382,7 +372,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pop, .pushScope, .popScope, .call, .return:
+				case .do, .if, .pushScope, .popScope, .call, .return:
 				return self
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)
@@ -404,17 +394,17 @@ extension ALA {
 				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
 				return try .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
-				return .allocateBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)
+				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
+				return .pushBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)
+				
+				case .popBuffer(let buffer, analysisAtEntry: let analysis):
+				return .popBuffer(try substitute(buffer), analysisAtEntry: analysis)
 				
 				case .getElement(let dataType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: let analysis):
 				return try .getElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(destination), analysisAtEntry: analysis)
 				
 				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
 				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
-				
-				case .push(let source, analysisAtEntry: let analysis):
-				return .push(try substitute(source), analysisAtEntry: analysis)
 				
 			}
 			

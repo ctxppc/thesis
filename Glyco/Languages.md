@@ -381,12 +381,13 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>popValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -431,15 +432,14 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>allocateVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushVector</strong>(ValueType, <strong>count:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>popValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
@@ -494,12 +494,11 @@ A language that infers declarations from definitions.
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
@@ -548,12 +547,11 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
@@ -614,12 +612,11 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>push</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -674,12 +671,11 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
@@ -746,11 +742,10 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dt><code>BB.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 </dl>
@@ -787,11 +782,10 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dt><code>FO.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Source)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
@@ -850,11 +844,10 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Register)</code></dd>
+	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Register)</code></dd>
+	<dd><code><strong>popBuffer</strong>(Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>push</strong>(DataType, Register)</code></dd>
-	<dd><code><strong>pop</strong>(<strong>bytes:</strong> Int)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>

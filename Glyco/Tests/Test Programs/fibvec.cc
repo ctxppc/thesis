@@ -12,7 +12,7 @@
 		in: do(
 			set(ls.arg0, to: constant(2))
 			set(ls.arg1, to: constant(29))
-			allocateVector(s32(), count: 30, into: ls.arg2)
+			pushVector(s32(), count: 30, into: ls.arg2)
 			call(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2), result: df.result$1)
 			return(location(df.result$1))
 		)

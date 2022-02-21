@@ -15,7 +15,7 @@
 			set(s32, register(s1), to: location(register(a1)))
 			set(s32, register(s1), to: immediate(2))
 			set(s32, register(a0), to: immediate(29))
-			allocateBuffer(bytes: 120, into: register(a1))
+			pushBuffer(bytes: 120, into: register(a1))
 			set(s32, register(a0), to: location(register(s1)))
 			set(s32, register(a1), to: location(register(a0)))
 			set(cap, register(a2), to: location(register(a1)))

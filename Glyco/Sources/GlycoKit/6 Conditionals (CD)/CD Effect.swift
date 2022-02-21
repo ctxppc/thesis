@@ -17,7 +17,12 @@ extension CD {
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, into: Location)
+		case pushBuffer(bytes: Int, into: Location)
+		
+		/// An effect that pops the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic.
+		case popBuffer(Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
@@ -27,12 +32,6 @@ extension CD {
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
-		
-		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int)
 		
 		/// Pushes given frame to the call stack.
 		///
@@ -69,7 +68,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .allocateBuffer, .getElement, .setElement, .if, .push, .pop, .pushFrame, .popFrame, .call, .return:
+				case .set, .compute, .pushBuffer, .popBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -104,7 +103,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .allocateBuffer, .getElement, .setElement, .push, .pop, .pushFrame, .popFrame, .call:
+				case .set, .compute, .pushBuffer, .popBuffer, .getElement, .setElement, .pushFrame, .popFrame, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -237,11 +236,20 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .allocateBuffer(bytes: let bytes, into: let buffer):
+			case .pushBuffer(bytes: let bytes, into: let buffer):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.allocateBuffer(bytes: bytes, into: buffer)],
+				previousEffects:	previousEffects + [.pushBuffer(bytes: bytes, into: buffer)],
+				exitLabel:			exitLabel
+			)
+			
+			
+			case .popBuffer(let buffer):
+			return try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [.popBuffer(buffer)],
 				exitLabel:			exitLabel
 			)
 			
@@ -291,22 +299,6 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
-			
-			case .push(let dataType, let source):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.push(dataType, source)],
-				exitLabel:			exitLabel
-			)
-			
-			case .pop(bytes: let bytes):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.pop(bytes: bytes)],
-				exitLabel:			exitLabel
-			)
 			
 			case .pushFrame(let frame):
 			return try rest.lowered(

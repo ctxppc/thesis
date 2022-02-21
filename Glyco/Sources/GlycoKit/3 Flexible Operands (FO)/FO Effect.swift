@@ -21,19 +21,18 @@ extension FO {
 		case compute(Source, BinaryOperator, Source, to: Location)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, into: Location)
+		case pushBuffer(bytes: Int, into: Location)
+		
+		/// An effect that pops the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic.
+		case popBuffer(Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
-		
-		/// An effect that retrieves the value from given source and pushes it to the call frame.
-		case push(DataType, Source)
-		
-		/// An effect that removes `bytes` bytes from the stack.
-		case pop(bytes: Int)
 		
 		/// Pushes given frame to the call stack.
 		///
@@ -137,9 +136,13 @@ extension FO {
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(into: dest, value: .registerRegister(lhs, operation, rhs))] + storeResult
 				
-				case .allocateBuffer(bytes: let bytes, into: let buffer):
+				case .pushBuffer(bytes: let bytes, into: let buffer):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.allocateBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
+				return [.pushBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
+				
+				case .popBuffer(let buffer):
+				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)
+				return loadBufferCap + [.popBuffer(bufferCap)]
 				
 				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
 				let (loadBuffer, buffer) = try load(type, from: .location(buffer), using: temp1)
@@ -152,13 +155,6 @@ extension FO {
 				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
 				let (loadElement, element) = try load(type, from: element, using: temp3)
 				return loadBuffer + loadOffset + loadElement + [.storeElement(type, buffer: buffer, offset: offset, from: element)]
-				
-				case .push(let type, let source):
-				let (loadElement, element) = try load(type, from: source, using: temp1)
-				return loadElement + [.push(type, element)]
-				
-				case .pop(bytes: let bytes):
-				return [.pop(bytes: bytes)]
 				
 				case .pushFrame(let frame):
 				return [.pushFrame(frame)]
