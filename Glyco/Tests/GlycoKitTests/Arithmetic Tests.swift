@@ -13,7 +13,7 @@ final class ArithmeticTests : XCTestCase {
 			locals: try .init([.abstract(location) ~ .s32]),
 			in: .do([
 				.set(.abstract(location), to: .constant(1)),
-				.compute(.constant(2), .add, .abstract(location), to: .abstract(location)),
+				.compute(.abstract(location), .constant(2), .add, .abstract(location)),
 				.set(.register(.a0), to: .abstract(location)),
 				.return,
 			]),
@@ -75,7 +75,7 @@ final class ArithmeticTests : XCTestCase {
 		let program = AL.Program(
 			locals: try .init([.abstract(testedNumber) ~ .s32, .abstract(isEven) ~ .s32]),
 			in: .do([
-				.compute(.constant(12), .sub, .constant(11), to: .abstract(testedNumber)),
+				.compute(.abstract(testedNumber), .constant(12), .sub, .constant(11)),
 				.if(
 					.relation(.abstract(testedNumber), .eq, .constant(1)),
 					then:	.set(.abstract(isEven), to: .constant(1)),

@@ -21,9 +21,9 @@ extension ALA {
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .constant(let imm):			return .immediate(imm)
-				case .abstract(let location):		return .location(try location.lowered(in: &context))
-				case .register(let register, _):	return .location(.register(register))
-				case .frame(let location):			return .location(.frameCell(location))
+				case .abstract(let location):		return .init(try location.lowered(in: &context))
+				case .register(let register, _):	return .register(register)
+				case .frame(let location):			return .frame(location)
 			}
 		}
 		

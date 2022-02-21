@@ -11,8 +11,8 @@ extension ALA {
 		/// An effect that retrieves the datum from given source and puts it in given location, effectively copying the datum.
 		case set(Location, to: Source, analysisAtEntry: Analysis)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location, analysisAtEntry: Analysis)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source, analysisAtEntry: Analysis)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
@@ -74,8 +74,8 @@ extension ALA {
 					to: source.lowered(in: &context)
 				)
 				
-				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: _):
-				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: destination.lowered(in: &context))
+				case .compute(let destination, let lhs, let op, let rhs, analysisAtEntry: _):
+				try Lowered.compute(destination.lowered(in: &context), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
 				Lowered.pushBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
@@ -143,8 +143,8 @@ extension ALA {
 				case .set(let destination, to: let source, analysisAtEntry: _):
 				return .set(destination, to: source, analysisAtEntry: analysis)
 				
-				case .compute(let lhs, let operation, let rhs, to: let destination, analysisAtEntry: _):
-				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: analysis)
+				case .compute(let destination, let lhs, let operation, let rhs, analysisAtEntry: _):
+				return .compute(destination, lhs, operation, rhs, analysisAtEntry: analysis)
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
 				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
@@ -216,7 +216,7 @@ extension ALA {
 			switch self {
 				case .do(_, analysisAtEntry: let analysis),
 					.set(_, to: _, analysisAtEntry: let analysis),
-					.compute(_, _, _, to: _, analysisAtEntry: let analysis),
+					.compute(_, _, _, _, analysisAtEntry: let analysis),
 					.pushBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
 					.popBuffer(_, analysisAtEntry: let analysis),
 					.getElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
@@ -239,7 +239,7 @@ extension ALA {
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
 					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
-					.compute(_, _, _, to: let destination, analysisAtEntry: _),
+					.compute(let destination, _, _, _, analysisAtEntry: _),
 					.pushBuffer(bytes: _, into: let destination, analysisAtEntry: _):
 				return [destination]
 				
@@ -258,7 +258,7 @@ extension ALA {
 				
 				case .do,
 					.set(_, to: .constant, analysisAtEntry: _),
-					.compute(.constant, _, .constant, to: _, analysisAtEntry: _),
+					.compute(_, .constant, _, .constant, analysisAtEntry: _),
 					.pushBuffer,
 					.if,
 					.pushScope,
@@ -269,7 +269,7 @@ extension ALA {
 					.set(_, to: let source, analysisAtEntry: _):
 				return [source].compactMap(\.location)
 				
-				case .compute(let lhs, _, let rhs, to: _, analysisAtEntry: _):
+				case .compute(_, let lhs, _, let rhs, analysisAtEntry: _):
 				return [lhs, rhs].compactMap(\.location)
 				
 				case .getElement(_, of: let buffer, offset: .constant, to: _, analysisAtEntry: _),
@@ -391,8 +391,8 @@ extension ALA {
 				case .set:
 				return self
 				
-				case .compute(let lhs, let op, let rhs, to: let destination, analysisAtEntry: let analysis):
-				return try .compute(substitute(lhs), op, substitute(rhs), to: substitute(destination), analysisAtEntry: analysis)
+				case .compute(let destination, let lhs, let op, let rhs, analysisAtEntry: let analysis):
+				return try .compute(substitute(destination), substitute(lhs), op, substitute(rhs), analysisAtEntry: analysis)
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
 				return .pushBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)

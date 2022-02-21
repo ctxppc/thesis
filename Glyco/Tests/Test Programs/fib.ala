@@ -1151,10 +1151,10 @@
 						)
 					)
 					compute(
+						abstract(ls.arg1),
 						abstract(ls.lhs$1),
 						add,
 						abstract(ls.rhs$1),
-						to: abstract(ls.arg1),
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(ls.arg0), abstract(ls.arg1))
@@ -1297,10 +1297,10 @@
 						)
 					)
 					compute(
+						abstract(ls.arg2),
 						abstract(ls.lhs$2),
 						sub,
 						abstract(ls.rhs$2),
-						to: abstract(ls.arg2),
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(ls.arg0), abstract(ls.arg2))

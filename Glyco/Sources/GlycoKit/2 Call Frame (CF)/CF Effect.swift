@@ -8,8 +8,8 @@ extension CF {
 		/// An effect that copies the contents from `from` to `into`.
 		case copy(DataType, into: Register, from: Register)
 		
-		/// An effect that computes `value` and puts the result in `into`.
-		case compute(into: Register, value: BinaryExpression)
+		/// An effect that computes given expression and puts the result in given register.
+		case compute(Register, BinaryExpression)
 		
 		/// An effect that loads the datum in the frame at `from` and puts it in `into`.
 		case load(DataType, into: Register, from: Frame.Location)
@@ -57,7 +57,7 @@ extension CF {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		static var nop: Self { .compute(into: .zero, value: Register.zero + .zero) }
+		static var nop: Self { .compute(.zero, Register.zero + .zero) }
 		
 		// See protocol.
 		func lowered(in context: inout ()) throws -> [Lower.Instruction] {
@@ -71,10 +71,10 @@ extension CF {
 				case .copy(.cap, into: let destination, from: let source):
 				return try [.copyCapability(destination: destination.lowered(), source: source.lowered())]
 				
-				case .compute(into: let destination, value: .registerRegister(let rs1, let operation, let rs2)):
+				case .compute(let destination, .registerRegister(let rs1, let operation, let rs2)):
 				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
-				case .compute(into: let destination, value: .registerImmediate(let rs1, let operation, let imm)):
+				case .compute(let destination, .registerImmediate(let rs1, let operation, let imm)):
 				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
 				case .load(.u8, into: let destination, from: let source):

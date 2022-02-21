@@ -11,8 +11,8 @@ extension ID {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the current scope and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, into: Location)
@@ -65,11 +65,11 @@ extension ID {
 				try context.declarations.declare(destination, type: context.declarations.type(of: source))
 				Lowered.set(destination, to: source)
 				
-				case .compute(let lhs, let operation, let rhs, to: let destination):
+				case .compute(let destination, let lhs, let operation, let rhs):
 				try context.declarations.require(lhs, type: .s32)
 				try context.declarations.require(rhs, type: .s32)
 				try context.declarations.declare(destination, type: .s32)
-				Lowered.compute(lhs, operation, rhs, to: destination)
+				Lowered.compute(destination, lhs, operation, rhs)
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer):
 				try context.declarations.declare(buffer, type: .cap)

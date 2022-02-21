@@ -11,8 +11,8 @@ extension AL {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call scope and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, into: Location)
@@ -63,8 +63,8 @@ extension AL {
 				case .set(let destination, to: let source):
 				return .set(destination, to: source, analysisAtEntry: .init())
 				
-				case .compute(let lhs, let operation, let rhs, to: let destination):
-				return .compute(lhs, operation, rhs, to: destination, analysisAtEntry: .init())
+				case .compute(let destination, let lhs, let operation, let rhs):
+				return .compute(destination, lhs, operation, rhs, analysisAtEntry: .init())
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer):
 				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: .init())

@@ -14,8 +14,8 @@ extension CC {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
 		case pushRecord(RecordType, into: Location)
@@ -62,8 +62,8 @@ extension CC {
 				case .set(let location, to: let source):
 				Lowered.set(.abstract(location), to: try source.lowered(in: &context))
 				
-				case .compute(let lhs, let op, let rhs, to: let destination):
-				try Lowered.compute(lhs.lowered(in: &context), op, rhs.lowered(in: &context), to: .abstract(destination))
+				case .compute(let destination, let lhs, let op, let rhs):
+				try Lowered.compute(.abstract(destination), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .pushRecord(let type, into: let record):
 				Lowered.pushRecord(type, into: .abstract(record))

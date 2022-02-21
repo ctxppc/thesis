@@ -35,7 +35,7 @@ extension CA {
 				Lowered.set(destination, to: source)
 				
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
-				Lowered.compute(lhs, op, rhs, to: destination)
+				Lowered.compute(destination, lhs, op, rhs)
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				Lowered.getElement(of: vector, index: index, to: destination)

@@ -5,11 +5,11 @@ extension FO {
 	/// A location to a register or frame cell on an FO machine.
 	public enum Location : Codable, Equatable {
 		
-		/// A location to a register.
+		/// A location on the register bank.
 		case register(Register)
 		
-		/// A location to a frame cell.
-		case frameCell(Frame.Location)
+		/// A location on the call frame.
+		case frame(Frame.Location)
 		
 	}
 	

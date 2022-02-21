@@ -22,7 +22,7 @@ extension ALA {
 			switch self {
 				case .abstract(let location):	return try location.lowered(in: &context)
 				case .register(let register):	return .register(register)
-				case .frame(let location):		return .frameCell(location)
+				case .frame(let location):		return .frame(location)
 			}
 		}
 		
@@ -80,7 +80,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frameCell(frame.allocate(try declarations.type(of: Location.abstract(location))))
+					home = .frame(frame.allocate(try declarations.type(of: Location.abstract(location))))
 				}
 				homesByLocation[location] = home
 				return home

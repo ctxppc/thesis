@@ -16,30 +16,22 @@
 			do()
 			do()
 			if(
-				do(
-					set(s32, register(s1), to: location(register(a2))) set(s32, register(s1), to: immediate(0)),
-					then: constant(true)
-				),
-				then: do(
-					set(s32, register(s1), to: location(register(a1)))
-					set(s32, register(a0), to: location(register(s1)))
-					popFrame()
-					return()
-				),
+				do(set(s32, register(s1), to: register(a2)) set(s32, register(s1), to: immediate(0)), then: constant(true)),
+				then: do(set(s32, register(s1), to: register(a1)) set(s32, register(a0), to: register(s1)) popFrame() return()),
 				else: do(
-					set(s32, register(a3), to: location(register(a1)))
+					set(s32, register(a3), to: register(a1))
 					do()
-					set(s32, register(s1), to: location(register(a1)))
-					compute(location(register(a0)), add, location(register(s1)), to: register(a1))
-					set(s32, register(s1), to: location(register(a2)))
+					set(s32, register(s1), to: register(a1))
+					compute(register(a1), register(a0), add, register(s1))
+					set(s32, register(s1), to: register(a2))
 					set(s32, register(a0), to: immediate(1))
-					compute(location(register(s1)), sub, location(register(a0)), to: register(s1))
-					set(s32, register(a0), to: location(register(a3)))
+					compute(register(s1), register(s1), sub, register(a0))
+					set(s32, register(a0), to: register(a3))
 					do()
-					set(s32, register(a2), to: location(register(s1)))
+					set(s32, register(a2), to: register(s1))
 					call(fib)
-					set(s32, register(s1), to: location(register(a0)))
-					set(s32, register(a0), to: location(register(s1)))
+					set(s32, register(s1), to: register(a0))
+					set(s32, register(a0), to: register(s1))
 					popFrame()
 					return()
 				)

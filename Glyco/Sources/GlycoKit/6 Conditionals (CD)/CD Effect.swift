@@ -13,8 +13,8 @@ extension CD {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(DataType, Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, into: Location)
@@ -146,11 +146,11 @@ extension CD {
 				self = .do(effects)
 				return optimised
 				
-				case .set(_, let destination, to: .location(let source)) where source == destination,
-					.compute(.location(let source), .add, .immediate(0), to: let destination) where source == destination,
-					.compute(.immediate(0), .add, .location(let source), to: let destination) where source == destination,
-					.compute(.location(let source), .sub, .immediate(0), to: let destination) where source == destination,
-					.compute(.immediate(0), .sub, .location(let source), to: let destination) where source == destination:
+				case .set(_, let destination, to: let source) where source.location == destination,
+						.compute(let destination, let source, .add, .immediate(0)) where source.location == destination,
+						.compute(let destination, .immediate(0), .add, let source) where source.location == destination,
+						.compute(let destination, let source, .sub, .immediate(0)) where source.location == destination,
+						.compute(let destination, .immediate(0), .sub, let source) where source.location == destination:
 				self = .do([])
 				return true
 				
@@ -228,11 +228,11 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 				exitLabel:			exitLabel
 			)
 			
-			case .compute(let lhs, let operation, let rhs, to: let destination):
+			case .compute(let destination, let lhs, let operation, let rhs):
 			return try rest.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.compute(lhs, operation, rhs, to: destination)],
+				previousEffects:	previousEffects + [.compute(destination, lhs, operation, rhs)],
 				exitLabel:			exitLabel
 			)
 			

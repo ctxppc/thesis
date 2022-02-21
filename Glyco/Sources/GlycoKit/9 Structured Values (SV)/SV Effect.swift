@@ -13,8 +13,8 @@ extension SV {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
 		case pushRecord(RecordType, into: Location)
@@ -90,8 +90,8 @@ extension SV {
 				}
 				Lowered.set(destination, to: try source.lowered(in: &context))
 				
-				case .compute(let lhs, let operation, let rhs, to: let destination):
-				try Lowered.compute(lhs.lowered(in: &context), operation, rhs.lowered(in: &context), to: destination)
+				case .compute(let destination, let lhs, let operation, let rhs):
+				try Lowered.compute(destination, lhs.lowered(in: &context), operation, rhs.lowered(in: &context))
 				
 				case .pushRecord(let recordType, into: let record):
 				context.recordTypesByRecordLocation[record] = recordType
@@ -135,7 +135,7 @@ extension SV {
 				case .getElement(of: let vector, index: let index, to: let destination):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
-					Lowered.compute(try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount), to: .abstract(offset))
+					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount))
 					Lowered.getElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: destination)
 				} else {
 					throw LoweringError.noVectorType(vector)
@@ -144,7 +144,7 @@ extension SV {
 				case .setElement(of: let vector, index: let index, to: let source):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
-					Lowered.compute(try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount), to: .abstract(offset))
+					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount))
 					Lowered.setElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: try source.lowered(in: &context))
 				} else {
 					throw LoweringError.noVectorType(vector)

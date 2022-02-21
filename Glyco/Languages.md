@@ -380,7 +380,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dt><code>CC.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
@@ -431,7 +431,7 @@ A language that introduces structured values (vectors and records).
 	<dt><code>SV.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushRecord</strong>(RecordType, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
@@ -493,7 +493,7 @@ A language that infers declarations from definitions.
 	<dt><code>ID.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -546,7 +546,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dt><code>AL.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -611,7 +611,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -670,7 +670,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dt><code>CD.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -741,7 +741,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 <dl>
 	<dt><code>BB.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -776,12 +776,13 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <dl>
 	<dt><code>FO.Source</code></dt>
 	<dd><code><strong>immediate</strong>(Int)</code></dd>
-	<dd><code><strong>location</strong>(Location)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>FO.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>compute</strong>(Source, BinaryOperator, Source, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -797,7 +798,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <dl>
 	<dt><code>FO.Location</code></dt>
 	<dd><code><strong>register</strong>(Register)</code></dd>
-	<dd><code><strong>frameCell</strong>(Frame.Location)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
 	<dt><code>FO.Register</code></dt>
@@ -841,7 +842,7 @@ A language that introduces call frames and operations for managing the call fram
 <dl>
 	<dt><code>CF.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>compute</strong>(<strong>into:</strong> Register, <strong>value:</strong> BinaryExpression)</code></dd>
+	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>into:</strong> Register)</code></dd>

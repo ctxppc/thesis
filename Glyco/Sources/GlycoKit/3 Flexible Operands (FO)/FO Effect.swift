@@ -17,8 +17,8 @@ extension FO {
 		/// When `to` is an immediate, the data type cannot be `.capability`.
 		case set(DataType, Location, to: Source)
 		
-		/// An effect that computes `lhs` `operation` `rhs` and puts it in `to`.
-		case compute(Source, BinaryOperator, Source, to: Location)
+		/// An effect that computes given expression and puts the result in given location.
+		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, into: Location)
@@ -60,7 +60,7 @@ extension FO {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		public static var nop: Self { .compute(.location(.register(.zero)), .add, .location(.register(.zero)), to: .register(.zero)) }
+		public static var nop: Self { .compute(.register(.zero), .register(.zero), .add, .register(.zero)) }
 		
 		// See protocol.
 		public func lowered(in context: inout ()) throws -> [Lower.Effect] {
@@ -70,9 +70,9 @@ extension FO {
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
 			func load(_ type: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch source {
-					case .immediate(let imm):			return ([.compute(into: temporaryRegister, value: Lower.Register.zero + imm)], temporaryRegister)
-					case .location(.register(let r)):	return ([], try r.lowered())
-					case .location(.frameCell(let c)):	return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
+					case .immediate(let imm):	return ([.compute(temporaryRegister, Lower.Register.zero + imm)], temporaryRegister)
+					case .register(let r):		return ([], try r.lowered())
+					case .frame(let c):			return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
 				}
 			}
 			
@@ -82,7 +82,7 @@ extension FO {
 			func store(_ type: DataType, to destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch destination {
 					case .register(let r):	return ([], try r.lowered())
-					case .frameCell(let c):	return ([.store(type, into: c, from: temporaryRegister)], temporaryRegister)
+					case .frame(let c):		return ([.store(type, into: c, from: temporaryRegister)], temporaryRegister)
 				}
 			}
 			
@@ -93,48 +93,48 @@ extension FO {
 			switch self {
 				
 				case .set(.u8, .register(let dest), to: .immediate(let imm)):
-				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + .init(UInt8(truncatingIfNeeded: imm)))]
+				return try [.compute(dest.lowered(), Lower.Register.zero + .init(UInt8(truncatingIfNeeded: imm)))]
 				
 				case .set(.s32, .register(let dest), to: .immediate(let imm)):
-				return try [.compute(into: dest.lowered(), value: Lower.Register.zero + imm)]
+				return try [.compute(dest.lowered(), Lower.Register.zero + imm)]
 				
 				case .set(.cap, .register, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
-				case .set(let type, .register(let dest), to: .location(.register(let src))):
+				case .set(let type, .register(let dest), to: .register(let src)):
 				return try [.copy(type, into: dest.lowered(), from: src.lowered())]
 				
-				case .set(let type, .register(let dest), to: .location(.frameCell(let src))):
+				case .set(let type, .register(let dest), to: .frame(let src)):
 				return try [.load(type, into: dest.lowered(), from: src)]
 				
-				case .set(.cap, .frameCell, to: .immediate):
+				case .set(.cap, .frame, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
-				case .set(let type, .frameCell(let dest), to: .immediate(let imm)):
+				case .set(let type, .frame(let dest), to: .immediate(let imm)):
 				return [
-					.compute(into: temp1, value: .zero + imm),
+					.compute(temp1, .zero + imm),
 					.store(type, into: dest, from: temp1),
 				]
 				
-				case .set(let type, .frameCell(let dest), to: .location(.register(let src))):
+				case .set(let type, .frame(let dest), to: .register(let src)):
 				return try [.store(type, into: dest, from: src.lowered())]
 				
-				case .set(let type, .frameCell(let dest), to: .location(.frameCell(let src))):
+				case .set(let type, .frame(let dest), to: .frame(let src)):
 				return [
 					.load(type, into: temp1, from: src),
 					.store(type, into: dest, from: temp1),
 				]
 				
-				case .compute(let lhs, let operation, .immediate(let rhs), to: let destination):
+				case .compute(let destination, let lhs, let operation, .immediate(let rhs)):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
-				return loadLHS + [.compute(into: dest, value: .registerImmediate(lhs, operation, rhs))] + storeResult
+				return loadLHS + [.compute(dest, .registerImmediate(lhs, operation, rhs))] + storeResult
 				
-				case .compute(let lhs, let operation, let rhs, to: let destination):
+				case .compute(let destination, let lhs, let operation, let rhs):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
-				return loadLHS + loadRHS + [.compute(into: dest, value: .registerRegister(lhs, operation, rhs))] + storeResult
+				return loadLHS + loadRHS + [.compute(dest, .registerRegister(lhs, operation, rhs))] + storeResult
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
@@ -145,13 +145,13 @@ extension FO {
 				return loadBufferCap + [.popBuffer(bufferCap)]
 				
 				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
-				let (loadBuffer, buffer) = try load(type, from: .location(buffer), using: temp1)
+				let (loadBuffer, buffer) = try load(type, from: .init(buffer), using: temp1)
 				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
 				let (storeElement, dest) = try store(type, to: destination, using: temp3)
 				return loadBuffer + loadOffset + [.loadElement(type, into: dest, buffer: buffer, offset: offset)] + storeElement
 				
 				case .setElement(let type, of: let vector, offset: let offset, to: let element):
-				let (loadBuffer, buffer) = try load(type, from: .location(vector), using: temp1)
+				let (loadBuffer, buffer) = try load(type, from: .init(vector), using: temp1)
 				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
 				let (loadElement, element) = try load(type, from: element, using: temp3)
 				return loadBuffer + loadOffset + loadElement + [.storeElement(type, buffer: buffer, offset: offset, from: element)]
