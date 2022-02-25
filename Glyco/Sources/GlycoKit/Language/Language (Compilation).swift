@@ -130,7 +130,7 @@ private struct DecodeSourceAndCompileELFAction : LanguageAction {
 	let sispString:	String
 	let configuration: CompilationConfiguration
 	func callAsFunction<L : Language>(language: L.Type) throws -> Data {
-		try L.elf(from: SispDecoder(from: sispString).decode(L.Program.self), configuration: configuration)
+		try L.elf(from: L.Program(fromEncoded: sispString), configuration: configuration)
 	}
 }
 
