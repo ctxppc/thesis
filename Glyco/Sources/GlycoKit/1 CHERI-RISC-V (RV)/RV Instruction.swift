@@ -27,11 +27,11 @@ extension RV {
 		/// An instruction that loads the word byte memory at the address in `address`, with the address offset by `offset`.
 		case loadByte(destination: Register, address: Register)
 		
-		/// An instruction that loads the word from memory at the address in `address`, with the address offset by `offset`.
+		/// An instruction that loads the word from memory at the address in `address` and puts it in `destination`.
 		case loadSignedWord(destination: Register, address: Register)
 		
-		/// An instruction that loads the capability from memory at the address in `address`, with the address offset by `offset`, and puts it in `destination`.
-		case loadCapability(destination: Register, address: Register, offset: Int)
+		/// An instruction that loads the capability from memory at the address in `address` and puts it in `destination`.
+		case loadCapability(destination: Register, address: Register)
 		
 		/// An instruction that retrieves the byte from `source` and stores it in memory at the address in `address`.
 		case storeByte(source: Register, address: Register)
@@ -39,8 +39,8 @@ extension RV {
 		/// An instruction that retrieves the word from `source` and stores it in memory at the address in `address`.
 		case storeSignedWord(source: Register, address: Register)
 		
-		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`, with the address offset by `offset`.
-		case storeCapability(source: Register, address: Register, offset: Int)
+		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`.
+		case storeCapability(source: Register, address: Register)
 		
 		/// An instruction that offsets the capability in `source` by the offset in `offset` and puts it in `destination`.
 		case offsetCapability(destination: Register, source: Register, offset: Register)
@@ -106,8 +106,8 @@ extension RV {
 				case .loadSignedWord(destination: let rd, address: let address):
 				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
 				
-				case .loadCapability(destination: let cd, address: let address, offset: let offset):
-				return "\(tabs)clc \(cd.c), \(offset)(\(address.c))"
+				case .loadCapability(destination: let cd, address: let address):
+				return "\(tabs)lc.cap \(cd.c), 0(\(address.c))"
 				
 				case .storeByte(source: let rs, address: let address):
 				return "\(tabs)sbu.cap \(rs.x), 0(\(address.c))"
@@ -115,8 +115,8 @@ extension RV {
 				case .storeSignedWord(source: let rs, address: let address):
 				return "\(tabs)sw.cap \(rs.x), 0(\(address.c))"
 				
-				case .storeCapability(source: let cs, address: let address, offset: let offset):
-				return "\(tabs)csc \(cs.c), \(offset)(\(address.c))"
+				case .storeCapability(source: let cs, address: let address):
+				return "\(tabs)sc.cap \(cs.c), 0(\(address.c))"
 				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
 				return "\(tabs)cincoffset \(destination.c), \(source.c), \(offset.x)"
@@ -143,10 +143,10 @@ extension RV {
 				return "\(tabs)j \(target.rawValue)"
 				
 				case .call(target: let target):
-				return "\(tabs)ccall \(target.rawValue)"
+				return "\(tabs)call \(target.rawValue)"
 				
 				case .return:
-				return "\(tabs)cret"
+				return "\(tabs)ret.cap"
 				
 				case .labelled(let label, .labelled(let innerLabel, let instruction)):
 				let next = Self.labelled(innerLabel, instruction).lowered(in: &context)

@@ -80,32 +80,38 @@ extension CF {
 				case .load(.u8, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
-					.loadByte(destination: try destination.lowered(), address: temp)
+					.loadByte(destination: try destination.lowered(), address: temp),
 				]
 				
 				case .load(.s32, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
-					.loadSignedWord(destination: try destination.lowered(), address: temp)
+					.loadSignedWord(destination: try destination.lowered(), address: temp),
 				]
 				
 				case .load(.cap, into: let destination, from: let source):
-				return [.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)]
+				return [
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
+					.loadCapability(destination: try destination.lowered(), address: temp),
+				]
 				
 				case .store(.u8, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
-					.storeByte(source: try source.lowered(), address: temp)
+					.storeByte(source: try source.lowered(), address: temp),
 				]
 				
 				case .store(.s32, into: let destination, from: let source):
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
-					.storeSignedWord(source: try source.lowered(), address: temp)
+					.storeSignedWord(source: try source.lowered(), address: temp),
 				]
 				
 				case .store(.cap, into: let destination, from: let source):
-				return [.storeCapability(source: try source.lowered(), address: temp, offset: destination.offset)]
+				return [
+					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
+					.storeCapability(source: try source.lowered(), address: temp),
+				]
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer):
 				/*
@@ -151,7 +157,7 @@ extension CF {
 				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
 					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
-					.loadCapability(destination: destination.lowered(), address: destination.lowered(), offset: 0),
+					.loadCapability(destination: destination.lowered(), address: destination.lowered()),
 				]
 				
 				case .storeElement(.u8, buffer: let buffer, offset: let offset, from: let source):
@@ -169,21 +175,21 @@ extension CF {
 				case .storeElement(.cap, buffer: let buffer, offset: let offset, from: let source):
 				return try [
 					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
-					.storeCapability(source: source.lowered(), address: temp, offset: 0),
+					.storeCapability(source: source.lowered(), address: temp),
 				]
 				
 				case .pushFrame(let frame):
-				let frameCapOffsetBeforeStackCapUpdate = -DataType.cap.byteSize
 				return [
 					
-					// Push fp but defer sp update.
-					.storeCapability(source: .fp, address: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
+					// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
+					.offsetCapabilityWithImmediate(destination: temp, source: .sp, offset: -DataType.cap.byteSize),
+					.storeCapability(source: .fp, address: temp),
 					
-					// Set up fp for new frame using virtually updated sp.
-					.offsetCapabilityWithImmediate(destination: .fp, source: .sp, offset: frameCapOffsetBeforeStackCapUpdate),
+					// Set up fp for new frame — using deferred sp.
+					.copyCapability(destination: .fp, source: temp),
 					
-					// Actually update sp, for both saved fp and requested frame size.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -(DataType.cap.byteSize + frame.allocatedByteSize)),
+					// Allocate space for frame by pushing sp downward.
+					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -frame.allocatedByteSize),
 					
 				]
 
@@ -194,7 +200,7 @@ extension CF {
 					.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.cap.byteSize),
 					
 					// Restore saved fp — follow the linked list.
-					.loadCapability(destination: .fp, address: .fp, offset: 0)
+					.loadCapability(destination: .fp, address: .fp),
 					
 				]
 				

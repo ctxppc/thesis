@@ -30,29 +30,30 @@ cd.pred:		j cd.then$3
 cd.then$3:		mv s1, a1
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
+				lc.cap cfp, 0(cfp)
+				ret.cap
 cd.else:		j cd.then$4
 cd.then$4:		j cd.then$5
 cd.then$5:		mv a2, s1
-				ccall fib
+				call fib
 				j cd.ret
 cd.ret:			mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
-rv.main:		csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
+				lc.cap cfp, 0(cfp)
+				ret.cap
+rv.main:		cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
-				ccall fib
+				call fib
 				j cd.ret$1
 cd.ret$1:		cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
+				lc.cap cfp, 0(cfp)
+				ret.cap
 				
 				.align 6
 				.global tohost
