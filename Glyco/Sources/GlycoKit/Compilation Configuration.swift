@@ -43,4 +43,7 @@ public struct CompilationConfiguration {
 	/// A Boolean value indicating whether programs are validated in each language before lowering them.
 	public var validate: Bool = true
 	
+	/// The (suggested) maximum line length of serialised output programs.
+	public var maximumLineLength = 120
+	
 }

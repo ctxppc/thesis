@@ -39,7 +39,11 @@ extension Language {
 		targetLanguages:	TargetLanguages,
 		configuration:		CompilationConfiguration
 	) throws -> [String : String] {
-		try reduce(program, using: LoweredRepresentationsReductor(targetLanguages: targetLanguages), configuration: configuration)
+		try reduce(
+			program,
+			using: LoweredRepresentationsReductor(targetLanguages: targetLanguages, lineLimit: configuration.maximumLineLength),
+			configuration: configuration
+		)
 	}
 	
 }
@@ -79,18 +83,20 @@ public enum TargetLanguages {
 
 private struct LoweredRepresentationsReductor : ProgramReductor {
 	
-	init(targetLanguages: TargetLanguages) {
+	init(targetLanguages: TargetLanguages, lineLimit: Int) {
 		self.targetLanguages = targetLanguages
+		self.lineLimit = lineLimit
 	}
 	
 	private(set) var targetLanguages: TargetLanguages
 	private var programSispsByLanguageName = Result()
+	private let lineLimit: Int
 	
 	typealias Result = [String : String]
 	
 	mutating func update<L : Language>(language: L.Type, program: L.Program) throws -> Result? {
 		if targetLanguages.remove(language) {
-			programSispsByLanguageName[language.name] = try program.encoded()
+			programSispsByLanguageName[language.name] = try program.encoded(lineLimit: lineLimit)
 		}
 		return targetLanguages.isEmpty ? programSispsByLanguageName : nil
 	}

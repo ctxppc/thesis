@@ -19,13 +19,15 @@ struct CompileCommand : ParsableCommand {
 	
 	When one or more intermediate languages are specified with the -l option, Glyco lowers the source file to those languages. When no intermediate language is specified, Glyco lowers the source file to an ELF binary.
 	
-	Pass -O to output the programs in the specified intermediate languages to standard out. Pass -o to write the programs in the specified intermediate languages or the binary to disk. The -o option accepts paths relative to the current directory, one path per corresponding intermediate language or one path for the ELF binary. For any language for which no corresponding path is defined or if -o is omitted, a filename is derived from the source file and the file is stored in the same directory as the source file. Any files specified with or derived by -o are overwritten.
+	By default, intermediate programs and binary executables are written to the same directory as the source file, with a filename derived from the source file. To change this, pass paths (relative to the current directory) using the -o option, one path per corresponding intermediate language or one path for the ELF binary. Glyco overwrites files.
+	
+	To disable writing to disk, pass the --stdout flag. Intermediate programs are written to standard out; binary executables are discarded after compilation.
 	"""
 	
-	@Argument(help: "A Gly or intermediate file, relative to the current directory. The file‘s extension must be .gly or the name of an intermediate language: .S, .rv, .fl, etc.")
+	@Argument(help: "A Gly or intermediate file, relative to the current directory. The file‘s extension must be .gly or the name of an intermediate language: .s, .rv, .fl, etc.")
 	var source: URL
 	
-	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The intermediate languages (S, FL, FO, etc.) to emit. (Omit to build an ELF file.)")
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The intermediate languages (S, FL, FO, etc.) to emit. (Omit to build an executable ELF file.)")
 	var languages: [String] = []
 	
 	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(CompilationConfiguration.Target.sail) and \(CompilationConfiguration.Target.cheriBSD).")
@@ -34,7 +36,7 @@ struct CompileCommand : ParsableCommand {
 	@Option(name: [.short, .customLong("output")], parsing: .upToNextOption, help: "Output programs to disk at specified locations, to be overwritten and relative to the current directory. (Omit to write in the source file‘s directory.)")
 	var outputURLs: [URL] = []
 	
-	@Flag(name: [.customShort("O"), .long], help: "Output intermediate programs to standard out.")
+	@Flag(name: .customLong("stdout"), help: "Output intermediate programs to standard out or discard binary. (Omit to write to disk.)")
 	var outputsToStandardOut: Bool = false
 	
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "Registers used for passing arguments, in parameter order.")
@@ -45,6 +47,9 @@ struct CompileCommand : ParsableCommand {
 	
 	@Flag(name: .long, inversion: .prefixedNo, help: "Enable/disable intra-language validations.")
 	var validate: Bool = true
+	
+	@Option(name: .customLong("line"), help: "The (suggested) maximum line length of output programs.")
+	var maximumLineLength = 120
 	
 	#if os(macOS)
 	@Flag(name: .shortAndLong, help: "Continuously observe source file for changes and compile. (Omit to compile once and exit.)")
@@ -61,6 +66,7 @@ struct CompileCommand : ParsableCommand {
 			$0.argumentRegisters = argumentRegisters
 			$0.optimise = optimise
 			$0.validate = validate
+			$0.maximumLineLength = maximumLineLength
 		}
 		let sourceLanguage = source.pathExtension.uppercased()
 		
@@ -94,11 +100,13 @@ struct CompileCommand : ParsableCommand {
 				sourceLanguage:	sourceLanguage,
 				configuration:	configuration
 			)
-			if let outputURL = outputURLs.first {
+			
+			if outputsToStandardOut {
+				print("The ELF executable is \(elf.count) bytes long. Re-run this command without the --stdout flag to write the binary to disk.")
+			} else {
+				let outputURL = derivedOutputURL(language: nil)
 				try elf.write(to: outputURL)
 				print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
-			} else {
-				print("The ELF executable is \(elf.count) bytes long. Re-run this command with the -o flag or -O <file> option to save the binary to disk.")
 			}
 			
 		} else {
@@ -112,17 +120,18 @@ struct CompileCommand : ParsableCommand {
 				configuration:		configuration
 			)
 			
-			for (language, program) in programsByLanguage {
-				let url = urlsByLanguage[language] ?? derivedOutputURL(language: language)
-				try program.write(to: url, atomically: false, encoding: .utf8)
-				print("Exported \(language.uppercased()) program to \(url.absoluteString).")
-			}
-			
 			if outputsToStandardOut {
 				for language in normalisedLanguageNames {
+					guard let program = programsByLanguage[language] else { continue }
 					print("<language name='\(language)'><![CDATA[")
-					print(programsByLanguage[language]!)
+					print(program)
 					print("]]></language>")
+				}
+			} else {
+				for (language, program) in programsByLanguage {
+					let url = urlsByLanguage[language] ?? derivedOutputURL(language: language)
+					try program.write(to: url, atomically: false, encoding: .utf8)
+					print("Exported \(language.uppercased()) program to \(url.absoluteString).")
 				}
 			}
 			
