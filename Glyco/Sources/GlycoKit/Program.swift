@@ -18,7 +18,7 @@ public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertib
 	associatedtype LowerProgram : Program
 	
 	/// Returns an encoded representation of `self`.
-	func encoded(lineLimit: Int) throws -> String
+	func encoded(maxLineLength: Int) throws -> String
 	
 }
 
@@ -28,15 +28,15 @@ extension Program {
 		self = try SispDecoder(from: encoded).decode(Self.self)
 	}
 	
-	public func encoded(lineLimit: Int) throws -> String {
+	public func encoded(maxLineLength: Int) throws -> String {
 		try SispEncoder()
 			.encode(self)
-			.serialised(maxLineLength: lineLimit)
+			.serialised(maxLineLength: maxLineLength)
 	}
 	
 	public var description: String {
 		do {
-			return try encoded(lineLimit: 120)
+			return try encoded(maxLineLength: 120)
 		} catch {
 			return "Could not serialise program: \(error)"
 		}

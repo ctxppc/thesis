@@ -56,7 +56,7 @@ final class ArithmeticTests : XCTestCase {
 						addi t1, zero, 2
 						add s1, t1, s1
 						mv a0, s1
-						cret
+						ret.cap
 						
 						.align 6
 						.global tohost
@@ -131,7 +131,7 @@ final class ArithmeticTests : XCTestCase {
 		cd.else:		addi s1, zero, 0
 						j cd.endif
 		cd.endif:		mv a0, s1
-						cret
+						ret.cap
 						
 						.align 6
 						.global tohost

@@ -20,9 +20,10 @@ main:			la ra, rv.main
 				li gp, 1
 				j _exit
 				
-fib:			csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
+fib:			cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
 				mv s1, a0
 				mv s1, a1
 				addi s1, zero, 2
@@ -34,16 +35,17 @@ fib:			csc cfp, -8(csp)
 				mv a0, s1
 				mv a1, a0
 				cmove ca2, ca1
-				ccall recFib
+				call recFib
 				j cd.ret
 cd.ret:			mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
-recFib:			csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
+				lc.cap cfp, 0(cfp)
+				ret.cap
+recFib:			cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
 				mv a4, a0
 				mv a6, a1
 				cmove ca5, ca2
@@ -58,8 +60,8 @@ cd.then:		cmove ca0, ca5
 				lw.cap s1, 0(cs1)
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
+				lc.cap cfp, 0(cfp)
+				ret.cap
 cd.else:		j cd.then$1
 cd.then$1:		slli s1, a0, 4
 				cincoffset ct0, ca1, s1
@@ -70,23 +72,24 @@ cd.then$1:		slli s1, a0, 4
 				mv a0, s1
 				mv a1, a0
 				cmove ca2, ca1
-				ccall recFib
+				call recFib
 				j cd.ret$1
 cd.ret$1:		mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
-rv.main:		csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
+				lc.cap cfp, 0(cfp)
+				ret.cap
+rv.main:		cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
 				addi a0, zero, 1
 				addi a1, zero, 1
-				ccall fib
+				call fib
 				j cd.ret$2
 cd.ret$2:		cincoffsetimm csp, cfp, 8
-				clc cfp, 0(cfp)
-				cret
+				lc.cap cfp, 0(cfp)
+				ret.cap
 				
 				.align 6
 				.global tohost

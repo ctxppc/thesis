@@ -57,24 +57,26 @@ final class ProcedureTests : XCTestCase {
 						li gp, 1
 						j _exit
 						
-		fortytwo:		csc cfp, -8(csp)
-						cincoffsetimm cfp, csp, -8
-						cincoffsetimm csp, csp, -16
+		fortytwo:		cincoffsetimm ct0, csp, -8
+						sc.cap cfp, 0(ct0)
+						cmove cfp, ct0
+						cincoffsetimm csp, csp, -8
 						addi s1, zero, 42
 						mv a0, s1
 						cincoffsetimm csp, cfp, 8
-						clc cfp, 0(cfp)
-						cret
-		rv.main:		csc cfp, -8(csp)
-						cincoffsetimm cfp, csp, -8
-						cincoffsetimm csp, csp, -16
-						ccall fortytwo
+						lc.cap cfp, 0(cfp)
+						ret.cap
+		rv.main:		cincoffsetimm ct0, csp, -8
+						sc.cap cfp, 0(ct0)
+						cmove cfp, ct0
+						cincoffsetimm csp, csp, -8
+						call fortytwo
 						j cd.ret
 		cd.ret:			mv s1, a0
 						mv a0, s1
 						cincoffsetimm csp, cfp, 8
-						clc cfp, 0(cfp)
-						cret
+						lc.cap cfp, 0(cfp)
+						ret.cap
 						
 						.align 6
 						.global tohost

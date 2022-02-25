@@ -96,7 +96,7 @@ private struct LoweredRepresentationsReductor : ProgramReductor {
 	
 	mutating func update<L : Language>(language: L.Type, program: L.Program) throws -> Result? {
 		if targetLanguages.remove(language) {
-			programSispsByLanguageName[language.name] = try program.encoded(lineLimit: lineLimit)
+			programSispsByLanguageName[language.name] = try program.encoded(maxLineLength: lineLimit)
 		}
 		return targetLanguages.isEmpty ? programSispsByLanguageName : nil
 	}

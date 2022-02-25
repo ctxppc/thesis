@@ -87,7 +87,7 @@ public enum S : Language {
 		}
 		
 		// See protocol.
-		public func encoded() throws -> String { assembly }
+		public func encoded(maxLineLength: Int) throws -> String { assembly }
 		
 	}
 	
