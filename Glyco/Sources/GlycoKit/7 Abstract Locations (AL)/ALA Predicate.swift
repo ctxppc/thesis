@@ -71,12 +71,13 @@ extension ALA {
 				}
 				
 				case .do(let effects, then: let predicate, analysisAtEntry: _):
+				let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis)	// analysis flows backwards: first update predicate
 				return try .do(
 					effects
 						.reversed()
-						.map { try $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
-						.reversed(),												// reverse back to normal order
-					then: predicate.updated(using: transform, analysis: &analysis),
+						.map { try $0.updated(using: transform, analysis: &analysis) }	// update subeffects in reverse order so that analysis flows backwards
+						.reversed(),													// reverse back to normal order
+					then: updatedPredicate,
 					analysisAtEntry: analysis
 				)
 				
