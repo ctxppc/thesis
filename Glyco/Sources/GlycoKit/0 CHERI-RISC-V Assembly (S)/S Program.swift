@@ -75,7 +75,8 @@ public enum S : Language {
 				"-march=rv64gcxcheri",
 				"-mno-relax",
 				"-Wall", "-Wcheri",
-				assemblyURL.path, "-o", elfURL.path,
+				assemblyURL.path,
+				"-o", elfURL.path,
 			]
 			
 			try clang.run()

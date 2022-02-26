@@ -6,16 +6,9 @@ extension ALA {
 	public struct Analysis : Equatable, Codable {
 		
 		/// Constructs an analysis value.
-		public init(
-			conflicts:						ConflictGraph = .init([]),
-			possiblyLiveLocations:			Set<Location> = [],
-			definedLocations:				Set<Location> = [],
-			possiblyUsedUndefinedLocations:	Set<Location> = []
-		) {
-			self.conflicts						= conflicts
-			self.possiblyLiveLocations			= possiblyLiveLocations
-			self.definedLocations				= definedLocations
-			self.possiblyUsedUndefinedLocations	= possiblyUsedUndefinedLocations
+		public init(conflicts: ConflictGraph = .init([]), possiblyLiveLocations: Set<Location> = []) {
+			self.conflicts = conflicts
+			self.possiblyLiveLocations = possiblyLiveLocations
 		}
 		
 		/// The conflict set.
@@ -28,36 +21,18 @@ extension ALA {
 		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used is added to the set.
 		public private(set) var possiblyLiveLocations: Set<Location>
 		
-		/// The locations that are defined by a successor.
-		///
-		/// This set grows while traversing a program (in either order). A location that is defined is added to this set.
-		public private(set) var definedLocations: Set<Location>	// TODO: Needed?
-		
-		/// The locations that are possibly used by a successor but not defined by a successor.
-		///
-		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used and not in `definedLocations` is added to the set.
-		///
-		/// An *undefined use* error is thrown during lowering if this set is nonempty at a push-scope effect's entry.
-		public private(set) var possiblyUsedUndefinedLocations: Set<Location>	// TODO: Needed?
-		
 		/// Updates the analysis with information about an effect or predicate.
 		///
 		/// - Parameters:
 		///    - defined: The locations that are defined by the effect.
 		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.    
 		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws where D.Element == Location, U.Element == Location {
-			
 			let possiblyLiveLocationsAtExit = possiblyLiveLocations
 			markAsDefinitelyDiscarded(defined)
 			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
 			for definedLocation in defined {
 				conflicts.insert(between: definedLocation, and: possiblyLiveLocationsAtExit)
 			}
-			
-			definedLocations.formUnion(defined)
-			possiblyUsedUndefinedLocations.formUnion(possiblyUsed)
-			possiblyUsedUndefinedLocations.subtract(definedLocations)
-			
 		}
 		
 		/// Returns a copy of `self` with additional information about an effect or predicate applied to it.
@@ -92,18 +67,11 @@ extension ALA {
 			conflicts.safelyCoalescable(firstLocation, otherLocation)
 		}
 		
-		/// Returns the locations, ordered by increasing number of conflicts.
-		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
-			conflicts.locationsOrderedByIncreasingNumberOfConflicts()
-		}
-		
 		// See protocol.
 		public func encode(to encoder: Encoder) throws {	// behaves like a derived conformance except for sorting to get deterministic ordering
 			var container = encoder.container(keyedBy: CodingKeys.self)
 			try container.encode(conflicts, forKey: .conflicts)
 			try container.encode(possiblyLiveLocations.sorted(), forKey: .possiblyLiveLocations)
-			try container.encode(definedLocations.sorted(), forKey: .definedLocations)
-			try container.encode(possiblyUsedUndefinedLocations.sorted(), forKey: .possiblyUsedUndefinedLocations)
 		}
 		
 	}

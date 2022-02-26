@@ -50,8 +50,6 @@ extension ALA.Analysis {
 	public enum CodingKeys : String, CodingKey {
 		case conflicts = "conflicts"
 		case possiblyLiveLocations = "possiblyLiveLocations"
-		case definedLocations = "definedLocations"
-		case possiblyUsedUndefinedLocations = "possiblyUsedUndefinedLocations"
 	}
 }
 

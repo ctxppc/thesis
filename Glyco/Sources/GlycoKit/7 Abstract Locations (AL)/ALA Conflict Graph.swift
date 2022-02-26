@@ -52,6 +52,7 @@ extension ALA {
 				insert(firstLocation, otherLocation)
 			}
 		}
+		
 		/// Returns a Boolean value indicating whether the graph contains a conflict between `firstLocation` and any location in `otherLocations`.
 		func contains(_ firstLocation: Location, _ otherLocations: Set<Location>) -> Bool {
 			if firstLocation.isPhysical && otherLocations.contains(where: \.isPhysical) { return true }
@@ -79,11 +80,24 @@ extension ALA {
 			
 		}
 		
-		/// Returns the locations, ordered by increasing number of conflicts.
-		func locationsOrderedByIncreasingNumberOfConflicts() -> [Location] {
-			conflictingLocationsForLocation
-				.sorted { ($0.value.count, $0.key) < ($1.value.count, $1.key) }	// also order by location for deterministic ordering
-				.map(\.key)
+		/// A partition of locations in by conflict degree in `self`.
+		var degreePartition: DegreePartition { .init(from: self) }
+		
+		/// A partition of locations by conflict degree (number of conflicts).
+		struct DegreePartition {
+			
+			/// Creates a degree partition from given graph.
+			fileprivate init(from graph: ConflictGraph) {
+				degreesByLocation = graph.conflictingLocationsForLocation.mapValues(\.count)
+			}
+			
+			/// Accesses the degree of given location.
+			subscript (location: Location) -> Int {
+				degreesByLocation[location] ?? 0
+			}
+			
+			private let degreesByLocation: [Location : Int]
+			
 		}
 		
 	}

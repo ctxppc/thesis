@@ -22,7 +22,7 @@ extension ALA {
 		/// A mapping from locations to data types.
 		///
 		/// - Invariant: No location in the mapping represents a registers.
-		private var typesByLocation = [Location : DataType]()
+		fileprivate private(set) var typesByLocation = [Location : DataType]()
 		
 		/// Returns given location's declared data type.
 		///
@@ -197,6 +197,22 @@ extension ALA {
 	
 }
 
+extension ALA.Declarations : Collection {
+	
+	public typealias Index = Dictionary<ALA.Location, ALA.DataType>.Index
+	
+	public var startIndex: Index { typesByLocation.startIndex }
+	public var endIndex: Index { typesByLocation.endIndex }
+	
+	public subscript(index: Index) -> ALA.TypedLocation {
+		let (location, type) = typesByLocation[index]
+		return location ~ type
+	}
+	
+	public func index(after index: Index) -> Index { typesByLocation.index(after: index) }
+	
+}
+
 extension ALA.Declarations : Codable {
 	
 	//sourcery: isInternalForm
@@ -206,11 +222,7 @@ extension ALA.Declarations : Codable {
 	
 	public func encode(to encoder: Encoder) throws {
 		var container = encoder.singleValueContainer()
-		try container.encode(
-			typesByLocation
-				.map { $0.key ~ $0.value }
-				.sorted()	// ensure deterministic ordering by sorting
-		)
+		try container.encode(self.sorted())	// ensure deterministic ordering by sorting
 	}
 	
 }

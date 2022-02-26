@@ -41,18 +41,25 @@ extension ALA {
 			///
 			/// The initialiser assigns homes to all used locations, by increasing degree of conflict.
 			init(declarations: Declarations, analysisAtScopeEntry: Analysis) throws {
+				
 				self.declarations = declarations
 				self.analysisAtScopeEntry = analysisAtScopeEntry
-				for location in analysisAtScopeEntry.locationsOrderedByIncreasingNumberOfConflicts() {
+				
+				let partition = analysisAtScopeEntry.conflicts.degreePartition
+				let locationsOrderedByDegree = declarations
+					.map(\.location)
+					.sorted(by: { (partition[$0], $0) < (partition[$1], $1) })
+				for location in locationsOrderedByDegree {
 					guard case .abstract(let location) = location else { continue }
 					try addAssignment(for: location)
 				}
+				
 			}
 			
 			/// Returns `location`'s assigned physical location.
 			subscript (location: AbstractLocation) -> Lower.Location {
-				mutating get throws {
-					guard let home = homesByLocation[location] else { return try addAssignment(for: location) }
+				get throws {
+					guard let home = homesByLocation[location] else { throw Error.undeclaredLocation(location) }
 					return home
 				}
 			}
@@ -72,9 +79,8 @@ extension ALA {
 			/// The frame on which spilled data are stored.
 			private(set) var frame = Lower.Frame.initial
 			
-			/// Adds an assignment for `location` and returns the assigned physical location.
-			@discardableResult
-			private mutating func addAssignment(for location: AbstractLocation) throws -> Lower.Location {
+			/// Assigns a physical location to `location`.
+			private mutating func addAssignment(for location: AbstractLocation) throws {
 				let home: Lower.Location
 				if let register = assignableRegister(for: location) {
 					home = .register(register)
@@ -83,7 +89,6 @@ extension ALA {
 					home = .frame(frame.allocate(try declarations.type(of: Location.abstract(location))))
 				}
 				homesByLocation[location] = home
-				return home
 			}
 			
 			/// Returns a register that `location` can be assigned to, or `nil` if no register is available.
@@ -92,6 +97,21 @@ extension ALA {
 					guard let assignedLocations = locationsByRegister[register] else { return true }
 					return !analysisAtScopeEntry.conflicts.contains(.abstract(location), assignedLocations)
 				}
+			}
+			
+			enum Error : LocalizedError {
+				
+				/// An error indicating that given referenced location is not declared.
+				case undeclaredLocation(AbstractLocation)
+				
+				// See protocol.
+				var errorDescription: String? {
+					switch self {
+						case .undeclaredLocation(let location):
+						return "“\(location)” is referenced but not declared"
+					}
+				}
+				
 			}
 			
 		}

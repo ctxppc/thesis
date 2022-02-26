@@ -637,7 +637,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Analysis</code></dt>
-	<dd><code>(<strong>conflicts:</strong> ConflictGraph, <strong>possiblyLiveLocations:</strong> Set<Location>, <strong>definedLocations:</strong> Set<Location>, <strong>possiblyUsedUndefinedLocations:</strong> Set<Location>)</code></dd>
+	<dd><code>(<strong>conflicts:</strong> ConflictGraph, <strong>possiblyLiveLocations:</strong> Set<Location>)</code></dd>
 </dl>
 
 <h2 id="CD">Grammar for CD (Conditionals)</h2>
@@ -960,10 +960,10 @@ N/A
 	<dd><code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
 	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>

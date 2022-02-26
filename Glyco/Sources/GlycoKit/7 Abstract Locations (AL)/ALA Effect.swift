@@ -261,8 +261,7 @@ extension ALA {
 					.compute(_, .constant, _, .constant, analysisAtEntry: _),
 					.pushBuffer,
 					.if,
-					.pushScope,
-					.return:
+					.pushScope:
 				return []
 				
 				case .popBuffer(let source, analysisAtEntry: _),
@@ -285,6 +284,9 @@ extension ALA {
 				
 				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
+				
+				case .return:
+				return [.register(.a0)]
 				
 			}
 		}
