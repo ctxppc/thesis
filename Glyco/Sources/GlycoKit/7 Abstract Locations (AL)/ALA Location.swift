@@ -74,7 +74,11 @@ extension ALA {
 			private var homesByLocation = [AbstractLocation : Lower.Location]()
 			
 			/// A mapping from registers to locations assigned to that register.
-			private var locationsByRegister = [Lower.Register : Set<Location>]()
+			///
+			/// - Invariant: Every register location is assigned to its corresponding register.
+			private var locationsByRegister: [Lower.Register : Set<Location>] = .init(
+				uniqueKeysWithValues: Lower.Register.allCases.lazy.map { ($0, [.register($0)]) }
+			)
 			
 			/// The frame on which spilled data are stored.
 			private(set) var frame = Lower.Frame.initial
@@ -94,8 +98,10 @@ extension ALA {
 			/// Returns a register that `location` can be assigned to, or `nil` if no register is available.
 			private func assignableRegister(for location: AbstractLocation) -> Lower.Register? {
 				Lower.Register.assignableRegisters.first { register in
-					guard let assignedLocations = locationsByRegister[register] else { return true }
-					return !analysisAtScopeEntry.conflicts.contains(.abstract(location), assignedLocations)
+					!analysisAtScopeEntry.conflicts.contains(
+						.abstract(location),
+						locationsByRegister[register] !! "Register location \(register) not assigned to physical location \(register)"
+					)
 				}
 			}
 			

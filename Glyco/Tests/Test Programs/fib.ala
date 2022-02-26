@@ -1,319 +1,27 @@
 (
 	locals: ,
 	in: do(
-		pushScope(
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		set(
-			register(a0),
-			to: constant(0),
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		set(
-			register(a1),
-			to: constant(1),
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
+		pushScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: ))
+		set(register(a0), to: constant(0), analysisAtEntry: (conflicts: (), possiblyLiveLocations: ))
+		set(register(a1), to: constant(1), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
 		set(
 			register(a2),
 			to: constant(30),
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0) register(a1),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
+			analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1))
 		)
-		do(
-			,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0) register(a1) register(a2),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		do(
-			,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0) register(a1) register(a2),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		do(
-			,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0) register(a1) register(a2),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
-		)
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1) register(a2)))
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1) register(a2)))
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1) register(a2)))
 		call(
 			fib,
 			parameters: a0 a1 a2,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: register(a0) register(a1) register(a2),
-				definedLocations: register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
-			)
+			analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1) register(a2))
 		)
-		do(
-			,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: ,
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		do(
-			,
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: ,
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		popScope(
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: ,
-				possiblyUsedUndefinedLocations: 
-			)
-		)
-		return(
-			analysisAtEntry: (
-				conflicts: (),
-				possiblyLiveLocations: ,
-				definedLocations: ,
-				possiblyUsedUndefinedLocations: 
-			)
-		),
-		analysisAtEntry: (
-			conflicts: (),
-			possiblyLiveLocations: ,
-			definedLocations: register(a0)
-			register(a1)
-			register(a2)
-			register(a3)
-			register(a4)
-			register(a5)
-			register(a6)
-			register(a7)
-			register(ra)
-			register(s1)
-			register(s10)
-			register(s11)
-			register(s2)
-			register(s3)
-			register(s4)
-			register(s5)
-			register(s6)
-			register(s7)
-			register(s8)
-			register(s9)
-			register(t4)
-			register(t5)
-			register(t6),
-			possiblyUsedUndefinedLocations: 
-		)
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
+		popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
+		return(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0))),
+		analysisAtEntry: (conflicts: (), possiblyLiveLocations: )
 	),
 	procedures: (
 		fib,
@@ -369,44 +77,7 @@
 						(abstract(ls.prev), register(a1))
 						(abstract(ls.prev), register(a2))
 					),
-					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2),
-					definedLocations: abstract(df.result$2)
-					abstract(ls.arg0)
-					abstract(ls.arg1)
-					abstract(ls.arg2)
-					abstract(ls.curr)
-					abstract(ls.iter)
-					abstract(ls.lhs)
-					abstract(ls.lhs$1)
-					abstract(ls.lhs$2)
-					abstract(ls.prev)
-					abstract(ls.rhs)
-					abstract(ls.rhs$1)
-					abstract(ls.rhs$2)
-					register(a0)
-					register(a1)
-					register(a2)
-					register(a3)
-					register(a4)
-					register(a5)
-					register(a6)
-					register(a7)
-					register(ra)
-					register(s1)
-					register(s10)
-					register(s11)
-					register(s2)
-					register(s3)
-					register(s4)
-					register(s5)
-					register(s6)
-					register(s7)
-					register(s8)
-					register(s9)
-					register(t4)
-					register(t5)
-					register(t6),
-					possiblyUsedUndefinedLocations: 
+					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2)
 				)
 			)
 			set(
@@ -448,44 +119,7 @@
 						(abstract(ls.prev), register(a1))
 						(abstract(ls.prev), register(a2))
 					),
-					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2),
-					definedLocations: abstract(df.result$2)
-					abstract(ls.arg0)
-					abstract(ls.arg1)
-					abstract(ls.arg2)
-					abstract(ls.curr)
-					abstract(ls.iter)
-					abstract(ls.lhs)
-					abstract(ls.lhs$1)
-					abstract(ls.lhs$2)
-					abstract(ls.prev)
-					abstract(ls.rhs)
-					abstract(ls.rhs$1)
-					abstract(ls.rhs$2)
-					register(a0)
-					register(a1)
-					register(a2)
-					register(a3)
-					register(a4)
-					register(a5)
-					register(a6)
-					register(a7)
-					register(ra)
-					register(s1)
-					register(s10)
-					register(s11)
-					register(s2)
-					register(s3)
-					register(s4)
-					register(s5)
-					register(s6)
-					register(s7)
-					register(s8)
-					register(s9)
-					register(t4)
-					register(t5)
-					register(t6),
-					possiblyUsedUndefinedLocations: 
+					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2)
 				)
 			)
 			set(
@@ -525,43 +159,7 @@
 						(abstract(ls.lhs$2), abstract(ls.rhs$2))
 						(abstract(ls.prev), abstract(ls.rhs))
 					),
-					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.prev) abstract(ls.rhs) register(a1) register(a2),
-					definedLocations: abstract(df.result$2)
-					abstract(ls.arg0)
-					abstract(ls.arg1)
-					abstract(ls.arg2)
-					abstract(ls.curr)
-					abstract(ls.iter)
-					abstract(ls.lhs)
-					abstract(ls.lhs$1)
-					abstract(ls.lhs$2)
-					abstract(ls.rhs)
-					abstract(ls.rhs$1)
-					abstract(ls.rhs$2)
-					register(a0)
-					register(a1)
-					register(a2)
-					register(a3)
-					register(a4)
-					register(a5)
-					register(a6)
-					register(a7)
-					register(ra)
-					register(s1)
-					register(s10)
-					register(s11)
-					register(s2)
-					register(s3)
-					register(s4)
-					register(s5)
-					register(s6)
-					register(s7)
-					register(s8)
-					register(s9)
-					register(t4)
-					register(t5)
-					register(t6),
-					possiblyUsedUndefinedLocations: abstract(ls.prev)
+					possiblyLiveLocations: abstract(ls.lhs) abstract(ls.prev) abstract(ls.rhs) register(a1) register(a2)
 				)
 			)
 			set(
@@ -603,42 +201,7 @@
 					abstract(ls.lhs)
 					abstract(ls.prev)
 					abstract(ls.rhs)
-					register(a2),
-					definedLocations: abstract(df.result$2)
-					abstract(ls.arg0)
-					abstract(ls.arg1)
-					abstract(ls.arg2)
-					abstract(ls.iter)
-					abstract(ls.lhs)
-					abstract(ls.lhs$1)
-					abstract(ls.lhs$2)
-					abstract(ls.rhs)
-					abstract(ls.rhs$1)
-					abstract(ls.rhs$2)
-					register(a0)
-					register(a1)
 					register(a2)
-					register(a3)
-					register(a4)
-					register(a5)
-					register(a6)
-					register(a7)
-					register(ra)
-					register(s1)
-					register(s10)
-					register(s11)
-					register(s2)
-					register(s3)
-					register(s4)
-					register(s5)
-					register(s6)
-					register(s7)
-					register(s8)
-					register(s9)
-					register(t4)
-					register(t5)
-					register(t6),
-					possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.prev)
 				)
 			)
 			if(
@@ -676,41 +239,7 @@
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 								(abstract(ls.prev), abstract(ls.rhs))
 							),
-							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg0)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs)
-							abstract(ls.lhs$1)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
+							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 						)
 					)
 					set(
@@ -743,40 +272,7 @@
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 								(abstract(ls.prev), abstract(ls.rhs))
 							),
-							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg0)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs$1)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
+							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 						)
 					),
 					then: relation(
@@ -817,41 +313,7 @@
 							abstract(ls.iter)
 							abstract(ls.lhs)
 							abstract(ls.prev)
-							abstract(ls.rhs),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg0)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs)
-							abstract(ls.lhs$1)
-							abstract(ls.lhs$2)
 							abstract(ls.rhs)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 						)
 					),
 					analysisAtEntry: (
@@ -888,86 +350,23 @@
 						abstract(ls.iter)
 						abstract(ls.lhs)
 						abstract(ls.prev)
-						abstract(ls.rhs),
-						definedLocations: abstract(df.result$2)
-						abstract(ls.arg0)
-						abstract(ls.arg1)
-						abstract(ls.arg2)
-						abstract(ls.lhs)
-						abstract(ls.lhs$1)
-						abstract(ls.lhs$2)
 						abstract(ls.rhs)
-						abstract(ls.rhs$1)
-						abstract(ls.rhs$2)
-						register(a0)
-						register(a1)
-						register(a2)
-						register(a3)
-						register(a4)
-						register(a5)
-						register(a6)
-						register(a7)
-						register(ra)
-						register(s1)
-						register(s10)
-						register(s11)
-						register(s2)
-						register(s3)
-						register(s4)
-						register(s5)
-						register(s6)
-						register(s7)
-						register(s8)
-						register(s9)
-						register(t4)
-						register(t5)
-						register(t6),
-						possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 					)
 				),
 				then: do(
 					set(
 						abstract(df.result$1),
 						to: abstract(ls.curr),
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: abstract(ls.curr),
-							definedLocations: abstract(df.result$1) register(a0),
-							possiblyUsedUndefinedLocations: abstract(ls.curr)
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(ls.curr))
 					)
 					set(
 						register(a0),
 						to: abstract(df.result$1),
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: abstract(df.result$1),
-							definedLocations: register(a0),
-							possiblyUsedUndefinedLocations: abstract(df.result$1)
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(df.result$1))
 					)
-					popScope(
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: ,
-							definedLocations: ,
-							possiblyUsedUndefinedLocations: 
-						)
-					)
-					return(
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: ,
-							definedLocations: ,
-							possiblyUsedUndefinedLocations: 
-						)
-					),
-					analysisAtEntry: (
-						conflicts: (),
-						possiblyLiveLocations: abstract(ls.curr),
-						definedLocations: abstract(df.result$1) register(a0),
-						possiblyUsedUndefinedLocations: abstract(ls.curr)
-					)
+					popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
+					return(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0))),
+					analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(ls.curr))
 				),
 				else: do(
 					set(
@@ -997,39 +396,7 @@
 								(abstract(ls.lhs$1), abstract(ls.rhs$1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg0)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs$1)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
+							possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 						)
 					)
 					set(
@@ -1056,41 +423,7 @@
 								(abstract(ls.lhs$1), abstract(ls.rhs$1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.curr) abstract(ls.iter) abstract(ls.prev),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs$1)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0)
-							abstract(ls.curr)
-							abstract(ls.iter)
-							abstract(ls.prev)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 						)
 					)
 					set(
@@ -1114,40 +447,7 @@
 								(abstract(ls.lhs$1), abstract(ls.rhs$1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.curr) abstract(ls.iter) abstract(ls.lhs$1),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$1)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0)
-							abstract(ls.curr)
-							abstract(ls.iter)
-							abstract(ls.lhs$1)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.curr) abstract(ls.iter) abstract(ls.lhs$1)
 						)
 					)
 					compute(
@@ -1170,39 +470,7 @@
 								(abstract(ls.arg2), register(a1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.iter) abstract(ls.lhs$1) abstract(ls.rhs$1),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg1)
-							abstract(ls.arg2)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0)
-							abstract(ls.iter)
-							abstract(ls.lhs$1)
-							abstract(ls.rhs$1)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.iter) abstract(ls.lhs$1) abstract(ls.rhs$1)
 						)
 					)
 					set(
@@ -1221,35 +489,7 @@
 								(abstract(ls.arg2), register(a1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.iter),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg2)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.iter)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.iter)
 						)
 					)
 					set(
@@ -1266,34 +506,7 @@
 								(abstract(ls.arg2), register(a1))
 								(abstract(ls.lhs$2), abstract(ls.rhs$2))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.lhs$2),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg2)
-							abstract(ls.rhs$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.lhs$2)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.lhs$2)
 						)
 					)
 					compute(
@@ -1309,36 +522,7 @@
 								(abstract(ls.arg2), register(a0))
 								(abstract(ls.arg2), register(a1))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.lhs$2) abstract(ls.rhs$2),
-							definedLocations: abstract(df.result$2)
-							abstract(ls.arg2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0)
-							abstract(ls.arg1)
-							abstract(ls.lhs$2)
-							abstract(ls.rhs$2)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.lhs$2) abstract(ls.rhs$2)
 						)
 					)
 					set(
@@ -1350,32 +534,7 @@
 								(abstract(ls.arg2), register(a0))
 								(abstract(ls.arg2), register(a1))
 							),
-							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.arg2),
-							definedLocations: abstract(df.result$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.arg2)
+							possiblyLiveLocations: abstract(ls.arg0) abstract(ls.arg1) abstract(ls.arg2)
 						)
 					)
 					set(
@@ -1383,136 +542,31 @@
 						to: abstract(ls.arg1),
 						analysisAtEntry: (
 							conflicts: ((abstract(ls.arg2), register(a1))),
-							possiblyLiveLocations: abstract(ls.arg1) abstract(ls.arg2) register(a0),
-							definedLocations: abstract(df.result$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg1) abstract(ls.arg2)
+							possiblyLiveLocations: abstract(ls.arg1) abstract(ls.arg2) register(a0)
 						)
 					)
 					set(
 						register(a2),
 						to: abstract(ls.arg2),
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: abstract(ls.arg2) register(a0) register(a1),
-							definedLocations: abstract(df.result$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: abstract(ls.arg2)
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(ls.arg2) register(a0) register(a1))
 					)
 					call(
 						fib,
 						parameters: a0 a1 a2,
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: register(a0) register(a1) register(a2),
-							definedLocations: abstract(df.result$2)
-							register(a0)
-							register(a1)
-							register(a2)
-							register(a3)
-							register(a4)
-							register(a5)
-							register(a6)
-							register(a7)
-							register(ra)
-							register(s1)
-							register(s10)
-							register(s11)
-							register(s2)
-							register(s3)
-							register(s4)
-							register(s5)
-							register(s6)
-							register(s7)
-							register(s8)
-							register(s9)
-							register(t4)
-							register(t5)
-							register(t6),
-							possiblyUsedUndefinedLocations: 
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(a1) register(a2))
 					)
 					set(
 						abstract(df.result$2),
 						to: register(a0, s32),
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: register(a0),
-							definedLocations: abstract(df.result$2) register(a0),
-							possiblyUsedUndefinedLocations: 
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0))
 					)
 					set(
 						register(a0),
 						to: abstract(df.result$2),
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: abstract(df.result$2),
-							definedLocations: register(a0),
-							possiblyUsedUndefinedLocations: abstract(df.result$2)
-						)
+						analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(df.result$2))
 					)
-					popScope(
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: ,
-							definedLocations: ,
-							possiblyUsedUndefinedLocations: 
-						)
-					)
-					return(
-						analysisAtEntry: (
-							conflicts: (),
-							possiblyLiveLocations: ,
-							definedLocations: ,
-							possiblyUsedUndefinedLocations: 
-						)
-					),
+					popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0)))
+					return(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0))),
 					analysisAtEntry: (
 						conflicts: (
 							(abstract(ls.arg0), abstract(ls.arg1))
@@ -1537,39 +591,7 @@
 							(abstract(ls.lhs$1), abstract(ls.rhs$1))
 							(abstract(ls.lhs$2), abstract(ls.rhs$2))
 						),
-						possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev),
-						definedLocations: abstract(df.result$2)
-						abstract(ls.arg0)
-						abstract(ls.arg1)
-						abstract(ls.arg2)
-						abstract(ls.lhs$1)
-						abstract(ls.lhs$2)
-						abstract(ls.rhs$1)
-						abstract(ls.rhs$2)
-						register(a0)
-						register(a1)
-						register(a2)
-						register(a3)
-						register(a4)
-						register(a5)
-						register(a6)
-						register(a7)
-						register(ra)
-						register(s1)
-						register(s10)
-						register(s11)
-						register(s2)
-						register(s3)
-						register(s4)
-						register(s5)
-						register(s6)
-						register(s7)
-						register(s8)
-						register(s9)
-						register(t4)
-						register(t5)
-						register(t6),
-						possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
+						possiblyLiveLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 					)
 				),
 				analysisAtEntry: (
@@ -1606,41 +628,7 @@
 					abstract(ls.iter)
 					abstract(ls.lhs)
 					abstract(ls.prev)
-					abstract(ls.rhs),
-					definedLocations: abstract(df.result$2)
-					abstract(ls.arg0)
-					abstract(ls.arg1)
-					abstract(ls.arg2)
-					abstract(ls.lhs)
-					abstract(ls.lhs$1)
-					abstract(ls.lhs$2)
 					abstract(ls.rhs)
-					abstract(ls.rhs$1)
-					abstract(ls.rhs$2)
-					register(a0)
-					register(a1)
-					register(a2)
-					register(a3)
-					register(a4)
-					register(a5)
-					register(a6)
-					register(a7)
-					register(ra)
-					register(s1)
-					register(s10)
-					register(s11)
-					register(s2)
-					register(s3)
-					register(s4)
-					register(s5)
-					register(s6)
-					register(s7)
-					register(s8)
-					register(s9)
-					register(t4)
-					register(t5)
-					register(t6),
-					possiblyUsedUndefinedLocations: abstract(ls.curr) abstract(ls.iter) abstract(ls.prev)
 				)
 			),
 			analysisAtEntry: (
@@ -1679,44 +667,7 @@
 					(abstract(ls.prev), register(a1))
 					(abstract(ls.prev), register(a2))
 				),
-				possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2),
-				definedLocations: abstract(df.result$2)
-				abstract(ls.arg0)
-				abstract(ls.arg1)
-				abstract(ls.arg2)
-				abstract(ls.curr)
-				abstract(ls.iter)
-				abstract(ls.lhs)
-				abstract(ls.lhs$1)
-				abstract(ls.lhs$2)
-				abstract(ls.prev)
-				abstract(ls.rhs)
-				abstract(ls.rhs$1)
-				abstract(ls.rhs$2)
-				register(a0)
-				register(a1)
-				register(a2)
-				register(a3)
-				register(a4)
-				register(a5)
-				register(a6)
-				register(a7)
-				register(ra)
-				register(s1)
-				register(s10)
-				register(s11)
-				register(s2)
-				register(s3)
-				register(s4)
-				register(s5)
-				register(s6)
-				register(s7)
-				register(s8)
-				register(s9)
-				register(t4)
-				register(t5)
-				register(t6),
-				possiblyUsedUndefinedLocations: 
+				possiblyLiveLocations: abstract(ls.lhs) abstract(ls.rhs) register(a0) register(a1) register(a2)
 			)
 		)
 	)
