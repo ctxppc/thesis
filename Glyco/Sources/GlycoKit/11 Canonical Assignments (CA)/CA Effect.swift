@@ -43,6 +43,9 @@ extension CA {
 				case .set(let destination, to: .record(let type)):
 				Lowered.pushRecord(type, capability: destination)
 				
+				case .set(let destination, to: .field(let fieldName, of: let record)):
+				Lowered.getField(fieldName, of: record, to: destination)
+				
 				case .set(let destination, to: .vector(let elementType, count: let count)):
 				Lowered.pushVector(elementType, count: count, capability: destination)
 				

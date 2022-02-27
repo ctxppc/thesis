@@ -86,6 +86,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -161,6 +162,7 @@ A language that introduces lexical scopes of definitions
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Symbol)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
@@ -247,6 +249,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
@@ -304,6 +307,7 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
@@ -354,6 +358,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 </dl>

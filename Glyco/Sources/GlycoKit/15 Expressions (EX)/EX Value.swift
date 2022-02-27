@@ -13,6 +13,9 @@ extension EX {
 		/// A value that evaluates to a unique capability to an uninitialised record of given type.
 		case record(RecordType)
 		
+		/// A value that evaluates to the field with given name in the record `of`.
+		indirect case field(RecordType.Field.Name, of: Value)
+		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
 		
@@ -46,6 +49,12 @@ extension EX {
 				
 				case .record(let type):
 				return .record(type)
+				
+				case .field(let fieldName, of: let record):
+				let rec = context.bag.uniqueName(from: "rec")
+				return try .let([
+					.init(rec, record.lowered(in: &context)),
+				], in: .field(fieldName, of: rec))
 				
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)

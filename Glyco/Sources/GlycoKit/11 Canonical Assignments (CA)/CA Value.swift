@@ -13,6 +13,9 @@ extension CA {
 		/// A value that evaluates to a unique capability to an uninitialised record of given type.
 		case record(RecordType)
 		
+		/// A value that evaluates to the field with given name in the record at given location.
+		case field(RecordType.Field.Name, of: Location)
+		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given value type.
 		case vector(ValueType, count: Int)
 		

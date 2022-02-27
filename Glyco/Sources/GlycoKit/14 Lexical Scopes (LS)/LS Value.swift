@@ -13,6 +13,9 @@ extension LS {
 		/// A value that evaluates to a unique capability to an uninitialised record of given type.
 		case record(RecordType)
 		
+		/// A value that evaluates to the field with given name in the record `of`.
+		case field(RecordType.Field.Name, of: Symbol)
+		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
 		
@@ -43,6 +46,9 @@ extension LS {
 				
 				case .record(let type):
 				return .record(type)
+				
+				case .field(let fieldName, of: let record):
+				return .field(fieldName, of: record.lowered(in: &context))
 				
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)

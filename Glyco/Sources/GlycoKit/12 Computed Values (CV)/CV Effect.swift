@@ -40,6 +40,9 @@ extension CV {
 				case .set(let destination, to: .record(let type)):
 				Lowered.set(destination, to: .record(type))
 				
+				case .set(let destination, to: .field(let fieldName, of: let record)):
+				Lowered.set(destination, to: .field(fieldName, of: record))
+				
 				case .set(let destination, to: .vector(let elementType, count: let count)):
 				Lowered.set(destination, to: .vector(elementType, count: count))
 				
