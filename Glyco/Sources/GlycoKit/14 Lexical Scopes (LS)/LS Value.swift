@@ -10,11 +10,14 @@ extension LS {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		case binary(Source, BinaryOperator, Source)
 		
-		/// A value that evaluates to the element at zero-based position `at` in the vector named `of`.
-		case element(of: Symbol, at: Source)
+		/// A value that evaluates to a unique capability to an uninitialised record of given type.
+		case record(RecordType)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
+		
+		/// A value that evaluates to the element at zero-based position `at` in the vector named `of`.
+		case element(of: Symbol, at: Source)
 		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
@@ -38,11 +41,14 @@ extension LS {
 				case .binary(let lhs, let op, let rhs):
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .element(of: let vector, at: let index):
-				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				case .record(let type):
+				return .record(type)
 				
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)
+				
+				case .element(of: let vector, at: let index):
+				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, try arguments.lowered(in: &context))

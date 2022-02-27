@@ -11,6 +11,9 @@ extension CA {
 		/// An effect that retrieves the value from given source and puts it in given location.
 		case set(Location, to: Value)
 		
+		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
+		case setField(RecordType.Field.Name, of: Location, to: Source)
+		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(of: Location, at: Source, to: Source)
 		
@@ -37,11 +40,17 @@ extension CA {
 				case .set(let destination, to: .binary(let lhs, let op, let rhs)):
 				Lowered.compute(destination, lhs, op, rhs)
 				
+				case .set(let destination, to: .record(let type)):
+				Lowered.pushRecord(type, capability: destination)
+				
+				case .set(let destination, to: .vector(let elementType, count: let count)):
+				Lowered.pushVector(elementType, count: count, capability: destination)
+				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				Lowered.getElement(of: vector, index: index, to: destination)
 				
-				case .set(let destination, to: .vector(let type, count: let count)):
-				Lowered.pushVector(type, count: count, capability: destination)
+				case .setField(let fieldName, of: let record, to: let element):
+				Lowered.setField(fieldName, of: record, to: element)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
 				Lowered.setElement(of: vector, index: index, to: element)

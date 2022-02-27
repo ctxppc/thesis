@@ -74,6 +74,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 <code>BranchRelation</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
+<code>RecordType</code>, 
 <code>Symbol</code>, 
 <code>ValueType</code>
 <dl>
@@ -83,10 +84,11 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Value</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -114,6 +116,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dt><code>EX.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
@@ -132,6 +135,7 @@ A language that introduces lexical scopes of definitions
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Label</code>, 
+<code>RecordType</code>, 
 <code>ValueType</code>
 <dl>
 	<dt><code>LS.Program</code></dt>
@@ -156,8 +160,9 @@ A language that introduces lexical scopes of definitions
 	<dt><code>LS.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -180,6 +185,7 @@ A language that introduces lexical scopes of definitions
 	<dt><code>LS.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Symbol, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -203,6 +209,7 @@ A language that introduces definitions with function-wide namespacing.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
+<code>RecordType</code>, 
 <code>Source</code>, 
 <code>ValueType</code>
 <dl>
@@ -213,6 +220,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -238,8 +246,9 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -263,6 +272,7 @@ A language that allows a computation to be attached to a value.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
+<code>RecordType</code>, 
 <code>Source</code>, 
 <code>ValueType</code>
 <dl>
@@ -280,6 +290,7 @@ A language that allows a computation to be attached to a value.
 	<dt><code>CV.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -292,8 +303,9 @@ A language that allows a computation to be attached to a value.
 	<dt><code>CV.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -309,6 +321,7 @@ A language that groups all effects that write to a location under one canonical 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
+<code>RecordType</code>, 
 <code>Source</code>, 
 <code>ValueType</code>
 <dl>
@@ -323,6 +336,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dt><code>CA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -339,8 +353,9 @@ A language that groups all effects that write to a location under one canonical 
 	<dt><code>CA.Value</code></dt>
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 </dl>
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>

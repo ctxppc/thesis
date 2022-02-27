@@ -10,11 +10,14 @@ extension CV {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		case binary(Source, BinaryOperator, Source)
 		
-		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
-		case element(of: Location, at: Source)
+		/// A value that evaluates to a unique capability to an uninitialised record of given type.
+		case record(RecordType)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
+		
+		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
+		case element(of: Location, at: Source)
 		
 		/// A value that performs the procedure with given name and evaluates to that procedure's result.
 		case evaluate(Label, [Source])

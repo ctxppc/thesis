@@ -7,17 +7,20 @@ extension EX {
 		/// A value that evaluates to given number.
 		case constant(Int)
 		
-		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(ValueType, count: Int)
-		
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		
-		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
-		indirect case binary(Value, BinaryOperator, Value)
+		/// A value that evaluates to a unique capability to an uninitialised record of given type.
+		case record(RecordType)
+		
+		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
+		case vector(ValueType, count: Int)
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
+		
+		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
+		indirect case binary(Value, BinaryOperator, Value)
 		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Value])
@@ -38,19 +41,14 @@ extension EX {
 				case .constant(let value):
 				return .source(.constant(value))
 					
-				case .vector(let dataType, count: let count):
-				return .vector(dataType, count: count)
-				
 				case .named(let symbol):
 				return .source(.named(symbol))
 				
-				case .binary(let lhs, let op, let rhs):
-				let l = context.bag.uniqueName(from: "lhs")
-				let r = context.bag.uniqueName(from: "rhs")
-				return try .let([
-					.init(l, lhs.lowered(in: &context)),
-					.init(r, rhs.lowered(in: &context))
-				], in: .binary(.named(l), op, .named(r)))
+				case .record(let type):
+				return .record(type)
+				
+				case .vector(let dataType, count: let count):
+				return .vector(dataType, count: count)
 				
 				case .element(of: let vector, at: let index):
 				let vec = context.bag.uniqueName(from: "vec")
@@ -59,6 +57,14 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
 				], in: .element(of: vec, at: .named(idx)))
+				
+				case .binary(let lhs, let op, let rhs):
+				let l = context.bag.uniqueName(from: "lhs")
+				let r = context.bag.uniqueName(from: "rhs")
+				return try .let([
+					.init(l, lhs.lowered(in: &context)),
+					.init(r, rhs.lowered(in: &context))
+				], in: .binary(.named(l), op, .named(r)))
 				
 				case .evaluate(let name, let arguments):
 				let argumentNamesAndLoweredValues = try arguments.map {

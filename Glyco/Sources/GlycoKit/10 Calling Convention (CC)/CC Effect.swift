@@ -74,8 +74,8 @@ extension CC {
 				case .setField(let fieldName, of: let record, to: let source):
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
-				case .pushVector(let type, count: let count, capability: let vector):
-				Lowered.pushVector(type, count: count, capability: .abstract(vector))
+				case .pushVector(let elementType, count: let count, capability: let vector):
+				Lowered.pushVector(elementType, count: count, capability: .abstract(vector))
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))

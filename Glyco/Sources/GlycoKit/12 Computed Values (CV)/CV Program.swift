@@ -38,10 +38,11 @@ public enum CV : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias ValueType = Lower.ValueType
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter
+	public typealias RecordType = Lower.RecordType
 	public typealias Source = Lower.Source
+	public typealias ValueType = Lower.ValueType
 	
 }
