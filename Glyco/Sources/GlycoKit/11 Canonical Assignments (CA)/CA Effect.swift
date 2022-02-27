@@ -41,13 +41,13 @@ extension CA {
 				Lowered.compute(destination, lhs, op, rhs)
 				
 				case .set(let destination, to: .record(let type)):
-				Lowered.pushRecord(type, capability: destination)
+				Lowered.createRecord(type, capability: destination, scoped: true)	// FIXME: Unscoped record when escaping
 				
 				case .set(let destination, to: .field(let fieldName, of: let record)):
 				Lowered.getField(fieldName, of: record, to: destination)
 				
 				case .set(let destination, to: .vector(let elementType, count: let count)):
-				Lowered.pushVector(elementType, count: count, capability: destination)
+				Lowered.createVector(elementType, count: count, capability: destination, scoped: true)	// FIXME: Unscoped record when escaping
 				
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				Lowered.getElement(of: vector, index: index, to: destination)

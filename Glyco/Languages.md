@@ -401,13 +401,13 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>pushRecord</strong>(RecordType, <strong>capability:</strong> Location)</code></dd>
+	<dd><code><strong>createRecord</strong>(RecordType, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>pushVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location)</code></dd>
+	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>popValue</strong>(<strong>capability:</strong> Source)</code></dd>
+	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -452,13 +452,13 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>pushRecord</strong>(RecordType, <strong>capability:</strong> Location)</code></dd>
+	<dd><code><strong>createRecord</strong>(RecordType, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>pushVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location)</code></dd>
+	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>popValue</strong>(<strong>capability:</strong> Source)</code></dd>
+	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -514,9 +514,8 @@ A language that infers declarations from definitions.
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -568,9 +567,8 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -634,9 +632,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>

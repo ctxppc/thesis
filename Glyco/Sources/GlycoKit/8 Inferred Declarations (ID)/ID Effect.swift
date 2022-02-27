@@ -14,16 +14,15 @@ extension ID {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
-		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, capability: Location)
-		
-		/// An effect that pushes a buffer of `bytes` bytes to the current scope and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, capability: Location)
-		
-		/// An effect that pops the buffer referred by the capability from given source.
+		/// An effect that creates an (uninitialised) buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// This effect must only be used with buffers allocated in the current scope. For any two buffers *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the scope; in that case, deallocation is automatic.
-		case popBuffer(Source)
+		/// If `scoped` is `true`, the buffer is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createBuffer(bytes: Int, capability: Location, scoped: Bool)
+		
+		/// An effect that destroys the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with *scoped* buffers created in the *current* scope. For any two buffers *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroying *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
+		case destroyBuffer(capability: Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
@@ -74,17 +73,13 @@ extension ID {
 				try context.declarations.declare(destination, type: .s32)
 				Lowered.compute(destination, lhs, operation, rhs)
 				
-				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				case .createBuffer(bytes: let bytes, capability: let buffer, scoped: let scoped):
 				try context.declarations.declare(buffer, type: .cap)
-				Lowered.allocateBuffer(bytes: bytes, capability: buffer)
+				Lowered.createBuffer(bytes: bytes, capability: buffer, scoped: scoped)
 				
-				case .pushBuffer(bytes: let bytes, capability: let buffer):
-				try context.declarations.declare(buffer, type: .cap)
-				Lowered.pushBuffer(bytes: bytes, capability: buffer)
-				
-				case .popBuffer(capability: let buffer):
+				case .destroyBuffer(capability: let buffer):
 				try context.declarations.require(buffer, type: .cap)
-				Lowered.popBuffer(buffer)
+				Lowered.destroyBuffer(capability: buffer)
 				
 				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination):
 				try context.declarations.declare(destination, type: elementType)

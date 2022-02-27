@@ -14,16 +14,15 @@ extension AL {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
-		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, capability: Location)
-		
-		/// An effect that pushes a buffer of `bytes` bytes to the call scope and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, capability: Location)
-		
-		/// An effect that pops the buffer referred by the capability from given source.
+		/// An effect that creates an (uninitialised) buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// This effect must only be used with buffers allocated in the current call scope. For any two buffers *a* and *b* allocated in the current call scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call scope; in that case, deallocation is automatic.
-		case popBuffer(Source)
+		/// If `scoped` is `true`, the buffer is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createBuffer(bytes: Int, capability: Location, scoped: Bool)
+		
+		/// An effect that destroys the buffer referred by the capability from given source.
+		///
+		/// This effect must only be used with *scoped* buffers created in the *current* scope. For any two buffers *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroying *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
+		case destroyBuffer(capability: Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
@@ -69,14 +68,11 @@ extension AL {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				return .compute(destination, lhs, operation, rhs, analysisAtEntry: .init())
 				
-				case .allocateBuffer(bytes: let bytes, capability: let buffer):
-				return .allocateBuffer(bytes: bytes, capability: buffer, analysisAtEntry: .init())
+				case .createBuffer(bytes: let bytes, capability: let buffer, scoped: let scoped):
+				return .createBuffer(bytes: bytes, capability: buffer, scoped: scoped, analysisAtEntry: .init())
 				
-				case .pushBuffer(bytes: let bytes, capability: let buffer):
-				return .pushBuffer(bytes: bytes, capability: buffer, analysisAtEntry: .init())
-				
-				case .popBuffer(let buffer):
-				return .popBuffer(buffer, analysisAtEntry: .init())
+				case .destroyBuffer(capability: let buffer):
+				return .destroyBuffer(capability: buffer, analysisAtEntry: .init())
 				
 				case .getElement(let elementType, of: let vector, offset: let offset, to: let destination):
 				return .getElement(elementType, of: vector, offset: offset, to: destination, analysisAtEntry: .init())

@@ -17,8 +17,10 @@ extension CC {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
-		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
-		case pushRecord(RecordType, capability: Location)
+		/// An effect that creates an (uninitialised) record of given type and puts a capability for that record in given location.
+		///
+		/// If `scoped` is `true`, the record is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createRecord(RecordType, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -26,8 +28,10 @@ extension CC {
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
-		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
-		case pushVector(ValueType, count: Int = 1, capability: Location)
+		/// An effect that creates an (uninitialised) vector of `count` elements of given value type and puts a capability for that vector in given location.
+		///
+		/// If `scoped` is `true`, the vector is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createVector(ValueType, count: Int = 1, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
@@ -35,10 +39,10 @@ extension CC {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `index`.
 		case setElement(of: Location, index: Source, to: Source)
 		
-		/// An effect that pops the vector or record referred by the capability from given source.
+		/// An effect that destroys the scoped vector or record referred to by the capability from given source.
 		///
-		/// This effect must only be used with values allocated in the current scope. For any two values *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before returning; in that case, deallocation is automatic.
-		case popValue(capability: Source)
+		/// This effect must only be used with *scoped* values created in the *current* scope. For any two values *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroyed *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
+		case destroyScopedValue(capability: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -65,8 +69,8 @@ extension CC {
 				case .compute(let destination, let lhs, let op, let rhs):
 				try Lowered.compute(.abstract(destination), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .pushRecord(let type, capability: let record):
-				Lowered.pushRecord(type, capability: .abstract(record))
+				case .createRecord(let type, capability: let record, scoped: let scoped):
+				Lowered.createRecord(type, capability: .abstract(record), scoped: scoped)
 				
 				case .getField(let fieldName, of: let record, to: let destination):
 				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
@@ -74,8 +78,8 @@ extension CC {
 				case .setField(let fieldName, of: let record, to: let source):
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
-				case .pushVector(let elementType, count: let count, capability: let vector):
-				Lowered.pushVector(elementType, count: count, capability: .abstract(vector))
+				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
+				Lowered.createVector(elementType, count: count, capability: .abstract(vector), scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
@@ -83,8 +87,8 @@ extension CC {
 				case .setElement(of: let vector, index: let index, to: let source):
 				try Lowered.setElement(of: .abstract(vector), index: index.lowered(in: &context), to: source.lowered(in: &context))
 				
-				case .popValue(capability: let capability):
-				Lowered.popValue(capability: try capability.lowered(in: &context))
+				case .destroyScopedValue(capability: let capability):
+				Lowered.destroyScopedValue(capability: try capability.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -95,10 +99,10 @@ extension CC {
 					// Prepare assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
-					// Allocate arguments record, if nonempty.
+					// Create (scoped) arguments record, if nonempty.
 					let argumentsRecord = context.locations.uniqueName(from: "args")
 					if !assignments.parameterRecordType.isEmpty {
-						Lowered.pushRecord(assignments.parameterRecordType, capability: .abstract(argumentsRecord))
+						Lowered.createRecord(assignments.parameterRecordType, capability: .abstract(argumentsRecord), scoped: true)
 					}
 					
 					// Prepare arguments for lowering.
@@ -120,9 +124,9 @@ extension CC {
 					// Parameter registers are considered in use but no frame locations are used since frame-res. args. are passed via an allocated record.
 					Lowered.call(name, parameters: assignments.viaRegisters.map(\.register))
 					
-					// Deallocate frame-resident arguments, if any.
+					// Destroy arguments arguments, if any.
 					if !assignments.parameterRecordType.isEmpty {
-						Lowered.popValue(capability: .abstract(argumentsRecord))
+						Lowered.destroyScopedValue(capability: .abstract(argumentsRecord))
 					}
 					
 					// Write result.

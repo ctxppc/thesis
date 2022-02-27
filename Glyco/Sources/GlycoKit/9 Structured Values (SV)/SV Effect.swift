@@ -16,8 +16,10 @@ extension SV {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
-		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
-		case pushRecord(RecordType, capability: Location)
+		/// An effect that creates an (uninitialised) record of given type and puts a capability for that record in given location.
+		///
+		/// If `scoped` is `true`, the record is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createRecord(RecordType, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -25,8 +27,10 @@ extension SV {
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
-		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
-		case pushVector(ValueType, count: Int = 1, capability: Location)
+		/// An effect that creates an (uninitialised) vector of `count` elements of given value type and puts a capability for that vector in given location.
+		///
+		/// If `scoped` is `true`, the vector is destroyed when the current scope is popped and must not be accessed afterwards.
+		case createVector(ValueType, count: Int = 1, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
@@ -34,10 +38,10 @@ extension SV {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `index`.
 		case setElement(of: Location, index: Source, to: Source)
 		
-		/// An effect that pops the vector or record referred by the capability from given source.
+		/// An effect that destroys the scoped vector or record referred to by the capability from given source.
 		///
-		/// This effect must only be used with values allocated in the current scope. For any two values *a* and *b* allocated in the current scope, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the scope; in that case, deallocation is automatic.
-		case popValue(capability: Source)
+		/// This effect must only be used with *scoped* values created in the *current* scope. For any two values *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroyed *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
+		case destroyScopedValue(capability: Source)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -93,9 +97,9 @@ extension SV {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				try Lowered.compute(destination, lhs.lowered(in: &context), operation, rhs.lowered(in: &context))
 				
-				case .pushRecord(let recordType, capability: let record):
+				case .createRecord(let recordType, capability: let record, scoped: let scoped):
 				context.recordTypesByRecordLocation[record] = recordType
-				Lowered.pushBuffer(bytes: recordType.byteSize, capability: record)
+				Lowered.createBuffer(bytes: recordType.byteSize, capability: record, scoped: scoped)
 				
 				case .getField(let name, of: let record, to: let destination):
 				if let recordType = context.recordTypesByRecordLocation[record] {
@@ -129,8 +133,8 @@ extension SV {
 					throw LoweringError.noRecordType(record)
 				}
 				
-				case .pushVector(let elementType, count: let count, capability: let vector):
-				Lowered.pushBuffer(bytes: elementType.byteSize * count, capability: vector)
+				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
+				Lowered.createBuffer(bytes: elementType.byteSize * count, capability: vector, scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
@@ -150,8 +154,8 @@ extension SV {
 					throw LoweringError.noVectorType(vector)
 				}
 				
-				case .popValue(capability: let capability):
-				Lowered.popBuffer(try capability.lowered(in: &context))
+				case .destroyScopedValue(capability: let capability):
+				Lowered.destroyBuffer(capability: try capability.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
