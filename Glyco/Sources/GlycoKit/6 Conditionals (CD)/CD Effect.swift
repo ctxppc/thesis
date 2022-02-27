@@ -211,7 +211,7 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return try effects.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
-				previousEffects:	[],
+				previousEffects:	previousEffects,
 				exitLabel:			restLabel
 			) + rest.lowered(
 				in:					&context,
