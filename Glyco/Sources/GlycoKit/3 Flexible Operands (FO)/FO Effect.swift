@@ -20,16 +20,15 @@ extension FO {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
-		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
-		case allocateBuffer(bytes: Int, capability: Location)
+		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given location.
+		///
+		/// If `onFrame` is `true`, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
+		case createBuffer(bytes: Int, capability: Location, onFrame: Bool)
 		
-		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, capability: Location)
-		
-		/// An effect that pops the buffer referred by the capability from given source.
+		/// An effect that deallocates the buffer referred by the capability from given source.
 		///
 		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic.
-		case popBuffer(Source)
+		case destroyBuffer(capability: Source)
 		
 		/// An effect that retrieves the datum at offset `offset` in the buffer in `of` and puts it in `to`.
 		case getElement(DataType, of: Location, offset: Source, to: Location)
@@ -139,17 +138,13 @@ extension FO {
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(dest, .registerRegister(lhs, operation, rhs))] + storeResult
 				
-				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: let onFrame):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.allocateBuffer(bytes: bytes, capability: bufferCap)] + storeBufferCap
+				return [.createBuffer(bytes: bytes, capability: bufferCap, onFrame: onFrame)] + storeBufferCap
 				
-				case .pushBuffer(bytes: let bytes, capability: let buffer):
-				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.pushBuffer(bytes: bytes, capability: bufferCap)] + storeBufferCap
-				
-				case .popBuffer(let buffer):
+				case .destroyBuffer(capability: let buffer):
 				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)
-				return loadBufferCap + [.popBuffer(bufferCap)]
+				return loadBufferCap + [.destroyBuffer(capability: bufferCap)]
 				
 				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
 				let (loadBuffer, buffer) = try load(type, from: .init(buffer), using: temp1)

@@ -17,16 +17,15 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
-		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given register.
-		case allocateBuffer(bytes: Int, capability: Register)
+		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given register.
+		///
+		/// If `onFrame` is `true`, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
+		case createBuffer(bytes: Int, capability: Register, onFrame: Bool)
 		
-		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
-		case pushBuffer(bytes: Int, capability: Register)
-		
-		/// An effect that pops the buffer referred by the capability in given register.
+		/// An effect that deallocates the buffer referred by the capability in given register.
 		///
 		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic.
-		case popBuffer(Register)
+		case destroyBuffer(capability: Register)
 		
 		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
 		case loadElement(DataType, into: Register, buffer: Register, offset: Register)
@@ -116,7 +115,7 @@ extension MM {
 					.storeCapability(source: try source.lowered(), address: temp),
 				]
 				
-				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: false):
 				let buffer = try buffer.lowered()
 				return [
 					.setCapabilityBounds(destination: buffer, source: .tp, length: bytes),	// FIXME: base may be lower
@@ -124,7 +123,7 @@ extension MM {
 					.offsetCapability(destination: .tp, source: .tp, offset: temp),
 				]
 				
-				case .pushBuffer(bytes: let bytes, capability: let buffer):
+				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: true):
 				/*
 					 ┌──────────┐ high
 					 │          │
@@ -147,7 +146,7 @@ extension MM {
 					.setCapabilityAddress(destination: .sp, source: .sp, address: temp),				//   to actual base
 				]
 				
-				case .popBuffer(let buffer):
+				case .destroyBuffer(let buffer):
 				return [
 					.getCapabilityLength(destination: temp, source: try buffer.lowered()),
 					.offsetCapability(destination: .sp, source: .sp, offset: temp),

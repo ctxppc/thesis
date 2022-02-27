@@ -80,10 +80,10 @@ extension ALA {
 				try Lowered.compute(destination.lowered(in: &context), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, scoped: let scoped, analysisAtEntry: _):
-				(scoped ? Lowered.pushBuffer(bytes:capability:) : Lowered.allocateBuffer(bytes:capability:))(bytes, try buffer.lowered(in: &context))
+				Lowered.createBuffer(bytes: bytes, capability: try buffer.lowered(in: &context), onFrame: scoped)
 				
 				case .destroyBuffer(capability: let buffer, analysisAtEntry: _):
-				Lowered.popBuffer(try buffer.lowered(in: &context))
+				Lowered.destroyBuffer(capability: try buffer.lowered(in: &context))
 				
 				case .getElement(let elementType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: _):
 				try Lowered.getElement(
