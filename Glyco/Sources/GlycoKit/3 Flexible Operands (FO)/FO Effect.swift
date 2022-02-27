@@ -20,6 +20,9 @@ extension FO {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
+		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, capability: Location)
+		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, capability: Location)
 		
@@ -135,6 +138,10 @@ extension FO {
 				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(dest, .registerRegister(lhs, operation, rhs))] + storeResult
+				
+				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
+				return [.allocateBuffer(bytes: bytes, capability: bufferCap)] + storeBufferCap
 				
 				case .pushBuffer(bytes: let bytes, capability: let buffer):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)

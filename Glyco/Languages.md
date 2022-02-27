@@ -514,6 +514,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -567,6 +568,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -632,6 +634,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -691,6 +694,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -762,6 +766,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dt><code>BB.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -803,6 +808,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dt><code>FO.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
@@ -865,6 +871,7 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register)</code></dd>
 	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register)</code></dd>
 	<dd><code><strong>popBuffer</strong>(Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
@@ -937,6 +944,7 @@ N/A
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
 	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>tp</strong></code></dd>
 	<dd><code><strong>t0</strong></code></dd>
 	<dd><code><strong>t1</strong></code></dd>
 	<dd><code><strong>t2</strong></code></dd>

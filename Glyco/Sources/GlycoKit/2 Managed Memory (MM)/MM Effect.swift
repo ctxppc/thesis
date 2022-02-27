@@ -17,6 +17,9 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
+		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given register.
+		case allocateBuffer(bytes: Int, capability: Register)
+		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
 		case pushBuffer(bytes: Int, capability: Register)
 		
@@ -111,6 +114,14 @@ extension MM {
 				return [
 					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
 					.storeCapability(source: try source.lowered(), address: temp),
+				]
+				
+				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				let buffer = try buffer.lowered()
+				return [
+					.setCapabilityBounds(destination: buffer, source: .tp, length: bytes),	// FIXME: base may be lower
+					.getCapabilityLength(destination: temp, source: buffer),
+					.offsetCapability(destination: .tp, source: .tp, offset: temp),
 				]
 				
 				case .pushBuffer(bytes: let bytes, capability: let buffer):

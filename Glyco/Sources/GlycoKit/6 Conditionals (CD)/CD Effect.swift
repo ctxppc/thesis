@@ -16,6 +16,9 @@ extension CD {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
+		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, capability: Location)
+		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, capability: Location)
 		
@@ -68,7 +71,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .pushBuffer, .popBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .call, .return:
+				case .set, .compute, .allocateBuffer, .pushBuffer, .popBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -103,7 +106,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .pushBuffer, .popBuffer, .getElement, .setElement, .pushFrame, .popFrame, .call:
+				case .set, .compute, .allocateBuffer, .pushBuffer, .popBuffer, .getElement, .setElement, .pushFrame, .popFrame, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -200,7 +203,17 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 	///
 	/// - Returns: A representation of `self` in a lower language.
 	func lowered(in context: inout CD.Context, entryLabel: CD.Lower.Label, previousEffects: [CD.Lower.Effect], exitLabel: CD.Lower.Label) throws -> [CD.Lower.Block] {
+		
 		guard let (first, rest) = self.splittingFirst() else { return [.init(name: entryLabel, do: previousEffects, then: .continue(to: exitLabel))] }
+		func simpleLowering(_ loweredEffect: CD.Lower.Effect) throws -> [CD.Lower.Block] {
+			try rest.lowered(
+				in:					&context,
+				entryLabel:			entryLabel,
+				previousEffects:	previousEffects + [loweredEffect],
+				exitLabel:			exitLabel
+			)
+		}
+		
 		switch first {
 			
 			case .do(effects: let effects) where rest.doesNothing:
@@ -221,53 +234,25 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			)
 			
 			case .set(let type, let destination, to: let source):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.set(type, destination, to: source)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.set(type, destination, to: source))
 			
 			case .compute(let destination, let lhs, let operation, let rhs):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.compute(destination, lhs, operation, rhs)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.compute(destination, lhs, operation, rhs))
+				
+			case .allocateBuffer(bytes: let bytes, capability: let buffer):
+			return try simpleLowering(.allocateBuffer(bytes: bytes, capability: buffer))
 			
 			case .pushBuffer(bytes: let bytes, capability: let buffer):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.pushBuffer(bytes: bytes, capability: buffer)],
-				exitLabel:			exitLabel
-			)
-			
+			return try simpleLowering(.pushBuffer(bytes: bytes, capability: buffer))
 			
 			case .popBuffer(let buffer):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.popBuffer(buffer)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.popBuffer(buffer))
 			
 			case .getElement(let type, of: let vector, offset: let offset, to: let destination):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.getElement(type, of: vector, offset: offset, to: destination)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.getElement(type, of: vector, offset: offset, to: destination))
 			
 			case .setElement(let type, of: let vector, offset: let offset, to: let element):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.setElement(type, of: vector, offset: offset, to: element)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.setElement(type, of: vector, offset: offset, to: element))
 			
 			case .if(let predicate, then: let affirmative, else: let negative):
 			let affirmativeLabel = context.bag.uniqueName(from: "then")
@@ -301,20 +286,10 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return conditionalBlocks + affirmativeBlocks + negativeBlocks + restBlocks
 			
 			case .pushFrame(let frame):
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.pushFrame(frame)],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.pushFrame(frame))
 			
 			case .popFrame:
-			return try rest.lowered(
-				in:					&context,
-				entryLabel:			entryLabel,
-				previousEffects:	previousEffects + [.popFrame],
-				exitLabel:			exitLabel
-			)
+			return try simpleLowering(.popFrame)
 			
 			case .call(let procedure):
 			let returnPoint = context.bag.uniqueName(from: "ret")

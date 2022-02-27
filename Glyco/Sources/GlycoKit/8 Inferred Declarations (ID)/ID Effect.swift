@@ -14,6 +14,9 @@ extension ID {
 		/// An effect that computes given expression and puts the result in given location.
 		case compute(Location, Source, BinaryOperator, Source)
 		
+		/// An effect that allocates a buffer of `bytes` bytes on the heap and puts a capability for that buffer in given location.
+		case allocateBuffer(bytes: Int, capability: Location)
+		
 		/// An effect that pushes a buffer of `bytes` bytes to the current scope and puts a capability for that buffer in given location.
 		case pushBuffer(bytes: Int, capability: Location)
 		
@@ -70,6 +73,10 @@ extension ID {
 				try context.declarations.require(rhs, type: .s32)
 				try context.declarations.declare(destination, type: .s32)
 				Lowered.compute(destination, lhs, operation, rhs)
+				
+				case .allocateBuffer(bytes: let bytes, capability: let buffer):
+				try context.declarations.declare(buffer, type: .cap)
+				Lowered.allocateBuffer(bytes: bytes, capability: buffer)
 				
 				case .pushBuffer(bytes: let bytes, capability: let buffer):
 				try context.declarations.declare(buffer, type: .cap)
