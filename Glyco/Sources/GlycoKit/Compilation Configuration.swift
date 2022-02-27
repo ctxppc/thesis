@@ -28,6 +28,18 @@ public struct CompilationConfiguration {
 		
 	}
 	
+	/// The program's calling convention.
+	public var callingConvention: CallingConvention = .conventional
+	public enum CallingConvention : String, CaseIterable {
+		
+		/// The Conventional Glyco Calling Convention (CGCC), a calling convention based on a traditional RISC-V calling convention.
+		case conventional
+		
+		/// The Secure Glyco Calling Convention (SGCC), a calling convention enforcing well-bracketed control flow and stack encapsulation.
+		case secure
+		
+	}
+	
 	/// A URL to a CHERI-RISC-V toolchain.
 	public var toolchainURL: URL
 	
