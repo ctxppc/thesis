@@ -125,13 +125,11 @@ final class ArithmeticTests : XCTestCase {
 						addi s1, t1, -11
 						addi t2, zero, 1
 						beq s1, t2, cd.then
-						j cd.else
-		cd.then:		addi s1, zero, 1
-						j cd.endif
 		cd.else:		addi s1, zero, 0
-						j cd.endif
 		cd.endif:		mv a0, s1
 						ret.cap
+		cd.then:		addi s1, zero, 1
+						j cd.endif
 						
 						.align 6
 						.global tohost

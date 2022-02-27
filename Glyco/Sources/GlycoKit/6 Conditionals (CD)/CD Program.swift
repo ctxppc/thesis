@@ -35,7 +35,7 @@ public enum CD : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context()
-			return .init(try (procedures + [.init(.programEntry, in: effect)]).lowered(in: &context))
+			return .init(try ([.init(.programEntry, in: effect)] + procedures).lowered(in: &context))
 		}
 		
 		enum LoweringError : LocalizedError {

@@ -20,40 +20,6 @@ main:			la ra, rv.main
 				li gp, 1
 				j _exit
 				
-fib:			cincoffsetimm ct0, csp, -8
-				sc.cap cfp, 0(ct0)
-				cmove cfp, ct0
-				cincoffsetimm csp, csp, -8
-				mv a3, a0
-				j cd.then
-cd.then:		j cd.then$1
-cd.then$1:		mv s1, a2
-				addi a0, zero, 0
-				j cd.pred
-cd.pred:		ble s1, a0, cd.then$2
-				j cd.else
-cd.then$2:		mv s1, a1
-				mv a0, s1
-				cincoffsetimm csp, cfp, 8
-				lc.cap cfp, 0(cfp)
-				ret.cap
-cd.else:		mv a4, a1
-				mv a0, a3
-				mv s1, a1
-				add a1, a0, s1
-				mv s1, a2
-				addi a0, zero, 1
-				sub s1, s1, a0
-				mv a0, a4
-				j cd.then$3
-cd.then$3:		mv a2, s1
-				call fib
-				j cd.ret
-cd.ret:			mv s1, a0
-				mv a0, s1
-				cincoffsetimm csp, cfp, 8
-				lc.cap cfp, 0(cfp)
-				ret.cap
 rv.main:		cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
@@ -62,8 +28,37 @@ rv.main:		cincoffsetimm ct0, csp, -8
 				addi a1, zero, 1
 				addi a2, zero, 30
 				call fib
-				j cd.ret$1
-cd.ret$1:		cincoffsetimm csp, cfp, 8
+cd.ret:			cincoffsetimm csp, cfp, 8
+				lc.cap cfp, 0(cfp)
+				ret.cap
+fib:			cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
+				mv a3, a0
+cd.then:		add zero, zero, zero
+cd.then$1:		mv s1, a2
+				addi a0, zero, 0
+cd.pred:		add zero, zero, zero
+				ble s1, a0, cd.then$2
+cd.else:		mv a4, a1
+				mv a0, a3
+				mv s1, a1
+				add a1, a0, s1
+				mv s1, a2
+				addi a0, zero, 1
+				sub s1, s1, a0
+				mv a0, a4
+cd.then$3:		mv a2, s1
+				call fib
+cd.ret$1:		mv s1, a0
+				mv a0, s1
+				cincoffsetimm csp, cfp, 8
+				lc.cap cfp, 0(cfp)
+				ret.cap
+cd.then$2:		mv s1, a1
+				mv a0, s1
+				cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
 				ret.cap
 				

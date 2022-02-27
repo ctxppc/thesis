@@ -3,7 +3,7 @@
 extension BB {
 	
 	/// An effect on an BB machine.
-	public enum Effect : Codable, Equatable, MultiplyLowerable {
+	public enum Effect : Codable, Equatable, SimplyLowerable {
 		
 		/// An effect that retrieves the value in `from` and puts it in `to`.
 		case set(DataType, Location, to: Source)
@@ -36,32 +36,32 @@ extension BB {
 		case popFrame
 		
 		// See protocol.
-		func lowered(in context: inout ()) -> [Lower.Effect] {
+		func lowered(in context: inout ()) -> Lower.Effect {
 			switch self {
 				
 				case .set(let type, let destination, to: let source):
-				return [.set(type, destination, to: source)]
+				return .set(type, destination, to: source)
 				
 				case .compute(let destination, let lhs, let operation, let rhs):
-				return [.compute(destination, lhs, operation, rhs)]
+				return .compute(destination, lhs, operation, rhs)
 				
 				case .pushBuffer(bytes: let bytes, into: let buffer):
-				return [.pushBuffer(bytes: bytes, into: buffer)]
+				return .pushBuffer(bytes: bytes, into: buffer)
 				
 				case .popBuffer(let buffer):
-				return [.popBuffer(buffer)]
+				return .popBuffer(buffer)
 				
 				case .getElement(let type, of: let vector, offset: let offset, to: let destination):
-				return [.getElement(type, of: vector, offset: offset, to: destination)]
+				return .getElement(type, of: vector, offset: offset, to: destination)
 				
 				case .setElement(let type, of: let vector, offset: let offset, to: let element):
-				return [.setElement(type, of: vector, offset: offset, to: element)]
+				return .setElement(type, of: vector, offset: offset, to: element)
 				
 				case .pushFrame(let frame):
-				return [.pushFrame(frame)]
+				return .pushFrame(frame)
 				
 				case .popFrame:
-				return [.popFrame]
+				return .popFrame
 				
 			}
 		}

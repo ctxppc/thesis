@@ -20,21 +20,20 @@ main:			la ra, rv.main
 				li gp, 1
 				j _exit
 				
+rv.main:		cincoffsetimm ct0, csp, -8
+				sc.cap cfp, 0(ct0)
+				cmove cfp, ct0
+				cincoffsetimm csp, csp, -8
+				call f
+cd.ret:			cincoffsetimm csp, cfp, 8
+				lc.cap cfp, 0(cfp)
+				ret.cap
 f:				cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
 				cincoffsetimm csp, csp, -8
 				addi a0, zero, 42
 				cincoffsetimm csp, cfp, 8
-				lc.cap cfp, 0(cfp)
-				ret.cap
-rv.main:		cincoffsetimm ct0, csp, -8
-				sc.cap cfp, 0(ct0)
-				cmove cfp, ct0
-				cincoffsetimm csp, csp, -8
-				call f
-				j cd.ret
-cd.ret:			cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
 				ret.cap
 				
