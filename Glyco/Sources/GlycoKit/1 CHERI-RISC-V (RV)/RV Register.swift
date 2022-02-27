@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
+
 extension RV {
 	
 	/// A machine register.
-	public enum Register : String, Codable, Equatable {
+	public enum Register : String, Codable, Equatable, CaseIterable {
 		
 		/// The always-zero register.
 		case zero
@@ -11,16 +13,19 @@ extension RV {
 		/// The return address register.
 		case ra
 		
-		/// The stack pointer register.
+		/// The stack capability register.
 		case sp
 		
-		/// The thread pointer register (used for the heap).
+		/// The global capability register (not used).
+		case gp	// keep for ordinal
+		
+		/// The thread capability register (used for the heap).
 		case tp
 		
 		/// A register for temporaries.
 		case t0, t1, t2
 		
-		/// The frame pointer register.
+		/// The frame capability register.
 		case fp
 		
 		/// A saved register.
@@ -43,6 +48,12 @@ extension RV {
 		
 		/// The capability register's identifier.
 		public var c: String { "c\(rawValue)" }
+		
+		/// The register's ordinal.
+		public var ordinal: Int { Self.ordinalsByRegister[self] !! "Unknown register" }
+		private static let ordinalsByRegister = [Self : Int](
+			uniqueKeysWithValues: allCases.enumerated().map { ($0.element, $0.offset) }
+		)
 		
 	}
 	

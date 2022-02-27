@@ -62,6 +62,12 @@ extension MM {
 			}
 		}
 		
+		/// The register's ordinal.
+		public var ordinal: Int {
+			var context: () = ()
+			return lowered(in: &context).ordinal
+		}
+		
 	}
 	
 }

@@ -691,9 +691,8 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>onFrame:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -763,9 +762,8 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dt><code>BB.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>onFrame:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
@@ -805,9 +803,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dt><code>FO.Effect</code></dt>
 	<dd><code><strong>set</strong>(DataType, Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Source)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Location, <strong>onFrame:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
@@ -868,13 +865,13 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>allocateBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register)</code></dd>
-	<dd><code><strong>pushBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register)</code></dd>
-	<dd><code><strong>popBuffer</strong>(Register)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register, <strong>onFrame:</strong> Bool)</code></dd>
+	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
+	<dd><code><strong>clear</strong>([Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
@@ -941,6 +938,7 @@ N/A
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
 	<dd><code><strong>sp</strong></code></dd>
+	<dd><code><strong>gp</strong></code></dd>
 	<dd><code><strong>tp</strong></code></dd>
 	<dd><code><strong>t0</strong></code></dd>
 	<dd><code><strong>t1</strong></code></dd>
@@ -981,8 +979,8 @@ N/A
 	<dt><code>RV.Instruction</code></dt>
 	<dd><code><strong>copyWord</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>copyCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>registerRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
-	<dd><code><strong>registerImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
+	<dd><code><strong>computeWithRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
+	<dd><code><strong>computeWithImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
 	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
@@ -995,9 +993,15 @@ N/A
 	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
+	<dd><code><strong>sealEntry</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>clear</strong>(<strong>quarter:</strong> Int, <strong>mask:</strong> UInt8)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
+	<dd><code><strong>jumpWithRegister</strong>(<strong>target:</strong> Register)</code></dd>
 	<dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
+	<dd><code><strong>callWithRegister</strong>(<strong>target:</strong> Register, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
 </dl>

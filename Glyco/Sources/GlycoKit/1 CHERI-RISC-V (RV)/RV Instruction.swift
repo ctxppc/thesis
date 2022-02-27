@@ -19,10 +19,10 @@ extension RV {
 		case copyCapability(destination: Register, source: Register)
 		
 		/// An instruction that performs *x* `operation` *y* and puts the result in `rd`, where *x* is the value in `rs1` and *y* is the value in `rs2`.
-		case registerRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
+		case computeWithRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
 		
 		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
-		case registerImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
+		case computeWithImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
 		/// An instruction that loads the word byte memory at the address in `address`, with the address offset by `offset`.
 		case loadByte(destination: Register, address: Register)
@@ -62,14 +62,46 @@ extension RV {
 		/// An instruction that copies copies `destination` to `source`, replacing the address with the integer in `address`.
 		case setCapabilityAddress(destination: Register, source: Register, address: Register)
 		
+		/// An instruction that seals the capability in `source` using the address of the capability in `seal` as the object type and puts it in `destination`.
+		///
+		/// A hardware exception is raised if `source` or `seal` don't contain valid, unsealed capabilities, or if `seal` contains a capability that doesn't permit sealing, points outside its bounds, or whose address isn't a valid object type.
+		case seal(destination: Register, source: Register, seal: Register)
+		
+		/// An instruction that seals the capability in `source` as a sentry and puts it in `destination`.
+		///
+		/// A hardware exception is raised if `source` doesn't contain a valid, unsealed capability that permits execution.
+		case sealEntry(destination: Register, source: Register)
+		
+		/// An instruction that clears registers 8 × `quarter` + *i* where *i* is the *i*th bit of `mask`.
+		case clear(quarter: Int, mask: UInt8)
+		
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
 		/// An instruction that jumps to `target`.
 		case jump(target: Label)
 		
+		/// An instruction that jumps to the (possibly unsealed) address in `target`.
+		///
+		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
+		case jumpWithRegister(target: Register)
+		
 		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
 		case call(target: Label)
+		
+		/// An instruction that puts the next PCC in `link`, then jumps to the (possibly unsealed) address in `target`.
+		///
+		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
+		case callWithRegister(target: Register, link: Register)
+		
+		/// An instruction that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `ct6` after unsealing it.
+		///
+		/// A hardware exception is raised
+		/// * if `target` or `data` don't contain valid capabilities with the same object type that permit invocation,
+		/// * if `target` contains a capability that doesn't permit execution,
+		/// * if `data` contains a capability that permits execution, or
+		/// * if `target` contains a capability that points outside its bounds.
+		case invoke(target: Register, data: Register)
 		
 		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
@@ -88,16 +120,16 @@ extension RV {
 				case .copyCapability(destination: let destination, source: let source):
 				return "\(tabs)cmove \(destination.c), \(source.c)"
 				
-				case .registerRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
+				case .computeWithRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
 				return "\(tabs)\(operation.rawValue) \(rd.x), \(rs1.x), \(rs2.x)"
 				
-				case .registerImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm) where imm >= 0:
+				case .computeWithImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm) where imm >= 0:
 				return "\(tabs)addi \(rd.x), \(rs1.x), -\(imm)"
 				
-				case .registerImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm):
+				case .computeWithImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(tabs)addi \(rd.x), \(rs1.x), \(imm)"
 				
-				case .registerImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
+				case .computeWithImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(tabs)\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
 				case .loadByte(destination: let rd, address: let address):
@@ -136,14 +168,32 @@ extension RV {
 				case .setCapabilityAddress(destination: let destination, source: let source, address: let address):
 				return "\(tabs)csetaddr \(destination.c), \(source.c), \(address.x)"
 				
+				case .seal(destination: let destination, source: let source, seal: let seal):
+				return "\(tabs)cseal \(destination.c), \(source.c), \(seal.c)"
+				
+				case .sealEntry(destination: let destination, source: let source):
+				return "\(tabs)csealentry \(destination.c), \(source.c)"
+				
+				case .clear(quarter: let quarter, mask: let mask):
+				return "\(tabs)cclear \(quarter), \(mask)"
+				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "\(tabs)b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
 				case .jump(target: let target):
 				return "\(tabs)j \(target.rawValue)"
 				
+				case .jumpWithRegister(target: let target):
+				return "\(tabs)cjr \(target.c)"
+				
 				case .call(target: let target):
 				return "\(tabs)call \(target.rawValue)"
+				
+				case .callWithRegister(target: let target, link: let link):
+				return "\(tabs)cjalr \(target.c), \(link.c)"
+				
+				case .invoke(target: let target, data: let data):
+				return "\(tabs)cinvoke \(target.c), \(data.c)"
 				
 				case .return:
 				return "\(tabs)ret.cap"

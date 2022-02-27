@@ -33,15 +33,18 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
 		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
 		
-		/// Pushes given frame to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
+		/// An effect that pushes given frame to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(Frame)
 		
-		/// Pops a frame by copying `cfp` to `csp` and popping `cfp` from the stack.
+		/// An effect that pops a frame by copying `cfp` to `csp` and popping `cfp` from the stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
+		
+		/// An effect that clears given registers.
+		case clear([Register])
 		
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
@@ -74,10 +77,10 @@ extension MM {
 				return try [.copyCapability(destination: destination.lowered(), source: source.lowered())]
 				
 				case .compute(let destination, .registerRegister(let rs1, let operation, let rs2)):
-				return try [.registerRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
+				return try [.computeWithRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
 				
 				case .compute(let destination, .registerImmediate(let rs1, let operation, let imm)):
-				return try [.registerImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
+				return try [.computeWithImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
 				
 				case .load(.u8, into: let destination, from: let source):
 				return [
@@ -213,6 +216,16 @@ extension MM {
 					.loadCapability(destination: .fp, address: .fp),
 					
 				]
+				
+				case .clear(let registers):
+				let registersByQuarter = Dictionary(grouping: registers, by: { $0.ordinal / 8 })
+				let masksByQuarter = registersByQuarter.mapValues { registers -> UInt8 in
+					registers
+						.lazy
+						.map { 1 << ($0.ordinal % 8) }
+						.reduce(0, |)
+				}
+				return masksByQuarter.map { .clear(quarter: $0.0, mask: $0.1) }
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
 				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
