@@ -21,7 +21,7 @@ extension FO {
 		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, into: Location)
+		case pushBuffer(bytes: Int, capability: Location)
 		
 		/// An effect that pops the buffer referred by the capability from given source.
 		///
@@ -136,9 +136,9 @@ extension FO {
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
 				return loadLHS + loadRHS + [.compute(dest, .registerRegister(lhs, operation, rhs))] + storeResult
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer):
+				case .pushBuffer(bytes: let bytes, capability: let buffer):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.pushBuffer(bytes: bytes, into: bufferCap)] + storeBufferCap
+				return [.pushBuffer(bytes: bytes, capability: bufferCap)] + storeBufferCap
 				
 				case .popBuffer(let buffer):
 				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)

@@ -17,7 +17,7 @@ extension SV {
 		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
-		case pushRecord(RecordType, into: Location)
+		case pushRecord(RecordType, capability: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -26,7 +26,7 @@ extension SV {
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
-		case pushVector(ValueType, count: Int = 1, into: Location)
+		case pushVector(ValueType, count: Int = 1, capability: Location)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
@@ -93,9 +93,9 @@ extension SV {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				try Lowered.compute(destination, lhs.lowered(in: &context), operation, rhs.lowered(in: &context))
 				
-				case .pushRecord(let recordType, into: let record):
+				case .pushRecord(let recordType, capability: let record):
 				context.recordTypesByRecordLocation[record] = recordType
-				Lowered.pushBuffer(bytes: recordType.byteSize, into: record)
+				Lowered.pushBuffer(bytes: recordType.byteSize, capability: record)
 				
 				case .getField(let name, of: let record, to: let destination):
 				if let recordType = context.recordTypesByRecordLocation[record] {
@@ -129,8 +129,8 @@ extension SV {
 					throw LoweringError.noRecordType(record)
 				}
 				
-				case .pushVector(let elementType, count: let count, into: let vector):
-				Lowered.pushBuffer(bytes: elementType.byteSize * count, into: vector)
+				case .pushVector(let elementType, count: let count, capability: let vector):
+				Lowered.pushBuffer(bytes: elementType.byteSize * count, capability: vector)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				if let elementType = context.elementTypesByVectorLocation[vector] {

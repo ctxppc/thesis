@@ -18,7 +18,7 @@ extension MM {
 		case store(DataType, into: Frame.Location, from: Register)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given register.
-		case pushBuffer(bytes: Int, into: Register)
+		case pushBuffer(bytes: Int, capability: Register)
 		
 		/// An effect that pops the buffer referred by the capability in given register.
 		///
@@ -113,7 +113,7 @@ extension MM {
 					.storeCapability(source: try source.lowered(), address: temp),
 				]
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer):
+				case .pushBuffer(bytes: let bytes, capability: let buffer):
 				/*
 					 ┌──────────┐ high
 					 │          │

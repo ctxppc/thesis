@@ -15,7 +15,7 @@ extension ID {
 		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the current scope and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, into: Location)
+		case pushBuffer(bytes: Int, capability: Location)
 		
 		/// An effect that pops the buffer referred by the capability from given source.
 		///
@@ -71,9 +71,9 @@ extension ID {
 				try context.declarations.declare(destination, type: .s32)
 				Lowered.compute(destination, lhs, operation, rhs)
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer):
+				case .pushBuffer(bytes: let bytes, capability: let buffer):
 				try context.declarations.declare(buffer, type: .cap)
-				Lowered.pushBuffer(bytes: bytes, into: buffer)
+				Lowered.pushBuffer(bytes: bytes, capability: buffer)
 				
 				case .popBuffer(capability: let buffer):
 				try context.declarations.require(buffer, type: .cap)

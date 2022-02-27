@@ -15,7 +15,7 @@
 			set(s32, register(s1), to: register(a1))
 			set(s32, register(s1), to: immediate(2))
 			set(s32, register(a1), to: immediate(29))
-			pushBuffer(bytes: 120, into: register(a2))
+			pushBuffer(bytes: 120, capability: register(a2))
 			set(s32, register(a0), to: register(s1))
 			do()
 			do()

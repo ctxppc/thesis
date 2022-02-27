@@ -41,7 +41,7 @@ extension CA {
 				Lowered.getElement(of: vector, index: index, to: destination)
 				
 				case .set(let destination, to: .vector(let type, count: let count)):
-				Lowered.pushVector(type, count: count, into: destination)
+				Lowered.pushVector(type, count: count, capability: destination)
 				
 				case .setElement(of: let vector, at: let index, to: let element):
 				Lowered.setElement(of: vector, index: index, to: element)

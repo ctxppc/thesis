@@ -15,7 +15,7 @@ extension AL {
 		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call scope and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, into: Location)
+		case pushBuffer(bytes: Int, capability: Location)
 		
 		/// An effect that pops the buffer referred by the capability from given source.
 		///
@@ -66,8 +66,8 @@ extension AL {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				return .compute(destination, lhs, operation, rhs, analysisAtEntry: .init())
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer):
-				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: .init())
+				case .pushBuffer(bytes: let bytes, capability: let buffer):
+				return .pushBuffer(bytes: bytes, capability: buffer, analysisAtEntry: .init())
 				
 				case .popBuffer(let buffer):
 				return .popBuffer(buffer, analysisAtEntry: .init())

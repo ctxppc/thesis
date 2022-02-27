@@ -18,7 +18,7 @@ extension CC {
 		case compute(Location, Source, BinaryOperator, Source)
 		
 		/// An effect that pushes a record of given type to the current scope and puts a capability for that record in given location.
-		case pushRecord(RecordType, into: Location)
+		case pushRecord(RecordType, capability: Location)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
 		case getField(RecordType.Field.Name, of: Location, to: Location)
@@ -27,7 +27,7 @@ extension CC {
 		case setField(RecordType.Field.Name, of: Location, to: Source)
 		
 		/// An effect that pushes a vector of `count` elements of given value type to the current scope and puts a capability for that vector in given location.
-		case pushVector(ValueType, count: Int = 1, into: Location)
+		case pushVector(ValueType, count: Int = 1, capability: Location)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
 		case getElement(of: Location, index: Source, to: Location)
@@ -65,8 +65,8 @@ extension CC {
 				case .compute(let destination, let lhs, let op, let rhs):
 				try Lowered.compute(.abstract(destination), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .pushRecord(let type, into: let record):
-				Lowered.pushRecord(type, into: .abstract(record))
+				case .pushRecord(let type, capability: let record):
+				Lowered.pushRecord(type, capability: .abstract(record))
 				
 				case .getField(let fieldName, of: let record, to: let destination):
 				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
@@ -74,8 +74,8 @@ extension CC {
 				case .setField(let fieldName, of: let record, to: let source):
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
-				case .pushVector(let type, count: let count, into: let vector):
-				Lowered.pushVector(type, count: count, into: .abstract(vector))
+				case .pushVector(let type, count: let count, capability: let vector):
+				Lowered.pushVector(type, count: count, capability: .abstract(vector))
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
@@ -98,7 +98,7 @@ extension CC {
 					// Allocate arguments record, if nonempty.
 					let argumentsRecord = context.locations.uniqueName(from: "args")
 					if !assignments.parameterRecordType.isEmpty {
-						Lowered.pushRecord(assignments.parameterRecordType, into: .abstract(argumentsRecord))
+						Lowered.pushRecord(assignments.parameterRecordType, capability: .abstract(argumentsRecord))
 					}
 					
 					// Prepare arguments for lowering.

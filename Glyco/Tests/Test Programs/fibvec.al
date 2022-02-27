@@ -26,7 +26,7 @@
 			set(abstract(ls.second), to: register(a1, s32))
 			set(abstract(ls.arg0), to: constant(2))
 			set(abstract(ls.arg1), to: constant(29))
-			pushBuffer(bytes: 120, into: abstract(ls.arg2))
+			pushBuffer(bytes: 120, capability: abstract(ls.arg2))
 			set(register(a0), to: abstract(ls.arg0))
 			set(register(a1), to: abstract(ls.arg1))
 			set(register(a2), to: abstract(ls.arg2))

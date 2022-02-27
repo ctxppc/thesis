@@ -15,7 +15,7 @@ extension ALA {
 		case compute(Location, Source, BinaryOperator, Source, analysisAtEntry: Analysis)
 		
 		/// An effect that pushes a buffer of `bytes` bytes to the call frame and puts a capability for that buffer in given location.
-		case pushBuffer(bytes: Int, into: Location, analysisAtEntry: Analysis)
+		case pushBuffer(bytes: Int, capability: Location, analysisAtEntry: Analysis)
 		
 		/// An effect that pops the buffer referred by the capability from given source.
 		///
@@ -77,8 +77,8 @@ extension ALA {
 				case .compute(let destination, let lhs, let op, let rhs, analysisAtEntry: _):
 				try Lowered.compute(destination.lowered(in: &context), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
-				Lowered.pushBuffer(bytes: bytes, into: try buffer.lowered(in: &context))
+				case .pushBuffer(bytes: let bytes, capability: let buffer, analysisAtEntry: _):
+				Lowered.pushBuffer(bytes: bytes, capability: try buffer.lowered(in: &context))
 				
 				case .popBuffer(let buffer, analysisAtEntry: _):
 				Lowered.popBuffer(try buffer.lowered(in: &context))
@@ -146,8 +146,8 @@ extension ALA {
 				case .compute(let destination, let lhs, let operation, let rhs, analysisAtEntry: _):
 				return .compute(destination, lhs, operation, rhs, analysisAtEntry: analysis)
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: _):
-				return .pushBuffer(bytes: bytes, into: buffer, analysisAtEntry: analysis)
+				case .pushBuffer(bytes: let bytes, capability: let buffer, analysisAtEntry: _):
+				return .pushBuffer(bytes: bytes, capability: buffer, analysisAtEntry: analysis)
 				
 				case .popBuffer(let buffer, analysisAtEntry: _):
 				return .popBuffer(buffer, analysisAtEntry: analysis)
@@ -217,7 +217,7 @@ extension ALA {
 				case .do(_, analysisAtEntry: let analysis),
 					.set(_, to: _, analysisAtEntry: let analysis),
 					.compute(_, _, _, _, analysisAtEntry: let analysis),
-					.pushBuffer(bytes: _, into: _, analysisAtEntry: let analysis),
+					.pushBuffer(bytes: _, capability: _, analysisAtEntry: let analysis),
 					.popBuffer(_, analysisAtEntry: let analysis),
 					.getElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.setElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
@@ -240,7 +240,7 @@ extension ALA {
 				case .set(let destination, to: _, analysisAtEntry: _),
 					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
 					.compute(let destination, _, _, _, analysisAtEntry: _),
-					.pushBuffer(bytes: _, into: let destination, analysisAtEntry: _):
+					.pushBuffer(bytes: _, capability: let destination, analysisAtEntry: _):
 				return [destination]
 				
 				case .pushScope:
@@ -396,8 +396,8 @@ extension ALA {
 				case .compute(let destination, let lhs, let op, let rhs, analysisAtEntry: let analysis):
 				return try .compute(substitute(destination), substitute(lhs), op, substitute(rhs), analysisAtEntry: analysis)
 				
-				case .pushBuffer(bytes: let bytes, into: let buffer, analysisAtEntry: let analysis):
-				return .pushBuffer(bytes: bytes, into: substitute(buffer), analysisAtEntry: analysis)
+				case .pushBuffer(bytes: let bytes, capability: let buffer, analysisAtEntry: let analysis):
+				return .pushBuffer(bytes: bytes, capability: substitute(buffer), analysisAtEntry: analysis)
 				
 				case .popBuffer(let buffer, analysisAtEntry: let analysis):
 				return .popBuffer(try substitute(buffer), analysisAtEntry: analysis)
