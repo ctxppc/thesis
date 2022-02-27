@@ -29,7 +29,7 @@ public enum FO : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = CF
+	public typealias Lower = MM
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation

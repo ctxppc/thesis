@@ -1,8 +1,8 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension CF {
+extension MM {
 	
-	/// An effect on an FL machine.
+	/// An MM effect.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that copies the contents from `from` to `into`.

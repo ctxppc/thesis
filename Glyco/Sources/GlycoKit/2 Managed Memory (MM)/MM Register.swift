@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension CF {
+extension MM {
 	
 	/// A machine register.
 	public enum Register : String, Codable, Equatable, SimplyLowerable {

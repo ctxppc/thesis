@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension CF {
+extension MM {
 	
 	public enum BinaryExpression : Codable, Equatable {
 		
@@ -14,42 +14,42 @@ extension CF {
 	
 }
 
-public func + (lhs: CF.Register, rhs: CF.Register) -> CF.BinaryExpression {
+public func + (lhs: MM.Register, rhs: MM.Register) -> MM.BinaryExpression {
 	.registerRegister(lhs, .add, rhs)
 }
 
-public func + (lhs: CF.Register, rhs: Int) -> CF.BinaryExpression {
+public func + (lhs: MM.Register, rhs: Int) -> MM.BinaryExpression {
 	.registerImmediate(lhs, .add, rhs)
 }
 
-public func - (lhs: CF.Register, rhs: CF.Register) -> CF.BinaryExpression {
+public func - (lhs: MM.Register, rhs: MM.Register) -> MM.BinaryExpression {
 	.registerRegister(lhs, .sub, rhs)
 }
 
-public func - (lhs: CF.Register, rhs: Int) -> CF.BinaryExpression {
+public func - (lhs: MM.Register, rhs: Int) -> MM.BinaryExpression {
 	.registerImmediate(lhs, .sub, rhs)
 }
 
-public func & (lhs: CF.Register, rhs: CF.Register) -> CF.BinaryExpression {
+public func & (lhs: MM.Register, rhs: MM.Register) -> MM.BinaryExpression {
 	.registerRegister(lhs, .and, rhs)
 }
 
-public func & (lhs: CF.Register, rhs: Int) -> CF.BinaryExpression {
+public func & (lhs: MM.Register, rhs: Int) -> MM.BinaryExpression {
 	.registerImmediate(lhs, .and, rhs)
 }
 
-public func | (lhs: CF.Register, rhs: CF.Register) -> CF.BinaryExpression {
+public func | (lhs: MM.Register, rhs: MM.Register) -> MM.BinaryExpression {
 	.registerRegister(lhs, .or, rhs)
 }
 
-public func | (lhs: CF.Register, rhs: Int) -> CF.BinaryExpression {
+public func | (lhs: MM.Register, rhs: Int) -> MM.BinaryExpression {
 	.registerImmediate(lhs, .or, rhs)
 }
 
-public func ^ (lhs: CF.Register, rhs: CF.Register) -> CF.BinaryExpression {
+public func ^ (lhs: MM.Register, rhs: MM.Register) -> MM.BinaryExpression {
 	.registerRegister(lhs, .xor, rhs)
 }
 
-public func ^ (lhs: CF.Register, rhs: Int) -> CF.BinaryExpression {
+public func ^ (lhs: MM.Register, rhs: Int) -> MM.BinaryExpression {
 	.registerImmediate(lhs, .xor, rhs)
 }

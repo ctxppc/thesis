@@ -2,7 +2,7 @@
 
 import DepthKit
 
-extension CF {
+extension MM {
 	
 	/// A value that keeps track of allocated frame cells in a single frame.
 	///
@@ -47,7 +47,7 @@ extension CF {
 	
 }
 
-extension CF.Frame.Location : Comparable {
+extension MM.Frame.Location : Comparable {
 	public static func < (lhs: Self, rhs: Self) -> Bool {
 		lhs.offset < rhs.offset
 	}

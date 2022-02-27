@@ -120,18 +120,6 @@ extension CD.Procedure {
 	}
 }
 
-extension CF.Program {
-	public enum CodingKeys : String, CodingKey {
-		case effects = "_0"
-	}
-}
-
-extension CF.Frame {
-	public enum CodingKeys : String, CodingKey {
-		case allocatedByteSize = "allocatedByteSize"
-	}
-}
-
 extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
@@ -241,6 +229,18 @@ extension LS.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case value = "_1"
+	}
+}
+
+extension MM.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effects = "_0"
+	}
+}
+
+extension MM.Frame {
+	public enum CodingKeys : String, CodingKey {
+		case allocatedByteSize = "allocatedByteSize"
 	}
 }
 

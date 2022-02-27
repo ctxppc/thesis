@@ -17,7 +17,7 @@ The pipeline, from high-level to low-level is:
 [`PR`](#PR) →
 [`BB`](#BB) →
 [`FO`](#FO) →
-[`CF`](#CF) →
+[`MM`](#MM) →
 [`RV`](#RV) →
 [`S`](#S) →
  ELF.
@@ -764,7 +764,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 <h2 id="FO">Grammar for FO (Flexible Operands)</h2>
 A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 
-**Inherited from CF:**
+**Inherited from MM:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -828,19 +828,19 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>t6</strong></code></dd>
 </dl>
 
-<h2 id="CF">Grammar for CF (Call Frame)</h2>
-A language that introduces call frames and operations for managing the call frame.
+<h2 id="MM">Grammar for MM (Managed Memory)</h2>
+A language that introduces the call stack, the heap, and operations on them.
 
 **Inherited from RV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Label</code>
 <dl>
-	<dt><code>CF.Program</code></dt>
+	<dt><code>MM.Program</code></dt>
 	<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
-	<dt><code>CF.Effect</code></dt>
+	<dt><code>MM.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
@@ -858,13 +858,7 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
 <dl>
-	<dt><code>CF.DataType</code></dt>
-	<dd><code><strong>u8</strong></code></dd>
-	<dd><code><strong>s32</strong></code></dd>
-	<dd><code><strong>cap</strong></code></dd>
-</dl>
-<dl>
-	<dt><code>CF.Register</code></dt>
+	<dt><code>MM.Register</code></dt>
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
 	<dd><code><strong>t1</strong></code></dd>
@@ -894,13 +888,19 @@ A language that introduces call frames and operations for managing the call fram
 	<dd><code><strong>t6</strong></code></dd>
 </dl>
 <dl>
-	<dt><code>CF.BinaryExpression</code></dt>
-	<dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
-	<dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
+	<dt><code>MM.Frame</code></dt>
+	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
 </dl>
 <dl>
-	<dt><code>CF.Frame</code></dt>
-	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
+	<dt><code>MM.DataType</code></dt>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>MM.BinaryExpression</code></dt>
+	<dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
+	<dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>

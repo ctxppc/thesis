@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Call Frame
-//sourcery: description = "A language that introduces call frames and operations for managing the call frame."
-public enum CF : Language {
+//sourcery: longname = Managed Memory
+//sourcery: description = "A language that introduces the call stack, the heap, and operations on them."
+public enum MM : Language {
 	
-	/// A program in the base language.
+	/// An MM program.
 	public struct Program : Codable, GlycoKit.Program {
 		
 		/// Creates a program with given effects.
