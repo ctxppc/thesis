@@ -860,6 +860,20 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
+	<dt><code>MM.Permission</code></dt>
+	<dd><code><strong>global</strong></code></dd>
+	<dd><code><strong>execute</strong></code></dd>
+	<dd><code><strong>load</strong></code></dd>
+	<dd><code><strong>store</strong></code></dd>
+	<dd><code><strong>loadCapability</strong></code></dd>
+	<dd><code><strong>storeCapability</strong></code></dd>
+	<dd><code><strong>storeLocalCapability</strong></code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>invoke</strong></code></dd>
+	<dd><code><strong>unseal</strong></code></dd>
+	<dd><code><strong>setCID</strong></code></dd>
+</dl>
+<dl>
 	<dt><code>MM.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
@@ -871,6 +885,7 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
+	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>clear</strong>([Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
@@ -995,6 +1010,7 @@ N/A
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>seal</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
 	<dd><code><strong>sealEntry</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>permit</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>mask:</strong> Register)</code></dd>
 	<dd><code><strong>clear</strong>(<strong>quarter:</strong> Int, <strong>mask:</strong> UInt8)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>

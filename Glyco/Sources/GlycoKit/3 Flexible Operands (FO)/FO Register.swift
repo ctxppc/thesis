@@ -16,7 +16,7 @@ extension FO {
 		static let savedRegisters = OrderedSet(allCases).subtracting([.zero])
 		
 		/// The set of registers that are used for passing arguments to procedures, in argument order, in RISC-V ABIs.
-		public static let argumentRegistersInRVABI = [Self.a0, .a1, a2, a3, a4, a5, a6, a7]
+		public static let argumentRegistersInRVABI = registers(inClass: "a")
 		
 		/// The set of registers that can be used for passing results from procedures, in result value order, in RISC-V ABIs.
 		public static let resultRegistersInRVABI: OrderedSet = [Self.a0, .a1]
@@ -25,7 +25,7 @@ extension FO {
 		public static let callerSavedRegistersInRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInRVABI)
 		
 		/// The set of registers that a procedure must save before using in RISC-V ABIs.
-		public static let calleeSavedRegistersInRVABI = [Self.s1, .s2, .s3, .s4, .s5, .s6, .s7, .s8, .s9, .s10, .s11]
+		public static let calleeSavedRegistersInRVABI = registers(inClass: "s")
 		
 		/// The set of registers that a procedure must save before invoking a procedure in hybrid CHERI-RISC-V ABIs.
 		public static let callerSavedRegistersInCHERIRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInCHERIRVABI)
@@ -53,6 +53,11 @@ extension FO {
 		
 		/// A register for temporaries.
 		case t4, t5, t6
+		
+		/// Returns the registers in given class.
+		static func registers(inClass class: Character) -> [Self] {
+			allCases.filter { $0.rawValue.first == `class` }
+		}
 		
 		// See protocol.
 		func lowered(in context: inout ()) -> Lower.Register {

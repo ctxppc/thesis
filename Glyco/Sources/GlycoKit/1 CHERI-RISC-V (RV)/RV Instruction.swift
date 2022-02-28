@@ -72,6 +72,13 @@ extension RV {
 		/// A hardware exception is raised if `source` doesn't contain a valid, unsealed capability that permits execution.
 		case sealEntry(destination: Register, source: Register)
 		
+		/// An instruction that derives `destination` from `source`, keeping at most the permissions specified in the bitmask in `mask`.
+		///
+		/// The capability in `destination` contains a permission *p* iff *p* is in the capability in `source` **and** if *p* is among the specified permissions.
+		///
+		/// A hardware exception is raised if `source` doesn't contain a valid, unsealed capability.
+		case permit(destination: Register, source: Register, mask: Register)
+		
 		/// An instruction that clears registers 8 × `quarter` + *i* where *i* is the *i*th bit of `mask`.
 		case clear(quarter: Int, mask: UInt8)
 		
@@ -173,6 +180,9 @@ extension RV {
 				
 				case .sealEntry(destination: let destination, source: let source):
 				return "\(tabs)csealentry \(destination.c), \(source.c)"
+				
+				case .permit(destination: let destination, source: let source, mask: let mask):
+				return "\(tabs)candperm \(destination.c), \(source.c), \(mask.x)"
 				
 				case .clear(quarter: let quarter, mask: let mask):
 				return "\(tabs)cclear \(quarter), \(mask)"

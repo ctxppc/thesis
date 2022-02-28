@@ -43,6 +43,13 @@ extension MM {
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
 		
+		/// An effect that derives a capability from `source`, keeping at most the specified permissions, and puts it in `source`.
+		///
+		/// The capability in `destination` contains a permission *p* iff *p* is in the capability in `source` **and** if *p* is among the specified permissions.
+		///
+		/// A hardware exception is raised if `source` doesn't contain a valid, unsealed capability.
+		case permit([Permission], destination: Register, source: Register)
+		
 		/// An effect that clears given registers.
 		case clear([Register])
 		
@@ -121,9 +128,19 @@ extension MM {
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: false):
 				let buffer = try buffer.lowered()
 				return [
-					.setCapabilityBounds(destination: buffer, source: .tp, length: bytes),	// FIXME: base may be lower
+					
+					// Derive buffer capability.
+					.setCapabilityBounds(destination: buffer, source: .tp, length: bytes),
+					// FIXME: The base might move downward and into a previously allocated region.
+					
+					// Determine (possibly rounded-up) length of allocated buffer.
 					.getCapabilityLength(destination: temp, source: buffer),
+					
+					// Move heap capability over the allocated region.
 					.offsetCapability(destination: .tp, source: .tp, offset: temp),
+					
+					// TODO: Deallocation is not supported so maybe also restrict the heap capability?
+					
 				]
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: true):
@@ -143,10 +160,17 @@ extension MM {
 				 */
 				let buffer = try buffer.lowered()
 				return [
-					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),	// compute tentative base
-					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),			// actual base may be lower, length may be greater
-					.getCapabilityAddress(destination: temp, source: buffer),							// move stack capability
-					.setCapabilityAddress(destination: .sp, source: .sp, address: temp),				//   to actual base
+					
+					// Derive buffer capability (without bounding it yet).
+					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),
+					
+					// Restrict its bounds. Its base might move downwards, its length might increase.
+					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),
+					
+					// Move stack capability over the allocated region.
+					.getCapabilityAddress(destination: temp, source: buffer),
+					.setCapabilityAddress(destination: .sp, source: .sp, address: temp),
+					
 				]
 				
 				case .destroyBuffer(let buffer):
@@ -215,6 +239,13 @@ extension MM {
 					// Restore saved fp — follow the linked list.
 					.loadCapability(destination: .fp, address: .fp),
 					
+				]
+				
+				case .permit(let permissions, destination: let destination, source: let source):
+				let destination = try destination.lowered()
+				return [
+					.computeWithImmediate(operation: .add, rd: destination, rs1: .zero, imm: Int(permissions.bitmask)),
+					.permit(destination: destination, source: try source.lowered(), mask: destination),
 				]
 				
 				case .clear(let registers):
