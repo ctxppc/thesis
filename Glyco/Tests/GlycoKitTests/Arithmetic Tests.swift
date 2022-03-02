@@ -32,23 +32,25 @@ final class ArithmeticTests : XCTestCase {
 		let expected = """
 						.text
 						
-						.globl _start
-		_start:			la t0, _trap_vector
-						csrw mtvec, t0
-						la t0, main
-						csrw mepc, t0
+						.global _start
+		_start:			cllc ct0, _trap_vector
+						cspecialrw c0, mtcc, ct0
+						cllc ct0, rv.begin
+						cspecialrw c0, mepcc, ct0
 						mret
 						
 						.align 4
 		_trap_vector:	li gp, 3
 						j _exit
 						
-		_exit:			auipc t5, 0x1
-						sw gp, tohost, t5
+		_exit:			auipcc ct5, 0x1
+						cllc ct0, tohost
+						cincoffset ct0, ct0, gp
+						csc ct5, 0(ct0)
 						j _exit
 						
-		main:			la ra, rv.main
-						jalr ra, ra
+		rv.begin:		cllc cra, rv.main
+						cjalr cra, cra
 						li gp, 1
 						j _exit
 						
@@ -58,7 +60,7 @@ final class ArithmeticTests : XCTestCase {
 						mv a0, s1
 						ret.cap
 						
-						.align 6
+		rv.end:			.align 6
 						.global tohost
 		tohost:			.dword 0
 		"""
@@ -101,23 +103,25 @@ final class ArithmeticTests : XCTestCase {
 		let expected = """
 						.text
 						
-						.globl _start
-		_start:			la t0, _trap_vector
-						csrw mtvec, t0
-						la t0, main
-						csrw mepc, t0
+						.global _start
+		_start:			cllc ct0, _trap_vector
+						cspecialrw c0, mtcc, ct0
+						cllc ct0, rv.begin
+						cspecialrw c0, mepcc, ct0
 						mret
 						
 						.align 4
 		_trap_vector:	li gp, 3
 						j _exit
 						
-		_exit:			auipc t5, 0x1
-						sw gp, tohost, t5
+		_exit:			auipcc ct5, 0x1
+						cllc ct0, tohost
+						cincoffset ct0, ct0, gp
+						csc ct5, 0(ct0)
 						j _exit
 						
-		main:			la ra, rv.main
-						jalr ra, ra
+		rv.begin:		cllc cra, rv.main
+						cjalr cra, cra
 						li gp, 1
 						j _exit
 						
@@ -131,7 +135,7 @@ final class ArithmeticTests : XCTestCase {
 		cd.then:		addi s1, zero, 1
 						j cd.endif
 						
-						.align 6
+		rv.end:			.align 6
 						.global tohost
 		tohost:			.dword 0
 		"""
