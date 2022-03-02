@@ -55,22 +55,24 @@ public enum RV : Language {
 								.text
 								
 								.global _start
-				_start:			la t0, _trap_vector
-								csrw mtvec, t0
-								la t0, rv.begin
-								csrw mepc, t0
+				_start:			cllc ct0, _trap_vector
+								cspecialrw c0, mtcc, ct0
+								cllc ct0, rv.begin
+								cspecialrw c0, mepcc, ct0
 								mret
 								
 								.align 4
 				_trap_vector:	li gp, 3
 								j _exit
 								
-				_exit:			auipc t5, 0x1
-								sw gp, tohost, t5
+				_exit:			auipcc ct5, 0x1
+								cllc ct0, tohost
+								cincoffset ct0, ct0, gp
+								csc ct5, 0(ct0)
 								j _exit
 								
-				rv.begin:		la ra, \(Label.programEntry.rawValue)
-								jalr ra, ra
+				rv.begin:		cllc cra, \(Label.programEntry.rawValue)
+								cjalr cra, cra
 								li gp, 1
 								j _exit
 								

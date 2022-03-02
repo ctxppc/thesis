@@ -71,7 +71,7 @@ public enum S : Language {
 				}
 			}() + [
 				"-O2",
-				"-mabi=lp64d",
+				"-mabi=l64pc128d",
 				"-march=rv64gcxcheri",
 				"-mno-relax",
 				"-Wall", "-Wcheri",

@@ -1,22 +1,24 @@
 				.text
 				
 				.global _start
-_start:			la t0, _trap_vector
-				csrw mtvec, t0
-				la t0, rv.begin
-				csrw mepc, t0
+_start:			cllc ct0, _trap_vector
+				cspecialrw c0, mtcc, ct0
+				cllc ct0, rv.begin
+				cspecialrw c0, mepcc, ct0
 				mret
 				
 				.align 4
 _trap_vector:	li gp, 3
 				j _exit
 				
-_exit:			auipc t5, 0x1
-				sw gp, tohost, t5
+_exit:			auipcc ct5, 0x1
+				cllc ct0, tohost
+				cincoffset ct0, ct0, gp
+				csc ct5, 0(ct0)
 				j _exit
 				
-rv.begin:		la ra, rv.main
-				jalr ra, ra
+rv.begin:		cllc cra, rv.main
+				cjalr cra, cra
 				li gp, 1
 				j _exit
 				
@@ -26,7 +28,7 @@ rv.main:		cincoffsetimm ct0, csp, -8
 				cincoffsetimm csp, csp, -8
 				addi a0, zero, 1
 				addi a1, zero, 1
-				call fib
+				ccall fib
 cd.ret:			cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
 				ret.cap
@@ -45,7 +47,7 @@ fib:			cincoffsetimm ct0, csp, -8
 				mv a0, s1
 cd.then:		add zero, zero, zero
 cd.then$1:		add zero, zero, zero
-				call recFib
+				ccall recFib
 cd.ret$1:		mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
@@ -93,7 +95,7 @@ cd.then$3:		slli s1, a0, 4
 				mv a0, s1
 cd.then$4:		add zero, zero, zero
 cd.then$5:		add zero, zero, zero
-				call recFib
+				ccall recFib
 cd.ret$2:		mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8

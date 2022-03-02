@@ -197,7 +197,7 @@ extension RV {
 				return "\(tabs)cjr \(target.c)"
 				
 				case .call(target: let target):
-				return "\(tabs)call \(target.rawValue)"
+				return "\(tabs)ccall \(target.rawValue)"
 				
 				case .callWithRegister(target: let target, link: let link):
 				return "\(tabs)cjalr \(target.c), \(link.c)"
