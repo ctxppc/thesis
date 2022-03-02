@@ -26,7 +26,7 @@ rv.main:		cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
 				cincoffsetimm csp, csp, -8
-				call f
+				ccall f
 cd.ret:			cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
 				ret.cap
