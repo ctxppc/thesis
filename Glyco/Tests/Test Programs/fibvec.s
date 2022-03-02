@@ -1,9 +1,9 @@
 				.text
 				
-				.globl _start
+				.global _start
 _start:			la t0, _trap_vector
 				csrw mtvec, t0
-				la t0, main
+				la t0, rv.begin
 				csrw mepc, t0
 				mret
 				
@@ -15,7 +15,7 @@ _exit:			auipc t5, 0x1
 				sw gp, tohost, t5
 				j _exit
 				
-main:			la ra, rv.main
+rv.begin:		la ra, rv.main
 				jalr ra, ra
 				li gp, 1
 				j _exit
@@ -109,6 +109,6 @@ cd.then$2:		cmove ca0, ca5
 				lc.cap cfp, 0(cfp)
 				ret.cap
 				
-				.align 6
+rv.end:			.align 6
 				.global tohost
 tohost:			.dword 0

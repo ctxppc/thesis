@@ -54,10 +54,10 @@ public enum RV : Language {
 				return .init(assembly: """
 								.text
 								
-								.globl _start
+								.global _start
 				_start:			la t0, _trap_vector
 								csrw mtvec, t0
-								la t0, main
+								la t0, rv.begin
 								csrw mepc, t0
 								mret
 								
@@ -69,14 +69,14 @@ public enum RV : Language {
 								sw gp, tohost, t5
 								j _exit
 								
-				main:			la ra, \(Label.programEntry.rawValue)
+				rv.begin:		la ra, \(Label.programEntry.rawValue)
 								jalr ra, ra
 								li gp, 1
 								j _exit
 								
 				\(try instructions.lowered(in: &context).joined(separator: "\n"))
 								
-								.align 6
+				rv.end:			.align 6
 								.global tohost
 				tohost:			.dword 0
 				""")
