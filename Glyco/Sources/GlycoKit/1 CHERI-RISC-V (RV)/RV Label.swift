@@ -5,11 +5,14 @@ extension RV {
 	/// An identifier that can be used to jump execution to.
 	public struct Label : Name, RawCodable {
 		
-		/// The program entry label.
-		public static let programEntry = Self(rawValue: "rv.main")
+		/// The label for the initialisation routine.
+		public static let initialise: Self = "rv.init"
 		
-		/// The program exit label.
-		public static let programExit = Self(rawValue: "_exit")
+		/// The label for the user program's first instruction.
+		public static let programEntry: Self = "rv.main"
+		
+		/// The label for the exit routine.
+		public static let programExit: Self = "_exit"
 		
 		// See protocol.
 		public init(rawValue: String) {

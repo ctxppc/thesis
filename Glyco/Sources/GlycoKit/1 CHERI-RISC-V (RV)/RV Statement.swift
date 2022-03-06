@@ -8,11 +8,17 @@ extension RV {
 		/// A machine instruction or pseudo-instruction.
 		case instruction(Instruction)
 		
-		/// A region of memory occupied by sufficient space to ensure subsequent statements are lowered in `alignment`-byte-aligned memory.
-		case padding(alignment: Int)
+		/// A region of memory occupied by sufficient space to ensure subsequent statements are lowered in `byteAlignment`-byte-aligned memory.
+		case padding(byteAlignment: Int)
+		
+		/// A region of memory filled with `copies` copies of the `datumByteSize`-byte datum with value `value`.
+		case filled(value: Int, datumByteSize: Int, copies: Int)
 		
 		/// A region of memory consisting of given signed word.
 		case signedWord(Int)
+		
+		/// A region of memory consisting of a null capability.
+		case nullCapability
 		
 		/// A region of memory described by given statement and associated with a label.
 		indirect case labelled(Label, Statement)
@@ -25,11 +31,17 @@ extension RV {
 				case .instruction(let instruction):
 				return "\(tabs)\(instruction.lowered(in: &context))"
 				
-				case .padding(alignment: let alignment):
-				return "\(tabs).align \(alignment)"
+				case .padding(byteAlignment: let byteAlignment):
+				return "\(tabs).align \(byteAlignment)"
+				
+				case .filled(value: let value, datumByteSize: let datumByteSize, copies: let copies):
+				return "\(tabs).fill \(copies), \(datumByteSize), \(value)"
 				
 				case .signedWord(let value):
 				return "\(tabs).dword \(value)"
+				
+				case .nullCapability:
+				return "\(tabs).quad 0"
 				
 				case .labelled(let label, .labelled(let innerLabel, let statement)):
 				let next = Self.labelled(innerLabel, statement).lowered(in: &context)
@@ -49,6 +61,47 @@ extension RV {
 				
 			}
 		}
+	}
+	
+}
+
+@resultBuilder
+enum StatementsBuilder {
+	
+	static func buildBlock(_ statements: [RV.Statement]...) -> [RV.Statement] {
+		statements.flatMap { $0 }
+	}
+	
+	static func buildArray(_ statements: [RV.Statement]) -> [RV.Statement] {
+		statements
+	}
+	
+	static func buildOptional(_ statements: [RV.Statement]?) -> [RV.Statement] {
+		statements ?? []
+	}
+	
+	static func buildEither(first statements: [RV.Statement]) -> [RV.Statement] {
+		statements
+	}
+	
+	static func buildEither(second statements: [RV.Statement]) -> [RV.Statement] {
+		statements
+	}
+	
+	static func buildExpression(_ statement: RV.Statement) -> [RV.Statement] {
+		[statement]
+	}
+	
+	static func buildExpression(_ statements: [RV.Statement]) -> [RV.Statement] {
+		statements
+	}
+	
+	static func buildExpression(_ statement: RV.Instruction) -> [RV.Statement] {
+		[.instruction(statement)]
+	}
+	
+	static func buildExpression(_: ()) -> [RV.Statement] {
+		[]
 	}
 	
 }

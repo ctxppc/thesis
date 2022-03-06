@@ -55,7 +55,12 @@ public struct CompilationConfiguration {
 	/// A Boolean value indicating whether programs are validated in each language before lowering them.
 	public var validate: Bool = true
 	
+	/// The size of the heap, in bytes.
+	///
+	/// The default size is 1 MiB.
+	public var heapByteSize: Int = 1 << 20
+	
 	/// The (suggested) maximum line length of serialised output programs.
-	public var maximumLineLength = 120
+	public var maximumLineLength: Int = 120
 	
 }

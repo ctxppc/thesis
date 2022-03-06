@@ -12,6 +12,11 @@ public enum RV : Language {
 			self.statements = statements
 		}
 		
+		//sourcery: isInternalForm
+		public init(@StatementsBuilder _ statements: () throws -> [Statement]) rethrows {
+			self.init(try statements())
+		}
+		
 		/// The program's statements.
 		public var statements: [Statement]
 		
@@ -38,6 +43,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
+								ccall		\(Label.initialise.rawValue)
 								ccall		\(Label.programEntry.rawValue)
 								cret
 				main.end:		.size		main, main.end-main
@@ -71,8 +77,8 @@ public enum RV : Language {
 								csc ct5, 0(ct0)
 								j _exit
 								
-				rv.begin:		cllc cra, \(Label.programEntry.rawValue)
-								cjalr cra, cra
+				rv.begin:		ccall \(Label.initialise.rawValue)
+								ccall \(Label.programEntry.rawValue)
 								li gp, 1
 								j _exit
 								

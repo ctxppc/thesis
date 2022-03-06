@@ -42,6 +42,9 @@ extension RV {
 		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`.
 		case storeCapability(source: Register, address: Register)
 		
+		/// An instruction that derives a capability from PCC to the memory location labelled `label` and puts it in `destination`.
+		case deriveCapabilityFromLabel(destination: Register, label: Label)
+		
 		/// An instruction that offsets the capability in `source` by the offset in `offset` and puts it in `destination`.
 		case offsetCapability(destination: Register, source: Register, offset: Register)
 		
@@ -51,16 +54,24 @@ extension RV {
 		/// An instruction that determines the (integer) length of the capability in `source` and puts it in `destination`.
 		case getCapabilityLength(destination: Register, source: Register)
 		
-		/// An instruction that copies the capability from `source` to `datum` then adjusts its length to `length` bytes.
+		/// An instruction that copies the capability from `source` to `destination` then adjusts its length to the length in `length`.
 		///
 		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
-		case setCapabilityBounds(destination: Register, source: Register, length: Int)
+		case setCapabilityBounds(destination: Register, source: Register, length: Register)
+		
+		/// An instruction that copies the capability from `source` to `destination` then adjusts its length to `length` bytes.
+		///
+		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
+		case setCapabilityBoundsWithImmediate(destination: Register, source: Register, length: Int)
 		
 		/// An instruction that determines the (integer) address of the capability in `source` and puts it in `destination`.
 		case getCapabilityAddress(destination: Register, source: Register)
 		
 		/// An instruction that copies copies `destination` to `source`, replacing the address with the integer in `address`.
 		case setCapabilityAddress(destination: Register, source: Register, address: Register)
+		
+		/// An instruction that subtracts the address in `cs2` from the address in `cs1` and puts the difference in `destination`.
+		case getCapabilityDistance(destination: Register, cs1: Register, cs2: Register)
 		
 		/// An instruction that seals the capability in `source` using the address of the capability in `seal` as the object type and puts it in `destination`.
 		///
@@ -153,6 +164,9 @@ extension RV {
 				case .storeCapability(source: let cs, address: let address):
 				return "sc.cap \(cs.c), 0(\(address.c))"
 				
+				case .deriveCapabilityFromLabel(destination: let cd, label: let label):
+				return "cllc \(cd.c), \(label.rawValue)"
+				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
 				return "cincoffset \(destination.c), \(source.c), \(offset.x)"
 				
@@ -163,6 +177,9 @@ extension RV {
 				return "cgetlen \(destination.x), \(source.c)"
 				
 				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
+				return "csetbounds \(destination.c), \(source.c), \(length.x)"
+				
+				case .setCapabilityBoundsWithImmediate(destination: let destination, source: let source, length: let length):
 				return "csetboundsimm \(destination.c), \(source.c), \(length)"
 				
 				case .getCapabilityAddress(destination: let destination, source: let source):
@@ -170,6 +187,9 @@ extension RV {
 				
 				case .setCapabilityAddress(destination: let destination, source: let source, address: let address):
 				return "csetaddr \(destination.c), \(source.c), \(address.x)"
+				
+				case .getCapabilityDistance(destination: let destination, cs1: let cs1, cs2: let cs2):
+				return "csub \(destination.x), \(cs1.c), \(cs2.c)"
 				
 				case .seal(destination: let destination, source: let source, seal: let seal):
 				return "cseal \(destination.c), \(source.c), \(seal.c)"

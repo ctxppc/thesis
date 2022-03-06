@@ -986,8 +986,10 @@ N/A
 <dl>
 	<dt><code>RV.Statement</code></dt>
 	<dd><code><strong>instruction</strong>(Instruction)</code></dd>
-	<dd><code><strong>padding</strong>(<strong>alignment:</strong> Int)</code></dd>
+	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
+	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
 	<dd><code><strong>signedWord</strong>(Int)</code></dd>
+	<dd><code><strong>nullCapability</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 <dl>
@@ -1009,12 +1011,15 @@ N/A
 	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityBoundsWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>
 	<dd><code><strong>seal</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
 	<dd><code><strong>sealEntry</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>permit</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>mask:</strong> Register)</code></dd>

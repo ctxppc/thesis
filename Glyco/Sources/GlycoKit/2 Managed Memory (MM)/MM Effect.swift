@@ -130,7 +130,7 @@ extension MM {
 				return [
 					
 					// Derive buffer capability.
-					.instruction(.setCapabilityBounds(destination: buffer, source: .tp, length: bytes)),
+					.instruction(.setCapabilityBoundsWithImmediate(destination: buffer, source: .tp, length: bytes)),
 					// FIXME: The base might move downward and into a previously allocated region.
 					
 					// Determine (possibly rounded-up) length of allocated buffer.
@@ -138,8 +138,6 @@ extension MM {
 					
 					// Move heap capability over the allocated region.
 					.instruction(.offsetCapability(destination: .tp, source: .tp, offset: temp)),
-					
-					// TODO: Deallocation is not supported so maybe also restrict the heap capability?
 					
 				]
 				
@@ -165,7 +163,7 @@ extension MM {
 					.instruction(.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes)),
 					
 					// Restrict its bounds. Its base might move downwards, its length might increase.
-					.instruction(.setCapabilityBounds(destination: buffer, source: buffer, length: bytes)),
+					.instruction(.setCapabilityBoundsWithImmediate(destination: buffer, source: buffer, length: bytes)),
 					
 					// Move stack capability over the allocated region.
 					.instruction(.getCapabilityAddress(destination: temp, source: buffer)),
