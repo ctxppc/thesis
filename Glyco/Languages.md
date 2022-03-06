@@ -940,13 +940,13 @@ A language that introduces the call stack, the heap, and operations on them.
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
-A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
+A language that maps directly to CHERI-RISC-V assembly statements, i.e., labels, instructions, and directives.
 
 **Inherited from S:**
 N/A
 <dl>
 	<dt><code>RV.Program</code></dt>
-	<dd><code>([Instruction])</code></dd>
+	<dd><code>([Statement])</code></dd>
 </dl>
 <dl>
 	<dt><code>RV.Register</code></dt>
@@ -984,6 +984,13 @@ N/A
 	<dd><code><strong>t6</strong></code></dd>
 </dl>
 <dl>
+	<dt><code>RV.Statement</code></dt>
+	<dd><code><strong>instruction</strong>(Instruction)</code></dd>
+	<dd><code><strong>padding</strong>(<strong>alignment:</strong> Int)</code></dd>
+	<dd><code><strong>signedWord</strong>(Int)</code></dd>
+	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
+</dl>
+<dl>
 	<dt><code>RV.Label</code></dt>
 	<dd><code>String</code></dd>
 </dl>
@@ -1019,7 +1026,6 @@ N/A
 	<dd><code><strong>callWithRegister</strong>(<strong>target:</strong> Register, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
-	<dd><code><strong>labelled</strong>(Label, Instruction)</code></dd>
 </dl>
 <dl>
 	<dt><code>RV.BranchRelation</code></dt>

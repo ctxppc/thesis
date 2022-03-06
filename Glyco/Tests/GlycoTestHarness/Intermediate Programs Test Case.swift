@@ -8,9 +8,10 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	
 	func testPrograms() throws {
 		
-		guard
-			let urls = try? FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "Tests/Test Programs"), includingPropertiesForKeys: nil)
-		else { throw XCTSkip("Tests/Test Programs doesn't exist") }
+		guard let urls = try? FileManager.default.contentsOfDirectory(
+			at: .init(fileURLWithPath: "Tests/Test Programs"),
+			includingPropertiesForKeys: nil
+		) else { throw XCTSkip("Tests/Test Programs doesn't exist") }
 		
 		let urlsByGroupName = Dictionary(grouping: urls) { url in
 			url.deletingPathExtension().lastPathComponent

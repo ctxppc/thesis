@@ -4,7 +4,7 @@ extension RV {
 	
 	/// A CHERI-RISC-V instruction.
 	///
-	/// Each instruction maps to exactly one assembly instruction.
+	/// Each instruction maps to exactly one machine instruction or pseudo-instruction.
 	///
 	/// As a convention, the following verbiage is used in the context of data movement:
 	/// * a datum is *loaded from* or *stored in* memory;
@@ -113,116 +113,96 @@ extension RV {
 		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
 		
-		/// An instruction that can be jumped to using given label.
-		indirect case labelled(Label, Instruction)
-		
 		// See protocol.
 		func lowered(in context: inout Context) -> String {
-			let tabs = String((0..<context.tabIndentation).map { _ in "\t" })
 			switch self {
 				
 				case .copyWord(destination: let destination, source: let source):
-				return "\(tabs)mv \(destination.x), \(source.x)"
+				return "mv \(destination.x), \(source.x)"
 				
 				case .copyCapability(destination: let destination, source: let source):
-				return "\(tabs)cmove \(destination.c), \(source.c)"
+				return "cmove \(destination.c), \(source.c)"
 				
 				case .computeWithRegister(operation: let operation, rd: let rd, rs1: let rs1, rs2: let rs2):
-				return "\(tabs)\(operation.rawValue) \(rd.x), \(rs1.x), \(rs2.x)"
+				return "\(operation.rawValue) \(rd.x), \(rs1.x), \(rs2.x)"
 				
 				case .computeWithImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm) where imm >= 0:
-				return "\(tabs)addi \(rd.x), \(rs1.x), -\(imm)"
+				return "addi \(rd.x), \(rs1.x), -\(imm)"
 				
 				case .computeWithImmediate(operation: .sub, rd: let rd, rs1: let rs1, imm: let imm):
-				return "\(tabs)addi \(rd.x), \(rs1.x), \(imm)"
+				return "addi \(rd.x), \(rs1.x), \(imm)"
 				
 				case .computeWithImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
-				return "\(tabs)\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
+				return "\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
 				case .loadByte(destination: let rd, address: let address):
-				return "\(tabs)lbu.cap \(rd.x), 0(\(address.c))"
+				return "lbu.cap \(rd.x), 0(\(address.c))"
 				
 				case .loadSignedWord(destination: let rd, address: let address):
-				return "\(tabs)lw.cap \(rd.x), 0(\(address.c))"
+				return "lw.cap \(rd.x), 0(\(address.c))"
 				
 				case .loadCapability(destination: let cd, address: let address):
-				return "\(tabs)lc.cap \(cd.c), 0(\(address.c))"
+				return "lc.cap \(cd.c), 0(\(address.c))"
 				
 				case .storeByte(source: let rs, address: let address):
-				return "\(tabs)sbu.cap \(rs.x), 0(\(address.c))"
+				return "sbu.cap \(rs.x), 0(\(address.c))"
 				
 				case .storeSignedWord(source: let rs, address: let address):
-				return "\(tabs)sw.cap \(rs.x), 0(\(address.c))"
+				return "sw.cap \(rs.x), 0(\(address.c))"
 				
 				case .storeCapability(source: let cs, address: let address):
-				return "\(tabs)sc.cap \(cs.c), 0(\(address.c))"
+				return "sc.cap \(cs.c), 0(\(address.c))"
 				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
-				return "\(tabs)cincoffset \(destination.c), \(source.c), \(offset.x)"
+				return "cincoffset \(destination.c), \(source.c), \(offset.x)"
 				
 				case .offsetCapabilityWithImmediate(destination: let destination, source: let source, offset: let offset):
-				return "\(tabs)cincoffsetimm \(destination.c), \(source.c), \(offset)"
+				return "cincoffsetimm \(destination.c), \(source.c), \(offset)"
 				
 				case .getCapabilityLength(destination: let destination, source: let source):
-				return "\(tabs)cgetlen \(destination.x), \(source.c)"
+				return "cgetlen \(destination.x), \(source.c)"
 				
 				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
-				return "\(tabs)csetboundsimm \(destination.c), \(source.c), \(length)"
+				return "csetboundsimm \(destination.c), \(source.c), \(length)"
 				
 				case .getCapabilityAddress(destination: let destination, source: let source):
-				return "\(tabs)cgetaddr \(destination.x), \(source.c)"
+				return "cgetaddr \(destination.x), \(source.c)"
 				
 				case .setCapabilityAddress(destination: let destination, source: let source, address: let address):
-				return "\(tabs)csetaddr \(destination.c), \(source.c), \(address.x)"
+				return "csetaddr \(destination.c), \(source.c), \(address.x)"
 				
 				case .seal(destination: let destination, source: let source, seal: let seal):
-				return "\(tabs)cseal \(destination.c), \(source.c), \(seal.c)"
+				return "cseal \(destination.c), \(source.c), \(seal.c)"
 				
 				case .sealEntry(destination: let destination, source: let source):
-				return "\(tabs)csealentry \(destination.c), \(source.c)"
+				return "csealentry \(destination.c), \(source.c)"
 				
 				case .permit(destination: let destination, source: let source, mask: let mask):
-				return "\(tabs)candperm \(destination.c), \(source.c), \(mask.x)"
+				return "candperm \(destination.c), \(source.c), \(mask.x)"
 				
 				case .clear(quarter: let quarter, mask: let mask):
-				return "\(tabs)cclear \(quarter), \(mask)"
+				return "cclear \(quarter), \(mask)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
-				return "\(tabs)b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
+				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
 				case .jump(target: let target):
-				return "\(tabs)j \(target.rawValue)"
+				return "j \(target.rawValue)"
 				
 				case .jumpWithRegister(target: let target):
-				return "\(tabs)cjr \(target.c)"
+				return "cjr \(target.c)"
 				
 				case .call(target: let target):
-				return "\(tabs)ccall \(target.rawValue)"
+				return "ccall \(target.rawValue)"
 				
 				case .callWithRegister(target: let target, link: let link):
-				return "\(tabs)cjalr \(target.c), \(link.c)"
+				return "cjalr \(target.c), \(link.c)"
 				
 				case .invoke(target: let target, data: let data):
-				return "\(tabs)cinvoke \(target.c), \(data.c)"
+				return "cinvoke \(target.c), \(data.c)"
 				
 				case .return:
-				return "\(tabs)ret.cap"
-				
-				case .labelled(let label, .labelled(let innerLabel, let instruction)):
-				let next = Self.labelled(innerLabel, instruction).lowered(in: &context)
-				return "\(label.rawValue):\n\(next)"
-				
-				case .labelled(let label, let instruction):
-				let prefix = "\(label.rawValue):"
-				let spacingWidth = (context.tabIndentation - prefix.count / 4).capped(to: 1...)
-				let spacing = String((0..<spacingWidth).map { _ in "\t" })
-				let next: String = {
-					let previousIndentation = context.tabIndentation
-					context.tabIndentation = 0
-					defer { context.tabIndentation = previousIndentation }
-					return instruction.lowered(in: &context)
-				}()
-				return "\(prefix)\(spacing)\(next)"
+				return "ret.cap"
 				
 			}
 		}

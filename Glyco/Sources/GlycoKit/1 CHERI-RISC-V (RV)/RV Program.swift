@@ -1,19 +1,19 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = CHERI-RISC-V
-//sourcery: description = A language that maps directly to CHERI-RISC-V (pseudo-)instructions.
+//sourcery: description = "A language that maps directly to CHERI-RISC-V assembly statements, i.e., labels, instructions, and directives."
 public enum RV : Language {
 	
 	/// A program in the RV language.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given instructions.
-		public init(_ instructions: [Instruction]) {
-			self.instructions = instructions
+		/// Creates a program with given statements.
+		public init(_ statements: [Statement]) {
+			self.statements = statements
 		}
 		
-		/// The program's instructions.
-		public var instructions: [Instruction]
+		/// The program's statements.
+		public var statements: [Statement]
 		
 		// See protocol.
 		public func optimise() -> Bool { false }
@@ -43,7 +43,7 @@ public enum RV : Language {
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
 								
-				\(try instructions.lowered(in: &context).joined(separator: "\n"))
+				\(try statements.lowered(in: &context).joined(separator: "\n"))
 								
 								.ident		"glyco version 0.1"
 								.section	".note.GNU-stack", "", @progbits
@@ -76,7 +76,7 @@ public enum RV : Language {
 								li gp, 1
 								j _exit
 								
-				\(try instructions.lowered(in: &context).joined(separator: "\n"))
+				\(try statements.lowered(in: &context).joined(separator: "\n"))
 								
 				rv.end:			.align 6
 								.global tohost

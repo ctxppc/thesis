@@ -72,57 +72,57 @@ extension MM {
 		static var nop: Self { .compute(.zero, Register.zero + .zero) }
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> [Lower.Instruction] {
+		func lowered(in context: inout ()) throws -> [Lower.Statement] {
 			let temp = Lower.Register.t0
 			switch self {
 				
 				case .copy(.u8, into: let destination, from: let source),	// TODO: Copy u8 as s32 then mask out upper bits.
 					.copy(.s32, into: let destination, from: let source):
-				return try [.copyWord(destination: destination.lowered(), source: source.lowered())]
+				return try [.instruction(.copyWord(destination: destination.lowered(), source: source.lowered()))]
 				
 				case .copy(.cap, into: let destination, from: let source):
-				return try [.copyCapability(destination: destination.lowered(), source: source.lowered())]
+				return try [.instruction(.copyCapability(destination: destination.lowered(), source: source.lowered()))]
 				
 				case .compute(let destination, .registerRegister(let rs1, let operation, let rs2)):
-				return try [.computeWithRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())]
+				return try [.instruction(.computeWithRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered()))]
 				
 				case .compute(let destination, .registerImmediate(let rs1, let operation, let imm)):
-				return try [.computeWithImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)]
+				return try [.instruction(.computeWithImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm))]
 				
 				case .load(.u8, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
-					.loadByte(destination: try destination.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)),
+					.instruction(.loadByte(destination: try destination.lowered(), address: temp)),
 				]
 				
 				case .load(.s32, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
-					.loadSignedWord(destination: try destination.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)),
+					.instruction(.loadSignedWord(destination: try destination.lowered(), address: temp)),
 				]
 				
 				case .load(.cap, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset),
-					.loadCapability(destination: try destination.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)),
+					.instruction(.loadCapability(destination: try destination.lowered(), address: temp)),
 				]
 				
 				case .store(.u8, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
-					.storeByte(source: try source.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)),
+					.instruction(.storeByte(source: try source.lowered(), address: temp)),
 				]
 				
 				case .store(.s32, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
-					.storeSignedWord(source: try source.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)),
+					.instruction(.storeSignedWord(source: try source.lowered(), address: temp)),
 				]
 				
 				case .store(.cap, into: let destination, from: let source):
 				return [
-					.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset),
-					.storeCapability(source: try source.lowered(), address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)),
+					.instruction(.storeCapability(source: try source.lowered(), address: temp)),
 				]
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: false):
@@ -130,14 +130,14 @@ extension MM {
 				return [
 					
 					// Derive buffer capability.
-					.setCapabilityBounds(destination: buffer, source: .tp, length: bytes),
+					.instruction(.setCapabilityBounds(destination: buffer, source: .tp, length: bytes)),
 					// FIXME: The base might move downward and into a previously allocated region.
 					
 					// Determine (possibly rounded-up) length of allocated buffer.
-					.getCapabilityLength(destination: temp, source: buffer),
+					.instruction(.getCapabilityLength(destination: temp, source: buffer)),
 					
 					// Move heap capability over the allocated region.
-					.offsetCapability(destination: .tp, source: .tp, offset: temp),
+					.instruction(.offsetCapability(destination: .tp, source: .tp, offset: temp)),
 					
 					// TODO: Deallocation is not supported so maybe also restrict the heap capability?
 					
@@ -162,71 +162,71 @@ extension MM {
 				return [
 					
 					// Derive buffer capability (without bounding it yet).
-					.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes),
+					.instruction(.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes)),
 					
 					// Restrict its bounds. Its base might move downwards, its length might increase.
-					.setCapabilityBounds(destination: buffer, source: buffer, length: bytes),
+					.instruction(.setCapabilityBounds(destination: buffer, source: buffer, length: bytes)),
 					
 					// Move stack capability over the allocated region.
-					.getCapabilityAddress(destination: temp, source: buffer),
-					.setCapabilityAddress(destination: .sp, source: .sp, address: temp),
+					.instruction(.getCapabilityAddress(destination: temp, source: buffer)),
+					.instruction(.setCapabilityAddress(destination: .sp, source: .sp, address: temp)),
 					
 				]
 				
 				case .destroyBuffer(let buffer):
 				return [
-					.getCapabilityLength(destination: temp, source: try buffer.lowered()),
-					.offsetCapability(destination: .sp, source: .sp, offset: temp),
+					.instruction(.getCapabilityLength(destination: temp, source: try buffer.lowered())),
+					.instruction(.offsetCapability(destination: .sp, source: .sp, offset: temp)),
 				]
 				
 				case .loadElement(.u8, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
-					.loadByte(destination: destination.lowered(), address: destination.lowered()),
+					.instruction(.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.loadByte(destination: destination.lowered(), address: destination.lowered())),
 				]
 				
 				case .loadElement(.s32, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
-					.loadSignedWord(destination: destination.lowered(), address: destination.lowered()),
+					.instruction(.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.loadSignedWord(destination: destination.lowered(), address: destination.lowered())),
 				]
 				
 				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: let offset):
 				return try [
-					.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered()),
-					.loadCapability(destination: destination.lowered(), address: destination.lowered()),
+					.instruction(.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.loadCapability(destination: destination.lowered(), address: destination.lowered())),
 				]
 				
 				case .storeElement(.u8, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
-					.storeByte(source: source.lowered(), address: temp),
+					.instruction(.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.storeByte(source: source.lowered(), address: temp)),
 				]
 				
 				case .storeElement(.s32, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
-					.storeSignedWord(source: source.lowered(), address: temp),
+					.instruction(.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.storeSignedWord(source: source.lowered(), address: temp)),
 				]
 				
 				case .storeElement(.cap, buffer: let buffer, offset: let offset, from: let source):
 				return try [
-					.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered()),
-					.storeCapability(source: source.lowered(), address: temp),
+					.instruction(.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())),
+					.instruction(.storeCapability(source: source.lowered(), address: temp)),
 				]
 				
 				case .pushFrame(let frame):
 				return [
 					
 					// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
-					.offsetCapabilityWithImmediate(destination: temp, source: .sp, offset: -DataType.cap.byteSize),
-					.storeCapability(source: .fp, address: temp),
+					.instruction(.offsetCapabilityWithImmediate(destination: temp, source: .sp, offset: -DataType.cap.byteSize)),
+					.instruction(.storeCapability(source: .fp, address: temp)),
 					
 					// Set up fp for new frame — using deferred sp.
-					.copyCapability(destination: .fp, source: temp),
+					.instruction(.copyCapability(destination: .fp, source: temp)),
 					
 					// Allocate space for frame by pushing sp downward.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -frame.allocatedByteSize),
+					.instruction(.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -frame.allocatedByteSize)),
 					
 				]
 
@@ -234,18 +234,18 @@ extension MM {
 				return [
 					
 					// Pop frame and saved fp by moving sp one word above the saved fp's location.
-					.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.cap.byteSize),
+					.instruction(.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.cap.byteSize)),
 					
 					// Restore saved fp — follow the linked list.
-					.loadCapability(destination: .fp, address: .fp),
+					.instruction(.loadCapability(destination: .fp, address: .fp)),
 					
 				]
 				
 				case .permit(let permissions, destination: let destination, source: let source):
 				let destination = try destination.lowered()
 				return [
-					.computeWithImmediate(operation: .add, rd: destination, rs1: .zero, imm: Int(permissions.bitmask)),
-					.permit(destination: destination, source: try source.lowered(), mask: destination),
+					.instruction(.computeWithImmediate(operation: .add, rd: destination, rs1: .zero, imm: Int(permissions.bitmask))),
+					.instruction(.permit(destination: destination, source: try source.lowered(), mask: destination)),
 				]
 				
 				case .clear(let registers):
@@ -256,22 +256,24 @@ extension MM {
 						.map { 1 << ($0.ordinal % 8) }
 						.reduce(0, |)
 				}
-				return masksByQuarter.map { .clear(quarter: $0.0, mask: $0.1) }
+				return masksByQuarter.map { .instruction(.clear(quarter: $0.0, mask: $0.1)) }
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
-				return try [.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)]
+				return try [.instruction(.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target))]
 				
 				case .jump(to: let target):
-				return [.jump(target: target)]
+				return [.instruction(.jump(target: target))]
 				
 				case .call(let label):
-				return [.call(target: label)]
+				return [.instruction(.call(target: label))]
 				
 				case .return:
-				return [.return]
+				return [.instruction(.return)]
 				
-				case .labelled(let label, let instruction):
-				guard let (first, tail) = try instruction.lowered(in: &context).splittingFirst() else { return [] /* should never happen — famous last words */ }
+				case .labelled(let label, let effect):
+				guard let (first, tail) = try effect.lowered(in: &context).splittingFirst() else {
+					return [] /* should never happen — famous last words */
+				}
 				return [.labelled(label, first)].appending(contentsOf: tail)
 				
 			}
