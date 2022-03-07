@@ -11,9 +11,6 @@ extension MM {
 		/// The return address register.
 		case ra
 		
-		/// A register for temporaries.
-		case t1, t2
-		
 		/// A saved register.
 		case s1
 		
@@ -34,8 +31,6 @@ extension MM {
 			switch self {
 				case .zero:	return .zero
 				case .ra:	return .ra
-				case .t1:	return .t1
-				case .t2:	return .t2
 				case .s1:	return .s1
 				case .a0:	return .a0
 				case .a1:	return .a1

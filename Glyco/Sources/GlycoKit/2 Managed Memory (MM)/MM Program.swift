@@ -24,9 +24,11 @@ public enum MM : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			
+			var context = Context(configuration: configuration)
+			
 			let allocLabel = "mm.alloc" as Label
 			let allocEndLabel = "mm.alloc.end" as Label
-			let allocCapLabel = "mm.alloc.cap" as Label
+			let allocCapLabel = Label.allocationRoutineCapability
 			
 			let heapLabel = "mm.heap" as Label
 			let heapEndLabel = "mm.heap.end" as Label
@@ -35,147 +37,144 @@ public enum MM : Language {
 			let userLabel = "mm.user" as Label
 			let userEndLabel = "mm.user.end" as Label
 			
-			// Routines are allowed to touch all argument registers.
-			let actualLengthReg = Lower.Register.a3
-			let permissionsMaskReg = Lower.Register.a4
+			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
-			// A routine that initialises the runtime. It does not take arguments or return a value.
+			// A routine that initialises the runtime and restricts the user's authority. It touches all registers.
 			@StatementsBuilder
 			var initialisationRoutine: [Lower.Statement] {
 				
-				Lower.Statement.padding(byteAlignment: 4)
-				
+				// Initialise heap cap.
 				do {
 					
-					let heapCapReg = Lower.Register.a0
-					let heapCapEndReg = Lower.Register.a1
-					let heapCapLengthReg = Lower.Register.a2
-					let heapCapCapReg = Lower.Register.a3
-					
 					// Derive heap cap.
-					Lower.Statement.labelled(.initialise, .instruction(.deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)))
+					let heapCapReg = Lower.Register.t0
+					(.initialise) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
 					
 					// Restrict heap cap bounds.
+					let heapCapEndReg = Lower.Register.t1
+					let heapCapLengthReg = Lower.Register.t1
 					Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapEndReg, label: heapEndLabel)
 					Lower.Instruction.getCapabilityDistance(destination: heapCapLengthReg, cs1: heapCapEndReg, cs2: heapCapReg)
 					Lower.Instruction.setCapabilityBounds(destination: heapCapReg, source: heapCapReg, length: heapCapLengthReg)
 					
 					// Restrict heap cap permissions.
-					Lower.Instruction.computeWithImmediate(
-						operation:	.add,
-						rd:			permissionsMaskReg,
-						rs1:		.zero,
-						imm:		.init(Self.heapCapabilityPermissions.bitmask)
-					)
-					Lower.Instruction.permit(destination: heapCapReg, source: heapCapReg, mask: permissionsMaskReg)
+					let permissionsReg = Lower.Register.t1
+					let bitmask = Self.heapCapabilityPermissions.bitmask
+					Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsReg, rs1: .zero, imm: .init(bitmask))
+					Lower.Instruction.permit(destination: heapCapReg, source: heapCapReg, mask: permissionsReg)
 					
 					// Derive heap cap cap and store heap cap.
+					let heapCapCapReg = Lower.Register.t1
 					Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
 					Lower.Instruction.storeCapability(source: heapCapReg, address: heapCapCapReg)
 					
 				}
 				
+				// Initialise alloc cap.
 				do {
 					
-					let allocCapReg = Lower.Register.a0
-					let allocCapEndReg = Lower.Register.a1
-					let allocCapLengthReg = Lower.Register.a2
-					let allocCapCapReg = Lower.Register.a3
-					
 					// Derive alloc cap.
+					let allocCapReg = Lower.Register.t0
 					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapReg, label: allocLabel)
 					
 					// Restrict alloc cap bounds.
+					let allocCapEndReg = Lower.Register.t1
+					let allocCapLengthReg = Lower.Register.t1
 					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapEndReg, label: allocEndLabel)
 					Lower.Instruction.getCapabilityDistance(destination: allocCapLengthReg, cs1: allocCapEndReg, cs2: allocCapReg)
 					Lower.Instruction.setCapabilityBounds(destination: allocCapReg, source: allocCapReg, length: allocCapLengthReg)
 					
 					// Restrict alloc cap permissions.
-					Lower.Instruction.computeWithImmediate(
-						operation:	.add,
-						rd:			permissionsMaskReg,
-						rs1:		.zero,
-						imm:		.init(Self.allocCapabilityPermissions.bitmask)
-					)
-					Lower.Instruction.permit(destination: allocCapReg, source: allocCapReg, mask: permissionsMaskReg)
+					let permissionsReg = Lower.Register.t1
+					let bitmask = Self.allocCapabilityPermissions.bitmask
+					Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsReg, rs1: .zero, imm: .init(bitmask))
+					Lower.Instruction.permit(destination: allocCapReg, source: allocCapReg, mask: permissionsReg)
 					Lower.Instruction.sealEntry(destination: allocCapReg, source: allocCapReg)
 					
 					// Derive alloc cap cap and store alloc cap.
+					let allocCapCapReg = Lower.Register.t1
 					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapCapReg, label: allocCapLabel)
 					Lower.Instruction.storeCapability(source: allocCapReg, address: allocCapCapReg)
 					
 				}
 				
+				// TODO: Clear all registers except (selected) user authority.
+				
 				// Return to caller.
 				Lower.Instruction.return
 				
 			}
 			
-			// A routine that allocates a buffer on the heap. It takes a length in a0 and returns a buffer cap in ca0.
+			// A routine that allocates a buffer on the heap. It takes a length in t0 and returns a buffer cap in ct0. It also touches t1 and t2.
 			@StatementsBuilder
 			var allocationRoutine: [Lower.Statement] {
 				
-				let heapCapCapReg = Lower.Register.a1
-				let heapCapReg = Lower.Register.a2
-				
-				Lower.Statement.padding(byteAlignment: 4)
+				let lengthReg = Lower.Register.t0	// input
+				let bufferReg = Lower.Register.t0	// output (same location as input)
 				
 				// Derive heap cap cap and load heap cap.
-				Lower.Statement.labelled(allocLabel, .instruction(.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)))
-				Lower.Instruction.loadCapability(destination: heapCapReg, address: heapCapCapReg)
+				let heapCapCapReg1 = Lower.Register.t1
+				let heapCapReg = Lower.Register.t1
+				allocLabel ~ .deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
+				Lower.Instruction.loadCapability(destination: heapCapReg, address: heapCapCapReg1)
 				
 				// Derive buffer cap into ca0 using length in a0.
-				Lower.Instruction.setCapabilityBounds(destination: .a0, source: heapCapReg, length: .a0)
+				Lower.Instruction.setCapabilityBounds(destination: bufferReg, source: heapCapReg, length: lengthReg)
 				
 				// Determine (possibly rounded-up) length of allocated buffer.
-				Lower.Instruction.getCapabilityLength(destination: actualLengthReg, source: .a0)
+				let actualLengthReg = Lower.Register.t2
+				Lower.Instruction.getCapabilityLength(destination: actualLengthReg, source: bufferReg)
 				
 				// Move heap capability over the allocated region.
 				Lower.Instruction.offsetCapability(destination: heapCapReg, source: heapCapReg, offset: actualLengthReg)
 				
 				// Store updated heap cap using heap cap cap.
-				Lower.Instruction.storeCapability(source: heapCapReg, address: heapCapCapReg)
+				let heapCapCapReg2 = Lower.Register.t2	// shortening liveness by deriving it again
+				Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
+				Lower.Instruction.storeCapability(source: heapCapReg, address: heapCapCapReg2)
+				
+				// TODO: Clear authority.
 				
 				// Return to caller.
 				Lower.Instruction.return
 				
 				// Heap capability.
-				Lower.Statement.labelled(heapCapLabel, .nullCapability)
+				heapCapLabel ~ .nullCapability
 				
-				// End of routine.
-				Lower.Statement.labelled(allocEndLabel, .signedWord(0))
+				// Label end of routine.
+				allocEndLabel ~ .signedWord(0)
 				
 			}
 			
+			// The user's region, consisting of code and authority.
 			@StatementsBuilder
 			var user: [Lower.Statement] {
 				get throws {
 					
-					// Alloc capability.
-					Lower.Statement.labelled(
-						userLabel, .labelled(allocCapLabel, .nullCapability)
-					)
-					
 					// User code.
-					Lower.Statement.padding(byteAlignment: 4)
-					try effects.lowered()
+					try effects.lowered(in: &context)
 					
-					Lower.Statement.labelled(userEndLabel, .signedWord(0))
+					// Alloc capability.
+					userLabel ~ (allocCapLabel ~ .nullCapability)
+					
+					// Label end of user.
+					userEndLabel ~ .signedWord(0)
 					
 				}
 			}
 			
+			// The heap.
 			@StatementsBuilder
 			var heap: [Lower.Statement] {
-				Lower.Statement.labelled(heapLabel, .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize))
-				Lower.Statement.labelled(heapEndLabel, .signedWord(0))
+				heapLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize)
+				heapEndLabel ~ .signedWord(0)
 			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
 			
 			return try .init {
-				initialisationRoutine
-				allocationRoutine
-				try user
-				heap
+				initialisationRoutine	// requires & preserves alignment
+				allocationRoutine		// requires & preserves alignment
+				try user				// requires & consumes alignment
+				heap					// does not require alignment
 			}
 			
 		}

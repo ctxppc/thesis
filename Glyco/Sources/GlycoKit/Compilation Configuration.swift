@@ -38,6 +38,14 @@ public struct CompilationConfiguration {
 		/// The Secure Glyco Calling Convention (SGCC), a calling convention enforcing well-bracketed control flow and stack encapsulation.
 		case secure
 		
+		/// A Boolean value indicating whether the call stack is enabled.
+		var callStackEnabled: Bool {
+			switch self {
+				case .conventional:	return true
+				case .secure:		return false
+			}
+		}
+		
 	}
 	
 	/// A URL to a CHERI-RISC-V toolchain.

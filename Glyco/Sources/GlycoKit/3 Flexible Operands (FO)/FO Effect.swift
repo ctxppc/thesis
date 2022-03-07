@@ -88,9 +88,9 @@ extension FO {
 				}
 			}
 			
-			let temp1 = Lower.Register.t1
-			let temp2 = Lower.Register.t2
-			let temp3 = Lower.Register.t3
+			let temp1 = Lower.Register.t3
+			let temp2 = Lower.Register.t4
+			let temp3 = Lower.Register.t5
 			
 			switch self {
 				
@@ -140,7 +140,7 @@ extension FO {
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: let onFrame):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.createBuffer(bytes: bytes, capability: bufferCap, onFrame: onFrame)] + storeBufferCap
+				return [.createBufferWithImmediate(bytes: bytes, capability: bufferCap, onFrame: onFrame)] + storeBufferCap
 				
 				case .destroyBuffer(capability: let buffer):
 				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)

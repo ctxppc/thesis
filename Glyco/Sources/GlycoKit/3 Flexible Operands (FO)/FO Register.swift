@@ -52,11 +52,11 @@ extension FO {
 		case s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
 		
 		/// A register for temporaries.
-		case t4, t5, t6
+		case t6
 		
 		/// Returns the registers in given class.
-		static func registers(inClass class: Character) -> [Self] {
-			allCases.filter { $0.rawValue.first == `class` }
+		static func registers(inClass c: Character) -> [Self] {
+			allCases.filter { $0.rawValue.first == c }
 		}
 		
 		// See protocol.
@@ -83,8 +83,6 @@ extension FO {
 				case .s9:	return .s9
 				case .s10:	return .s10
 				case .s11:	return .s11
-				case .t4:	return .t4
-				case .t5:	return .t5
 				case .t6:	return .t6
 			}
 		}

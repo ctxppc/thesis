@@ -76,6 +76,10 @@ enum StatementsBuilder {
 		statements
 	}
 	
+	static func buildArray(_ statements: [[RV.Statement]]) -> [RV.Statement] {
+		statements.flatMap { $0 }
+	}
+	
 	static func buildOptional(_ statements: [RV.Statement]?) -> [RV.Statement] {
 		statements ?? []
 	}
@@ -96,6 +100,10 @@ enum StatementsBuilder {
 		statements
 	}
 	
+	static func buildExpression<S : Sequence>(_ statements: S) -> [RV.Statement] where S.Element == RV.Statement {
+		.init(statements)
+	}
+	
 	static func buildExpression(_ statement: RV.Instruction) -> [RV.Statement] {
 		[.instruction(statement)]
 	}
@@ -104,4 +112,12 @@ enum StatementsBuilder {
 		[]
 	}
 	
+}
+
+func ~ (label: RV.Label, statement: RV.Statement) -> RV.Statement {
+	.labelled(label, statement)
+}
+
+func ~ (label: RV.Label, instruction: RV.Instruction) -> RV.Statement {
+	.labelled(label, .instruction(instruction))
 }
