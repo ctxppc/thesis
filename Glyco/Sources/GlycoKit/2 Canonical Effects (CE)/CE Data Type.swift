@@ -1,10 +1,8 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension MM {
+extension CE {
 	
 	/// A value denoting the type of a datum.
-	///
-	/// Data types are only introduced in MM because RV doesn't have a uniform interface dealing with arbitrary data types, e.g., there's no single instruction for copying a byte and the load/store instructions differ in format between capabilities and non-capabilities.
 	public enum DataType : String, Codable {
 		
 		/// An unsigned byte or 1-byte integer.
@@ -40,7 +38,7 @@ extension MM {
 	
 }
 
-extension MM.DataType : Comparable {
+extension CE.DataType : Comparable {
 	public static func < (firstType: Self, laterType: Self) -> Bool {
 		firstType.rawValue < laterType.rawValue
 	}

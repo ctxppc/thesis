@@ -101,7 +101,7 @@ public enum MM : Language {
 				// TODO: Clear all registers except (selected) user authority.
 				
 				// Return to caller.
-				Lower.Instruction.return
+				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
 				
 			}
 			
@@ -136,7 +136,7 @@ public enum MM : Language {
 				// TODO: Clear authority.
 				
 				// Return to caller.
-				Lower.Instruction.return
+				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
 				
 				// Heap capability.
 				heapCapLabel ~ .nullCapability
@@ -196,6 +196,8 @@ public enum MM : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias DataType = CE.DataType
 	public typealias Label = Lower.Label
+	public typealias Permission = CE.Permission
 	
 }

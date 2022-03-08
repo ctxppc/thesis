@@ -2,7 +2,7 @@
 
 import DepthKit
 
-extension MM {
+extension CE {
 	
 	public enum Permission : String, Codable, CaseIterable {
 		
@@ -50,7 +50,7 @@ extension MM {
 	
 }
 
-extension Sequence where Element == MM.Permission {
+extension Sequence where Element == CE.Permission {
 	
 	/// A bitmask representing the permissions in `self`.
 	var bitmask: UInt {

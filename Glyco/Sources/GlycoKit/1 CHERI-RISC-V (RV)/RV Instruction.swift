@@ -96,21 +96,13 @@ extension RV {
 		/// An instruction that jumps to `target` if *x* `relation` *y*, where *x* is the value in `rs1` and *y* is the value in `rs2`.
 		case branch(rs1: Register, relation: BranchRelation, rs2: Register, target: Label)
 		
-		/// An instruction that jumps to `target`.
-		case jump(target: Label)
-		
-		/// An instruction that jumps to the (possibly unsealed) address in `target`.
-		///
-		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
-		case jumpWithRegister(target: Register)
-		
-		/// An instruction that puts the next PCC in `cra`, then jumps to `target`.
-		case call(target: Label)
+		/// An instruction that puts the next PCC in `link`, then jumps to `target`.
+		case jump(target: Label, link: Register)
 		
 		/// An instruction that puts the next PCC in `link`, then jumps to the (possibly unsealed) address in `target`.
 		///
 		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
-		case callWithRegister(target: Register, link: Register)
+		case jumpWithRegister(target: Register, link: Register)
 		
 		/// An instruction that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `ct6` after unsealing it.
 		///
@@ -120,9 +112,6 @@ extension RV {
 		/// * if `data` contains a capability that permits execution, or
 		/// * if `target` contains a capability that points outside its bounds.
 		case invoke(target: Register, data: Register)
-		
-		/// An instruction that jumps to address *x*, where *x* is the value in `cra`.
-		case `return`
 		
 		// See protocol.
 		func lowered(in context: inout Context) -> String {
@@ -206,23 +195,14 @@ extension RV {
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"
 				
-				case .jump(target: let target):
-				return "j \(target.rawValue)"
+				case .jump(target: let target, link: let link):
+				return "cjal \(link.c), \(target.rawValue)"
 				
-				case .jumpWithRegister(target: let target):
-				return "cjr \(target.c)"
-				
-				case .call(target: let target):
-				return "ccall \(target.rawValue)"
-				
-				case .callWithRegister(target: let target, link: let link):
-				return "cjalr \(target.c), \(link.c)"
+				case .jumpWithRegister(target: let target, link: let link):
+				return "cjalr \(link.c), \(target.c)"
 				
 				case .invoke(target: let target, data: let data):
 				return "cinvoke \(target.c), \(data.c)"
-				
-				case .return:
-				return "ret.cap"
 				
 			}
 		}

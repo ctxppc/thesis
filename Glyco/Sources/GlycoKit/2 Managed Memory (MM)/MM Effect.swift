@@ -122,7 +122,7 @@ extension MM {
 				case .createBufferWithImmediate(bytes: let bytes, capability: let buffer, onFrame: false):
 				Lower.Instruction.computeWithImmediate(operation: .add, rd: .t0, rs1: .zero, imm: bytes)
 				Lower.Instruction.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
-				Lower.Instruction.jumpWithRegister(target: .t1)
+				Lower.Instruction.jumpWithRegister(target: .t1, link: .ra)
 				Lower.Instruction.copyCapability(destination: try buffer.lowered(), source: .t0)
 				
 				case .createBufferWithImmediate(bytes: let bytes, capability: let buffer, onFrame: true):
@@ -161,7 +161,7 @@ extension MM {
 				case .createBufferWithRegister(bytes: let bytesReg, capability: let buffer, onFrame: false):
 				Lower.Instruction.computeWithRegister(operation: .add, rd: .t0, rs1: .zero, rs2: try bytesReg.lowered())
 				Lower.Instruction.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
-				Lower.Instruction.jumpWithRegister(target: .t1)
+				Lower.Instruction.jumpWithRegister(target: .t1, link: .ra)
 				Lower.Instruction.copyCapability(destination: try buffer.lowered(), source: .t0)
 				
 				case .createBufferWithRegister(bytes: let bytesReg, capability: let buffer, onFrame: true):
@@ -261,13 +261,13 @@ extension MM {
 				try Lower.Instruction.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)
 				
 				case .jump(to: let target):
-				Lower.Instruction.jump(target: target)
+				Lower.Instruction.jump(target: target, link: .zero)
 				
 				case .call(let label):
-				Lower.Instruction.call(target: label)
+				Lower.Instruction.jump(target: label, link: .ra)
 				
 				case .return:
-				Lower.Instruction.return
+				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
