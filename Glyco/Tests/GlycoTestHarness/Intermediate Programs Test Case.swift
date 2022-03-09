@@ -19,7 +19,7 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language>") }
 		
 		var errors = TestErrors()
-		for (groupName, urls) in urlsByGroupName {
+		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
 				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension.uppercased(), try String(contentsOf: $0)) })

@@ -34,7 +34,12 @@ final class ArithmeticTests : XCTestCase {
 						.text
 						
 						.global _start
-		_start:			cllc ct0, _trap_vector
+		_start:			li t0, 1
+						cspecialrw ct1, pcc, c0
+						csetflags ct1, ct1, t0
+						cincoffsetimm ct1, ct1, 16
+						jr.cap ct1
+						cllc ct0, _trap_vector
 						cspecialrw c0, mtcc, ct0
 						cllc ct0, rv.begin
 						cspecialrw c0, mepcc, ct0
@@ -139,7 +144,12 @@ final class ArithmeticTests : XCTestCase {
 						.text
 						
 						.global _start
-		_start:			cllc ct0, _trap_vector
+		_start:			li t0, 1
+						cspecialrw ct1, pcc, c0
+						csetflags ct1, ct1, t0
+						cincoffsetimm ct1, ct1, 16
+						jr.cap ct1
+						cllc ct0, _trap_vector
 						cspecialrw c0, mtcc, ct0
 						cllc ct0, rv.begin
 						cspecialrw c0, mepcc, ct0
