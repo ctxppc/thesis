@@ -65,53 +65,10 @@ extension RV {
 	
 }
 
-@resultBuilder
-enum StatementsBuilder {
-	
-	static func buildBlock(_ statements: [RV.Statement]...) -> [RV.Statement] {
-		statements.flatMap { $0 }
-	}
-	
-	static func buildArray(_ statements: [RV.Statement]) -> [RV.Statement] {
-		statements
-	}
-	
-	static func buildArray(_ statements: [[RV.Statement]]) -> [RV.Statement] {
-		statements.flatMap { $0 }
-	}
-	
-	static func buildOptional(_ statements: [RV.Statement]?) -> [RV.Statement] {
-		statements ?? []
-	}
-	
-	static func buildEither(first statements: [RV.Statement]) -> [RV.Statement] {
-		statements
-	}
-	
-	static func buildEither(second statements: [RV.Statement]) -> [RV.Statement] {
-		statements
-	}
-	
-	static func buildExpression(_ statement: RV.Statement) -> [RV.Statement] {
-		[statement]
-	}
-	
-	static func buildExpression(_ statements: [RV.Statement]) -> [RV.Statement] {
-		statements
-	}
-	
-	static func buildExpression<S : Sequence>(_ statements: S) -> [RV.Statement] where S.Element == RV.Statement {
-		.init(statements)
-	}
-	
+extension ArrayBuilder where Element == RV.Statement {
 	static func buildExpression(_ statement: RV.Instruction) -> [RV.Statement] {
 		[.instruction(statement)]
 	}
-	
-	static func buildExpression(_: ()) -> [RV.Statement] {
-		[]
-	}
-	
 }
 
 func ~ (label: RV.Label, statement: RV.Statement) -> RV.Statement {

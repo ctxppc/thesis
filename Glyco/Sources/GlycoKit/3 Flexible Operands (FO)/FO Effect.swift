@@ -72,7 +72,7 @@ extension FO {
 			/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
 			func load(_ type: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 				switch source {
-					case .immediate(let imm):	return ([.compute(temporaryRegister, Lower.Register.zero + imm)], temporaryRegister)
+					case .immediate(let imm):	return ([.load(into: temporaryRegister, value: imm)], temporaryRegister)
 					case .register(let r):		return ([], try r.lowered())
 					case .frame(let c):			return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
 				}
@@ -95,10 +95,10 @@ extension FO {
 			switch self {
 				
 				case .set(.u8, .register(let dest), to: .immediate(let imm)):
-				return try [.compute(dest.lowered(), Lower.Register.zero + .init(UInt8(truncatingIfNeeded: imm)))]
+				return try [.load(into: dest.lowered(), value: .init(UInt8(truncatingIfNeeded: imm)))]
 				
 				case .set(.s32, .register(let dest), to: .immediate(let imm)):
-				return try [.compute(dest.lowered(), Lower.Register.zero + imm)]
+				return try [.load(into: dest.lowered(), value: imm)]
 				
 				case .set(.cap, .register, to: .immediate):
 				throw LoweringError.settingCapabilityUsingImmediate
@@ -114,7 +114,7 @@ extension FO {
 				
 				case .set(let type, .frame(let dest), to: .immediate(let imm)):
 				return [
-					.compute(temp1, .zero + imm),
+					.load(into: temp1, value: imm),
 					.store(type, into: dest, from: temp1),
 				]
 				
@@ -130,17 +130,17 @@ extension FO {
 				case .compute(let destination, let lhs, let operation, .immediate(let rhs)):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
-				return loadLHS + [.compute(dest, .registerImmediate(lhs, operation, rhs))] + storeResult
+				return loadLHS + [.compute(destination: dest, lhs, operation, .constant(rhs))] + storeResult
 				
 				case .compute(let destination, let lhs, let operation, let rhs):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
-				return loadLHS + loadRHS + [.compute(dest, .registerRegister(lhs, operation, rhs))] + storeResult
+				return loadLHS + loadRHS + [.compute(destination: dest, lhs, operation, .register(rhs))] + storeResult
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: let onFrame):
 				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
-				return [.createBufferWithImmediate(bytes: bytes, capability: bufferCap, onFrame: onFrame)] + storeBufferCap
+				return [.createBuffer(bytes: .constant(bytes), capability: bufferCap, onFrame: onFrame)] + storeBufferCap
 				
 				case .destroyBuffer(capability: let buffer):
 				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)
@@ -170,7 +170,7 @@ extension FO {
 				return loadLHS + loadRHS + [.branch(to: target, lhs, relation, rhs)]
 				
 				case .jump(to: let target):
-				return [.jump(to: target)]
+				return [.jump(to: .label(target), link: .zero)]
 				
 				case .call(let label):
 				return [.call(label)]

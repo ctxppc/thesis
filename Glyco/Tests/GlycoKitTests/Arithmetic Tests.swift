@@ -29,6 +29,7 @@ final class ArithmeticTests : XCTestCase {
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 		let expected = """
 						.text
 						
@@ -71,7 +72,7 @@ final class ArithmeticTests : XCTestCase {
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc.cap
 						sc.cap ct0, 0(ct1)
-						ret.cap
+						cjalr c0, cra
 		mm.alloc:		cllc ct1, mm.heap.cap
 						lc.cap ct1, 0(ct1)
 						csetbounds ct0, ct1, t0
@@ -79,14 +80,14 @@ final class ArithmeticTests : XCTestCase {
 						cincoffset ct1, ct1, t2
 						cllc ct2, mm.heap.cap
 						sc.cap ct1, 0(ct2)
-						ret.cap
+						cjalr c0, cra
 		mm.heap.cap:	.quad 0
 		mm.alloc.end:	.dword 0
 		rv.main:		addi s1, zero, 1
 						addi t3, zero, 2
 						add s1, t3, s1
 						mv a0, s1
-						ret.cap
+						cjalr c0, cra
 		mm.user:
 		mm.alloc.cap:	.quad 0
 		mm.user.end:	.dword 0
@@ -124,6 +125,7 @@ final class ArithmeticTests : XCTestCase {
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -175,7 +177,7 @@ final class ArithmeticTests : XCTestCase {
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc.cap
 						sc.cap ct0, 0(ct1)
-						ret.cap
+						cjalr c0, cra
 		mm.alloc:		cllc ct1, mm.heap.cap
 						lc.cap ct1, 0(ct1)
 						csetbounds ct0, ct1, t0
@@ -183,7 +185,7 @@ final class ArithmeticTests : XCTestCase {
 						cincoffset ct1, ct1, t2
 						cllc ct2, mm.heap.cap
 						sc.cap ct1, 0(ct2)
-						ret.cap
+						cjalr c0, cra
 		mm.heap.cap:	.quad 0
 		mm.alloc.end:	.dword 0
 		rv.main:		addi t3, zero, 12
@@ -192,9 +194,9 @@ final class ArithmeticTests : XCTestCase {
 						beq s1, t4, cd.then
 		cd.else:		addi s1, zero, 0
 		cd.endif:		mv a0, s1
-						ret.cap
+						cjalr c0, cra
 		cd.then:		addi s1, zero, 1
-						j cd.endif
+						cjal c0, cd.endif
 		mm.user:
 		mm.alloc.cap:	.quad 0
 		mm.user.end:	.dword 0

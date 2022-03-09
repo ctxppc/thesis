@@ -39,7 +39,7 @@ rv.init:		cllc ct0, mm.heap
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
 				sc.cap ct0, 0(ct1)
-				ret.cap
+				cjalr c0, cra
 mm.alloc:		cllc ct1, mm.heap.cap
 				lc.cap ct1, 0(ct1)
 				csetbounds ct0, ct1, t0
@@ -47,7 +47,7 @@ mm.alloc:		cllc ct1, mm.heap.cap
 				cincoffset ct1, ct1, t2
 				cllc ct2, mm.heap.cap
 				sc.cap ct1, 0(ct2)
-				ret.cap
+				cjalr c0, cra
 mm.heap.cap:	.quad 0
 mm.alloc.end:	.dword 0
 rv.main:		cincoffsetimm ct0, csp, -8
@@ -56,10 +56,10 @@ rv.main:		cincoffsetimm ct0, csp, -8
 				cincoffsetimm csp, csp, -8
 				addi a0, zero, 1
 				addi a1, zero, 1
-				ccall fib
+				cjal cra, fib
 cd.ret:			cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 fib:			cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
@@ -75,12 +75,12 @@ fib:			cincoffsetimm ct0, csp, -8
 				mv a0, s1
 cd.then:		add zero, zero, zero
 cd.then$1:		add zero, zero, zero
-				ccall recFib
+				cjal cra, recFib
 cd.ret$1:		mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 recFib:			cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
@@ -123,12 +123,12 @@ cd.then$3:		slli s1, a0, 4
 				mv a0, s1
 cd.then$4:		add zero, zero, zero
 cd.then$5:		add zero, zero, zero
-				ccall recFib
+				cjal cra, recFib
 cd.ret$2:		mv s1, a0
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 cd.then$2:		cmove ca0, ca5
 				mv s1, a6
 				slli s1, s1, 4
@@ -137,7 +137,7 @@ cd.then$2:		cmove ca0, ca5
 				mv a0, s1
 				cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 mm.user:
 mm.alloc.cap:	.quad 0
 mm.user.end:	.dword 0

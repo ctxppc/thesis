@@ -89,11 +89,14 @@ extension CE {
 		/// An effect that can jumped to using given label.
 		indirect case labelled(Label, Effect)
 		
+		/// A placeholder for a buffer containing `count` elements of given data type.
+		case buffer(DataType, count: Int)
+		
 		/// An effect that does nothing.
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
-		@StatementsBuilder
+		@ArrayBuilder<Lower.Statement>
 		func lowered(in context: inout ()) throws -> [Lower.Statement] {
 			switch self {
 				
@@ -166,7 +169,7 @@ extension CE {
 				
 				case .permit(let permissions, destination: let destination, source: let source, using: let permissionsRegister):
 				Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsRegister, rs1: .zero, imm: Int(permissions.bitmask))
-				Lower.Instruction.permit(destination: destination, source: source, mask: destination)
+				Lower.Instruction.permit(destination: destination, source: source, mask: permissionsRegister)
 				
 				case .clear(let registers):
 				let registersByQuarter = Dictionary(grouping: registers, by: { $0.ordinal / 8 })
@@ -201,6 +204,15 @@ extension CE {
 					tail
 				}
 				
+				case .buffer(.s32, count: 1):
+				Lower.Statement.signedWord(0)
+				
+				case .buffer(.cap, count: 1):
+				Lower.Statement.nullCapability
+				
+				case .buffer(let dataType, count: let count):
+				Lower.Statement.filled(value: 0, datumByteSize: dataType.byteSize, copies: count)
+				
 			}
 		}
 		
@@ -221,4 +233,8 @@ extension CE {
 		
 	}
 	
+}
+
+func ~ (label: CE.Label, effect: CE.Effect) -> CE.Effect {
+	.labelled(label, effect)
 }

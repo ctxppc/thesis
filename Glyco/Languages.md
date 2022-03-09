@@ -18,6 +18,7 @@ The pipeline, from high-level to low-level is:
 [`BB`](#BB) →
 [`FO`](#FO) →
 [`MM`](#MM) →
+[`CE`](#CE) →
 [`RV`](#RV) →
 [`S`](#S) →
  ELF.
@@ -843,43 +844,29 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>s9</strong></code></dd>
 	<dd><code><strong>s10</strong></code></dd>
 	<dd><code><strong>s11</strong></code></dd>
-	<dd><code><strong>t4</strong></code></dd>
-	<dd><code><strong>t5</strong></code></dd>
 	<dd><code><strong>t6</strong></code></dd>
 </dl>
 
 <h2 id="MM">Grammar for MM (Managed Memory)</h2>
 A language that introduces the call stack, the heap, and operations on them.
 
-**Inherited from RV:**
+**Inherited from CE:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Label</code>
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Permission</code>
 <dl>
 	<dt><code>MM.Program</code></dt>
 	<dd><code>([Effect])</code></dd>
 </dl>
 <dl>
-	<dt><code>MM.Permission</code></dt>
-	<dd><code><strong>global</strong></code></dd>
-	<dd><code><strong>execute</strong></code></dd>
-	<dd><code><strong>load</strong></code></dd>
-	<dd><code><strong>store</strong></code></dd>
-	<dd><code><strong>loadCapability</strong></code></dd>
-	<dd><code><strong>storeCapability</strong></code></dd>
-	<dd><code><strong>storeLocalCapability</strong></code></dd>
-	<dd><code><strong>seal</strong></code></dd>
-	<dd><code><strong>invoke</strong></code></dd>
-	<dd><code><strong>unseal</strong></code></dd>
-	<dd><code><strong>setCID</strong></code></dd>
-</dl>
-<dl>
 	<dt><code>MM.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>compute</strong>(Register, BinaryExpression)</code></dd>
+	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Frame.Location)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
-	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Int, <strong>capability:</strong> Register, <strong>onFrame:</strong> Bool)</code></dd>
+	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Source, <strong>capability:</strong> Register, <strong>onFrame:</strong> Bool)</code></dd>
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
@@ -888,8 +875,7 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>clear</strong>([Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
-	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
-	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -897,8 +883,6 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dt><code>MM.Register</code></dt>
 	<dd><code><strong>zero</strong></code></dd>
 	<dd><code><strong>ra</strong></code></dd>
-	<dd><code><strong>t1</strong></code></dd>
-	<dd><code><strong>t2</strong></code></dd>
 	<dd><code><strong>s1</strong></code></dd>
 	<dd><code><strong>a0</strong></code></dd>
 	<dd><code><strong>a1</strong></code></dd>
@@ -924,19 +908,88 @@ A language that introduces the call stack, the heap, and operations on them.
 	<dd><code><strong>t6</strong></code></dd>
 </dl>
 <dl>
+	<dt><code>MM.Target</code></dt>
+	<dd><code><strong>label</strong>(Label)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+</dl>
+<dl>
+	<dt><code>MM.Context</code></dt>
+</dl>
+<dl>
+	<dt><code>MM.Source</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+</dl>
+<dl>
 	<dt><code>MM.Frame</code></dt>
 	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
 </dl>
+
+<h2 id="CE">Grammar for CE (Canonical Effects)</h2>
+A language grouping related instructions under a single effect.
+
+**Inherited from RV:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Label</code>, 
+<code>Register</code>
 <dl>
-	<dt><code>MM.DataType</code></dt>
+	<dt><code>CE.Program</code></dt>
+	<dd><code>([Effect])</code></dd>
+</dl>
+<dl>
+	<dt><code>CE.Permission</code></dt>
+	<dd><code><strong>global</strong></code></dd>
+	<dd><code><strong>execute</strong></code></dd>
+	<dd><code><strong>load</strong></code></dd>
+	<dd><code><strong>store</strong></code></dd>
+	<dd><code><strong>loadCapability</strong></code></dd>
+	<dd><code><strong>storeCapability</strong></code></dd>
+	<dd><code><strong>storeLocalCapability</strong></code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>invoke</strong></code></dd>
+	<dd><code><strong>unseal</strong></code></dd>
+	<dd><code><strong>setCID</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>CE.DataType</code></dt>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
 	<dd><code><strong>cap</strong></code></dd>
 </dl>
 <dl>
-	<dt><code>MM.BinaryExpression</code></dt>
-	<dd><code><strong>registerRegister</strong>(Register, BinaryOperator, Register)</code></dd>
-	<dd><code><strong>registerImmediate</strong>(Register, BinaryOperator, Int)</code></dd>
+	<dt><code>CE.Source</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+</dl>
+<dl>
+	<dt><code>CE.Target</code></dt>
+	<dd><code><strong>label</strong>(Label)</code></dd>
+	<dd><code><strong>register</strong>(Register)</code></dd>
+</dl>
+<dl>
+	<dt><code>CE.Effect</code></dt>
+	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
+	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
+	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Source)</code></dd>
+	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
+	<dd><code><strong>sealEntry</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>using:</strong> Register)</code></dd>
+	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+	<dd><code><strong>buffer</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
@@ -1025,12 +1078,9 @@ N/A
 	<dd><code><strong>permit</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>mask:</strong> Register)</code></dd>
 	<dd><code><strong>clear</strong>(<strong>quarter:</strong> Int, <strong>mask:</strong> UInt8)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>rs1:</strong> Register, <strong>relation:</strong> BranchRelation, <strong>rs2:</strong> Register, <strong>target:</strong> Label)</code></dd>
-	<dd><code><strong>jump</strong>(<strong>target:</strong> Label)</code></dd>
-	<dd><code><strong>jumpWithRegister</strong>(<strong>target:</strong> Register)</code></dd>
-	<dd><code><strong>call</strong>(<strong>target:</strong> Label)</code></dd>
-	<dd><code><strong>callWithRegister</strong>(<strong>target:</strong> Register, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>target:</strong> Label, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>jumpWithRegister</strong>(<strong>target:</strong> Register, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
-	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>RV.BranchRelation</code></dt>

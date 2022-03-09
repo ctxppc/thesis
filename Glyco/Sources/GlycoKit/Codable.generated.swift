@@ -120,6 +120,12 @@ extension CD.Procedure {
 	}
 }
 
+extension CE.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effects = "_0"
+	}
+}
+
 extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"

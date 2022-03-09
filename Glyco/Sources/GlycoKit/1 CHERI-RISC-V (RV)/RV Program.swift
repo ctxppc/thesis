@@ -12,11 +12,6 @@ public enum RV : Language {
 			self.statements = statements
 		}
 		
-		//sourcery: isInternalForm
-		public init(@StatementsBuilder _ statements: () throws -> [Statement]) rethrows {
-			self.init(try statements())
-		}
-		
 		/// The program's statements.
 		public var statements: [Statement]
 		

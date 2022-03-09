@@ -8,8 +8,10 @@ extension MM {
 		/// An effect that copies the contents from `from` to `into`.
 		case copy(DataType, into: Register, from: Register)
 		
-		/// An effect that computes given expression and puts the result in given register.
-		case compute(Register, BinaryExpression)
+		/// An effect that performs *x* `operation` *y* where *x* is the value in the second given register and *y* is the value from given source, and puts in `destination`.
+		case compute(destination: Register, Register, BinaryOperator, Source)
+		
+		static func load(into destination: Register, value: Int) -> Self { .compute(destination: destination, .zero, .add, .constant(value)) }
 		
 		/// An effect that loads the datum in the frame at `from` and puts it in `into`.
 		case load(DataType, into: Register, from: Frame.Location)
@@ -20,12 +22,7 @@ extension MM {
 		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given register.
 		///
 		/// If `onFrame` is `true` and the call stack is enabled, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
-		case createBufferWithImmediate(bytes: Int, capability: Register, onFrame: Bool)
-		
-		/// An effect that allocates a buffer of *b* bytes, where *b* is in `bytes`, and puts a capability for that buffer in `capability`.
-		///
-		/// If `onFrame` is `true` and the call stack is enabled, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
-		case createBufferWithRegister(bytes: Register, capability: Register, onFrame: Bool)
+		case createBuffer(bytes: Source, capability: Register, onFrame: Bool)
 		
 		/// An effect that deallocates the buffer referred by the capability in given register.
 		///
@@ -61,11 +58,15 @@ extension MM {
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
 		
-		/// An effect that jumps to `to`.
-		case jump(to: Label)
+		/// An effect that puts the next PCC in `link`, then jumps to given target.
+		///
+		/// If the target is a sentry capability, it is unsealed first.
+		///
+		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
+		case jump(to: Target, link: Register)
 		
-		/// An effect that puts the next PCC in `cra`, then jumps to given label.
-		case call(Label)
+		/// Returns an effect that puts the next PCC in `cra`, then jumps to given target.
+		static func call(_ target: Label) -> Self { .jump(to: .label(target), link: .ra) }
 		
 		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
@@ -74,58 +75,35 @@ extension MM {
 		indirect case labelled(Label, Effect)
 		
 		/// An effect that does nothing.
-		static var nop: Self { .compute(.zero, Register.zero + .zero) }
+		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
-		@StatementsBuilder
-		func lowered(in context: inout Context) throws -> [Lower.Statement] {
+		@ArrayBuilder<Lower.Effect>
+		func lowered(in context: inout Context) throws -> [Lower.Effect] {
 			let temp = Lower.Register.t0
 			switch self {
 				
-				case .copy(.u8, into: let destination, from: let source),	// TODO: Copy u8 as s32 then mask out upper bits.
-					.copy(.s32, into: let destination, from: let source):
-				try Lower.Instruction.copyWord(destination: destination.lowered(), source: source.lowered())
+				case .copy(let dataType, into: let destination, from: let source):
+				try Lower.Effect.copy(dataType, into: destination.lowered(), from: source.lowered())
 				
-				case .copy(.cap, into: let destination, from: let source):
-				try Lower.Instruction.copyCapability(destination: destination.lowered(), source: source.lowered())
+				case .compute(let destination, let lhs, let operation, let rhs):
+				try Lower.Effect.compute(destination: destination.lowered(), lhs.lowered(), operation, rhs.lowered())
 				
-				case .compute(let destination, .registerRegister(let rs1, let operation, let rs2)):
-				try Lower.Instruction.computeWithRegister(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), rs2: rs2.lowered())
+				case .load(let dataType, into: let destination, from: let source):
+				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(source.offset))
+				Lower.Effect.load(dataType, destination: try destination.lowered(), address: temp)
 				
-				case .compute(let destination, .registerImmediate(let rs1, let operation, let imm)):
-				try Lower.Instruction.computeWithImmediate(operation: operation, rd: destination.lowered(), rs1: rs1.lowered(), imm: imm)
+				case .store(let dataType, into: let destination, from: let source):
+				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(destination.offset))
+				Lower.Effect.store(dataType, address: temp, source: try source.lowered())
 				
-				case .load(.u8, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)
-				Lower.Instruction.loadByte(destination: try destination.lowered(), address: temp)
+				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: false):
+				Lower.Effect.compute(destination: .t0, .zero, .add, try bytes.lowered())
+				Lower.Effect.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
+				Lower.Effect.jump(to: .register(.t1), link: .ra)
+				Lower.Effect.copy(.cap, into: try buffer.lowered(), from: .t0)
 				
-				case .load(.s32, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)
-				Lower.Instruction.loadSignedWord(destination: try destination.lowered(), address: temp)
-				
-				case .load(.cap, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: source.offset)
-				Lower.Instruction.loadCapability(destination: try destination.lowered(), address: temp)
-				
-				case .store(.u8, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)
-				Lower.Instruction.storeByte(source: try source.lowered(), address: temp)
-				
-				case .store(.s32, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)
-				Lower.Instruction.storeSignedWord(source: try source.lowered(), address: temp)
-				
-				case .store(.cap, into: let destination, from: let source):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .fp, offset: destination.offset)
-				Lower.Instruction.storeCapability(source: try source.lowered(), address: temp)
-				
-				case .createBufferWithImmediate(bytes: let bytes, capability: let buffer, onFrame: false):
-				Lower.Instruction.computeWithImmediate(operation: .add, rd: .t0, rs1: .zero, imm: bytes)
-				Lower.Instruction.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
-				Lower.Instruction.jumpWithRegister(target: .t1, link: .ra)
-				Lower.Instruction.copyCapability(destination: try buffer.lowered(), source: .t0)
-				
-				case .createBufferWithImmediate(bytes: let bytes, capability: let buffer, onFrame: true):
+				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: true):
 				if context.configuration.callingConvention.callStackEnabled {
 					
 					/*
@@ -145,133 +123,86 @@ extension MM {
 					
 					// Derive buffer capability (without bounding it yet).
 					let buffer = try buffer.lowered()
-					Lower.Instruction.offsetCapabilityWithImmediate(destination: buffer, source: .sp, offset: -bytes)
+					switch bytes {
+						
+						case .constant(let bytes):
+						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .constant(-bytes))
+						
+						case .register(let bytesReg):
+						Lower.Effect.compute(destination: temp, .zero, .sub, .register(try bytesReg.lowered()))
+						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .register(temp))
+						
+					}
 					
 					// Restrict its bounds. Its base might move downwards, its length might increase.
-					Lower.Instruction.setCapabilityBoundsWithImmediate(destination: buffer, source: buffer, length: bytes)
+					Lower.Effect.setCapabilityBounds(destination: buffer, source: buffer, length: try bytes.lowered())
 					
 					// Move stack capability over the allocated region.
-					Lower.Instruction.getCapabilityAddress(destination: temp, source: buffer)
-					Lower.Instruction.setCapabilityAddress(destination: .sp, source: .sp, address: temp)
+					Lower.Effect.getCapabilityAddress(destination: temp, source: buffer)
+					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: temp)
 					
 				} else {
-					try Self.createBufferWithImmediate(bytes: bytes, capability: buffer, onFrame: false).lowered(in: &context)
-				}
-				
-				case .createBufferWithRegister(bytes: let bytesReg, capability: let buffer, onFrame: false):
-				Lower.Instruction.computeWithRegister(operation: .add, rd: .t0, rs1: .zero, rs2: try bytesReg.lowered())
-				Lower.Instruction.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
-				Lower.Instruction.jumpWithRegister(target: .t1, link: .ra)
-				Lower.Instruction.copyCapability(destination: try buffer.lowered(), source: .t0)
-				
-				case .createBufferWithRegister(bytes: let bytesReg, capability: let buffer, onFrame: true):
-				if context.configuration.callingConvention.callStackEnabled {
-					
-					// Derive buffer capability (without bounding it yet).
-					let bytesReg = try bytesReg.lowered()
-					let buffer = try buffer.lowered()
-					Lower.Instruction.computeWithRegister(operation: .sub, rd: temp, rs1: .zero, rs2: bytesReg)
-					Lower.Instruction.offsetCapability(destination: buffer, source: .sp, offset: temp)
-					
-					// Restrict its bounds. Its base might move downwards, its length might increase.
-					Lower.Instruction.setCapabilityBounds(destination: buffer, source: buffer, length: bytesReg)
-					
-					// Move stack capability over the allocated region.
-					Lower.Instruction.getCapabilityAddress(destination: temp, source: buffer)
-					Lower.Instruction.setCapabilityAddress(destination: .sp, source: .sp, address: temp)
-					
-				} else {
-					try Self.createBufferWithRegister(bytes: bytesReg, capability: buffer, onFrame: false).lowered(in: &context)
+					try Self.createBuffer(bytes: bytes, capability: buffer, onFrame: false).lowered(in: &context)
 				}
 				
 				case .destroyBuffer(let buffer):
 				if context.configuration.callingConvention.callStackEnabled {
-					Lower.Instruction.getCapabilityLength(destination: temp, source: try buffer.lowered())
-					Lower.Instruction.offsetCapability(destination: .sp, source: .sp, offset: temp)
+					Lower.Effect.getCapabilityLength(destination: temp, source: try buffer.lowered())
+					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(temp))
 				}
 				
-				case .loadElement(.u8, into: let destination, buffer: let buffer, offset: let offset):
-				try Lower.Instruction.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.loadByte(destination: destination.lowered(), address: destination.lowered())
+				case .loadElement(let dataType, into: let destination, buffer: let buffer, offset: let offset):
+				try Lower.Effect.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: .register(offset.lowered()))
+				try Lower.Effect.load(dataType, destination: destination.lowered(), address: destination.lowered())
 				
-				case .loadElement(.s32, into: let destination, buffer: let buffer, offset: let offset):
-				try Lower.Instruction.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.loadSignedWord(destination: destination.lowered(), address: destination.lowered())
-				
-				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: let offset):
-				try Lower.Instruction.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.loadCapability(destination: destination.lowered(), address: destination.lowered())
-				
-				case .storeElement(.u8, buffer: let buffer, offset: let offset, from: let source):
-				try Lower.Instruction.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.storeByte(source: source.lowered(), address: temp)
-				
-				case .storeElement(.s32, buffer: let buffer, offset: let offset, from: let source):
-				try Lower.Instruction.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.storeSignedWord(source: source.lowered(), address: temp)
-				
-				case .storeElement(.cap, buffer: let buffer, offset: let offset, from: let source):
-				try Lower.Instruction.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Instruction.storeCapability(source: source.lowered(), address: temp)
+				case .storeElement(let dataType, buffer: let buffer, offset: let offset, from: let source):
+				try Lower.Effect.offsetCapability(destination: temp, source: buffer.lowered(), offset: .register(offset.lowered()))
+				try Lower.Effect.store(dataType, address: temp, source: source.lowered())
 				
 				case .pushFrame(let frame):
 				do {
 					
 					// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
-					Lower.Instruction.offsetCapabilityWithImmediate(destination: temp, source: .sp, offset: -DataType.cap.byteSize)
-					Lower.Instruction.storeCapability(source: .fp, address: temp)
+					Lower.Effect.offsetCapability(destination: temp, source: .sp, offset: .constant(-DataType.cap.byteSize))
+					Lower.Effect.store(.cap, address: temp, source: .fp)
 					
 					// Set up fp for new frame — using deferred sp.
-					Lower.Instruction.copyCapability(destination: .fp, source: temp)
+					Lower.Effect.copy(.cap, into: .fp, from: temp)
 					
 					// Allocate space for frame by pushing sp downward.
-					Lower.Instruction.offsetCapabilityWithImmediate(destination: .sp, source: .sp, offset: -frame.allocatedByteSize)
+					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .constant(-frame.allocatedByteSize))
 					
 				}
-
+				
 				case .popFrame:
 				do {
 					
 					// Pop frame and saved fp by moving sp one word above the saved fp's location.
-					Lower.Instruction.offsetCapabilityWithImmediate(destination: .sp, source: .fp, offset: +DataType.cap.byteSize)
+					Lower.Effect.offsetCapability(destination: .sp, source: .fp, offset: .constant(+DataType.cap.byteSize))
 					
 					// Restore saved fp — follow the linked list.
-					Lower.Instruction.loadCapability(destination: .fp, address: .fp)
+					Lower.Effect.load(.cap, destination: .fp, address: .fp)
 					
 				}
 				
 				case .permit(let permissions, destination: let destination, source: let source):
-				let destination = try destination.lowered()
-				Lower.Instruction.computeWithImmediate(operation: .add, rd: destination, rs1: .zero, imm: Int(permissions.bitmask))
-				Lower.Instruction.permit(destination: destination, source: try source.lowered(), mask: destination)
+				try Lower.Effect.permit(permissions, destination: destination.lowered(), source: source.lowered(), using: temp)
 				
 				case .clear(let registers):
-				let registersByQuarter = Dictionary(grouping: registers, by: { $0.ordinal / 8 })
-				let masksByQuarter = registersByQuarter.mapValues { registers -> UInt8 in
-					registers
-						.lazy
-						.map { 1 << ($0.ordinal % 8) }
-						.reduce(0, |)
-				}
-				for (quarter, mask) in masksByQuarter {
-					Lower.Instruction.clear(quarter: quarter, mask: mask)
-				}
+				Lower.Effect.clear(try registers.lowered())
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
-				try Lower.Instruction.branch(rs1: rs1.lowered(), relation: relation, rs2: rs2.lowered(), target: target)
+				try Lower.Effect.branch(to: target, rs1.lowered(), relation, rs2.lowered())
 				
-				case .jump(to: let target):
-				Lower.Instruction.jump(target: target, link: .zero)
-				
-				case .call(let label):
-				Lower.Instruction.jump(target: label, link: .ra)
+				case .jump(to: let target, link: let link):
+				try Lower.Effect.jump(to: target.lowered(), link: link.lowered())
 				
 				case .return:
-				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
+				Lower.Effect.return
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
-					Lower.Statement.labelled(label, first)
+					Lower.Effect.labelled(label, first)
 					tail
 				}
 				

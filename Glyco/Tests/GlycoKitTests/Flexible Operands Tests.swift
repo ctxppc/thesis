@@ -20,7 +20,7 @@ final class FlexibleOperandsTests : XCTestCase {
 		let expected = MM.Program([
 			.load(.s32, into: .t3, from: .init(offset: -8)),
 			.load(.s32, into: .t4, from: .init(offset: -12)),
-			.compute(.t5, .registerRegister(.t3, .add, .t4)),
+			.compute(destination: .t5, .t3, .add, .register(.t4)),
 			.store(.s32, into: .init(offset: -16), from: .t5),
 		])
 		

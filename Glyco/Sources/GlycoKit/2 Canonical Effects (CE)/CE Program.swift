@@ -12,6 +12,11 @@ public enum CE : Language {
 			self.effects = effects
 		}
 		
+		//sourcery: isInternalForm
+		public init(@ArrayBuilder<Effect> _ effects: () throws -> [Effect]) rethrows {
+			self.init(try effects())
+		}
+		
 		/// The program's effects.
 		public var effects: [Effect] = []
 		

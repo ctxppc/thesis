@@ -40,8 +40,8 @@ public enum MM : Language {
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
 			// A routine that initialises the runtime and restricts the user's authority. It touches all registers.
-			@StatementsBuilder
-			var initialisationRoutine: [Lower.Statement] {
+			@ArrayBuilder<Lower.Effect>
+			var initialisationRoutine: [Lower.Effect] {
 				
 				// Initialise heap cap.
 				do {
@@ -53,20 +53,17 @@ public enum MM : Language {
 					// Restrict heap cap bounds.
 					let heapCapEndReg = Lower.Register.t1
 					let heapCapLengthReg = Lower.Register.t1
-					Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapEndReg, label: heapEndLabel)
-					Lower.Instruction.getCapabilityDistance(destination: heapCapLengthReg, cs1: heapCapEndReg, cs2: heapCapReg)
-					Lower.Instruction.setCapabilityBounds(destination: heapCapReg, source: heapCapReg, length: heapCapLengthReg)
+					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapEndReg, label: heapEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: heapCapLengthReg, cs1: heapCapEndReg, cs2: heapCapReg)
+					Lower.Effect.setCapabilityBounds(destination: heapCapReg, source: heapCapReg, length: .register(heapCapLengthReg))
 					
 					// Restrict heap cap permissions.
-					let permissionsReg = Lower.Register.t1
-					let bitmask = Self.heapCapabilityPermissions.bitmask
-					Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsReg, rs1: .zero, imm: .init(bitmask))
-					Lower.Instruction.permit(destination: heapCapReg, source: heapCapReg, mask: permissionsReg)
+					Lower.Effect.permit(Self.heapCapabilityPermissions, destination: heapCapReg, source: heapCapReg, using: .t1)
 					
 					// Derive heap cap cap and store heap cap.
 					let heapCapCapReg = Lower.Register.t1
-					Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
-					Lower.Instruction.storeCapability(source: heapCapReg, address: heapCapCapReg)
+					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
+					Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg)
 					
 				}
 				
@@ -75,39 +72,36 @@ public enum MM : Language {
 					
 					// Derive alloc cap.
 					let allocCapReg = Lower.Register.t0
-					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapReg, label: allocLabel)
+					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapReg, label: allocLabel)
 					
 					// Restrict alloc cap bounds.
 					let allocCapEndReg = Lower.Register.t1
 					let allocCapLengthReg = Lower.Register.t1
-					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapEndReg, label: allocEndLabel)
-					Lower.Instruction.getCapabilityDistance(destination: allocCapLengthReg, cs1: allocCapEndReg, cs2: allocCapReg)
-					Lower.Instruction.setCapabilityBounds(destination: allocCapReg, source: allocCapReg, length: allocCapLengthReg)
+					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapEndReg, label: allocEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: allocCapLengthReg, cs1: allocCapEndReg, cs2: allocCapReg)
+					Lower.Effect.setCapabilityBounds(destination: allocCapReg, source: allocCapReg, length: .register(allocCapLengthReg))
 					
 					// Restrict alloc cap permissions.
-					let permissionsReg = Lower.Register.t1
-					let bitmask = Self.allocCapabilityPermissions.bitmask
-					Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsReg, rs1: .zero, imm: .init(bitmask))
-					Lower.Instruction.permit(destination: allocCapReg, source: allocCapReg, mask: permissionsReg)
-					Lower.Instruction.sealEntry(destination: allocCapReg, source: allocCapReg)
+					Lower.Effect.permit(Self.allocCapabilityPermissions, destination: allocCapReg, source: allocCapReg, using: .t1)
+					Lower.Effect.sealEntry(destination: allocCapReg, source: allocCapReg)
 					
 					// Derive alloc cap cap and store alloc cap.
 					let allocCapCapReg = Lower.Register.t1
-					Lower.Instruction.deriveCapabilityFromLabel(destination: allocCapCapReg, label: allocCapLabel)
-					Lower.Instruction.storeCapability(source: allocCapReg, address: allocCapCapReg)
+					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapCapReg, label: allocCapLabel)
+					Lower.Effect.store(.cap, address: allocCapCapReg, source: allocCapReg)
 					
 				}
 				
 				// TODO: Clear all registers except (selected) user authority.
 				
 				// Return to caller.
-				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
+				Lower.Effect.return
 				
 			}
 			
 			// A routine that allocates a buffer on the heap. It takes a length in t0 and returns a buffer cap in ct0. It also touches t1 and t2.
-			@StatementsBuilder
-			var allocationRoutine: [Lower.Statement] {
+			@ArrayBuilder<Lower.Effect>
+			var allocationRoutine: [Lower.Effect] {
 				
 				let lengthReg = Lower.Register.t0	// input
 				let bufferReg = Lower.Register.t0	// output (same location as input)
@@ -116,58 +110,58 @@ public enum MM : Language {
 				let heapCapCapReg1 = Lower.Register.t1
 				let heapCapReg = Lower.Register.t1
 				allocLabel ~ .deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
-				Lower.Instruction.loadCapability(destination: heapCapReg, address: heapCapCapReg1)
+				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1)
 				
 				// Derive buffer cap into ca0 using length in a0.
-				Lower.Instruction.setCapabilityBounds(destination: bufferReg, source: heapCapReg, length: lengthReg)
+				Lower.Effect.setCapabilityBounds(destination: bufferReg, source: heapCapReg, length: .register(lengthReg))
 				
 				// Determine (possibly rounded-up) length of allocated buffer.
 				let actualLengthReg = Lower.Register.t2
-				Lower.Instruction.getCapabilityLength(destination: actualLengthReg, source: bufferReg)
+				Lower.Effect.getCapabilityLength(destination: actualLengthReg, source: bufferReg)
 				
 				// Move heap capability over the allocated region.
-				Lower.Instruction.offsetCapability(destination: heapCapReg, source: heapCapReg, offset: actualLengthReg)
+				Lower.Effect.offsetCapability(destination: heapCapReg, source: heapCapReg, offset: .register(actualLengthReg))
 				
 				// Store updated heap cap using heap cap cap.
 				let heapCapCapReg2 = Lower.Register.t2	// shortening liveness by deriving it again
-				Lower.Instruction.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
-				Lower.Instruction.storeCapability(source: heapCapReg, address: heapCapCapReg2)
+				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
+				Lower.Effect.store(.cap, address: heapCapCapReg2, source: heapCapReg)
 				
 				// TODO: Clear authority.
 				
 				// Return to caller.
-				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
+				Lower.Effect.return
 				
 				// Heap capability.
-				heapCapLabel ~ .nullCapability
+				heapCapLabel ~ .buffer(.cap, count: 1)
 				
 				// Label end of routine.
-				allocEndLabel ~ .signedWord(0)
+				allocEndLabel ~ .buffer(.s32, count: 1)
 				
 			}
 			
 			// The user's region, consisting of code and authority.
-			@StatementsBuilder
-			var user: [Lower.Statement] {
+			@ArrayBuilder<Lower.Effect>
+			var user: [Lower.Effect] {
 				get throws {
 					
 					// User code.
 					try effects.lowered(in: &context)
 					
 					// Alloc capability.
-					userLabel ~ (allocCapLabel ~ .nullCapability)
+					userLabel ~ (allocCapLabel ~ .buffer(.cap, count: 1))
 					
 					// Label end of user.
-					userEndLabel ~ .signedWord(0)
+					userEndLabel ~ .buffer(.s32, count: 1)
 					
 				}
 			}
 			
 			// The heap.
-			@StatementsBuilder
-			var heap: [Lower.Statement] {
-				heapLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize)
-				heapEndLabel ~ .signedWord(0)
+			@ArrayBuilder<Lower.Effect>
+			var heap: [Lower.Effect] {
+				heapLabel ~ .buffer(.u8, count: configuration.heapByteSize)
+				heapEndLabel ~ .buffer(.s32, count: 1)
 			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
 			
 			return try .init {
@@ -192,12 +186,12 @@ public enum MM : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = RV
+	public typealias Lower = CE
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias DataType = CE.DataType
+	public typealias DataType = Lower.DataType
 	public typealias Label = Lower.Label
-	public typealias Permission = CE.Permission
+	public typealias Permission = Lower.Permission
 	
 }

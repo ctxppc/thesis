@@ -39,7 +39,7 @@ rv.init:		cllc ct0, mm.heap
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
 				sc.cap ct0, 0(ct1)
-				ret.cap
+				cjalr c0, cra
 mm.alloc:		cllc ct1, mm.heap.cap
 				lc.cap ct1, 0(ct1)
 				csetbounds ct0, ct1, t0
@@ -47,17 +47,17 @@ mm.alloc:		cllc ct1, mm.heap.cap
 				cincoffset ct1, ct1, t2
 				cllc ct2, mm.heap.cap
 				sc.cap ct1, 0(ct2)
-				ret.cap
+				cjalr c0, cra
 mm.heap.cap:	.quad 0
 mm.alloc.end:	.dword 0
 rv.main:		cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
 				cincoffsetimm csp, csp, -8
-				ccall f
+				cjal cra, f
 cd.ret:			cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 f:				cincoffsetimm ct0, csp, -8
 				sc.cap cfp, 0(ct0)
 				cmove cfp, ct0
@@ -65,7 +65,7 @@ f:				cincoffsetimm ct0, csp, -8
 				addi a0, zero, 42
 				cincoffsetimm csp, cfp, 8
 				lc.cap cfp, 0(cfp)
-				ret.cap
+				cjalr c0, cra
 mm.user:
 mm.alloc.cap:	.quad 0
 mm.user.end:	.dword 0
