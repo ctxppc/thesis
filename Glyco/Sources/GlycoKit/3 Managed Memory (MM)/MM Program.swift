@@ -34,6 +34,11 @@ public enum MM : Language {
 			let heapEndLabel = "mm.heap.end" as Label
 			let heapCapLabel = "mm.heap.cap" as Label
 			
+			let scallLabel = "mm.scall" as Label
+			let scallEndLabel = "mm.scall.end" as Label
+			let scallCapLabel = Label.secureCallingRoutineCapability
+			let sealLabel = "mm.seal.cap" as Label
+			
 			let userLabel = "mm.user" as Label
 			let userEndLabel = "mm.user.end" as Label
 			
@@ -82,7 +87,8 @@ public enum MM : Language {
 					Lower.Effect.setCapabilityBounds(destination: allocCapReg, source: allocCapReg, length: .register(allocCapLengthReg))
 					
 					// Restrict alloc cap permissions.
-					Lower.Effect.permit(Self.allocCapabilityPermissions, destination: allocCapReg, source: allocCapReg, using: .t1)
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.allocCapabilityPermissions, destination: allocCapReg, source: allocCapReg, using: bitmaskReg)
 					Lower.Effect.sealEntry(destination: allocCapReg, source: allocCapReg)
 					
 					// Derive alloc cap cap and store alloc cap.
@@ -92,6 +98,34 @@ public enum MM : Language {
 					
 				}
 				
+				// Initialise scall cap.
+				do {
+					
+					// Derive scall cap.
+					let scallCapReg = Lower.Register.t0
+					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapReg, label: scallLabel)
+					
+					// Restrict scall cap bounds.
+					let scallCapEndReg = Lower.Register.t1
+					let scallCapLengthReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapEndReg, label: scallEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: scallCapLengthReg, cs1: scallCapEndReg, cs2: scallCapReg)
+					Lower.Effect.setCapabilityBounds(destination: scallCapReg, source: scallCapReg, length: .register(scallCapLengthReg))
+					
+					// Restrict scall cap permissions.
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.scallCapabilityPermissions, destination: scallCapReg, source: scallCapReg, using: bitmaskReg)
+					Lower.Effect.sealEntry(destination: scallCapReg, source: scallCapReg)
+					
+					// Derive scall cap cap and store scall cap.
+					let scallCapCapReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
+					Lower.Effect.store(.cap, address: scallCapCapReg, source: scallCapReg)
+					
+				}
+				
+				// TODO: Initialise seal cap.
+				
 				// TODO: Clear all registers except (selected) user authority.
 				
 				// Return to caller.
@@ -99,7 +133,8 @@ public enum MM : Language {
 				
 			}
 			
-			// A routine that allocates a buffer on the heap. It takes a length in t0 and returns a buffer cap in ct0. It also touches t1 and t2.
+			// A routine that allocates a buffer on the heap.
+			// It takes a length in t0 and returns a buffer cap in ct0. It also touches t1 and t2 but will not leak any unintended new authority.
 			@ArrayBuilder<Lower.Effect>
 			var allocationRoutine: [Lower.Effect] {
 				
@@ -127,7 +162,8 @@ public enum MM : Language {
 				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
 				Lower.Effect.store(.cap, address: heapCapCapReg2, source: heapCapReg)
 				
-				// TODO: Clear authority.
+				// Clear authority.
+				Lower.Effect.clear([heapCapReg, heapCapCapReg2])
 				
 				// Return to caller.
 				Lower.Effect.return
@@ -137,6 +173,39 @@ public enum MM : Language {
 				
 				// Label end of routine.
 				allocEndLabel ~ .buffer(.s32, count: 1)
+				
+			}
+			
+			// A routine that performs a secure function call transition.
+			// It takes a target capability in ct0, a return capability in cra, a frame capability in cfp, and function arguments in argument registers. It returns the same frame capability in ct6 and function results in argument registers.
+			// It may touch any register but will not leak any new authority — the caller and callee are expected to perform appropriate register clearing before calling/returning.
+			// The callee receives a sealed return–frame capability pair in cra and csp as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
+			@ArrayBuilder<Lower.Effect>
+			var scallRoutine: [Lower.Effect] {
+				
+				let targetReg = Lower.Register.t0	// input
+				
+				// Load seal cap.
+				let sealCapCap = Lower.Register.t1
+				let sealCap = Lower.Register.t1
+				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: sealLabel)
+				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
+				
+				// Seal return & frame capabilities.
+				Lower.Effect.seal(destination: .ra, source: .ra, seal: sealCap)
+				Lower.Effect.seal(destination: .sp, source: .fp, seal: sealCap)
+				
+				// Clear authority.
+				Lower.Effect.clear([sealCap, .fp])
+				
+				// Jump to callee — while preserving link.
+				Lower.Effect.jump(to: .register(targetReg), link: .zero)
+				
+				// The seal capability.
+				sealLabel ~ .buffer(.cap, count: 1)
+				
+				// Label end of routine.
+				scallEndLabel ~ .buffer(.s32, count: 1)
 				
 			}
 			
@@ -182,6 +251,11 @@ public enum MM : Language {
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
 		static let allocCapabilityPermissions = [Permission.execute, .loadCapability, .storeCapability]
+		
+		/// The secure calling routine capability's permissions.
+		///
+		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
+		static let scallCapabilityPermissions = [Permission.execute, .loadCapability]
 		
 	}
 	

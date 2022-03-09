@@ -218,4 +218,7 @@ extension MM.Label {
 	/// The label for the capability to the allocation routine.
 	static var allocationRoutineCapability: Self { "mm.alloc.cap" }
 	
+	/// The label for the capability to the secure calling routine.
+	static var secureCallingRoutineCapability: Self { "mm.scall.cap" }
+	
 }
