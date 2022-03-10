@@ -149,10 +149,10 @@ extension CD {
 				return optimised
 				
 				case .set(_, let destination, to: let source) where source.location == destination,
-						.compute(let destination, let source, .add, .immediate(0)) where source.location == destination,
-						.compute(let destination, .immediate(0), .add, let source) where source.location == destination,
-						.compute(let destination, let source, .sub, .immediate(0)) where source.location == destination,
-						.compute(let destination, .immediate(0), .sub, let source) where source.location == destination:
+						.compute(let destination, let source, .add, .constant(0)) where source.location == destination,
+						.compute(let destination, .constant(0), .add, let source) where source.location == destination,
+						.compute(let destination, let source, .sub, .constant(0)) where source.location == destination,
+						.compute(let destination, .constant(0), .sub, let source) where source.location == destination:
 				self = .do([])
 				return true
 				

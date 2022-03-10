@@ -72,13 +72,13 @@ extension FO {
 			let temp3 = Lower.Register.t5
 			switch self {
 				
-				case .set(.u8, .register(let dest), to: .immediate(let imm)):
-				try Lower.Effect.load(into: dest.lowered(), value: .init(UInt8(truncatingIfNeeded: imm)))
+				case .set(.u8, .register(let dest), to: .constant(let imm)):
+				try Lower.Effect.put(into: dest.lowered(), value: .init(UInt8(truncatingIfNeeded: imm)))
 				
-				case .set(.s32, .register(let dest), to: .immediate(let imm)):
-				try Lower.Effect.load(into: dest.lowered(), value: imm)
+				case .set(.s32, .register(let dest), to: .constant(let imm)):
+				try Lower.Effect.put(into: dest.lowered(), value: imm)
 				
-				case .set(.cap, .register, to: .immediate):
+				case .set(.cap, .register, to: .constant):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
 				case .set(let type, .register(let dest), to: .register(let src)):
@@ -87,11 +87,11 @@ extension FO {
 				case .set(let type, .register(let dest), to: .frame(let src)):
 				try Lower.Effect.load(type, into: dest.lowered(), from: src)
 				
-				case .set(.cap, .frame, to: .immediate):
+				case .set(.cap, .frame, to: .constant):
 				throw LoweringError.settingCapabilityUsingImmediate
 				
-				case .set(let type, .frame(let dest), to: .immediate(let imm)):
-				Lower.Effect.load(into: temp1, value: imm)
+				case .set(let type, .frame(let dest), to: .constant(let imm)):
+				Lower.Effect.put(into: temp1, value: imm)
 				Lower.Effect.store(type, into: dest, from: temp1)
 				
 				case .set(let type, .frame(let dest), to: .register(let src)):
@@ -101,7 +101,7 @@ extension FO {
 				Lower.Effect.load(type, into: temp1, from: src)
 				Lower.Effect.store(type, into: dest, from: temp1)
 				
-				case .compute(let destination, let lhs, let operation, .immediate(let rhs)):
+				case .compute(let destination, let lhs, let operation, .constant(let rhs)):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
 				loadLHS
@@ -183,7 +183,7 @@ extension FO {
 		/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
 		private func load(_ type: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 			switch source {
-				case .immediate(let imm):	return ([.load(into: temporaryRegister, value: imm)], temporaryRegister)
+				case .constant(let imm):	return ([.put(into: temporaryRegister, value: imm)], temporaryRegister)
 				case .register(let r):		return ([], try r.lowered())
 				case .frame(let c):			return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
 			}

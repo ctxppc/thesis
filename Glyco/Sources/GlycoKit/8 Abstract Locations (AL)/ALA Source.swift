@@ -20,7 +20,7 @@ extension ALA {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
-				case .constant(let imm):			return .immediate(imm)
+				case .constant(let imm):			return .constant(imm)
 				case .abstract(let location):		return .init(try location.lowered(in: &context))
 				case .register(let register, _):	return .register(register)
 				case .frame(let location):			return .frame(location)

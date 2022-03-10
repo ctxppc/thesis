@@ -25,7 +25,7 @@ extension CD {
 				case .constant:
 				return false
 				
-				case .relation(.immediate(let lhs), let relation, .immediate(let rhs)):
+				case .relation(.constant(let lhs), let relation, .constant(let rhs)):
 				self = .constant(relation.holds(lhs, rhs))
 				return true
 				

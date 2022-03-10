@@ -1,9 +1,9 @@
 (
 	do(
 		pushFrame((allocatedByteSize: 8))
-		set(s32, register(a0), to: immediate(0))
-		set(s32, register(a1), to: immediate(1))
-		set(s32, register(a2), to: immediate(30))
+		set(s32, register(a0), to: constant(0))
+		set(s32, register(a1), to: constant(1))
+		set(s32, register(a2), to: constant(30))
 		call(fib)
 		popFrame()
 		return()
@@ -17,7 +17,7 @@
 			do()
 			if(
 				do(
-					set(s32, register(s1), to: register(a2)) set(s32, register(a0), to: immediate(0)),
+					set(s32, register(s1), to: register(a2)) set(s32, register(a0), to: constant(0)),
 					then: relation(register(s1), le, register(a0))
 				),
 				then: do(set(s32, register(s1), to: register(a1)) set(s32, register(a0), to: register(s1)) popFrame() return()),
@@ -27,7 +27,7 @@
 					set(s32, register(s1), to: register(a1))
 					compute(register(a1), register(a0), add, register(s1))
 					set(s32, register(s1), to: register(a2))
-					set(s32, register(a0), to: immediate(1))
+					set(s32, register(a0), to: constant(1))
 					compute(register(s1), register(s1), sub, register(a0))
 					set(s32, register(a0), to: register(a4))
 					do()

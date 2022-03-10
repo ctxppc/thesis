@@ -11,7 +11,8 @@ extension MM {
 		/// An effect that performs *x* `operation` *y* where *x* is the value in the second given register and *y* is the value from given source, and puts in `destination`.
 		case compute(destination: Register, Register, BinaryOperator, Source)
 		
-		static func load(into destination: Register, value: Int) -> Self { .compute(destination: destination, .zero, .add, .constant(value)) }
+		/// Returns an effect that puts `value` in `destination`.
+		static func put(into destination: Register, value: Int) -> Self { .compute(destination: destination, .zero, .add, .constant(value)) }
 		
 		/// An effect that loads the datum in the frame at `from` and puts it in `into`.
 		case load(DataType, into: Register, from: Frame.Location)
@@ -21,12 +22,12 @@ extension MM {
 		
 		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given register.
 		///
-		/// If `onFrame` is `true` and the call stack is enabled, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
+		/// If `onFrame` is `true` and a contiguous call stack is used, the buffer is allocated in the current call frame and automatically deallocated when the frame is popped, after which it must not be accessed; otherwise, the buffer is allocated on the heap.
 		case createBuffer(bytes: Source, capability: Register, onFrame: Bool)
 		
 		/// An effect that deallocates the buffer referred by the capability in given register.
 		///
-		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic. This effect does nothing if the call stack is disabled.
+		/// This effect must only be used with buffers allocated in the current call frame. For any two buffers *a* and *b* allocated in the current call frame, *b* must be deallocated exactly once before deallocating *a*. Deallocation is not required before popping the call frame; in that case, deallocation is automatic. This effect does nothing if the contiguous call stack is disabled.
 		case destroyBuffer(capability: Register)
 		
 		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
@@ -35,12 +36,16 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
 		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
 		
-		/// An effect that pushes given frame to the call stack by pushing `cfp` to the stack, copying `csp` to `cfp`, and offsetting `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
+		/// An effect that pushes given frame to the call stack.
+		///
+		/// If the contiguous call stack is enabled, this effect pushes `cfp` to it, copies `csp` to `cfp`, and offsets `csp` *b* bytes downward, where *b* is the byte size allocated by the frame. Otherwise, this effect allocates a buffer of *b* bytes on the heap and puts a capability to it in `cfp`.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(Frame)
 		
-		/// An effect that pops a frame by copying `cfp` to `csp` and popping `cfp` from the stack.
+		/// An effect that pops a frame from the call stack, if the contiguous call stack is enabled.
+		///
+		/// This effect copies `cfp` to `csp` and pops `cfp` from the stack. This effect does nothing if the contiguous call stack is disabled.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
@@ -97,14 +102,20 @@ extension MM {
 				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(destination.offset))
 				Lower.Effect.store(dataType, address: temp, source: try source.lowered())
 				
-				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: false):
-				Lower.Effect.compute(destination: .t0, .zero, .add, try bytes.lowered())
-				Lower.Effect.deriveCapabilityFromLabel(destination: .t1, label: .allocationRoutineCapability)
-				Lower.Effect.jump(to: .register(.t1), link: .ra)
-				Lower.Effect.copy(.cap, into: try buffer.lowered(), from: .t0)
+				case .createBuffer(bytes: let bytes, capability: let destinationBuffer, onFrame: false):
+				let lengthReg = Lower.Register.t0	// cf. alloc routine
+				let bufferReg = Lower.Register.t0	// cf. alloc routine
+				let allocCapReg = Lower.Register.t1
+				let destinationBufferReg = try destinationBuffer.lowered()
+				Lower.Effect.compute(destination: lengthReg, .zero, .add, try bytes.lowered())
+				Lower.Effect.deriveCapabilityFromLabel(destination: allocCapReg, label: .allocationRoutineCapability)
+				Lower.Effect.jump(to: .register(allocCapReg), link: .ra)
+				if bufferReg != destinationBufferReg {
+					Lower.Effect.copy(.cap, into: destinationBufferReg, from: bufferReg)
+				}
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: true):
-				if context.configuration.callingConvention.callStackEnabled {
+				if context.configuration.callingConvention.usesContiguousCallStack {
 					
 					/*
 						 ┌──────────┐ high
@@ -146,7 +157,7 @@ extension MM {
 				}
 				
 				case .destroyBuffer(let buffer):
-				if context.configuration.callingConvention.callStackEnabled {
+				if context.configuration.callingConvention.usesContiguousCallStack {
 					Lower.Effect.getCapabilityLength(destination: temp, source: try buffer.lowered())
 					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(temp))
 				}
@@ -160,7 +171,7 @@ extension MM {
 				try Lower.Effect.store(dataType, address: temp, source: source.lowered())
 				
 				case .pushFrame(let frame):
-				do {
+				if context.configuration.callingConvention.usesContiguousCallStack {
 					
 					// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
 					Lower.Effect.offsetCapability(destination: temp, source: .sp, offset: .constant(-DataType.cap.byteSize))
@@ -172,10 +183,18 @@ extension MM {
 					// Allocate space for frame by pushing sp downward.
 					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .constant(-frame.allocatedByteSize))
 					
+				} else {
+					let lengthReg = Lower.Register.t0	// cf. alloc routine
+					let bufferReg = Lower.Register.t0	// cf. alloc routine
+					let allocCapReg = Lower.Register.t1
+					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
+					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapReg, label: .allocationRoutineCapability)
+					Lower.Effect.jump(to: .register(allocCapReg), link: .ra)
+					Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
 				}
 				
 				case .popFrame:
-				do {
+				if context.configuration.callingConvention.usesContiguousCallStack {
 					
 					// Pop frame and saved fp by moving sp one word above the saved fp's location.
 					Lower.Effect.offsetCapability(destination: .sp, source: .fp, offset: .constant(+DataType.cap.byteSize))

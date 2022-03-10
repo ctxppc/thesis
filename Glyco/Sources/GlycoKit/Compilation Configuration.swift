@@ -32,17 +32,17 @@ public struct CompilationConfiguration {
 	public var callingConvention: CallingConvention = .conventional
 	public enum CallingConvention : String, CaseIterable {
 		
-		/// The Conventional Glyco Calling Convention (CGCC), a calling convention based on a traditional RISC-V calling convention.
+		/// The Glyco Conventional Calling Convention (GCCC), a calling convention based on a traditional RISC-V calling convention.
 		case conventional
 		
-		/// The Secure Glyco Calling Convention (SGCC), a calling convention enforcing well-bracketed control flow and stack encapsulation.
-		case secure
+		/// The Glyco Heap-based Secure Calling Convention (GHSCC), a calling convention enforcing stack encapsulation but no well-bracketed control flow.
+		case heap
 		
-		/// A Boolean value indicating whether the call stack is enabled.
-		var callStackEnabled: Bool {
+		/// A Boolean value indicating whether a contiguous call stack is used.
+		var usesContiguousCallStack: Bool {
 			switch self {
 				case .conventional:	return true
-				case .secure:		return false
+				case .heap:			return false
 			}
 		}
 		

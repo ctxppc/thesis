@@ -796,7 +796,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 <dl>
 	<dt><code>FO.Source</code></dt>
-	<dd><code><strong>immediate</strong>(Int)</code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
