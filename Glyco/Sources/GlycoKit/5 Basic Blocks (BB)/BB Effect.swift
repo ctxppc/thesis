@@ -37,8 +37,8 @@ extension BB {
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
 		
-		/// An effect that clears given registers.
-		case clear([Register])
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		case clearAll(except: [Register])
 		
 		// See protocol.
 		func lowered(in context: inout ()) -> Lower.Effect {
@@ -68,8 +68,8 @@ extension BB {
 				case .popFrame:
 				return .popFrame
 				
-				case .clear(let registers):
-				return .clear(registers)
+				case .clearAll(except: let sparedRegisters):
+				return .clearAll(except: sparedRegisters)
 				
 			}
 		}

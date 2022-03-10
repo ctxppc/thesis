@@ -57,8 +57,12 @@ extension MM {
 		/// A hardware exception is raised if `source` doesn't contain a valid, unsealed capability.
 		case permit([Permission], destination: Register, source: Register)
 		
-		/// An effect that clears given registers.
-		case clear([Register])
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		///
+		/// This effect must be executed before jumping to untrusted or partially untrusted code to ensure that the target code does not get unintended authority. Any registers (whether containing capabilities with intended authority, or non-capability data) can be exempted from clearing.
+		///
+		/// `ctp` and `cgp` are reserved global registers whereas `csp` and `cfp` are managed by the runtime. These registers therefore cannot explicitly be cleared in MM.
+		case clearAll(except: [Register])
 		
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
@@ -207,8 +211,10 @@ extension MM {
 				case .permit(let permissions, destination: let destination, source: let source):
 				try Lower.Effect.permit(permissions, destination: destination.lowered(), source: source.lowered(), using: temp)
 				
-				case .clear(let registers):
-				Lower.Effect.clear(try registers.lowered())
+				case .clearAll(except: let sparedRegisters):
+				let sparedRegisters = Set(try sparedRegisters.lowered()).union([.sp, .gp, .tp, .fp])
+				let clearedRegisters = Lower.Register.allCases.filter { !sparedRegisters.contains($0) }
+				Lower.Effect.clear(clearedRegisters)
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
 				try Lower.Effect.branch(to: target, rs1.lowered(), relation, rs2.lowered())

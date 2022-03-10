@@ -463,7 +463,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -523,7 +523,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -577,7 +577,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -643,7 +643,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>clear</strong>([Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
@@ -703,7 +703,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
@@ -774,7 +774,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 </dl>
 <dl>
 	<dt><code>BB.Continuation</code></dt>
@@ -816,7 +816,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
@@ -880,7 +880,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>

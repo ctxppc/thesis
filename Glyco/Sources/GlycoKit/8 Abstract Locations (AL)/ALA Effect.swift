@@ -49,8 +49,8 @@ extension ALA {
 		/// A pop scope effect "uses" the values of callee-saved registers, as defined during the preceding push scope effect so that it can "return" them to the previous scope. If those values were copied into abstract locations after their definition by the push scope effect, they should be copied back to the callee-saved registers before the pop scope effect so that the registers become available for other assignments.
 		case popScope(analysisAtEntry: Analysis)
 		
-		/// An effect that clears given registers.
-		case clear([Register], analysisAtEntry: Analysis)
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		case clearAll(except: [Register], analysisAtEntry: Analysis)
 		
 		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
@@ -113,8 +113,8 @@ extension ALA {
 				case .popScope(analysisAtEntry: _):
 				Lowered.popFrame
 				
-				case .clear(let registers, analysisAtEntry: _):
-				Lowered.clear(registers)
+				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
+				Lowered.clearAll(except: sparedRegisters)
 				
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
@@ -207,8 +207,8 @@ extension ALA {
 				case .popScope(analysisAtEntry: _):
 				return .popScope(analysisAtEntry: analysis)
 				
-				case .clear(let registers, analysisAtEntry: _):
-				return .clear(registers, analysisAtEntry: analysis)
+				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
+				return .clearAll(except: sparedRegisters, analysisAtEntry: analysis)
 				
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
@@ -235,7 +235,7 @@ extension ALA {
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
-					.clear(_, analysisAtEntry: let analysis),
+					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -258,8 +258,11 @@ extension ALA {
 				case .pushScope:
 				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
-				case .clear(let registers, analysisAtEntry: _):
-				return registers.map { .register($0) }
+				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
+				let sparedRegisters = Set(sparedRegisters)
+				return Register.allCases
+					.filter { !sparedRegisters.contains($0) }
+					.map { .register($0) }
 				
 				case .call:
 				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
@@ -277,7 +280,7 @@ extension ALA {
 					.createBuffer,
 					.if,
 					.pushScope,
-					.clear:
+					.clearAll:
 				return []
 				
 				case .destroyBuffer(capability: let source, analysisAtEntry: _),
@@ -326,7 +329,7 @@ extension ALA {
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushScope, .popScope, .clear, .call, .return:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushScope, .popScope, .clearAll, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -390,7 +393,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pushScope, .popScope, .clear, .call, .return:
+				case .do, .if, .pushScope, .popScope, .clearAll, .call, .return:
 				return self
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)

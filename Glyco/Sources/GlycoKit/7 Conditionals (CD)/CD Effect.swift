@@ -45,8 +45,8 @@ extension CD {
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
 		
-		/// An effect that clears given registers.
-		case clear([Register])
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		case clearAll(except: [Register])
 		
 		/// An effect that invokes the labelled procedure.
 		///
@@ -73,7 +73,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .clear, .call, .return:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .clearAll, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -108,7 +108,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clear, .call:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clearAll, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -290,8 +290,8 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			case .popFrame:
 			return try simpleLowering(.popFrame)
 			
-			case .clear(let registers):
-			return try simpleLowering(.clear(registers))
+			case .clearAll(except: let sparedRegisters):
+			return try simpleLowering(.clearAll(except: sparedRegisters))
 			
 			case .call(let procedure):
 			let returnPoint = context.bag.uniqueName(from: "ret")

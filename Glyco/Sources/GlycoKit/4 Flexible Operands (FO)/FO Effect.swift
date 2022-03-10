@@ -46,8 +46,8 @@ extension FO {
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
 		
-		/// An effect that clears given registers.
-		case clear([Register])
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		case clearAll(except: [Register])
 		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
@@ -164,8 +164,8 @@ extension FO {
 				case .jump(to: let target):
 				Lower.Effect.jump(to: .label(target), link: .zero)
 				
-				case .clear(let registers):
-				Lower.Effect.clear(try registers.lowered())
+				case .clearAll(except: let sparedRegisters):
+				Lower.Effect.clearAll(except: try sparedRegisters.lowered())
 				
 				case .call(let label):
 				Lower.Effect.call(label)

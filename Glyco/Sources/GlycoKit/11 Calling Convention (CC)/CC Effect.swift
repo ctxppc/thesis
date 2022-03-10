@@ -120,9 +120,15 @@ extension CC {
 						Lowered.set(.register(asn.register), to: arg)
 					}
 					
+					// If using a secure CC, clear all registers except parameter registers in use.
+					let parameterRegisters = assignments.viaRegisters.map(\.register)
+					if context.configuration.callingConvention != .conventional {
+						Lowered.clearAll(except: parameterRegisters)
+					}
+					
 					// Invoke procedure.
-					// Parameter registers are considered in use but no frame locations are used since frame-res. args. are passed via an allocated record.
-					Lowered.call(name, parameters: assignments.viaRegisters.map(\.register))
+					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
+					Lowered.call(name, parameters: parameterRegisters)
 					
 					// Destroy arguments arguments, if any.
 					if !assignments.parameterRecordType.isEmpty {
@@ -140,7 +146,8 @@ extension CC {
 				do {
 					
 					// Write result to a0.
-					Lowered.set(.register(.a0), to: try result.lowered(in: &context))
+					let resultRegister = Lower.Register.a0
+					Lowered.set(.register(resultRegister), to: try result.lowered(in: &context))
 					// TODO: Write to a global abstract location to ensure consistent return type, and infer return type from that.
 					
 					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
@@ -148,6 +155,11 @@ extension CC {
 						for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
 							Lowered.set(.register(register), to: .abstract(context.calleeSaveLocation(for: register)))
 						}
+					}
+					
+					// If using a secure CC, clear all registers except for the result value.
+					if context.configuration.callingConvention != .conventional {
+						Lowered.clearAll(except: [resultRegister])
 					}
 					
 					// We're done.

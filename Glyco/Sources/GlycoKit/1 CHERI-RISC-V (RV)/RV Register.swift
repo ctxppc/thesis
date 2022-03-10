@@ -19,8 +19,8 @@ extension RV {
 		/// The global capability register (not used).
 		case gp	// keep for ordinal
 		
-		/// The thread capability register (used for the heap).
-		case tp
+		/// The thread capability register (not used).
+		case tp	// keep for ordinal
 		
 		/// A register for temporaries.
 		case t0, t1, t2

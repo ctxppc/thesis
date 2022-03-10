@@ -46,6 +46,14 @@ public struct CompilationConfiguration {
 			}
 		}
 		
+		/// A Boolean value indicating whether the calling convention uses a call routine provided by the runtime, i.e., whether an scall is required, as opposed to the caller jumping directly to the callee.
+		var requiresCallRoutine: Bool {
+			switch self {
+				case .conventional:	return false
+				case .heap:			return true
+			}
+		}
+		
 	}
 	
 	/// A URL to a CHERI-RISC-V toolchain.

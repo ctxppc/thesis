@@ -47,8 +47,8 @@ extension ID {
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope
 		
-		/// An effect that clears given registers.
-		case clear([Register])
+		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
+		case clearAll(except: [Register])
 		
 		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
@@ -101,8 +101,8 @@ extension ID {
 				case .popScope:
 				Lowered.popScope
 				
-				case .clear(let registers):
-				Lowered.clear(registers)
+				case .clearAll(except: let sparedRegisters):
+				Lowered.clearAll(except: sparedRegisters)
 				
 				case .call(let name, parameters: let parameters):
 				Lowered.call(name, parameters: parameters)
