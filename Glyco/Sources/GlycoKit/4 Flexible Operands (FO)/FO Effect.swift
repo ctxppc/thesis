@@ -22,7 +22,7 @@ extension FO {
 		
 		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// If `onFrame` is `true`, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
+		/// If `onFrame` is `true`, the buffer may be allocated on the call frame and may be automatically deallocated when the frame is popped, after which it must not be accessed.
 		case createBuffer(bytes: Int, capability: Location, onFrame: Bool)
 		
 		/// An effect that deallocates the buffer referred by the capability from given source.
@@ -45,6 +45,9 @@ extension FO {
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
+		
+		/// An effect that clears given registers.
+		case clear([Register])
 		
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
@@ -160,6 +163,9 @@ extension FO {
 				
 				case .jump(to: let target):
 				Lower.Effect.jump(to: .label(target), link: .zero)
+				
+				case .clear(let registers):
+				Lower.Effect.clear(try registers.lowered())
 				
 				case .call(let label):
 				Lower.Effect.call(label)

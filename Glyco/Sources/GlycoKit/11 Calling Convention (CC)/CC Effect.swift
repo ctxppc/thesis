@@ -19,7 +19,7 @@ extension CC {
 		
 		/// An effect that creates an (uninitialised) record of given type and puts a capability for that record in given location.
 		///
-		/// If `scoped` is `true`, the record is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the record may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createRecord(RecordType, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
@@ -30,7 +30,7 @@ extension CC {
 		
 		/// An effect that creates an (uninitialised) vector of `count` elements of given value type and puts a capability for that vector in given location.
 		///
-		/// If `scoped` is `true`, the vector is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the vector may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createVector(ValueType, count: Int = 1, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
@@ -99,7 +99,7 @@ extension CC {
 					// Prepare assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
-					// Create (scoped) arguments record, if nonempty.
+					// Create (scoped) arguments record, if nonempty. (The record is heap-allocated when the call stack is discontiguous.)
 					let argumentsRecord = context.locations.uniqueName(from: "args")
 					if !assignments.parameterRecordType.isEmpty {
 						Lowered.createRecord(assignments.parameterRecordType, capability: .abstract(argumentsRecord), scoped: true)

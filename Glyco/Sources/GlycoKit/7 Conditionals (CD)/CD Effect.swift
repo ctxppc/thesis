@@ -18,7 +18,7 @@ extension CD {
 		
 		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// If `onFrame` is `true`, the buffer is allocated on the call frame and automatically deallocated when the frame is popped, after which it must not be accessed.
+		/// If `onFrame` is `true`, the buffer may be allocated on the call frame and may be automatically deallocated when the frame is popped, after which it must not be accessed.
 		case createBuffer(bytes: Int, capability: Location, onFrame: Bool)
 		
 		/// An effect that deallocates the buffer referred by the capability from given source.
@@ -45,6 +45,9 @@ extension CD {
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
 		
+		/// An effect that clears given registers.
+		case clear([Register])
+		
 		/// An effect that invokes the labelled procedure.
 		///
 		/// This effect assumes the calling convention is respected by the rest of the program.
@@ -70,7 +73,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .call, .return:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .clear, .call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -105,7 +108,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .call:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clear, .call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -286,6 +289,9 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			
 			case .popFrame:
 			return try simpleLowering(.popFrame)
+			
+			case .clear(let registers):
+			return try simpleLowering(.clear(registers))
 			
 			case .call(let procedure):
 			let returnPoint = context.bag.uniqueName(from: "ret")

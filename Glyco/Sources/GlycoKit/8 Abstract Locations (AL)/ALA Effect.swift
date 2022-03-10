@@ -16,7 +16,7 @@ extension ALA {
 		
 		/// An effect that creates an (uninitialised) buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// If `scoped` is `true`, the buffer is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the buffer may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createBuffer(bytes: Int, capability: Location, scoped: Bool, analysisAtEntry: Analysis)
 		
 		/// An effect that destroys the buffer referred by the capability from given source.
@@ -48,6 +48,9 @@ extension ALA {
 		///
 		/// A pop scope effect "uses" the values of callee-saved registers, as defined during the preceding push scope effect so that it can "return" them to the previous scope. If those values were copied into abstract locations after their definition by the push scope effect, they should be copied back to the callee-saved registers before the pop scope effect so that the registers become available for other assignments.
 		case popScope(analysisAtEntry: Analysis)
+		
+		/// An effect that clears given registers.
+		case clear([Register], analysisAtEntry: Analysis)
 		
 		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
@@ -109,6 +112,9 @@ extension ALA {
 				
 				case .popScope(analysisAtEntry: _):
 				Lowered.popFrame
+				
+				case .clear(let registers, analysisAtEntry: _):
+				Lowered.clear(registers)
 				
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
@@ -201,6 +207,9 @@ extension ALA {
 				case .popScope(analysisAtEntry: _):
 				return .popScope(analysisAtEntry: analysis)
 				
+				case .clear(let registers, analysisAtEntry: _):
+				return .clear(registers, analysisAtEntry: analysis)
+				
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
@@ -226,6 +235,7 @@ extension ALA {
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
+					.clear(_, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -248,6 +258,9 @@ extension ALA {
 				case .pushScope:
 				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
+				case .clear(let registers, analysisAtEntry: _):
+				return registers.map { .register($0) }
+				
 				case .call:
 				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
 				
@@ -263,7 +276,8 @@ extension ALA {
 					.compute(_, .constant, _, .constant, analysisAtEntry: _),
 					.createBuffer,
 					.if,
-					.pushScope:
+					.pushScope,
+					.clear:
 				return []
 				
 				case .destroyBuffer(capability: let source, analysisAtEntry: _),
@@ -312,7 +326,7 @@ extension ALA {
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushScope, .popScope, .call, .return:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushScope, .popScope, .clear, .call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -376,7 +390,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pushScope, .popScope, .call, .return:
+				case .do, .if, .pushScope, .popScope, .clear, .call, .return:
 				return self
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)

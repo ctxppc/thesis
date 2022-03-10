@@ -18,7 +18,7 @@ extension SV {
 		
 		/// An effect that creates an (uninitialised) record of given type and puts a capability for that record in given location.
 		///
-		/// If `scoped` is `true`, the record is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the record may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createRecord(RecordType, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
@@ -29,7 +29,7 @@ extension SV {
 		
 		/// An effect that creates an (uninitialised) vector of `count` elements of given value type and puts a capability for that vector in given location.
 		///
-		/// If `scoped` is `true`, the vector is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the vector may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createVector(ValueType, count: Int = 1, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the element at zero-based position `index` in the vector in `of` and puts it in `to`.
@@ -59,6 +59,9 @@ extension SV {
 		///
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope
+		
+		/// An effect that clears given registers.
+		case clear([Register])
 		
 		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
@@ -165,6 +168,9 @@ extension SV {
 				
 				case .popScope:
 				Lowered.popScope
+				
+				case .clear(let registers):
+				Lowered.clear(registers)
 				
 				case .call(let name, let parameters):
 				Lowered.call(name, parameters: parameters)

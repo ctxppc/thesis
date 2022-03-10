@@ -16,7 +16,7 @@ extension ID {
 		
 		/// An effect that creates an (uninitialised) buffer of `bytes` bytes and puts a capability for that buffer in given location.
 		///
-		/// If `scoped` is `true`, the buffer is destroyed when the current scope is popped and must not be accessed afterwards.
+		/// If `scoped` is `true`, the buffer may be destroyed when the current scope is popped and must not be accessed afterwards.
 		case createBuffer(bytes: Int, capability: Location, scoped: Bool)
 		
 		/// An effect that destroys the buffer referred by the capability from given source.
@@ -46,6 +46,9 @@ extension ID {
 		///
 		/// This effect must be executed exactly once before any location defined in the previous scope is accessed.
 		case popScope
+		
+		/// An effect that clears given registers.
+		case clear([Register])
 		
 		/// An effect that invokes the labelled procedure and uses given parameter registers.
 		///
@@ -97,6 +100,9 @@ extension ID {
 				
 				case .popScope:
 				Lowered.popScope
+				
+				case .clear(let registers):
+				Lowered.clear(registers)
 				
 				case .call(let name, parameters: let parameters):
 				Lowered.call(name, parameters: parameters)
