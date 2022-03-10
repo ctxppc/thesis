@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Managed Memory
-//sourcery: description = "A language that introduces the call stack, the heap, and operations on them."
+//sourcery: description = "A language that introduces a runtime, call stack, heap, and operations on them."
 public enum MM : Language {
 	
 	/// An MM program.
@@ -37,23 +37,23 @@ public enum MM : Language {
 			let scallLabel = "mm.scall" as Label
 			let scallEndLabel = "mm.scall.end" as Label
 			let scallCapLabel = Label.secureCallingRoutineCapability
-			let sealLabel = "mm.seal.cap" as Label
+			let sealCapLabel = "mm.seal.cap" as Label
 			
 			let userLabel = "mm.user" as Label
 			let userEndLabel = "mm.user.end" as Label
 			
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
-			// A routine that initialises the runtime and restricts the user's authority. It touches all registers.
+			// A routine that initialises the runtime, restricts the user's authority, and executes the user program. It touches all registers.
 			@ArrayBuilder<Lower.Effect>
-			var initialisationRoutine: [Lower.Effect] {
+			var runtime: [Lower.Effect] {
 				
 				// Initialise heap cap.
 				do {
 					
 					// Derive heap cap.
 					let heapCapReg = Lower.Register.t0
-					(.initialise) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
+					(.runtime) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
 					
 					// Restrict heap cap bounds.
 					let heapCapEndReg = Lower.Register.t1
@@ -69,6 +69,27 @@ public enum MM : Language {
 					let heapCapCapReg = Lower.Register.t1
 					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
 					Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg)
+					
+				}
+				
+				// Initialise seal cap.
+				do {
+					
+					// Derive seal cap from PCC.
+					let sealCapReg = Lower.Register.t0
+					Lower.Effect.deriveCapabilityFromPCC(destination: sealCapReg, upperBits: 0)
+					
+					// Restrict seal cap bounds to seal with otype 0 only.
+					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
+					Lower.Effect.setCapabilityBounds(destination: sealCapReg, source: sealCapReg, length: .constant(1))
+					
+					// Restrict seal cap permissions.
+					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: .t1)
+					
+					// Derive seal cap cap and store seal cap.
+					let sealCapCapReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: sealCapCapReg, label: sealCapLabel)
+					Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg)
 					
 				}
 				
@@ -124,12 +145,46 @@ public enum MM : Language {
 					
 				}
 				
-				// TODO: Initialise seal cap.
-				
-				// TODO: Clear all registers except (selected) user authority.
-				
-				// Return to caller.
-				Lower.Effect.return
+				// Execute user program & return.
+				do {
+					
+					// Derive user cap.
+					let userCapReg = Lower.Register.t0
+					Lower.Effect.deriveCapabilityFromLabel(destination: userCapReg, label: .programEntry)
+					
+					// Restrict user cap bounds.
+					let userEndReg = Lower.Register.t1
+					let userLengthReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: userEndReg, label: userEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: userLengthReg, cs1: userEndReg, cs2: userCapReg)
+					Lower.Effect.setCapabilityBounds(destination: userCapReg, source: userCapReg, length: .register(userLengthReg))
+					
+					// Restrict user cap permissions.
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
+					
+					// Copy cra to cfp to preserve it across the scall — we don't need an actual frame in the runtime.
+					let savedRABeforeScallReg = Lower.Register.fp
+					Lower.Effect.copy(.cap, into: savedRABeforeScallReg, from: .ra)
+					
+					// Load (appropriately restricted) scall cap.
+					let scallCapCapReg = Lower.Register.t1
+					let scallCapReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
+					Lower.Effect.load(.cap, destination: scallCapReg, address: scallCapCapReg)
+					
+					// Clear all registers except (selected) user authority.
+					let preservedRegisters = [savedRABeforeScallReg, userCapReg, scallCapReg]	// Set is probably less efficient for 3 elements
+					Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
+					
+					// Perform scall — do not use a label target as it would transfer too much authority!
+					Lower.Effect.jump(to: .register(scallCapReg), link: .ra)
+					
+					// Return to OS/framework.
+					let savedRAAfterScallReg = Lower.Register.dataCapabilityAfterInvoke
+					Lower.Effect.jump(to: .register(savedRAAfterScallReg), link: .zero)
+					
+				}
 				
 			}
 			
@@ -188,7 +243,7 @@ public enum MM : Language {
 				// Load seal cap.
 				let sealCapCap = Lower.Register.t1
 				let sealCap = Lower.Register.t1
-				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: sealLabel)
+				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: sealCapLabel)
 				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
 				
 				// Seal return & frame capabilities.
@@ -202,7 +257,7 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
 				
 				// The seal capability.
-				sealLabel ~ .buffer(.cap, count: 1)
+				sealCapLabel ~ .buffer(.cap, count: 1)
 				
 				// Label end of routine.
 				scallEndLabel ~ .buffer(.s32, count: 1)
@@ -214,11 +269,14 @@ public enum MM : Language {
 			var user: [Lower.Effect] {
 				get throws {
 					
-					// User code.
-					try effects.lowered(in: &context)
-					
 					// Alloc capability.
 					userLabel ~ (allocCapLabel ~ .buffer(.cap, count: 1))
+					
+					// Scall capability.
+					scallCapLabel ~ .buffer(.cap, count: 1)
+					
+					// User code.
+					try effects.lowered(in: &context)
 					
 					// Label end of user.
 					userEndLabel ~ .buffer(.s32, count: 1)
@@ -234,9 +292,10 @@ public enum MM : Language {
 			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
 			
 			return try .init {
-				initialisationRoutine	// requires & preserves alignment
-				allocationRoutine		// requires & preserves alignment
-				try user				// requires & consumes alignment
+				runtime					// requires & preserves 4-byte alignment
+				allocationRoutine		// requires & preserves 4-byte alignment
+				scallRoutine			// requires & preserves 4-byte alignment
+				try user				// requires & preserves 4-byte alignment
 				heap					// does not require alignment
 			}
 			
@@ -256,6 +315,12 @@ public enum MM : Language {
 		///
 		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
 		static let scallCapabilityPermissions = [Permission.execute, .loadCapability]
+		
+		/// The seal capability's permissions.
+		static let sealCapabilityPermissions = [Permission.seal]
+		
+		/// The user's PPC capability permissions.
+		static let userPPCPermissions = [Permission.load, .execute, .invoke]
 		
 	}
 	

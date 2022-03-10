@@ -38,8 +38,7 @@ public enum RV : Language {
 								.p2align	1
 								.type		main, @function
 				main:			.cfi_startproc
-								ccall		\(Label.initialise.rawValue)
-								ccall		\(Label.programEntry.rawValue)
+								ccall		\(Label.runtime.rawValue)
 								cret
 				main.end:		.size		main, main.end-main
 								.cfi_endproc
@@ -77,8 +76,7 @@ public enum RV : Language {
 								csc ct5, 0(ct0)
 								j _exit
 								
-				rv.begin:		ccall \(Label.initialise.rawValue)
-								ccall \(Label.programEntry.rawValue)
+				rv.begin:		ccall \(Label.runtime.rawValue)
 								li gp, 1
 								j _exit
 								

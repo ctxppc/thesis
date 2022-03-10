@@ -45,6 +45,9 @@ extension RV {
 		/// An instruction that derives a capability from PCC to the memory location labelled `label` and puts it in `destination`.
 		case deriveCapabilityFromLabel(destination: Register, label: Label)
 		
+		/// An instruction that derives a capability from PCC, adds `upperBits` to after left-shifting it by 12, and puts the resulting capability in `destination`.
+		case deriveCapabilityFromPCC(destination: Register, upperBits: UInt)
+		
 		/// An instruction that offsets the capability in `source` by the offset in `offset` and puts it in `destination`.
 		case offsetCapability(destination: Register, source: Register, offset: Register)
 		
@@ -156,6 +159,9 @@ extension RV {
 				case .deriveCapabilityFromLabel(destination: let cd, label: let label):
 				return "cllc \(cd.c), \(label.rawValue)"
 				
+				case .deriveCapabilityFromPCC(destination: let cd, upperBits: let imm):
+				return "auipcc \(cd.c), \(imm)"
+				
 				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
 				return "cincoffset \(destination.c), \(source.c), \(offset.x)"
 				
@@ -190,7 +196,7 @@ extension RV {
 				return "candperm \(destination.c), \(source.c), \(mask.x)"
 				
 				case .clear(quarter: let quarter, mask: let mask):
-				return "cclear \(quarter), \(mask)"
+				return "clear \(quarter), \(mask)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"

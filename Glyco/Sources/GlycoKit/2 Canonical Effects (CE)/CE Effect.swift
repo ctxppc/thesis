@@ -19,6 +19,9 @@ extension CE {
 		/// An effect that retrieves the datum from `source` and stores it at `address`.
 		case store(DataType, address: Register, source: Register)
 		
+		/// An effect that derives a capability from PCC, adds `upperBits` to after left-shifting it by 12, and puts the resulting capability in `destination`.
+		case deriveCapabilityFromPCC(destination: Register, upperBits: UInt)
+		
 		/// An effect that derives a capability from PCC to the memory location labelled `label` and puts it in `destination`.
 		case deriveCapabilityFromLabel(destination: Register, label: Label)
 		
@@ -134,6 +137,9 @@ extension CE {
 				case .deriveCapabilityFromLabel(destination: let destination, label: let label):
 				Lower.Instruction.deriveCapabilityFromLabel(destination: destination, label: label)
 				
+				case .deriveCapabilityFromPCC(destination: let destination, upperBits: let upperBits):
+				Lower.Instruction.deriveCapabilityFromPCC(destination: destination, upperBits: upperBits)
+				
 				case .offsetCapability(destination: let destination, source: let source, offset: .register(let offset)):
 				Lower.Instruction.offsetCapability(destination: destination, source: source, offset: offset)
 				
@@ -178,7 +184,7 @@ extension CE {
 						.lazy
 						.map { 1 << ($0.ordinal % 8) }
 						.reduce(0, |)
-				}
+				}.sorted(by: { $0.key < $1.key })	// sort to get deterministic ordering
 				for (quarter, mask) in masksByQuarter where mask != 0 {
 					Lower.Instruction.clear(quarter: quarter, mask: mask)
 				}

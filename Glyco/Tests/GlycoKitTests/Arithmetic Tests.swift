@@ -55,18 +55,24 @@ final class ArithmeticTests : XCTestCase {
 						csc ct5, 0(ct0)
 						j _exit
 						
-		rv.begin:		ccall rv.init
-						ccall rv.main
+		rv.begin:		ccall rv.runtime
 						li gp, 1
 						j _exit
 						
-		rv.init:		cllc ct0, mm.heap
+		rv.runtime:		cllc ct0, mm.heap
 						cllc ct1, mm.heap.end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
 						addi t1, zero, 7
 						candperm ct0, ct0, t1
 						cllc ct1, mm.heap.cap
+						sc.cap ct0, 0(ct1)
+						auipcc ct0, 0
+						csetaddr ct0, ct0, zero
+						csetboundsimm ct0, ct0, 1
+						addi t1, zero, 7
+						candperm ct0, ct0, t1
+						cllc ct1, mm.seal.cap
 						sc.cap ct0, 0(ct1)
 						cllc ct0, mm.alloc
 						cllc ct1, mm.alloc.end
@@ -77,7 +83,30 @@ final class ArithmeticTests : XCTestCase {
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc.cap
 						sc.cap ct0, 0(ct1)
-						cjalr c0, cra
+						cllc ct0, mm.scall
+						cllc ct1, mm.scall.end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 5
+						candperm ct0, ct0, t1
+						csealentry ct0, ct0
+						cllc ct1, mm.scall.cap
+						sc.cap ct0, 0(ct1)
+						cllc ct0, rv.main
+						cllc ct1, mm.user.end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 11
+						candperm ct0, ct0, t1
+						cmove cfp, cra
+						cllc ct1, mm.scall.cap
+						lc.cap ct1, 0(ct1)
+						clear 0, 159
+						clear 1, 254
+						clear 2, 255
+						clear 3, 255
+						cjalr cra, ct1
+						cjalr c0, ct6
 		mm.alloc:		cllc ct1, mm.heap.cap
 						lc.cap ct1, 0(ct1)
 						csetbounds ct0, ct1, t0
@@ -85,16 +114,27 @@ final class ArithmeticTests : XCTestCase {
 						cincoffset ct1, ct1, t2
 						cllc ct2, mm.heap.cap
 						sc.cap ct1, 0(ct2)
+						clear 0, 192
 						cjalr c0, cra
 		mm.heap.cap:	.quad 0
 		mm.alloc.end:	.dword 0
+		mm.scall:		cllc ct1, mm.seal.cap
+						lc.cap ct1, 0(ct1)
+						cseal cra, cra, ct1
+						cseal csp, cfp, ct1
+						clear 0, 64
+						clear 1, 1
+						cjalr c0, ct0
+		mm.seal.cap:	.quad 0
+		mm.scall.end:	.dword 0
+		mm.user:
+		mm.alloc.cap:	.quad 0
+		mm.scall.cap:	.quad 0
 		rv.main:		addi s1, zero, 1
 						addi t3, zero, 2
 						add s1, t3, s1
 						mv a0, s1
 						cjalr c0, cra
-		mm.user:
-		mm.alloc.cap:	.quad 0
 		mm.user.end:	.dword 0
 		mm.heap:		.fill 1048576, 1, 0
 		mm.heap.end:	.dword 0
@@ -165,18 +205,24 @@ final class ArithmeticTests : XCTestCase {
 						csc ct5, 0(ct0)
 						j _exit
 						
-		rv.begin:		ccall rv.init
-						ccall rv.main
+		rv.begin:		ccall rv.runtime
 						li gp, 1
 						j _exit
 						
-		rv.init:		cllc ct0, mm.heap
+		rv.runtime:		cllc ct0, mm.heap
 						cllc ct1, mm.heap.end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
 						addi t1, zero, 7
 						candperm ct0, ct0, t1
 						cllc ct1, mm.heap.cap
+						sc.cap ct0, 0(ct1)
+						auipcc ct0, 0
+						csetaddr ct0, ct0, zero
+						csetboundsimm ct0, ct0, 1
+						addi t1, zero, 7
+						candperm ct0, ct0, t1
+						cllc ct1, mm.seal.cap
 						sc.cap ct0, 0(ct1)
 						cllc ct0, mm.alloc
 						cllc ct1, mm.alloc.end
@@ -187,7 +233,30 @@ final class ArithmeticTests : XCTestCase {
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc.cap
 						sc.cap ct0, 0(ct1)
-						cjalr c0, cra
+						cllc ct0, mm.scall
+						cllc ct1, mm.scall.end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 5
+						candperm ct0, ct0, t1
+						csealentry ct0, ct0
+						cllc ct1, mm.scall.cap
+						sc.cap ct0, 0(ct1)
+						cllc ct0, rv.main
+						cllc ct1, mm.user.end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 11
+						candperm ct0, ct0, t1
+						cmove cfp, cra
+						cllc ct1, mm.scall.cap
+						lc.cap ct1, 0(ct1)
+						clear 0, 159
+						clear 1, 254
+						clear 2, 255
+						clear 3, 255
+						cjalr cra, ct1
+						cjalr c0, ct6
 		mm.alloc:		cllc ct1, mm.heap.cap
 						lc.cap ct1, 0(ct1)
 						csetbounds ct0, ct1, t0
@@ -195,9 +264,22 @@ final class ArithmeticTests : XCTestCase {
 						cincoffset ct1, ct1, t2
 						cllc ct2, mm.heap.cap
 						sc.cap ct1, 0(ct2)
+						clear 0, 192
 						cjalr c0, cra
 		mm.heap.cap:	.quad 0
 		mm.alloc.end:	.dword 0
+		mm.scall:		cllc ct1, mm.seal.cap
+						lc.cap ct1, 0(ct1)
+						cseal cra, cra, ct1
+						cseal csp, cfp, ct1
+						clear 0, 64
+						clear 1, 1
+						cjalr c0, ct0
+		mm.seal.cap:	.quad 0
+		mm.scall.end:	.dword 0
+		mm.user:
+		mm.alloc.cap:	.quad 0
+		mm.scall.cap:	.quad 0
 		rv.main:		addi t3, zero, 12
 						addi s1, t3, -11
 						addi t4, zero, 1
@@ -207,8 +289,6 @@ final class ArithmeticTests : XCTestCase {
 						cjalr c0, cra
 		cd.then:		addi s1, zero, 1
 						cjal c0, cd.endif
-		mm.user:
-		mm.alloc.cap:	.quad 0
 		mm.user.end:	.dword 0
 		mm.heap:		.fill 1048576, 1, 0
 		mm.heap.end:	.dword 0

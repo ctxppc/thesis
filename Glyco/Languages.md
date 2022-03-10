@@ -848,7 +848,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 
 <h2 id="MM">Grammar for MM (Managed Memory)</h2>
-A language that introduces the call stack, the heap, and operations on them.
+A language that introduces a runtime, call stack, heap, and operations on them.
 
 **Inherited from CE:**
 <code>BinaryOperator</code>, 
@@ -973,6 +973,7 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
@@ -1065,6 +1066,7 @@ N/A
 	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
+	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>

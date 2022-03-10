@@ -55,6 +55,11 @@ extension RV {
 			uniqueKeysWithValues: allCases.enumerated().map { ($0.element, $0.offset) }
 		)
 		
+		/// The register that contains the unsealed data capability after an invocation with a sealed code–data pair, i.e., `ct6`.
+		///
+		/// The unsealed code capability after an invocation with a sealed pair is in PCC.
+		public static let dataCapabilityAfterInvoke = Self.t6
+		
 	}
 	
 }
