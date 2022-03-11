@@ -18,6 +18,7 @@ The pipeline, from high-level to low-level is:
 [`BB`](#BB) →
 [`FO`](#FO) →
 [`MM`](#MM) →
+[`RT`](#RT) →
 [`CE`](#CE) →
 [`RV`](#RV) →
 [`S`](#S) →
@@ -857,7 +858,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <h2 id="MM">Grammar for MM (Managed Memory)</h2>
 A language that introduces a runtime, call stack, heap, and operations on them.
 
-**Inherited from CE:**
+**Inherited from RT:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
@@ -930,6 +931,48 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 <dl>
 	<dt><code>MM.Frame</code></dt>
 	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
+</dl>
+
+<h2 id="RT">Grammar for RT (Runtime)</h2>
+A language that introduces a runtime system and runtime routines.
+
+**Inherited from CE:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>DataType</code>, 
+<code>Label</code>, 
+<code>Permission</code>, 
+<code>Register</code>, 
+<code>Source</code>, 
+<code>Target</code>
+<dl>
+	<dt><code>RT.Program</code></dt>
+	<dd><code>([Effect])</code></dd>
+</dl>
+<dl>
+	<dt><code>RT.Effect</code></dt>
+	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
+	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
+	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
+	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
+	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Source)</code></dd>
+	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
+	<dd><code><strong>sealEntry</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>using:</strong> Register)</code></dd>
+	<dd><code><strong>clear</strong>([Register])</code></dd>
+	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
+	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
+	<dd><code><strong>buffer</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="CE">Grammar for CE (Canonical Effects)</h2>

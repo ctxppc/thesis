@@ -264,6 +264,12 @@ extension PR.Block {
 	}
 }
 
+extension RT.Program {
+	public enum CodingKeys : String, CodingKey {
+		case effects = "_0"
+	}
+}
+
 extension RV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case statements = "_0"

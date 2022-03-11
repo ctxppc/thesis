@@ -30,6 +30,7 @@ final class ArithmeticTests : XCTestCase {
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 		let expected = """
 						.text
 						
@@ -170,6 +171,7 @@ final class ArithmeticTests : XCTestCase {
 		
 		let configuration = CompilationConfiguration(target: .sail)
 		let loweredProgram = try program.lowered(configuration: configuration)
+			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)

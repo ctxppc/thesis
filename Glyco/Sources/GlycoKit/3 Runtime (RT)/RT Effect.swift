@@ -2,9 +2,9 @@
 
 import Foundation
 
-extension CE {
+extension RT {
 	
-	/// A CE effect.
+	/// An RT effect.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		
 		/// An effect that copies the contents from `from` to `into`.
@@ -99,144 +99,86 @@ extension CE {
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
-		@ArrayBuilder<Lower.Statement>
-		func lowered(in context: inout ()) throws -> [Lower.Statement] {
+		@ArrayBuilder<Lower.Effect>
+		func lowered(in context: inout ()) -> [Lower.Effect] {
 			switch self {
 				
-				case .copy(.u8, into: let destination, from: let source),	// TODO: Copy u8 as s32 then mask out upper bits.
-					.copy(.s32, into: let destination, from: let source):
-				Lower.Instruction.copyWord(destination: destination, source: source)
+				case .copy(let dataType, into: let destination, from: let source):
+				Lower.Effect.copy(dataType, into: destination, from: source)
 				
-				case .copy(.cap, into: let destination, from: let source):
-				Lower.Instruction.copyCapability(destination: destination, source: source)
+				case .compute(let destination, let lhs, let operation, let rhs):
+				Lower.Effect.compute(destination: destination, lhs, operation, rhs)
 				
-				case .compute(let destination, let rs1, let operation, .register(let rs2)):
-				Lower.Instruction.computeWithRegister(operation: operation, rd: destination, rs1: rs1, rs2: rs2)
+				case .load(let dataType, destination: let destination, address: let address):
+				Lower.Effect.load(dataType, destination: destination, address: address)
 				
-				case .compute(let destination, let rs1, let operation, .constant(let imm)):
-				Lower.Instruction.computeWithImmediate(operation: operation, rd: destination, rs1: rs1, imm: imm)
-				
-				case .load(.u8, destination: let destination, address: let address):
-				Lower.Instruction.loadByte(destination: destination, address: address)
-				
-				case .load(.s32, destination: let destination, address: let address):
-				Lower.Instruction.loadSignedWord(destination: destination, address: address)
-				
-				case .load(.cap, destination: let destination, address: let address):
-				Lower.Instruction.loadCapability(destination: destination, address: address)
-				
-				case .store(.u8, address: let address, source: let source):
-				Lower.Instruction.storeByte(source: source, address: address)
-				
-				case .store(.s32, address: let address, source: let source):
-				Lower.Instruction.storeSignedWord(source: source, address: address)
-				
-				case .store(.cap, address: let address, source: let source):
-				Lower.Instruction.storeCapability(source: source, address: address)
+				case .store(let dataType, address: let address, source: let source):
+				Lower.Effect.store(dataType, address: address, source: source)
 				
 				case .deriveCapabilityFromLabel(destination: let destination, label: let label):
-				Lower.Instruction.deriveCapabilityFromLabel(destination: destination, label: label)
+				Lower.Effect.deriveCapabilityFromLabel(destination: destination, label: label)
 				
 				case .deriveCapabilityFromPCC(destination: let destination, upperBits: let upperBits):
-				Lower.Instruction.deriveCapabilityFromPCC(destination: destination, upperBits: upperBits)
+				Lower.Effect.deriveCapabilityFromPCC(destination: destination, upperBits: upperBits)
 				
-				case .offsetCapability(destination: let destination, source: let source, offset: .register(let offset)):
-				Lower.Instruction.offsetCapability(destination: destination, source: source, offset: offset)
-				
-				case .offsetCapability(destination: let destination, source: let source, offset: .constant(let offset)):
-				Lower.Instruction.offsetCapabilityWithImmediate(destination: destination, source: source, offset: offset)
+				case .offsetCapability(destination: let destination, source: let source, offset: let offset):
+				Lower.Effect.offsetCapability(destination: destination, source: source, offset: offset)
 				
 				case .getCapabilityLength(destination: let destination, source: let source):
-				Lower.Instruction.getCapabilityLength(destination: destination, source: source)
+				Lower.Effect.getCapabilityLength(destination: destination, source: source)
 				
-				case .setCapabilityBounds(destination: let destination, source: let source, length: .register(let length)):
-				Lower.Instruction.setCapabilityBounds(destination: destination, source: source, length: length)
-				
-				case .setCapabilityBounds(destination: let destination, source: let source, length: .constant(let length)):
-				Lower.Instruction.setCapabilityBoundsWithImmediate(destination: destination, source: source, length: length)
+				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
+				Lower.Effect.setCapabilityBounds(destination: destination, source: source, length: length)
 				
 				case .getCapabilityAddress(destination: let destination, source: let source):
-				Lower.Instruction.getCapabilityAddress(destination: destination, source: source)
+				Lower.Effect.getCapabilityAddress(destination: destination, source: source)
 				
 				case .setCapabilityAddress(destination: let destination, source: let source, address: let address):
-				Lower.Instruction.setCapabilityAddress(destination: destination, source: source, address: address)
+				Lower.Effect.setCapabilityAddress(destination: destination, source: source, address: address)
 				
 				case .getCapabilityDistance(destination: let destination, cs1: let cs1, cs2: let cs2):
-				Lower.Instruction.getCapabilityDistance(destination: destination, cs1: cs1, cs2: cs2)
+				Lower.Effect.getCapabilityDistance(destination: destination, cs1: cs1, cs2: cs2)
 				
 				case .seal(destination: let destination, source: let source, seal: let seal):
-				Lower.Instruction.seal(destination: destination, source: source, seal: seal)
+				Lower.Effect.seal(destination: destination, source: source, seal: seal)
 				
 				case .sealEntry(destination: let destination, source: let source):
-				Lower.Instruction.sealEntry(destination: destination, source: source)
-				
-				case .permit(_, destination: _, source: let source, using: let permissionsRegister) where source == permissionsRegister:
-				throw LoweringError.sourceAndPermissionsRegisterEqual(source)
+				Lower.Effect.sealEntry(destination: destination, source: source)
 				
 				case .permit(let permissions, destination: let destination, source: let source, using: let permissionsRegister):
-				Lower.Instruction.computeWithImmediate(operation: .add, rd: permissionsRegister, rs1: .zero, imm: Int(permissions.bitmask))
-				Lower.Instruction.permit(destination: destination, source: source, mask: permissionsRegister)
+				Lower.Effect.permit(permissions, destination: destination, source: source, using: permissionsRegister)
 				
 				case .clear(let registers):
-				let registersByQuarter = Dictionary(grouping: registers, by: { $0.ordinal / 8 })
-				let masksByQuarter = registersByQuarter.mapValues { registers -> UInt8 in
-					registers
-						.lazy
-						.map { 1 << ($0.ordinal % 8) }
-						.reduce(0, |)
-				}.sorted(by: { $0.key < $1.key })	// sort to get deterministic ordering
-				for (quarter, mask) in masksByQuarter where mask != 0 {
-					Lower.Instruction.clear(quarter: quarter, mask: mask)
-				}
+				Lower.Effect.clear(registers)
 				
 				case .branch(to: let target, let rs1, let relation, let rs2):
-				Lower.Instruction.branch(rs1: rs1, relation: relation, rs2: rs2, target: target)
+				Lower.Effect.branch(to: target, rs1, relation, rs2)
 				
-				case .jump(.label(let target), link: let link):
-				Lower.Instruction.jump(target: target, link: link)
-				
-				case .jump(.register(let target), link: let link):
-				Lower.Instruction.jumpWithRegister(target: target, link: link)
+				case .jump(to: let target, link: let link):
+				Lower.Effect.jump(to: target, link: link)
 				
 				case .invoke(target: let target, data: let data):
-				Lower.Instruction.invoke(target: target, data: data)
+				Lower.Effect.invoke(target: target, data: data)
 				
 				case .return:
-				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
+				Lower.Effect.return
 				
 				case .labelled(let label, let effect):
-				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
-					Lower.Statement.labelled(label, first)
+				if let (first, tail) = effect.lowered(in: &context).splittingFirst() {
+					Lower.Effect.labelled(label, first)
 					tail
 				}
 				
-				case .buffer(.s32, count: 1):
-				Lower.Statement.signedWord(0)
-				
-				case .buffer(.cap, count: 1):
-				Lower.Statement.nullCapability
-				
 				case .buffer(let dataType, count: let count):
-				Lower.Statement.filled(value: 0, datumByteSize: dataType.byteSize, copies: count)
+				Lower.Effect.buffer(dataType, count: count)
 				
 			}
-		}
-		
-		enum LoweringError : LocalizedError {
-			
-			/// An error indicating that a `permit` effect has the same source and `using` register.
-			case sourceAndPermissionsRegisterEqual(Register)
-			
-			// See protocol.
-			var errorDescription: String? {
-				switch self {
-					case .sourceAndPermissionsRegisterEqual(let register):
-					return "A permit effect has the same source and `using` register \(register)."
-				}
-			}
-			
 		}
 		
 	}
 	
+}
+
+func ~ (label: RT.Label, effect: RT.Effect) -> RT.Effect {
+	.labelled(label, effect)
 }

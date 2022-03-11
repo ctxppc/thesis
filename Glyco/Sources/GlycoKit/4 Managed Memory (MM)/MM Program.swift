@@ -327,7 +327,7 @@ public enum MM : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = CE
+	public typealias Lower = RT
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
