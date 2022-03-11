@@ -77,6 +77,11 @@ extension MM {
 		/// Returns an effect that puts the next PCC in `cra`, then jumps to given target.
 		static func call(_ target: Label) -> Self { .jump(to: .label(target), link: .ra) }
 		
+		/// An effect that invokes given runtime routine.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine)
+		
 		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
 		
@@ -112,8 +117,7 @@ extension MM {
 				let allocCapReg = Lower.Register.t1
 				let destinationBufferReg = try destinationBuffer.lowered()
 				Lower.Effect.compute(destination: lengthReg, .zero, .add, try bytes.lowered())
-				Lower.Effect.deriveCapabilityFromLabel(destination: allocCapReg, label: .allocationRoutineCapability)
-				Lower.Effect.jump(to: .register(allocCapReg), link: .ra)
+				Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
 				if bufferReg != destinationBufferReg {
 					Lower.Effect.copy(.cap, into: destinationBufferReg, from: bufferReg)
 				}
@@ -192,8 +196,7 @@ extension MM {
 					let bufferReg = Lower.Register.t0	// cf. alloc routine
 					let allocCapReg = Lower.Register.t1
 					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
-					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapReg, label: .allocationRoutineCapability)
-					Lower.Effect.jump(to: .register(allocCapReg), link: .ra)
+					Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
 					Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
 				}
 				
@@ -221,6 +224,9 @@ extension MM {
 				
 				case .jump(to: let target, link: let link):
 				try Lower.Effect.jump(to: target.lowered(), link: link.lowered())
+				
+				case .invokeRuntimeRoutine(.scall):
+				Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: .t1)	// the callee is in ct0
 				
 				case .return:
 				Lower.Effect.return

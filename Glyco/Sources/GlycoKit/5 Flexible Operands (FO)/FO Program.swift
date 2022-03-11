@@ -35,5 +35,6 @@ public enum FO : Language {
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias DataType = Lower.DataType
 	public typealias Label = Lower.Label
+	public typealias RuntimeRoutine = Lower.RuntimeRoutine
 	
 }

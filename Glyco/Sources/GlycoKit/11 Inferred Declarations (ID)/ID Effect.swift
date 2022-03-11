@@ -55,6 +55,11 @@ extension ID {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
+		/// An effect that invokes given runtime routine.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine)
+		
 		/// An effect that returns to the caller.
 		case `return`
 		

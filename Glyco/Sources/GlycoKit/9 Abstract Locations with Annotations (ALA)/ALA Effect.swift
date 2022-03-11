@@ -59,6 +59,11 @@ extension ALA {
 		/// A call effect "uses" the values of caller-saved registers.
 		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
+		/// An effect that invokes given runtime routine.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine, analysisAtEntry: Analysis)
+		
 		/// An effect that returns to the caller.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program.
@@ -212,6 +217,9 @@ extension ALA {
 				
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
+				
+				case .invokeRuntimeRoutine(let routine, analysisAtEntry: _):
+				return .invokeRuntimeRoutine(routine, analysisAtEntry: analysis)
 				
 				case .return(analysisAtEntry: _):
 				return .return(analysisAtEntry: analysis)

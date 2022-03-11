@@ -58,6 +58,11 @@ extension FO {
 		/// An effect that links the return address then jumps to `target`.
 		case call(Label)
 		
+		/// An effect that invokes given runtime routine.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine)
+		
 		/// An effect that jumps to the previously linked return address.
 		case `return`
 		
@@ -169,6 +174,9 @@ extension FO {
 				
 				case .call(let label):
 				Lower.Effect.call(label)
+				
+				case .invokeRuntimeRoutine(let routine):
+				Lower.Effect.invokeRuntimeRoutine(routine)
 				
 				case .return:
 				Lower.Effect.return

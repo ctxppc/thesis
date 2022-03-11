@@ -86,6 +86,11 @@ extension RT {
 		/// * if `target` contains a capability that points outside its bounds.
 		case invoke(target: Register, data: Register)
 		
+		/// An effect that invokes the runtime routine whose user capability has given name.
+		///
+		/// The calling convention is dictated by the routine. The effect uses given register to prepare the target capability.
+		case invokeRuntimeRoutine(Label, using: Register)
+		
 		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
 		
@@ -159,6 +164,10 @@ extension RT {
 				
 				case .invoke(target: let target, data: let data):
 				Lower.Effect.invoke(target: target, data: data)
+				
+				case .invokeRuntimeRoutine(let name, using: let targetCapability):
+				Lower.Effect.deriveCapabilityFromLabel(destination: targetCapability, label: name)
+				Lower.Effect.jump(to: .register(targetCapability), link: .ra)
 				
 				case .return:
 				Lower.Effect.return

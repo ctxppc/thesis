@@ -53,6 +53,11 @@ extension CD {
 		/// This effect assumes the calling convention is respected by the rest of the program.
 		case call(Label)
 		
+		/// An effect that invokes given runtime routine.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine)
+		
 		/// An effect that returns to the caller.
 		///
 		/// This effect assumes the calling convention is respected by the rest of the program.
@@ -73,7 +78,7 @@ extension CD {
 				case .do(let effects):
 				return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .clearAll, .call, .return:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .if, .pushFrame, .popFrame, .clearAll, .call, .invokeRuntimeRoutine, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -108,7 +113,7 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clearAll, .call:
+				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clearAll, .call, .invokeRuntimeRoutine:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -296,6 +301,11 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			case .call(let procedure):
 			let returnPoint = context.bag.uniqueName(from: "ret")
 			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
+				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
+			
+			case .invokeRuntimeRoutine(let routine):
+			let returnPoint = context.bag.uniqueName(from: "ret")
+			return try [.init(name: entryLabel, do: previousEffects, then: .invokeRuntimeRoutine(routine, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			
 			case .return:

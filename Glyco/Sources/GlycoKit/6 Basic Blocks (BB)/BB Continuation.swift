@@ -14,6 +14,11 @@ extension BB {
 		/// A continuation that jumps to the procedure with given label then returns to the block labelled `returnPoint`.
 		case call(Label, returnPoint: Label)
 		
+		/// A continuation that jumps to given runtime routine then returns to the block labelled `returnPoint`.
+		///
+		/// The calling convention is dictated by the routine.
+		case invokeRuntimeRoutine(RuntimeRoutine, returnPoint: Label)
+		
 		/// A continuation that returns to the caller, by jumping to the return capability.
 		case `return`
 		

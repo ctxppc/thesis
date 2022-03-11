@@ -59,6 +59,10 @@ public enum BB : Language {
 						loweredProgramEffects.append(.call(name))
 						try appendBlockOrJumpToBlock(named: returnPoint)
 						
+						case .invokeRuntimeRoutine(let routine, returnPoint: let returnPoint):
+						loweredProgramEffects.append(.invokeRuntimeRoutine(routine))
+						try appendBlockOrJumpToBlock(named: returnPoint)
+						
 						case .return:
 						loweredProgramEffects.append(.return)
 						
@@ -105,6 +109,7 @@ public enum BB : Language {
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
+	public typealias RuntimeRoutine = Lower.RuntimeRoutine
 	public typealias Source = Lower.Source
 	
 }

@@ -54,6 +54,7 @@ public enum AL : Language {
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Register = Lower.Register
+	public typealias RuntimeRoutine = Lower.RuntimeRoutine
 	public typealias Source = Lower.Source
 	
 }
