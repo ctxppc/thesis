@@ -120,8 +120,16 @@ extension CC {
 						Lowered.set(.register(asn.register), to: arg)
 					}
 					
+					// Pass capability to arguments record, if applicable.
+					if let recordRegister = assignments.argumentsRecordRegister {
+						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
+					}
+					
 					// If using a secure CC, clear all registers except parameter registers in use.
-					let parameterRegisters = assignments.viaRegisters.map(\.register)
+					let parameterRegisters = assignments
+						.viaRegisters
+						.map(\.register)
+						.appending(contentsOf: [assignments.argumentsRecordRegister].compacted())
 					if context.configuration.callingConvention != .conventional {
 						Lowered.clearAll(except: parameterRegisters)
 					}

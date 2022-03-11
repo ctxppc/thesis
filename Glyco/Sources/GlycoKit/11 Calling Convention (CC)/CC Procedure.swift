@@ -79,19 +79,25 @@ extension CC {
 			var registers = configuration.argumentRegisters[...]
 			var parameters = self.parameters[...]
 			
+			// If a discontiguous call stack is in use, reserve a register for the arguments record capability.
+			if !configuration.callingConvention.usesContiguousCallStack {
+				assignments.argumentsRecordRegister = registers.popLast()
+			}
+			
 			// As long as there is an argument register available, assign the next parameter to it.
 			while let register = registers.popFirst(), let parameter = parameters.popFirst() {
 				assignments.viaRegisters.append(.init(parameter: parameter, register: register))
 			}
 			
-			// Assign remaining parameters to the arguments record — ensure stack order by reversing the fields
-			assignments.parameterRecordType = .init(
-				parameters
-					.lazy
-					.map { parameter in
-						.init(name: .init(rawValue: parameter.location.rawValue), valueType: parameter.type)
-					}.reversed()
-			)
+			// Assign remaining parameters to the arguments record.
+			// If a contiguous call stack is in use, ensure stack order by reversing the fields.
+			let parameterRecordFields = parameters
+				.map { RecordType.Field(name: .init(rawValue: $0.location.rawValue), valueType: $0.type) }
+			if configuration.callingConvention.usesContiguousCallStack {
+				assignments.parameterRecordType = .init(parameterRecordFields.reversed())
+			} else {
+				assignments.parameterRecordType = .init(parameterRecordFields)
+			}
 			
 			// Done.
 			return assignments

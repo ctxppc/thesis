@@ -26,6 +26,9 @@ extension CC {
 			/// The fields in the record type are laid out in stack order, i.e., the first frame-resident argument is the last element (highest address) of the parameter record.
 			var parameterRecordType = RecordType([])
 			
+			/// The register to which a capability to the arguments record is assigned, or `nil` if no such capability is passed to the callee.
+			var argumentsRecordRegister: Lower.Register? = nil
+			
 		}
 		
 		/// An assignment of a parameter to a register.
