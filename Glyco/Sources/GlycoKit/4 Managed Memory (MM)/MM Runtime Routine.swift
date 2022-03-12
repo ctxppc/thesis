@@ -6,7 +6,7 @@ extension MM {
 		
 		/// A routine that performs a secure function call transition.
 		///
-		/// The scall routine takes a target capability in `ct0`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. It returns the same frame capability in `ct6` and any function results in argument registers.
+		/// The scall routine takes a target capability in `invocationData`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. It returns the same frame capability in `invocationData` and any function results in argument registers.
 		///
 		/// The routine may touch any register but will not leak any new authority. The routine also clears `cfp` before jumping to the callee. Procedures are expected to perform appropriate register clearing before invoking the scall routine or before returning to the callee.
 		///

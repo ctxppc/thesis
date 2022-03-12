@@ -467,7 +467,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
+	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -529,7 +529,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
+	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -585,7 +585,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
+	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 
@@ -653,7 +653,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
@@ -868,7 +868,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>s9</strong></code></dd>
 	<dd><code><strong>s10</strong></code></dd>
 	<dd><code><strong>s11</strong></code></dd>
-	<dd><code><strong>t6</strong></code></dd>
+	<dd><code><strong>invocationData</strong></code></dd>
 </dl>
 
 <h2 id="MM">Grammar for MM (Managed Memory)</h2>
@@ -930,7 +930,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>t3</strong></code></dd>
 	<dd><code><strong>t4</strong></code></dd>
 	<dd><code><strong>t5</strong></code></dd>
-	<dd><code><strong>t6</strong></code></dd>
+	<dd><code><strong>invocationData</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>MM.Target</code></dt>

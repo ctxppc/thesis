@@ -68,10 +68,10 @@ extension SV {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
-		/// An effect that invokes given runtime routine.
+		/// An effect that invokes given runtime routine and uses given parameter registers.
 		///
 		/// The calling convention is dictated by the routine.
-		case invokeRuntimeRoutine(RuntimeRoutine)
+		case invokeRuntimeRoutine(RuntimeRoutine, parameters: [Register])
 		
 		/// An effect that returns to the caller.
 		case `return`
@@ -179,6 +179,9 @@ extension SV {
 				
 				case .call(let name, let parameters):
 				Lowered.call(name, parameters: parameters)
+				
+				case .invokeRuntimeRoutine(let routine, parameters: let parameters):
+				Lowered.invokeRuntimeRoutine(routine, parameters: parameters)
 				
 				case .return:
 				Lowered.return

@@ -167,6 +167,7 @@ extension RT {
 				
 				case .invokeRuntimeRoutine(let name, using: let targetCapability):
 				Lower.Effect.deriveCapabilityFromLabel(destination: targetCapability, label: name)
+				Lower.Effect.load(.cap, destination: targetCapability, address: targetCapability)
 				Lower.Effect.jump(to: .register(targetCapability), link: .ra)
 				
 				case .return:

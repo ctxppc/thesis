@@ -56,13 +56,15 @@ extension ALA {
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		///
-		/// A call effect "uses" the values of caller-saved registers.
+		/// A call effect "defines" caller-saved registers.
 		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
-		/// An effect that invokes given runtime routine.
+		/// An effect that invokes given runtime routine and uses given parameter registers.
 		///
 		/// The calling convention is dictated by the routine.
-		case invokeRuntimeRoutine(RuntimeRoutine, analysisAtEntry: Analysis)
+		///
+		/// An invocation effect "defines" caller-saved registers.
+		case invokeRuntimeRoutine(RuntimeRoutine, parameters: [Register], analysisAtEntry: Analysis)
 		
 		/// An effect that returns to the caller.
 		///
@@ -123,6 +125,9 @@ extension ALA {
 				
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
+				
+				case .invokeRuntimeRoutine(let routine, parameters: _, analysisAtEntry: _):
+				Lowered.invokeRuntimeRoutine(routine)
 				
 				case .return(analysisAtEntry: _):
 				Lowered.return
@@ -218,8 +223,8 @@ extension ALA {
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
-				case .invokeRuntimeRoutine(let routine, analysisAtEntry: _):
-				return .invokeRuntimeRoutine(routine, analysisAtEntry: analysis)
+				case .invokeRuntimeRoutine(let routine, parameters: let parameters, analysisAtEntry: _):
+				return .invokeRuntimeRoutine(routine, parameters: parameters, analysisAtEntry: analysis)
 				
 				case .return(analysisAtEntry: _):
 				return .return(analysisAtEntry: analysis)
@@ -245,6 +250,7 @@ extension ALA {
 					.popScope(analysisAtEntry: let analysis),
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
+					.invokeRuntimeRoutine(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
 			}
@@ -272,7 +278,7 @@ extension ALA {
 					.filter { !sparedRegisters.contains($0) }
 					.map { .register($0) }
 				
-				case .call:
+				case .call, .invokeRuntimeRoutine:
 				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
 				
 			}
@@ -309,7 +315,8 @@ extension ALA {
 				case .popScope:
 				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
-				case .call(_, parameters: let parameters, analysisAtEntry: _):
+				case .call(_, parameters: let parameters, analysisAtEntry: _),
+					.invokeRuntimeRoutine(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
 				case .return:
@@ -337,7 +344,12 @@ extension ALA {
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushScope, .popScope, .clearAll, .call, .return:
+				case .set, .compute,
+					.createBuffer, .destroyBuffer,
+					.getElement, .setElement,
+					.pushScope, .popScope,
+					.clearAll,
+					.call, .invokeRuntimeRoutine, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -401,7 +413,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pushScope, .popScope, .clearAll, .call, .return:
+				case .do, .if, .pushScope, .popScope, .clearAll, .call, .invokeRuntimeRoutine, .return:
 				return self
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)

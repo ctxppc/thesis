@@ -149,39 +149,34 @@ public enum MM : Language {
 				do {
 					
 					// Derive user cap.
-					let userCapReg = Lower.Register.t0
+					let userCapReg = Lower.Register.invocationData
 					Lower.Effect.deriveCapabilityFromLabel(destination: userCapReg, label: .programEntry)
 					
 					// Restrict user cap bounds.
-					let userEndReg = Lower.Register.t1
-					let userLengthReg = Lower.Register.t1
+					let userEndReg = Lower.Register.t0
+					let userLengthReg = Lower.Register.t0
 					Lower.Effect.deriveCapabilityFromLabel(destination: userEndReg, label: userEndLabel)
 					Lower.Effect.getCapabilityDistance(destination: userLengthReg, cs1: userEndReg, cs2: userCapReg)
 					Lower.Effect.setCapabilityBounds(destination: userCapReg, source: userCapReg, length: .register(userLengthReg))
 					
 					// Restrict user cap permissions.
-					let bitmaskReg = Lower.Register.t1
+					let bitmaskReg = Lower.Register.t0
 					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
 					
 					// Copy cra to cfp to preserve it across the scall — we don't need an actual frame in the runtime.
 					let savedRABeforeScallReg = Lower.Register.fp
 					Lower.Effect.copy(.cap, into: savedRABeforeScallReg, from: .ra)
 					
-					// Load (appropriately restricted) scall cap.
-					let scallCapCapReg = Lower.Register.t1
-					let scallCapReg = Lower.Register.t1
-					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
-					Lower.Effect.load(.cap, destination: scallCapReg, address: scallCapCapReg)
-					
 					// Clear all registers except (selected) user authority.
-					let preservedRegisters = [savedRABeforeScallReg, userCapReg, scallCapReg]	// Set is probably less efficient for 3 elements
+					let preservedRegisters = [savedRABeforeScallReg, userCapReg]	// Set is probably less efficient for 2 elements
 					Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
 					
-					// Perform scall — do not use a label target as it would transfer too much authority!
-					Lower.Effect.jump(to: .register(scallCapReg), link: .ra)
+					// Perform scall.
+					let scallCapReg = Lower.Register.t0
+					Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
 					
 					// Return to OS/framework.
-					let savedRAAfterScallReg = Lower.Register.dataCapabilityAfterInvoke
+					let savedRAAfterScallReg = Lower.Register.invocationData
 					Lower.Effect.jump(to: .register(savedRAAfterScallReg), link: .zero)
 					
 				}
@@ -231,10 +226,7 @@ public enum MM : Language {
 				
 			}
 			
-			// A routine that performs a secure function call transition.
-			// It takes a target capability in ct0, a return capability in cra, a frame capability in cfp, and function arguments in argument registers. It returns the same frame capability in ct6 and function results in argument registers.
-			// It may touch any register but will not leak any new authority. The routine also clears cfp before jumping to the callee. Procedures are expected to perform appropriate register clearing before calling or returning.
-			// The callee receives a sealed return–frame capability pair in cra and csp as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
+			// A routine that performs a secure function call transition — see also MM.RuntimeRoutine.scall.
 			@ArrayBuilder<Lower.Effect>
 			var scallRoutine: [Lower.Effect] {
 				

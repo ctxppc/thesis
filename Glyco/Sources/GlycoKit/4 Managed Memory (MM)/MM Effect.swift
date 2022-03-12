@@ -43,9 +43,9 @@ extension MM {
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(Frame)
 		
-		/// An effect that pops a frame from the call stack, if the contiguous call stack is enabled.
+		/// An effect that pops a frame from the call stack.
 		///
-		/// This effect copies `cfp` to `csp` and pops `cfp` from the stack. This effect does nothing if the contiguous call stack is disabled.
+		/// If a contiguous call stack is used, this effect copies `cfp` to `csp` and pops `cfp` from the stack. Otherwise, this effect copies `ct6` to `cfp`.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame.
 		case popFrame
@@ -209,6 +209,8 @@ extension MM {
 					// Restore saved fp — follow the linked list.
 					Lower.Effect.load(.cap, destination: .fp, address: .fp)
 					
+				} else {
+					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)
 				}
 				
 				case .permit(let permissions, destination: let destination, source: let source):

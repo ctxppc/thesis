@@ -55,10 +55,10 @@ extension RV {
 			uniqueKeysWithValues: allCases.enumerated().map { ($0.element, $0.offset) }
 		)
 		
-		/// The register that contains the unsealed data capability after an invocation with a sealed code–data pair, i.e., `ct6`.
+		/// A register for passing data through an invocation, i.e., `t6`/`ct6`.
 		///
-		/// The unsealed code capability after an invocation with a sealed pair is in PCC.
-		public static let dataCapabilityAfterInvoke = Self.t6
+		/// The invocation data register contains a data capability after an invocation using a sealed code–data capability pair, but is also used as a dedicated argument register for some runtime routines.
+		public static let invocationData = t6
 		
 	}
 	
