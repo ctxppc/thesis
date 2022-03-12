@@ -35,11 +35,6 @@ extension PR {
 				case .branch(if: .constant(true), then: let affirmative, else: _):
 				return .continue(to: affirmative)
 				
-				case .branch(if: .not(let predicate), then: let affirmative, else: let negative):
-				return Self
-					.branch(if: predicate, then: negative, else: affirmative)
-					.lowered(in: &context)
-				
 				case .branch(if: .relation(let lhs, let relation, let rhs), then: let affirmative, else: let negative):
 				return .branch(lhs, relation, rhs, then: affirmative, else: negative)
 				

@@ -45,7 +45,7 @@ extension CC {
 					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .registerDatum))
 				}
 				
-				// Compute parameter assignments.
+				// Determine parameter assignments.
 				let assignments = parameterAssignments(in: context.configuration)
 				
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
@@ -54,12 +54,22 @@ extension CC {
 					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type))
 				}
 				
-				// Bind local names to frame-resident arguments.
-				let parameterRecordType = with(assignments.parameterRecordType) {
-					$0.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .vectorCap(.u8)))
-				}
-				for (field, offset) in parameterRecordType.fieldByteOffsetPairs().dropFirst() {
-					Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(.init(offset: offset)))
+				// Bind local names to arguments in arguments record.
+				// If arguments record capability is available, use it as a record; otherwise load from call frame.
+				var parameterRecordType = assignments.parameterRecordType
+				if let argumentsRecordRegister = assignments.argumentsRecordRegister {
+					for field in parameterRecordType {
+						Lower.Effect.getField(
+							field.name,
+							of: .register(argumentsRecordRegister),
+							to: .abstract(.init(rawValue: field.name.rawValue))
+						)
+					}
+				} else {
+					parameterRecordType.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .vectorCap(.u8)))
+					for (field, offset) in parameterRecordType.fieldByteOffsetPairs().dropFirst() {
+						Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(.init(offset: offset)))
+					}
 				}
 				
 				// Execute main effect.
@@ -79,8 +89,8 @@ extension CC {
 			var registers = configuration.argumentRegisters[...]
 			var parameters = self.parameters[...]
 			
-			// If a discontiguous call stack is in use, reserve a register for the arguments record capability.
-			if !configuration.callingConvention.usesContiguousCallStack {
+			// If a discontiguous call stack is in use and an arguments record is required, reserve a register for the arguments record capability.
+			if !configuration.callingConvention.usesContiguousCallStack, registers.count > parameters.count {
 				assignments.argumentsRecordRegister = registers.popLast()
 			}
 			

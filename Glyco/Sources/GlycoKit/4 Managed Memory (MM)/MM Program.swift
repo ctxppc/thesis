@@ -230,7 +230,7 @@ public enum MM : Language {
 			@ArrayBuilder<Lower.Effect>
 			var scallRoutine: [Lower.Effect] {
 				
-				let targetReg = Lower.Register.t0	// input
+				let targetReg = Lower.Register.invocationData	// input
 				
 				// Load seal cap.
 				let sealCapCap = Lower.Register.t1
@@ -303,12 +303,12 @@ public enum MM : Language {
 		/// The allocation routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
-		static let allocCapabilityPermissions = [Permission.execute, .loadCapability, .storeCapability]
+		static let allocCapabilityPermissions = [Permission.loadCapability, .storeCapability, .execute]
 		
 		/// The secure calling routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
-		static let scallCapabilityPermissions = [Permission.execute, .loadCapability]
+		static let scallCapabilityPermissions = [Permission.loadCapability, .execute]
 		
 		/// The seal capability's permissions.
 		static let sealCapabilityPermissions = [Permission.seal]

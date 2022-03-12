@@ -757,7 +757,6 @@ A language that introduces predicates in branches.
 <dl>
 	<dt><code>PR.Predicate</code></dt>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
-	<dd><code><strong>not</strong>(Predicate)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 </dl>
 
@@ -821,6 +820,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
+	<dd><code><strong>capability</strong>(<strong>to:</strong> Label)</code></dd>
 </dl>
 <dl>
 	<dt><code>FO.Effect</code></dt>
@@ -894,6 +894,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Register)</code></dd>
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>deriveCapability</strong>(<strong>in:</strong> Register, <strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>

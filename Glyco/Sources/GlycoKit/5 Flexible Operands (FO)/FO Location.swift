@@ -2,7 +2,7 @@
 
 extension FO {
 	
-	/// A location to a register or frame cell on an FO machine.
+	/// A register or memory location.
 	public enum Location : Codable, Equatable {
 		
 		/// A location on the register bank.

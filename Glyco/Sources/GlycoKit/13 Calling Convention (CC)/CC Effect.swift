@@ -96,7 +96,7 @@ extension CC {
 				case .call(let name, let arguments, result: let result):
 				if let procedure = context.procedures[name] {
 					
-					// Prepare assignments.
+					// Determine assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
 					// Create (scoped) arguments record, if nonempty. (The record is heap-allocated when the call stack is discontiguous.)
@@ -125,20 +125,25 @@ extension CC {
 						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
 					}
 					
-					// If using a secure CC, clear all registers except parameter registers in use.
-					let parameterRegisters = assignments
+					// If using a secure CC, clear all registers except argument registers in use.
+					let argumentRegisters = assignments
 						.viaRegisters
 						.map(\.register)
 						.appending(contentsOf: [assignments.argumentsRecordRegister].compacted())
 					if context.configuration.callingConvention != .conventional {
-						Lowered.clearAll(except: parameterRegisters)
+						Lowered.clearAll(except: argumentRegisters)
 					}
 					
-					// Invoke procedure.
+					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
-					Lowered.call(name, parameters: parameterRegisters)
+					if context.configuration.callingConvention.requiresCallRoutine {
+						// TODO: set invocation data register to target capability
+						Lowered.invokeRuntimeRoutine(.scall, parameters: argumentRegisters + [.invocationData])
+					} else {
+						Lowered.call(name, parameters: argumentRegisters)
+					}
 					
-					// Destroy arguments arguments, if any.
+					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {
 						Lowered.destroyScopedValue(capability: .abstract(argumentsRecord))
 					}

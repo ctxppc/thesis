@@ -80,23 +80,26 @@ extension FO {
 			let temp3 = Lower.Register.t5
 			switch self {
 				
-				case .set(.u8, .register(let dest), to: .constant(let imm)):
-				try Lower.Effect.put(into: dest.lowered(), value: .init(UInt8(truncatingIfNeeded: imm)))
+				case .set(.u8, .register(let dest), to: .constant(let value)):
+				try Lower.Effect.put(into: dest.lowered(), value: .init(UInt8(truncatingIfNeeded: value)))
 				
-				case .set(.s32, .register(let dest), to: .constant(let imm)):
-				try Lower.Effect.put(into: dest.lowered(), value: imm)
+				case .set(.s32, .register(let dest), to: .constant(let value)):
+				try Lower.Effect.put(into: dest.lowered(), value: value)
 				
-				case .set(.cap, .register, to: .constant):
-				throw LoweringError.settingCapabilityUsingImmediate
+				case .set(.cap, .register, to: .constant(let value)):
+				throw LoweringError.settingCapabilityUsingConstant(value)
 				
 				case .set(let type, .register(let dest), to: .register(let src)):
 				try Lower.Effect.copy(type, into: dest.lowered(), from: src.lowered())
 				
 				case .set(let type, .register(let dest), to: .frame(let src)):
-				try Lower.Effect.load(type, into: dest.lowered(), from: src)
+				Lower.Effect.load(type, into: try dest.lowered(), from: src)
 				
-				case .set(.cap, .frame, to: .constant):
-				throw LoweringError.settingCapabilityUsingImmediate
+				case .set(.cap, .register(let dest), to: .capability(to: let label)):
+				Lower.Effect.deriveCapability(in: try dest.lowered(), to: label)
+				
+				case .set(.cap, .frame, to: .constant(let value)):
+				throw LoweringError.settingCapabilityUsingConstant(value)
 				
 				case .set(let type, .frame(let dest), to: .constant(let imm)):
 				Lower.Effect.put(into: temp1, value: imm)
@@ -108,6 +111,13 @@ extension FO {
 				case .set(let type, .frame(let dest), to: .frame(let src)):
 				Lower.Effect.load(type, into: temp1, from: src)
 				Lower.Effect.store(type, into: dest, from: temp1)
+				
+				case .set(.cap, .frame(let dest), to: .capability(to: let label)):
+				Lower.Effect.deriveCapability(in: temp1, to: label)
+				Lower.Effect.store(.cap, into: dest, from: temp1)
+				
+				case .set(let dataType, _, to: .capability(to: let label)):
+				throw LoweringError.settingNoncapabilityToLabel(dataType, label)
 				
 				case .compute(let destination, let lhs, let operation, .constant(let rhs)):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
@@ -195,11 +205,22 @@ extension FO {
 		/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 		///
 		/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
-		private func load(_ type: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
+		private func load(_ dataType: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 			switch source {
-				case .constant(let imm):	return ([.put(into: temporaryRegister, value: imm)], temporaryRegister)
-				case .register(let r):		return ([], try r.lowered())
-				case .frame(let c):			return ([.load(type, into: temporaryRegister, from: c)], temporaryRegister)
+				
+				case .constant(let value):
+				return ([.put(into: temporaryRegister, value: value)], temporaryRegister)
+				
+				case .register(let register):
+				return ([], try register.lowered())
+				
+				case .frame(let location):
+				return ([.load(dataType, into: temporaryRegister, from: location)], temporaryRegister)
+				
+				case .capability(to: let label):
+				guard dataType == .cap else { throw LoweringError.settingNoncapabilityToLabel(dataType, label) }
+				return ([.deriveCapability(in: temporaryRegister, to: label)], temporaryRegister)
+				
 			}
 		}
 		
@@ -214,10 +235,23 @@ extension FO {
 		}
 		
 		enum LoweringError : LocalizedError {
-			case settingCapabilityUsingImmediate
+			
+			/// An error indicating that a capability is being set using a constant.
+			case settingCapabilityUsingConstant(Int)
+			
+			/// An error indicating that a non-capability is being set to capability to a labelled memory location.
+			case settingNoncapabilityToLabel(DataType, Label)
+			
+			// See protocol.
 			var errorDescription: String? {
 				switch self {
-					case .settingCapabilityUsingImmediate:	return "Cannot set a capability register or frame cell using an immediate"
+					
+					case .settingCapabilityUsingConstant(let value):
+					return "Cannot set a capability location using the constant value \(value)"
+					
+					case .settingNoncapabilityToLabel(let dataType, let label):
+					return "Cannot set a location typed \(dataType) to a capability to a memory location labelled “\(label)”"
+					
 				}
 			}
 		}

@@ -36,6 +36,9 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
 		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
 		
+		/// An effect that derives a capability to given label and puts it in given register.
+		case deriveCapability(in: Register, to: Label)
+		
 		/// An effect that pushes given frame to the call stack.
 		///
 		/// If the contiguous call stack is enabled, this effect pushes `cfp` to it, copies `csp` to `cfp`, and offsets `csp` *b* bytes downward, where *b* is the byte size allocated by the frame. Otherwise, this effect allocates a buffer of *b* bytes on the heap and puts a capability to it in `cfp`.
@@ -178,6 +181,9 @@ extension MM {
 				try Lower.Effect.offsetCapability(destination: temp, source: buffer.lowered(), offset: .register(offset.lowered()))
 				try Lower.Effect.store(dataType, address: temp, source: source.lowered())
 				
+				case .deriveCapability(in: let destination, to: let label):
+				Lower.Effect.deriveCapabilityFromLabel(destination: try destination.lowered(), label: label)
+				
 				case .pushFrame(let frame):
 				if context.configuration.callingConvention.usesContiguousCallStack {
 					
@@ -228,7 +234,7 @@ extension MM {
 				try Lower.Effect.jump(to: target.lowered(), link: link.lowered())
 				
 				case .invokeRuntimeRoutine(.scall):
-				Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: .t1)	// the callee is in ct0
+				Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: temp)
 				
 				case .return:
 				Lower.Effect.return
