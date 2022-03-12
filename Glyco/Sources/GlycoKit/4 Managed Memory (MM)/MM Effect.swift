@@ -80,6 +80,9 @@ extension MM {
 		/// Returns an effect that puts the next PCC in `cra`, then jumps to given target.
 		static func call(_ target: Label) -> Self { .jump(to: .label(target), link: .ra) }
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Register, data: Register)
+		
 		/// An effect that invokes given runtime routine.
 		///
 		/// The calling convention is dictated by the routine.
@@ -232,6 +235,9 @@ extension MM {
 				
 				case .jump(to: let target, link: let link):
 				try Lower.Effect.jump(to: target.lowered(), link: link.lowered())
+				
+				case .invoke(target: let target, data: let data):
+				try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
 				
 				case .invokeRuntimeRoutine(.scall):
 				Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: temp)

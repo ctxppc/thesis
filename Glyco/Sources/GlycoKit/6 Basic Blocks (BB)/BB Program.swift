@@ -59,6 +59,9 @@ public enum BB : Language {
 						loweredProgramEffects.append(.call(name))
 						try appendBlockOrJumpToBlock(named: returnPoint)
 						
+						case .invoke(target: let target, data: let data):
+						loweredProgramEffects.append(.invoke(target: target, data: data))
+						
 						case .invokeRuntimeRoutine(let routine, returnPoint: let returnPoint):
 						loweredProgramEffects.append(.invokeRuntimeRoutine(routine))
 						try appendBlockOrJumpToBlock(named: returnPoint)

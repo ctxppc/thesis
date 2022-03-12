@@ -68,6 +68,9 @@ extension SV {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Source, data: Source)
+		
 		/// An effect that invokes given runtime routine and uses given parameter registers.
 		///
 		/// The calling convention is dictated by the routine.
@@ -179,6 +182,9 @@ extension SV {
 				
 				case .call(let name, let parameters):
 				Lowered.call(name, parameters: parameters)
+				
+				case .invoke(target: let target, data: let data):
+				try Lowered.invoke(target: target.lowered(in: &context), data: data.lowered(in: &context))
 				
 				case .invokeRuntimeRoutine(let routine, parameters: let parameters):
 				Lowered.invokeRuntimeRoutine(routine, parameters: parameters)

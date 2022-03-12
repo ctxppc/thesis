@@ -73,6 +73,7 @@ extension ALA {
 				case .abstract(let location):	return try type(of: Location.abstract(location))
 				case .register(_, let type):	return type
 				case .frame(let location):		return try type(of: Location.frame(location))
+				case .capability:				return .cap
 			}
 		}
 		
@@ -108,6 +109,11 @@ extension ALA {
 				let locationType = try type(of: location)
 				guard locationType == sourceType else { throw TypeError.unequalTypes(location ~ locationType, .register(register) ~ sourceType) }
 				return locationType
+				
+				case .capability:
+				let locationType = try type(of: location)
+				guard locationType == .cap else { throw TypeError.capabilitySourceNotCompatibleWithLocation(location ~ locationType) }
+				return .cap
 				
 			}
 			
@@ -150,6 +156,9 @@ extension ALA {
 				case .frame(let location):
 				try require(Location.frame(location), type: requiredType)
 				
+				case .capability:
+				guard requiredType == .cap else { throw TypeError.capabilitySourceNotRepresentableByType(source, requiredType) }
+				
 			}
 		}
 		
@@ -172,6 +181,12 @@ extension ALA {
 			/// An error indicating that given typed locations have different value types when they should have the same value type.
 			case unequalTypes(TypedLocation, TypedLocation)
 			
+			/// An error indicating that given typed location is not compatible with a capability-typed source.
+			case capabilitySourceNotCompatibleWithLocation(TypedLocation)
+			
+			/// An error indicating that a capability-typed source cannot be represented by a value of given type.
+			case capabilitySourceNotRepresentableByType(Source, DataType)
+			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
@@ -187,6 +202,12 @@ extension ALA {
 					
 					case .unequalTypes(let first, let second):
 					return "\(first) does not have the same type as \(second)"
+					
+					case .capabilitySourceNotCompatibleWithLocation(let other):
+					return "\(other) is not a capability"
+					
+					case .capabilitySourceNotRepresentableByType(let source, let type):
+					return "\(source) can only be represented by a capability, not by a value typed \(type)"
 					
 				}
 			}

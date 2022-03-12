@@ -58,6 +58,9 @@ extension FO {
 		/// An effect that links the return address then jumps to `target`.
 		case call(Label)
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Source, data: Source)
+		
 		/// An effect that invokes given runtime routine.
 		///
 		/// The calling convention is dictated by the routine.
@@ -184,6 +187,13 @@ extension FO {
 				
 				case .call(let label):
 				Lower.Effect.call(label)
+				
+				case .invoke(target: let target, data: let data):
+				let (loadTarget, target) = try load(.cap, from: target, using: temp1)
+				let (loadData, data) = try load(.cap, from: data, using: temp2)
+				loadTarget
+				loadData
+				Lower.Effect.invoke(target: target, data: data)
 				
 				case .invokeRuntimeRoutine(let routine):
 				Lower.Effect.invokeRuntimeRoutine(routine)

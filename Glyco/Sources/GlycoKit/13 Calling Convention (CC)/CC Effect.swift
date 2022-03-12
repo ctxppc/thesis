@@ -137,7 +137,7 @@ extension CC {
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
 					if context.configuration.callingConvention.requiresCallRoutine {
-						// TODO: set invocation data register to target capability
+						Lowered.set(.register(.invocationData), to: .capability(to: name))
 						Lowered.invokeRuntimeRoutine(.scall, parameters: argumentRegisters + [.invocationData])
 					} else {
 						Lowered.call(name, parameters: argumentRegisters)
@@ -170,14 +170,24 @@ extension CC {
 						}
 					}
 					
-					// If using a secure CC, clear all registers except for the result value.
+					// If using a secure CC, clear all registers except for the result value and sealed return–frame capabilities.
 					if context.configuration.callingConvention != .conventional {
-						Lowered.clearAll(except: [resultRegister])
+						Lowered.clearAll(except: [resultRegister, .ra])	// TODO: Sealed frame capability?
 					}
 					
-					// We're done.
+					// Pop scope.
 					Lowered.popScope
-					Lowered.return
+					
+					// Return.
+					switch context.configuration.callingConvention {
+						
+						case .conventional:
+						Lowered.return
+						
+						case .heap:
+						_ = TODO.unimplemented
+						
+					}
 					
 				}
 				

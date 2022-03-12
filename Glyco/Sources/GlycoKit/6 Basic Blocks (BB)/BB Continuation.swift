@@ -14,6 +14,9 @@ extension BB {
 		/// A continuation that jumps to the procedure with given label then returns to the block labelled `returnPoint`.
 		case call(Label, returnPoint: Label)
 		
+		/// A continuation that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Source, data: Source)
+		
 		/// A continuation that jumps to given runtime routine then returns to the block labelled `returnPoint`.
 		///
 		/// The calling convention is dictated by the routine.

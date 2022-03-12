@@ -28,10 +28,9 @@ extension FO {
 		/// The location the operand is retrieved from, or `nil` if the operand is not retrieved from a location.
 		var location: Location? {
 			switch self {
-				case .constant:					return nil
+				case .constant, .capability:	return nil
 				case .register(let register):	return .register(register)
 				case .frame(let location):		return .frame(location)
-				case .capability:				return nil
 			}
 		}
 		

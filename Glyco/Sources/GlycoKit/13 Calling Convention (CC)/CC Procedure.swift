@@ -55,7 +55,7 @@ extension CC {
 				}
 				
 				// Bind local names to arguments in arguments record.
-				// If arguments record capability is available, use it as a record; otherwise load from call frame.
+				// If arguments record capability is available, load from record; otherwise load from call frame.
 				var parameterRecordType = assignments.parameterRecordType
 				if let argumentsRecordRegister = assignments.argumentsRecordRegister {
 					for field in parameterRecordType {

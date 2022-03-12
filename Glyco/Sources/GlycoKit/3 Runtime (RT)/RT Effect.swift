@@ -78,12 +78,6 @@ extension RT {
 		case jump(to: Target, link: Register)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `ct6` after unsealing it.
-		///
-		/// A hardware exception is raised
-		/// * if `target` or `data` don't contain valid capabilities with the same object type that permit invocation,
-		/// * if `target` contains a capability that doesn't permit execution,
-		/// * if `data` contains a capability that permits execution, or
-		/// * if `target` contains a capability that points outside its bounds.
 		case invoke(target: Register, data: Register)
 		
 		/// An effect that invokes the runtime routine whose user capability has given name.

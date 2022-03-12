@@ -59,6 +59,9 @@ extension ALA {
 		/// A call effect "defines" caller-saved registers.
 		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Source, data: Source, analysisAtEntry: Analysis)
+		
 		/// An effect that invokes given runtime routine and uses given parameter registers.
 		///
 		/// The calling convention is dictated by the routine.
@@ -125,6 +128,9 @@ extension ALA {
 				
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
+				
+				case .invoke(target: let target, data: let data, analysisAtEntry: _):
+				try Lowered.invoke(target: target.lowered(in: &context), data: data.lowered(in: &context))
 				
 				case .invokeRuntimeRoutine(let routine, parameters: _, analysisAtEntry: _):
 				Lowered.invokeRuntimeRoutine(routine)
@@ -223,6 +229,9 @@ extension ALA {
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
+				case .invoke(target: let target, data: let data, analysisAtEntry: _):
+				return .invoke(target: target, data: data, analysisAtEntry: analysis)
+				
 				case .invokeRuntimeRoutine(let routine, parameters: let parameters, analysisAtEntry: _):
 				return .invokeRuntimeRoutine(routine, parameters: parameters, analysisAtEntry: analysis)
 				
@@ -250,6 +259,7 @@ extension ALA {
 					.popScope(analysisAtEntry: let analysis),
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
+					.invoke(target: _, data: _, analysisAtEntry: let analysis),
 					.invokeRuntimeRoutine(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
@@ -260,7 +270,7 @@ extension ALA {
 		private func definedLocations() -> [Location] {
 			switch self {
 				
-				case .do, .destroyBuffer, .setElement, .if, .popScope, .return:
+				case .do, .destroyBuffer, .setElement, .if, .popScope, .invoke, .return:
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
@@ -319,7 +329,7 @@ extension ALA {
 					.invokeRuntimeRoutine(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
-				case .return:
+				case .invoke, .return:
 				return [.register(.a0)]
 				
 			}
@@ -349,7 +359,7 @@ extension ALA {
 					.getElement, .setElement,
 					.pushScope, .popScope,
 					.clearAll,
-					.call, .invokeRuntimeRoutine, .return:
+					.call, .invoke, .invokeRuntimeRoutine, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -446,6 +456,9 @@ extension ALA {
 				
 				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
 				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
+				
+				case .invoke(target: let target, data: let data, analysisAtEntry: let analysis):
+				return try .invoke(target: substitute(target), data: substitute(data), analysisAtEntry: analysis)
 				
 			}
 			
