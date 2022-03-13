@@ -85,7 +85,7 @@ extension RT {
 		/// The calling convention is dictated by the routine. The effect uses given register to prepare the target capability.
 		case invokeRuntimeRoutine(Label, using: Register)
 		
-		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
+		/// An effect that jumps to the address in `cra`, unsealing the latter first if it is a sentry capability.
 		case `return`
 		
 		/// An effect that can jumped to using given label.
@@ -171,6 +171,8 @@ extension RT {
 				if let (first, tail) = effect.lowered(in: &context).splittingFirst() {
 					Lower.Effect.labelled(label, first)
 					tail
+				} else {
+					Lower.Effect.labelled(label, .nop)
 				}
 				
 				case .buffer(let dataType, count: let count):

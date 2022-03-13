@@ -57,6 +57,5 @@ public enum ALA : Language {
 	public typealias Frame = Lower.Frame
 	public typealias Label = Lower.Label
 	public typealias Register = Lower.Register
-	public typealias RuntimeRoutine = Lower.RuntimeRoutine
 	
 }

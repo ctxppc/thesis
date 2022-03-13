@@ -41,16 +41,20 @@ extension MM {
 		
 		/// An effect that pushes given frame to the call stack.
 		///
-		/// If the contiguous call stack is enabled, this effect pushes `cfp` to it, copies `csp` to `cfp`, and offsets `csp` *b* bytes downward, where *b* is the byte size allocated by the frame. Otherwise, this effect allocates a buffer of *b* bytes on the heap and puts a capability to it in `cfp`.
+		/// This effect's semantics depend on the currently active calling convention:
+		/// * If GCCC is used, this effect pushes `cfp` to it, copies `csp` to `cfp`, and offsets `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
+		/// * If GHSCC is used, this effect allocates a buffer of *b* bytes on the heap, puts a capability to it in `cfp`, and stores the previous frame capability, sealed by an scall in `invocationData`, on the call frame.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(Frame)
 		
 		/// An effect that pops a frame from the call stack.
 		///
-		/// If a contiguous call stack is used, this effect copies `cfp` to `csp` and pops `cfp` from the stack. Otherwise, this effect copies `ct6` to `cfp`.
+		/// This effect's semantics depend on the currently active calling convention:
+		/// * If GCCC is used, this effect copies `cfp` to `csp` and pops `cfp` from the stack.
+		/// * If GHSCC is used, this effect loads the previous (still sealed) frame capability into `cfp`.
 		///
-		/// This effect must be executed exactly once before any effects accessing the previous call frame.
+		/// This effect must be executed exactly once before any effects accessing the previous call frame. If GHSCC is used, an additional return effect must be executed before the previous call frame is available.
 		case popFrame
 		
 		/// An effect that derives a capability from `source`, keeping at most the specified permissions, and puts it in `source`.
@@ -70,25 +74,24 @@ extension MM {
 		/// An effect that jumps to `to` if *x* *R* *y*, where *x* and *y* are given registers and *R* is given relation.
 		case branch(to: Label, Register, BranchRelation, Register)
 		
-		/// An effect that puts the next PCC in `link`, then jumps to given target.
+		/// An effect that jumps to given target.
 		///
 		/// If the target is a sentry capability, it is unsealed first.
 		///
 		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
-		case jump(to: Target, link: Register)
+		case jump(to: Target)
 		
-		/// Returns an effect that puts the next PCC in `cra`, then jumps to given target.
-		static func call(_ target: Label) -> Self { .jump(to: .label(target), link: .ra) }
+		/// An effect that calls the procedure with given name.
+		///
+		/// Depending on the calling convention, this effect either jumps to the target and links the return capability, or performs a scall.
+		case call(Label)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
 		case invoke(target: Register, data: Register)
 		
-		/// An effect that invokes given runtime routine.
+		/// An effect that returns control to the caller.
 		///
-		/// The calling convention is dictated by the routine.
-		case invokeRuntimeRoutine(RuntimeRoutine)
-		
-		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
+		/// If scall invocations are used, this effect invokes the code capability `cra` with the data capability `cfp`; otherwise, this effect jumps to the address in `cra`, unsealing it first if it is a sentry capability.
 		case `return`
 		
 		/// An effect that can jumped to using given label.
@@ -188,25 +191,39 @@ extension MM {
 				Lower.Effect.deriveCapabilityFromLabel(destination: try destination.lowered(), label: label)
 				
 				case .pushFrame(let frame):
-				if context.configuration.callingConvention.usesContiguousCallStack {
+				switch context.configuration.callingConvention {
 					
-					// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
-					Lower.Effect.offsetCapability(destination: temp, source: .sp, offset: .constant(-DataType.cap.byteSize))
-					Lower.Effect.store(.cap, address: temp, source: .fp)
+					case .conventional:
+					do {
+						
+						// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
+						Lower.Effect.offsetCapability(destination: temp, source: .sp, offset: .constant(-DataType.cap.byteSize))
+						Lower.Effect.store(.cap, address: temp, source: .fp)
+						
+						// Set up fp for new frame — using deferred sp.
+						Lower.Effect.copy(.cap, into: .fp, from: temp)
+						
+						// Allocate space for frame by pushing sp downward.
+						Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .constant(-frame.allocatedByteSize))
+						
+					}
 					
-					// Set up fp for new frame — using deferred sp.
-					Lower.Effect.copy(.cap, into: .fp, from: temp)
+					case .heap:
+					do {
+						
+						// Allocate frame on heap and set up fp.
+						let lengthReg = Lower.Register.t0	// cf. alloc routine
+						let bufferReg = Lower.Register.t0	// cf. alloc routine
+						let allocCapReg = Lower.Register.t1
+						Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
+						Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
+						Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
+						
+						// Save previous fp, which the scall sealed in ct6.
+						Lower.Effect.store(.cap, address: .fp, source: .invocationData)
+						
+					}
 					
-					// Allocate space for frame by pushing sp downward.
-					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .constant(-frame.allocatedByteSize))
-					
-				} else {
-					let lengthReg = Lower.Register.t0	// cf. alloc routine
-					let bufferReg = Lower.Register.t0	// cf. alloc routine
-					let allocCapReg = Lower.Register.t1
-					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
-					Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
-					Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
 				}
 				
 				case .popFrame:
@@ -233,17 +250,32 @@ extension MM {
 				case .branch(to: let target, let rs1, let relation, let rs2):
 				try Lower.Effect.branch(to: target, rs1.lowered(), relation, rs2.lowered())
 				
-				case .jump(to: let target, link: let link):
-				try Lower.Effect.jump(to: target.lowered(), link: link.lowered())
+				case .jump(to: let target):
+				Lower.Effect.jump(to: try target.lowered(), link: .zero)
+				
+				case .call(let name):
+				switch context.configuration.callingConvention {
+					
+					case .conventional:
+					Lower.Effect.jump(to: .label(name), link: .ra)
+						
+					case .heap:
+					let returnPoint = context.labels.uniqueName(from: "ret")	// TODO: maybe do in BB instead to avoid labelled nop?
+					Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
+					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: returnPoint)
+					Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: temp)
+					returnPoint ~ .nop
+					
+				}
 				
 				case .invoke(target: let target, data: let data):
 				try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
 				
-				case .invokeRuntimeRoutine(.scall):
-				Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: temp)
-				
 				case .return:
-				Lower.Effect.return
+				switch context.configuration.callingConvention {
+					case .conventional:	Lower.Effect.return
+					case .heap:			Lower.Effect.invoke(target: .ra, data: .fp)
+				}
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
@@ -263,7 +295,13 @@ extension MM.Label {
 	/// The label for the capability to the allocation routine.
 	static var allocationRoutineCapability: Self { "mm.alloc.cap" }
 	
-	/// The label for the capability to the secure calling routine.
+	/// The label for the capability to the secure calling (scall) routine.
+	///
+	/// The scall routine takes a target capability in `invocationData`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. It returns the same frame capability in `invocationData` and any function results in argument registers.
+	///
+	/// The routine may touch any register but will not leak any new authority. The routine also clears `cfp` before jumping to the callee. Procedures are expected to perform appropriate register clearing before invoking the scall routine or before returning to the callee.
+	///
+	/// The callee receives a sealed return–frame capability pair in `cra` and `csp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
 	static var secureCallingRoutineCapability: Self { "mm.scall.cap" }
 	
 }

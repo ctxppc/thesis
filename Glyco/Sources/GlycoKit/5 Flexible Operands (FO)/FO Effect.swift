@@ -52,21 +52,16 @@ extension FO {
 		/// An effect that jumps to `to` if *x* `relation` *y*, where *x* is the value of `lhs` and *y* is the value of `rhs`.
 		case branch(to: Label, Source, BranchRelation, Source)
 		
-		/// An effect that jumps to `to`.
+		/// An effect that jumps to given target.
 		case jump(to: Label)
 		
-		/// An effect that links the return address then jumps to `target`.
+		/// An effect that calls the procedure with given name.
 		case call(Label)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
 		case invoke(target: Source, data: Source)
 		
-		/// An effect that invokes given runtime routine.
-		///
-		/// The calling convention is dictated by the routine.
-		case invokeRuntimeRoutine(RuntimeRoutine)
-		
-		/// An effect that jumps to the previously linked return address.
+		/// An effect that returns to the caller.
 		case `return`
 		
 		/// An effect that can jumped to using given label.
@@ -172,6 +167,9 @@ extension FO {
 				case .popFrame:
 				Lower.Effect.popFrame
 				
+				case .clearAll(except: let sparedRegisters):
+				Lower.Effect.clearAll(except: try sparedRegisters.lowered())
+				
 				case .branch(to: let target, let lhs, let relation, let rhs):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
@@ -180,10 +178,7 @@ extension FO {
 				Lower.Effect.branch(to: target, lhs, relation, rhs)
 				
 				case .jump(to: let target):
-				Lower.Effect.jump(to: .label(target), link: .zero)
-				
-				case .clearAll(except: let sparedRegisters):
-				Lower.Effect.clearAll(except: try sparedRegisters.lowered())
+				Lower.Effect.jump(to: .label(target))
 				
 				case .call(let label):
 				Lower.Effect.call(label)
@@ -194,9 +189,6 @@ extension FO {
 				loadTarget
 				loadData
 				Lower.Effect.invoke(target: target, data: data)
-				
-				case .invokeRuntimeRoutine(let routine):
-				Lower.Effect.invokeRuntimeRoutine(routine)
 				
 				case .return:
 				Lower.Effect.return

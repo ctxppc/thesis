@@ -50,18 +50,13 @@ extension AL {
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		case clearAll(except: [Register])
 		
-		/// An effect that invokes the labelled procedure and uses given parameter registers.
+		/// An effect that calls the procedure with given name and uses given parameter registers.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
 		case invoke(target: Source, data: Source)
-		
-		/// An effect that invokes given runtime routine and uses given parameter registers.
-		///
-		/// The calling convention is dictated by the routine.
-		case invokeRuntimeRoutine(RuntimeRoutine, parameters: [Register])
 		
 		/// An effect that returns to the caller.
 		case `return`
@@ -113,9 +108,6 @@ extension AL {
 				
 				case .invoke(target: let target, data: let data):
 				return .invoke(target: target, data: data, analysisAtEntry: .init())
-				
-				case .invokeRuntimeRoutine(let routine, parameters: let parameters):
-				return .invokeRuntimeRoutine(routine, parameters: parameters, analysisAtEntry: .init())
 				
 				case .return:
 				return .return(analysisAtEntry: .init())

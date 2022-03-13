@@ -22,19 +22,19 @@ extension CC {
 		/// The locations bag.
 		var locations = Bag<Location>()
 		
-		/// Returns the location for given callee-saved register.
-		mutating func calleeSaveLocation(for register: Lower.Register) -> Location {
-			if let location = calleeSaveLocationByRegister[register] {
+		/// Returns the location for given saved register.
+		mutating func saveLocation(for register: Lower.Register) -> Location {
+			if let location = saveLocationByRegister[register] {
 				return location
 			} else {
 				let location = locations.uniqueName(from: "saved\(register.rawValue.uppercased())")
-				calleeSaveLocationByRegister[register] = location
+				saveLocationByRegister[register] = location
 				return location
 			}
 		}
 		
-		/// The locations by callee-saved register.
-		private var calleeSaveLocationByRegister = [Lower.Register : Location]()
+		/// The locations by saved register.
+		private var saveLocationByRegister = [Lower.Register : Location]()
 		
 	}
 	

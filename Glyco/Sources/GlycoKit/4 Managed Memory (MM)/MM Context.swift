@@ -8,6 +8,9 @@ extension MM {
 		/// The configuration.
 		let configuration: CompilationConfiguration
 		
+		/// A bag of labels
+		var labels = Bag<Label>()
+		
 	}
 	
 }

@@ -429,8 +429,7 @@ A language that introduces structured values (vectors and records).
 <code>Frame</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
-<code>Register</code>, 
-<code>RuntimeRoutine</code>
+<code>Register</code>
 <dl>
 	<dt><code>SV.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -469,7 +468,6 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -504,7 +502,6 @@ A language that infers declarations from definitions.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>RuntimeRoutine</code>, 
 <code>Source</code>
 <dl>
 	<dt><code>ID.Program</code></dt>
@@ -532,7 +529,6 @@ A language that infers declarations from definitions.
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -557,7 +553,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>RuntimeRoutine</code>, 
 <code>Source</code>
 <dl>
 	<dt><code>AL.Program</code></dt>
@@ -589,7 +584,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 
@@ -602,8 +596,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 <code>DataType</code>, 
 <code>Frame</code>, 
 <code>Label</code>, 
-<code>Register</code>, 
-<code>RuntimeRoutine</code>
+<code>Register</code>
 <dl>
 	<dt><code>ALA.Program</code></dt>
 	<dd><code>(<strong>locals:</strong> Declarations, <strong>in:</strong> Effect, <strong>procedures:</strong> [Procedure])</code></dd>
@@ -659,7 +652,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
@@ -691,7 +683,6 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>RuntimeRoutine</code>, 
 <code>Source</code>
 <dl>
 	<dt><code>CD.Program</code></dt>
@@ -722,7 +713,6 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -743,7 +733,6 @@ A language that introduces predicates in branches.
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>RuntimeRoutine</code>, 
 <code>Source</code>
 <dl>
 	<dt><code>PR.Program</code></dt>
@@ -759,7 +748,6 @@ A language that introduces predicates in branches.
 	<dd><code><strong>branch</strong>(<strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -779,7 +767,6 @@ A language that groups effects into blocks of effects where blocks can only be e
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Register</code>, 
-<code>RuntimeRoutine</code>, 
 <code>Source</code>
 <dl>
 	<dt><code>BB.Program</code></dt>
@@ -803,7 +790,6 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>branch</strong>(Source, BranchRelation, Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -818,8 +804,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>DataType</code>, 
-<code>Label</code>, 
-<code>RuntimeRoutine</code>
+<code>Label</code>
 <dl>
 	<dt><code>FO.Program</code></dt>
 	<dd><code>([Effect])</code></dd>
@@ -846,7 +831,6 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -910,9 +894,9 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
-	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
+	<dd><code><strong>jump</strong>(<strong>to:</strong> Target)</code></dd>
+	<dd><code><strong>call</strong>(Label)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(RuntimeRoutine)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -960,10 +944,6 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 <dl>
 	<dt><code>MM.Frame</code></dt>
 	<dd><code>(<strong>allocatedByteSize:</strong> Int)</code></dd>
-</dl>
-<dl>
-	<dt><code>MM.RuntimeRoutine</code></dt>
-	<dd><code><strong>scall</strong></code></dd>
 </dl>
 
 <h2 id="RT">Grammar for RT (Runtime)</h2>

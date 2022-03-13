@@ -96,6 +96,13 @@ extension CC {
 				case .call(let name, let arguments, result: let result):
 				if let procedure = context.procedures[name] {
 					
+					// Caller-save registers in abstract locations to limit their liveness across a call.
+					if context.configuration.limitsCallerSavedRegisterLifetimes {
+						for register in Lower.Register.callerSavedRegistersInCHERIRVABI {
+							Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
+						}
+					}
+					
 					// Determine assignments.
 					let assignments = procedure.parameterAssignments(in: context.configuration)
 					
@@ -136,12 +143,7 @@ extension CC {
 					
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
-					if context.configuration.callingConvention.requiresCallRoutine {
-						Lowered.set(.register(.invocationData), to: .capability(to: name))
-						Lowered.invokeRuntimeRoutine(.scall, parameters: argumentRegisters + [.invocationData])
-					} else {
-						Lowered.call(name, parameters: argumentRegisters)
-					}
+					Lowered.call(name, parameters: argumentRegisters)
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {
@@ -150,6 +152,13 @@ extension CC {
 					
 					// Write result.
 					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType))
+					
+					// Restore caller-saved registers from abstract locations.
+					if context.configuration.limitsCallerSavedRegisterLifetimes {
+						for register in Lower.Register.callerSavedRegistersInCHERIRVABI {
+							Lowered.set(.register(register), to: .abstract(context.saveLocation(for: register)))
+						}
+					}
 					
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
@@ -163,16 +172,16 @@ extension CC {
 					Lowered.set(.register(resultRegister), to: try result.lowered(in: &context))
 					// TODO: Write to a global abstract location to ensure consistent return type, and infer return type from that.
 					
-					// If lowering a procedure, copy callee-saved registers (except fp) back from abstract locations (reverse of prologue).
+					// If lowering a procedure, restore callee-saved registers (except fp) from abstract locations — reverse of prologue.
 					if context.loweredProcedure != nil {
 						for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
-							Lowered.set(.register(register), to: .abstract(context.calleeSaveLocation(for: register)))
+							Lowered.set(.register(register), to: .abstract(context.saveLocation(for: register)))
 						}
 					}
 					
 					// If using a secure CC, clear all registers except for the result value and sealed return–frame capabilities.
 					if context.configuration.callingConvention != .conventional {
-						Lowered.clearAll(except: [resultRegister, .ra])	// TODO: Sealed frame capability?
+						Lowered.clearAll(except: [resultRegister, .ra])
 					}
 					
 					// Pop scope.

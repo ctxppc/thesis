@@ -26,21 +26,21 @@ public enum MM : Language {
 			
 			var context = Context(configuration: configuration)
 			
-			let allocLabel = "mm.alloc" as Label
-			let allocEndLabel = "mm.alloc.end" as Label
+			let allocLabel = context.labels.uniqueName(from: "mm.alloc")
+			let allocEndLabel = context.labels.uniqueName(from: "mm.alloc.end")
 			let allocCapLabel = Label.allocationRoutineCapability
 			
-			let heapLabel = "mm.heap" as Label
-			let heapEndLabel = "mm.heap.end" as Label
-			let heapCapLabel = "mm.heap.cap" as Label
+			let heapLabel = context.labels.uniqueName(from: "mm.heap")
+			let heapEndLabel = context.labels.uniqueName(from: "mm.heap.end")
+			let heapCapLabel = context.labels.uniqueName(from: "mm.heap.cap")
 			
-			let scallLabel = "mm.scall" as Label
-			let scallEndLabel = "mm.scall.end" as Label
+			let scallLabel = context.labels.uniqueName(from: "mm.scall")
+			let scallEndLabel = context.labels.uniqueName(from: "mm.scall.end")
 			let scallCapLabel = Label.secureCallingRoutineCapability
-			let sealCapLabel = "mm.seal.cap" as Label
+			let sealCapLabel = context.labels.uniqueName(from: "mm.seal.cap")
 			
-			let userLabel = "mm.user" as Label
-			let userEndLabel = "mm.user.end" as Label
+			let userLabel = context.labels.uniqueName(from: "mm.user")
+			let userEndLabel = context.labels.uniqueName(from: "mm.user.end")
 			
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			

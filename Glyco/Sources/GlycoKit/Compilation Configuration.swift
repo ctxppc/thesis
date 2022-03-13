@@ -16,6 +16,8 @@ public struct CompilationConfiguration {
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
 	}
 	
+	// MARK: - Target
+	
 	/// The program's target platform.
 	public var target: Target
 	public enum Target : String, CaseIterable {
@@ -27,6 +29,8 @@ public struct CompilationConfiguration {
 		case sail
 		
 	}
+	
+	// MARK: Procedure Calls
 	
 	/// The program's calling convention.
 	public var callingConvention: CallingConvention = .conventional
@@ -56,14 +60,28 @@ public struct CompilationConfiguration {
 		
 	}
 	
+	/// The registers used for passing arguments, in argument order.
+	public var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
+	
+	/// A Boolean value indicating whether the lifetime of caller-saved registers is limited by copying their contents to abstract locations.
+	public var limitsCallerSavedRegisterLifetimes: Bool = true
+	
+	// MARK: - Memory
+	
+	/// The size of the heap, in bytes.
+	///
+	/// The default size is 1 MiB.
+	public var heapByteSize: Int = 1 << 20
+	
+	// MARK: - Toolchain
+	
 	/// A URL to a CHERI-RISC-V toolchain.
 	public var toolchainURL: URL
 	
 	/// A URL to a CheriBSD system root.
 	public var systemURL: URL
 	
-	/// The registers used for passing arguments, in argument order.
-	public var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
+	// MARK: Pipeline
 	
 	/// A Boolean value indicating whether programs are optimised in each language before lowering them.
 	public var optimise: Bool = true
@@ -71,10 +89,7 @@ public struct CompilationConfiguration {
 	/// A Boolean value indicating whether programs are validated in each language before lowering them.
 	public var validate: Bool = true
 	
-	/// The size of the heap, in bytes.
-	///
-	/// The default size is 1 MiB.
-	public var heapByteSize: Int = 1 << 20
+	// MARK: Output
 	
 	/// The (suggested) maximum line length of serialised output programs.
 	public var maximumLineLength: Int = 120

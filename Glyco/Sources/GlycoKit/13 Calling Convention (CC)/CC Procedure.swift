@@ -40,9 +40,9 @@ extension CC {
 				// Prepare new scope.
 				Lower.Effect.pushScope
 				
-				// Copy callee-saved registers (except fp) to abstract locations to limit their liveness.
+				// Callee-save registers (except fp) in abstract locations to limit their liveness.
 				for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
-					Lower.Effect.set(.abstract(context.calleeSaveLocation(for: register)), to: .register(register, .registerDatum))
+					Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
 				}
 				
 				// Determine parameter assignments.

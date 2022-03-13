@@ -52,7 +52,7 @@ extension ALA {
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		case clearAll(except: [Register], analysisAtEntry: Analysis)
 		
-		/// An effect that invokes the labelled procedure and uses given parameter registers.
+		/// An effect that calls the procedure with given name and uses given parameter registers.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		///
@@ -61,13 +61,6 @@ extension ALA {
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
 		case invoke(target: Source, data: Source, analysisAtEntry: Analysis)
-		
-		/// An effect that invokes given runtime routine and uses given parameter registers.
-		///
-		/// The calling convention is dictated by the routine.
-		///
-		/// An invocation effect "defines" caller-saved registers.
-		case invokeRuntimeRoutine(RuntimeRoutine, parameters: [Register], analysisAtEntry: Analysis)
 		
 		/// An effect that returns to the caller.
 		///
@@ -131,9 +124,6 @@ extension ALA {
 				
 				case .invoke(target: let target, data: let data, analysisAtEntry: _):
 				try Lowered.invoke(target: target.lowered(in: &context), data: data.lowered(in: &context))
-				
-				case .invokeRuntimeRoutine(let routine, parameters: _, analysisAtEntry: _):
-				Lowered.invokeRuntimeRoutine(routine)
 				
 				case .return(analysisAtEntry: _):
 				Lowered.return
@@ -232,9 +222,6 @@ extension ALA {
 				case .invoke(target: let target, data: let data, analysisAtEntry: _):
 				return .invoke(target: target, data: data, analysisAtEntry: analysis)
 				
-				case .invokeRuntimeRoutine(let routine, parameters: let parameters, analysisAtEntry: _):
-				return .invokeRuntimeRoutine(routine, parameters: parameters, analysisAtEntry: analysis)
-				
 				case .return(analysisAtEntry: _):
 				return .return(analysisAtEntry: analysis)
 				
@@ -260,7 +247,6 @@ extension ALA {
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
 					.invoke(target: _, data: _, analysisAtEntry: let analysis),
-					.invokeRuntimeRoutine(_, parameters: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
 			}
@@ -288,7 +274,7 @@ extension ALA {
 					.filter { !sparedRegisters.contains($0) }
 					.map { .register($0) }
 				
-				case .call, .invokeRuntimeRoutine:
+				case .call:
 				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
 				
 			}
@@ -325,8 +311,7 @@ extension ALA {
 				case .popScope:
 				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
 				
-				case .call(_, parameters: let parameters, analysisAtEntry: _),
-					.invokeRuntimeRoutine(_, parameters: let parameters, analysisAtEntry: _):
+				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
 				case .invoke, .return:
@@ -359,7 +344,7 @@ extension ALA {
 					.getElement, .setElement,
 					.pushScope, .popScope,
 					.clearAll,
-					.call, .invoke, .invokeRuntimeRoutine, .return:
+					.call, .invoke, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -423,7 +408,7 @@ extension ALA {
 			
 			switch self {
 				
-				case .do, .if, .pushScope, .popScope, .clearAll, .call, .invokeRuntimeRoutine, .return:
+				case .do, .if, .pushScope, .popScope, .clearAll, .call, .return:
 				return self
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)
