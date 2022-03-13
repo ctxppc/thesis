@@ -51,31 +51,12 @@ public enum MM : Language {
 			@ArrayBuilder<Lower.Effect>
 			var runtime: [Lower.Effect] {
 				
-				// Initialise stack cap.
-				if configuration.callingConvention.usesContiguousCallStack {
-					
-					// Derive stack cap.
-					(.runtime) ~ .deriveCapabilityFromLabel(destination: .sp, label: stackLabel)
-					
-					// Restrict stack cap bounds.
-					let stackCapEndReg = Lower.Register.t1
-					let stackCapLengthReg = Lower.Register.t1
-					Lower.Effect.deriveCapabilityFromLabel(destination: stackCapEndReg, label: stackEndLabel)
-					Lower.Effect.getCapabilityDistance(destination: stackCapLengthReg, cs1: stackCapEndReg, cs2: .sp)
-					Lower.Effect.setCapabilityBounds(destination: .sp, source: .sp, length: .register(stackCapLengthReg))
-					
-					// Restrict stack cap permissions.
-					let bitmaskReg = Lower.Register.t1
-					Lower.Effect.permit(Self.stackCapabilityPermissions, destination: .sp, source: .sp, using: bitmaskReg)
-					
-				}
-				
 				// Initialise heap cap.
 				do {
 					
 					// Derive heap cap.
 					let heapCapReg = Lower.Register.t0
-					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
+					(.runtime) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
 					
 					// Restrict heap cap bounds.
 					let heapCapEndReg = Lower.Register.t1
@@ -92,6 +73,25 @@ public enum MM : Language {
 					let heapCapCapReg = Lower.Register.t1
 					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
 					Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg)
+					
+				}
+				
+				// Initialise stack cap.
+				if configuration.callingConvention.usesContiguousCallStack {
+					
+					// Derive stack cap.
+					Lower.Effect.deriveCapabilityFromLabel(destination: .sp, label: stackLabel)
+					
+					// Restrict stack cap bounds.
+					let stackCapEndReg = Lower.Register.t1
+					let stackCapLengthReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: stackCapEndReg, label: stackEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: stackCapLengthReg, cs1: stackCapEndReg, cs2: .sp)
+					Lower.Effect.setCapabilityBounds(destination: .sp, source: .sp, length: .register(stackCapLengthReg))
+					
+					// Restrict stack cap permissions.
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.stackCapabilityPermissions, destination: .sp, source: .sp, using: bitmaskReg)
 					
 				}
 				

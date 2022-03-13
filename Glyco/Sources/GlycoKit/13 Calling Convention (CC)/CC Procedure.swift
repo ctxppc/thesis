@@ -90,7 +90,7 @@ extension CC {
 			var parameters = self.parameters[...]
 			
 			// If a discontiguous call stack is in use and an arguments record is required, reserve a register for the arguments record capability.
-			if !configuration.callingConvention.usesContiguousCallStack, registers.count > parameters.count {
+			if !configuration.callingConvention.usesContiguousCallStack, parameters.count > registers.count {
 				assignments.argumentsRecordRegister = registers.popLast()
 			}
 			
