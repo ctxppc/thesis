@@ -73,6 +73,11 @@ public struct CompilationConfiguration {
 	/// The default size is 1 MiB.
 	public var heapByteSize: Int = 1 << 20
 	
+	/// The size of the call stack, in bytes, when a contiguous stack is used.
+	///
+	/// The default size is 1 MiB.
+	public var stackByteSize: Int = 1 << 20
+	
 	// MARK: - Toolchain
 	
 	/// A URL to a CHERI-RISC-V toolchain.

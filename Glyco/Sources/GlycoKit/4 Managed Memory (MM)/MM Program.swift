@@ -34,6 +34,9 @@ public enum MM : Language {
 			let heapEndLabel = context.labels.uniqueName(from: "mm.heap.end")
 			let heapCapLabel = context.labels.uniqueName(from: "mm.heap.cap")
 			
+			let stackLabel = context.labels.uniqueName(from: "mm.stack")
+			let stackEndLabel = context.labels.uniqueName(from: "mm.stack.end")
+			
 			let scallLabel = context.labels.uniqueName(from: "mm.scall")
 			let scallEndLabel = context.labels.uniqueName(from: "mm.scall.end")
 			let scallCapLabel = Label.secureCallingRoutineCapability
@@ -48,12 +51,31 @@ public enum MM : Language {
 			@ArrayBuilder<Lower.Effect>
 			var runtime: [Lower.Effect] {
 				
+				// Initialise stack cap.
+				if configuration.callingConvention.usesContiguousCallStack {
+					
+					// Derive stack cap.
+					(.runtime) ~ .deriveCapabilityFromLabel(destination: .sp, label: stackLabel)
+					
+					// Restrict stack cap bounds.
+					let stackCapEndReg = Lower.Register.t1
+					let stackCapLengthReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: stackCapEndReg, label: stackEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: stackCapLengthReg, cs1: stackCapEndReg, cs2: .sp)
+					Lower.Effect.setCapabilityBounds(destination: .sp, source: .sp, length: .register(stackCapLengthReg))
+					
+					// Restrict stack cap permissions.
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.stackCapabilityPermissions, destination: .sp, source: .sp, using: bitmaskReg)
+					
+				}
+				
 				// Initialise heap cap.
 				do {
 					
 					// Derive heap cap.
 					let heapCapReg = Lower.Register.t0
-					(.runtime) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
+					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
 					
 					// Restrict heap cap bounds.
 					let heapCapEndReg = Lower.Register.t1
@@ -63,7 +85,8 @@ public enum MM : Language {
 					Lower.Effect.setCapabilityBounds(destination: heapCapReg, source: heapCapReg, length: .register(heapCapLengthReg))
 					
 					// Restrict heap cap permissions.
-					Lower.Effect.permit(Self.heapCapabilityPermissions, destination: heapCapReg, source: heapCapReg, using: .t1)
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.heapCapabilityPermissions, destination: heapCapReg, source: heapCapReg, using: bitmaskReg)
 					
 					// Derive heap cap cap and store heap cap.
 					let heapCapCapReg = Lower.Register.t1
@@ -73,7 +96,7 @@ public enum MM : Language {
 				}
 				
 				// Initialise seal cap.
-				do {
+				if configuration.callingConvention.requiresCallRoutine {
 					
 					// Derive seal cap from PCC.
 					let sealCapReg = Lower.Register.t0
@@ -84,7 +107,8 @@ public enum MM : Language {
 					Lower.Effect.setCapabilityBounds(destination: sealCapReg, source: sealCapReg, length: .constant(1))
 					
 					// Restrict seal cap permissions.
-					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: .t1)
+					let bitmaskReg = Lower.Register.t1
+					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: bitmaskReg)
 					
 					// Derive seal cap cap and store seal cap.
 					let sealCapCapReg = Lower.Register.t1
@@ -120,7 +144,7 @@ public enum MM : Language {
 				}
 				
 				// Initialise scall cap.
-				do {
+				if configuration.callingConvention.requiresCallRoutine {
 					
 					// Derive scall cap.
 					let scallCapReg = Lower.Register.t0
@@ -163,21 +187,34 @@ public enum MM : Language {
 					let bitmaskReg = Lower.Register.t0
 					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
 					
-					// Copy cra to cfp to preserve it across the scall — we don't need an actual frame in the runtime.
-					let savedRABeforeScallReg = Lower.Register.fp
-					Lower.Effect.copy(.cap, into: savedRABeforeScallReg, from: .ra)
-					
-					// Clear all registers except (selected) user authority.
-					let preservedRegisters = [savedRABeforeScallReg, userCapReg]	// Set is probably less efficient for 2 elements
-					Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
-					
-					// Perform scall.
-					let scallCapReg = Lower.Register.t0
-					Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
-					
-					// Return to OS/framework.
-					let savedRAAfterScallReg = Lower.Register.invocationData
-					Lower.Effect.jump(to: .register(savedRAAfterScallReg), link: .zero)
+					// Call user program.
+					switch configuration.callingConvention {
+							
+						case .conventional:
+						Lower.Effect.jump(to: .register(userCapReg), link: .ra)
+						
+						case .heap:
+						do {
+							
+							// Copy cra to cfp to preserve it across the scall — we don't need an actual frame in the runtime.
+							let savedRABeforeScallReg = Lower.Register.fp
+							Lower.Effect.copy(.cap, into: savedRABeforeScallReg, from: .ra)
+							
+							// Clear all registers except (selected) user authority.
+							let preservedRegisters = [savedRABeforeScallReg, userCapReg]	// Set is probably less efficient for 2 elements
+							Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
+							
+							// Perform scall.
+							let scallCapReg = Lower.Register.t0
+							Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
+							
+							// Return to OS/framework.
+							let savedRAAfterScallReg = Lower.Register.invocationData
+							Lower.Effect.jump(to: .register(savedRAAfterScallReg), link: .zero)
+							
+						}
+							
+					}
 					
 				}
 				
@@ -282,6 +319,13 @@ public enum MM : Language {
 				heapEndLabel ~ .buffer(.s32, count: 1)
 			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
 			
+			// The stack.
+			@ArrayBuilder<Lower.Effect>
+			var stack: [Lower.Effect] {
+				stackLabel ~ .buffer(.u8, count: configuration.stackByteSize)
+				stackEndLabel ~ .buffer(.s32, count: 1)
+			}	// FIXME: Zeroed stack is emitted in ELF; define a (lazily zeroed) section instead?
+			
 			return try .init {
 				runtime					// requires & preserves 4-byte alignment
 				allocationRoutine		// requires & preserves 4-byte alignment
@@ -290,13 +334,21 @@ public enum MM : Language {
 				}
 				try user				// requires & preserves 4-byte alignment
 				heap					// does not require alignment
+				if configuration.callingConvention.usesContiguousCallStack {
+					stack				// does not require alignment
+				}
 			}
 			
 		}
 		
+		/// The stack capability's permissions.
+		///
+		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions.
+		static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability]
+		
 		/// The heap capability's permissions.
 		///
-		/// Buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
+		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
 		static let heapCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability]
 		
 		/// The allocation routine capability's permissions.
