@@ -256,7 +256,7 @@ extension ALA {
 		private func definedLocations() -> [Location] {
 			switch self {
 				
-				case .do, .destroyBuffer, .setElement, .if, .popScope, .invoke, .return:
+				case .do, .destroyBuffer, .setElement, .if, .popScope, .invoke, .return:	// TODO: Is invoke really like return?
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
@@ -275,7 +275,7 @@ extension ALA {
 					.map { .register($0) }
 				
 				case .call:
-				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }
+				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }	// includes args and cra
 				
 			}
 		}
@@ -314,7 +314,7 @@ extension ALA {
 				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
-				case .invoke, .return:
+				case .invoke, .return:	// TODO: Is invoke really like return?
 				return [.register(.a0)]
 				
 			}

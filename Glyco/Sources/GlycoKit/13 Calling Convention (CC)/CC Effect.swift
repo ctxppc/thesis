@@ -188,15 +188,7 @@ extension CC {
 					Lowered.popScope
 					
 					// Return.
-					switch context.configuration.callingConvention {
-						
-						case .conventional:
-						Lowered.return
-						
-						case .heap:
-						_ = TODO.unimplemented
-						
-					}
+					Lowered.return
 					
 				}
 				

@@ -983,7 +983,7 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
-	<dd><code><strong>invokeRuntimeRoutine</strong>(Label, <strong>using:</strong> Register)</code></dd>
+	<dd><code><strong>callRuntimeRoutine</strong>(Label, <strong>using:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 	<dd><code><strong>buffer</strong>(DataType, <strong>count:</strong> Int)</code></dd>

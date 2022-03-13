@@ -43,7 +43,7 @@ extension MM {
 		///
 		/// This effect's semantics depend on the currently active calling convention:
 		/// * If GCCC is used, this effect pushes `cfp` to it, copies `csp` to `cfp`, and offsets `csp` *b* bytes downward, where *b* is the byte size allocated by the frame.
-		/// * If GHSCC is used, this effect allocates a buffer of *b* bytes on the heap, puts a capability to it in `cfp`, and stores the previous frame capability, sealed by an scall in `invocationData`, on the call frame.
+		/// * If GHSCC is used, this effect allocates a call frame of *b* bytes on the heap, stores the previous frame capability (as sealed by the scall routine in `cfp`) on it, and puts a capability to the call frame in `cfp`.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
 		case pushFrame(Frame)
@@ -54,7 +54,7 @@ extension MM {
 		/// * If GCCC is used, this effect copies `cfp` to `csp` and pops `cfp` from the stack.
 		/// * If GHSCC is used, this effect loads the previous (still sealed) frame capability into `cfp`.
 		///
-		/// This effect must be executed exactly once before any effects accessing the previous call frame. If GHSCC is used, an additional return effect must be executed before the previous call frame is available.
+		/// This effect must be executed exactly once before any effects accessing the previous call frame. If GHSCC is used, an additional return is required before the previous call frame is available.
 		case popFrame
 		
 		/// An effect that derives a capability from `source`, keeping at most the specified permissions, and puts it in `source`.
@@ -66,7 +66,7 @@ extension MM {
 		
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		///
-		/// This effect must be executed before jumping to untrusted or partially untrusted code to ensure that the target code does not get unintended authority. Any registers (whether containing capabilities with intended authority, or non-capability data) can be exempted from clearing.
+		/// When using a secure calling convention, this effect must be executed before jumping to untrusted or partially untrusted code to ensure that the target code does not get unintended authority. Any registers, whether containing non-capability data or capabilities with intended authority, can be exempted from clearing.
 		///
 		/// `ctp` and `cgp` are reserved global registers whereas `csp` and `cfp` are managed by the runtime. These registers therefore cannot explicitly be cleared in MM.
 		case clearAll(except: [Register])
@@ -81,9 +81,9 @@ extension MM {
 		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
 		case jump(to: Target)
 		
-		/// An effect that calls the procedure with given name.
+		/// An effect that links the return capability and calls the procedure with given name.
 		///
-		/// Depending on the calling convention, this effect either jumps to the target and links the return capability, or performs a scall.
+		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
 		case call(Label)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
@@ -91,7 +91,7 @@ extension MM {
 		
 		/// An effect that returns control to the caller.
 		///
-		/// If scall invocations are used, this effect invokes the code capability `cra` with the data capability `cfp`; otherwise, this effect jumps to the address in `cra`, unsealing it first if it is a sentry capability.
+		/// If scall invocations are used, this effect invokes the code capability `cra` with the data capability `cfp` thereby unsealing both for the caller. Otherwise, this effect jumps to the address in `cra`, unsealing it first if it is a sentry capability.
 		case `return`
 		
 		/// An effect that can jumped to using given label.
@@ -126,7 +126,7 @@ extension MM {
 				let allocCapReg = Lower.Register.t1
 				let destinationBufferReg = try destinationBuffer.lowered()
 				Lower.Effect.compute(destination: lengthReg, .zero, .add, try bytes.lowered())
-				Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
+				Lower.Effect.callRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
 				if bufferReg != destinationBufferReg {
 					Lower.Effect.copy(.cap, into: destinationBufferReg, from: bufferReg)
 				}
@@ -211,32 +211,40 @@ extension MM {
 					case .heap:
 					do {
 						
-						// Allocate frame on heap and set up fp.
+						// Allocate frame on heap.
 						let lengthReg = Lower.Register.t0	// cf. alloc routine
 						let bufferReg = Lower.Register.t0	// cf. alloc routine
 						let allocCapReg = Lower.Register.t1
 						Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
-						Lower.Effect.invokeRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
-						Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
+						Lower.Effect.callRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
 						
-						// Save previous fp, which the scall sealed in ct6.
-						Lower.Effect.store(.cap, address: .fp, source: .invocationData)
+						// Save previous fp in offset 0 of newly allocated frame.
+						Lower.Effect.store(.cap, address: bufferReg, source: .fp)
+						
+						// Update cfp.
+						Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
 						
 					}
 					
 				}
 				
 				case .popFrame:
-				if context.configuration.callingConvention.usesContiguousCallStack {
+				switch context.configuration.callingConvention {
 					
-					// Pop frame and saved fp by moving sp one word above the saved fp's location.
-					Lower.Effect.offsetCapability(destination: .sp, source: .fp, offset: .constant(+DataType.cap.byteSize))
+					case .conventional:
+					do {
+						
+						// Pop frame and saved fp by moving sp one word above the saved fp's location.
+						Lower.Effect.offsetCapability(destination: .sp, source: .fp, offset: .constant(+DataType.cap.byteSize))
+						
+						// Restore saved fp — follow the linked list.
+						Lower.Effect.load(.cap, destination: .fp, address: .fp)
+						
+					}
 					
-					// Restore saved fp — follow the linked list.
-					Lower.Effect.load(.cap, destination: .fp, address: .fp)
-					
-				} else {
+					case .heap:
 					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)
+					
 				}
 				
 				case .permit(let permissions, destination: let destination, source: let source):
@@ -260,11 +268,9 @@ extension MM {
 					Lower.Effect.jump(to: .label(name), link: .ra)
 						
 					case .heap:
-					let returnPoint = context.labels.uniqueName(from: "ret")	// TODO: maybe do in BB instead to avoid labelled nop?
 					Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
-					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: returnPoint)
-					Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: temp)
-					returnPoint ~ .nop
+					Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: temp)	// also links cra
+					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)	// restore fp
 					
 				}
 				
@@ -293,15 +299,17 @@ extension MM {
 extension MM.Label {
 	
 	/// The label for the capability to the allocation routine.
+	///
+	/// The allocation routine takes a length in `t0` and returns a buffer capability in `ct0`. The routine may also touch `ct1` and `ct2` but will not leak any unintended new authority.
 	static var allocationRoutineCapability: Self { "mm.alloc.cap" }
 	
 	/// The label for the capability to the secure calling (scall) routine.
 	///
 	/// The scall routine takes a target capability in `invocationData`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. It returns the same frame capability in `invocationData` and any function results in argument registers.
 	///
-	/// The routine may touch any register but will not leak any new authority. The routine also clears `cfp` before jumping to the callee. Procedures are expected to perform appropriate register clearing before invoking the scall routine or before returning to the callee.
+	/// The routine may touch any register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
 	///
-	/// The callee receives a sealed return–frame capability pair in `cra` and `csp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
+	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
 	static var secureCallingRoutineCapability: Self { "mm.scall.cap" }
 	
 }

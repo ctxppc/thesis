@@ -80,10 +80,10 @@ extension RT {
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `ct6` after unsealing it.
 		case invoke(target: Register, data: Register)
 		
-		/// An effect that invokes the runtime routine whose user capability has given name.
+		/// An effect that puts the next PCC in `cra` then jumps to the runtime routine user capability with given label.
 		///
 		/// The calling convention is dictated by the routine. The effect uses given register to prepare the target capability.
-		case invokeRuntimeRoutine(Label, using: Register)
+		case callRuntimeRoutine(Label, using: Register)
 		
 		/// An effect that jumps to the address in `cra`, unsealing the latter first if it is a sentry capability.
 		case `return`
@@ -159,7 +159,7 @@ extension RT {
 				case .invoke(target: let target, data: let data):
 				Lower.Effect.invoke(target: target, data: data)
 				
-				case .invokeRuntimeRoutine(let name, using: let targetCapability):
+				case .callRuntimeRoutine(let name, using: let targetCapability):
 				Lower.Effect.deriveCapabilityFromLabel(destination: targetCapability, label: name)
 				Lower.Effect.load(.cap, destination: targetCapability, address: targetCapability)
 				Lower.Effect.jump(to: .register(targetCapability), link: .ra)

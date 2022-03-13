@@ -173,7 +173,7 @@ public enum MM : Language {
 					
 					// Perform scall.
 					let scallCapReg = Lower.Register.t0
-					Lower.Effect.invokeRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
+					Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
 					
 					// Return to OS/framework.
 					let savedRAAfterScallReg = Lower.Register.invocationData
@@ -183,8 +183,7 @@ public enum MM : Language {
 				
 			}
 			
-			// A routine that allocates a buffer on the heap.
-			// It takes a length in t0 and returns a buffer cap in ct0. It also touches t1 and t2 but will not leak any unintended new authority.
+			// A routine that allocates a buffer on the heap — see also MM.Label.allocationRoutineCapability.
 			@ArrayBuilder<Lower.Effect>
 			var allocationRoutine: [Lower.Effect] {
 				
@@ -226,7 +225,7 @@ public enum MM : Language {
 				
 			}
 			
-			// A routine that performs a secure function call transition — see also MM.RuntimeRoutine.scall.
+			// A routine that performs a secure function call transition — see also MM.Label.secureCallingRoutineCapability.
 			@ArrayBuilder<Lower.Effect>
 			var scallRoutine: [Lower.Effect] {
 				
@@ -240,10 +239,10 @@ public enum MM : Language {
 				
 				// Seal return & frame capabilities.
 				Lower.Effect.seal(destination: .ra, source: .ra, seal: sealCap)
-				Lower.Effect.seal(destination: .sp, source: .fp, seal: sealCap)
+				Lower.Effect.seal(destination: .fp, source: .fp, seal: sealCap)
 				
 				// Clear authority.
-				Lower.Effect.clear([sealCap, .fp])
+				Lower.Effect.clear([sealCap])
 				
 				// Jump to callee — while preserving link.
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
