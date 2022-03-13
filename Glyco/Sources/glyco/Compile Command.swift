@@ -39,6 +39,9 @@ struct CompileCommand : ParsableCommand {
 	@Flag(name: .customLong("stdout"), help: "Output intermediate programs to standard out or discard binary. (Omit to write to disk.)")
 	var outputsToStandardOut: Bool = false
 	
+	@Option(name: .customLong("cc"), help: "The calling convention to use. Choose between \(CompilationConfiguration.CallingConvention.conventional) and \(CompilationConfiguration.CallingConvention.heap).")
+	var callingConvention: CompilationConfiguration.CallingConvention = .conventional
+	
 	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "Registers used for passing arguments, in parameter order.")
 	var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
 	
@@ -63,6 +66,7 @@ struct CompileCommand : ParsableCommand {
 		let toolchainURL = environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:))
 		let systemURL = environment["CHERISYSROOT"].map(URL.init(fileURLWithPath:))
 		let configuration = with(CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL)) {
+			$0.callingConvention = callingConvention
 			$0.argumentRegisters = argumentRegisters
 			$0.optimise = optimise
 			$0.validate = validate
@@ -170,6 +174,7 @@ private var fileWatcher: FileWatcher.Local?
 #endif
 
 extension CompilationConfiguration.Target : ExpressibleByArgument {}
+extension CompilationConfiguration.CallingConvention : ExpressibleByArgument {}
 
 extension AL.Register : ExpressibleByArgument {
 	public init?(argument: String) {
