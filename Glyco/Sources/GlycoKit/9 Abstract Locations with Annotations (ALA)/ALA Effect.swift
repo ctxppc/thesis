@@ -329,22 +329,24 @@ extension ALA {
 		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
 		///
+		/// - Parameter analysis: The analysis at scope (program, procedure) entry.
+		///
 		/// - Returns: A pair of locations that can be safely coalesced, or `nil` if no such pair is known.
-		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
+		func safelyCoalescableLocations(analysisAtScopeEntry analysis: Analysis) -> (AbstractLocation, Location)? {
 			switch self {
 				
 				case .do(let effects, analysisAtEntry: _):
 				return effects
 						.reversed()
 						.lazy
-						.compactMap { $0.safelyCoalescableLocations() }
+						.compactMap { $0.safelyCoalescableLocations(analysisAtScopeEntry: analysis) }
 						.first
 				
-				case .set(.abstract(let destination), to: let source, analysisAtEntry: let analysis):
+				case .set(.abstract(let destination), to: let source, analysisAtEntry: _):
 				guard let source = source.location, analysis.safelyCoalescable(source, .abstract(destination)) else { return nil }
 				return (destination, source)
 					
-				case .set(let destination, to: .abstract(let source), analysisAtEntry: let analysis):
+				case .set(let destination, to: .abstract(let source), analysisAtEntry: _):
 				guard analysis.safelyCoalescable(.abstract(source), destination) else { return nil }
 				return (source, destination)
 				
@@ -357,9 +359,9 @@ extension ALA {
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
-				return negative.safelyCoalescableLocations()
-					?? affirmative.safelyCoalescableLocations()
-					?? predicate.safelyCoalescableLocations()
+				return negative.safelyCoalescableLocations(analysisAtScopeEntry: analysis)
+					?? affirmative.safelyCoalescableLocations(analysisAtScopeEntry: analysis)
+					?? predicate.safelyCoalescableLocations(analysisAtScopeEntry: analysis)
 				
 			}
 		}

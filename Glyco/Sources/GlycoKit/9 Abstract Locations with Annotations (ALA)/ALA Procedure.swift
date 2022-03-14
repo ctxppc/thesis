@@ -24,9 +24,16 @@ extension ALA {
 		// See protocol.
 		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
 			var coalesced = false
-			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
-				var analysis = Analysis()
-				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis, configuration: configuration)
+			var analysis = effect.analysisAtEntry
+			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations(analysisAtScopeEntry: analysis) {
+				analysis = .init()
+				effect = try effect.coalescing(
+					removedLocation,
+					into:			retainedLocation,
+					declarations:	locals,
+					analysis:		&analysis,
+					configuration:	configuration
+				)
 				locals.remove(.abstract(removedLocation))	// must be done after coalescing — cf. Effect.coalescing(…)
 				coalesced = true
 			}
