@@ -610,6 +610,12 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(Location, Location)</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.Identity</code></dt>
+</dl>
+<dl>
+	<dt><code>ALA.CoalesceLocations</code></dt>
+</dl>
+<dl>
 	<dt><code>ALA.TypedLocation</code></dt>
 	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>

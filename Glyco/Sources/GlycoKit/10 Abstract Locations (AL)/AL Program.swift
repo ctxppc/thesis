@@ -33,7 +33,7 @@ public enum AL : Language {
 			var analysis = Lower.Analysis()
 			return try .init(
 				locals:		locals,
-				in:			effect.lowered().updated(using: { $0 }, analysis: &analysis, configuration: configuration),
+				in:			effect.lowered().updated(using: Lower.Identity(), analysis: &analysis, configuration: configuration),
 				procedures:	procedures.map { try $0.lowered(configuration: configuration) }
 			)
 		}

@@ -24,7 +24,11 @@ extension AL {
 		/// Lowers `self` to a procedure in the lower language.
 		func lowered(configuration: CompilationConfiguration) throws -> Lower.Procedure {
 			var analysis = Lower.Analysis()
-			return .init(name, locals: locals, in: try effect.lowered().updated(using: { $0 }, analysis: &analysis, configuration: configuration))
+			return .init(
+				name,
+				locals:	locals,
+				in:		try effect.lowered().updated(using: Lower.Identity(), analysis: &analysis, configuration: configuration)
+			)
 		}
 		
 	}

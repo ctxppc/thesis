@@ -131,17 +131,17 @@ extension ALA {
 			}
 		}
 		
-		/// Returns a (possibly) transformed copy of `self` with updated analysis at entry.
+		/// Returns a transformed copy of `self` with updated analysis at entry.
 		///
-		/// The transformation is applied first. If the transformed effect contains children, it is applied to those children as well.
+		/// The transformation is applied first. If the transformed effect contains effects or predicates, it is applied to those as well.
 		///
 		/// - Parameters:
-		///    - transform: A function that transforms effects.
+		///    - transform: A transformation.
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///    - configuration: The compilation configuration.
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
-		func updated(using transform: Transformation, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
+		func updated(using transform: ALALocalTransformation, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
 			let transformed = try transform(self)
 			try analysis.update(
 				defined:		transformed.definedLocations(configuration: configuration),
@@ -393,86 +393,11 @@ extension ALA {
 			analysis:				inout Analysis,
 			configuration:			CompilationConfiguration
 		) throws -> Self {
-			try updated(using: {
-				try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations)
-			}, analysis: &analysis, configuration: configuration)
-		}
-		
-		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.
-		///
-		/// This method should be used as part of an `update(using:analysis:)` call which ensures the coalescing is done globally and analysis information is updated appropriately.
-		///
-		/// - Parameters:
-		///   - removedLocation: The location that is replaced by `retainedLocation`.
-		///   - retainedLocation: The location that is retained.
-		///   - declarations: The local declarations.
-		///
-		/// - Requires: `declarations` contains a declaration for `removedLocation`. The declaration should be removed after global coalescing is done.
-		///
-		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
-		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location, declarations: Declarations) throws -> Self {
-			
-			func substitute(_ location: Location) -> Location {
-				location == .abstract(removedLocation) ? retainedLocation : location
-			}
-			
-			func substitute(_ source: Source) throws -> Source {
-				guard source == .abstract(removedLocation) else { return source }
-				switch retainedLocation {
-					
-					case .abstract(let location):
-					return .abstract(location)
-					
-					case .register(let register):
-					return try .register(register, declarations.type(of: Location.abstract(removedLocation)))
-					
-					case .frame(let location):
-					return .frame(location)
-					
-				}
-			}
-			
-			switch self {
-				
-				case .do, .if, .pushScope, .popScope, .clearAll, .call, .return:
-				return self
-				
-				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)
-					where source.location == retainedLocation || source.location == .abstract(removedLocation):
-				return .do([], analysisAtEntry: analysis)
-				
-				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis):
-				return .set(retainedLocation, to: source, analysisAtEntry: analysis)
-				
-				case .set(retainedLocation, to: .abstract(removedLocation), analysisAtEntry: let analysis):
-				return .do([], analysisAtEntry: analysis)
-				
-				case .set(retainedLocation, to: let source, analysisAtEntry: let analysis) where source.location == retainedLocation:
-				return .do([], analysisAtEntry: analysis)
-				
-				case .set:
-				return self
-				
-				case .compute(let destination, let lhs, let op, let rhs, analysisAtEntry: let analysis):
-				return try .compute(substitute(destination), substitute(lhs), op, substitute(rhs), analysisAtEntry: analysis)
-				
-				case .createBuffer(bytes: let bytes, capability: let buffer, scoped: let scoped, analysisAtEntry: let analysis):
-				return .createBuffer(bytes: bytes, capability: substitute(buffer), scoped: scoped, analysisAtEntry: analysis)
-				
-				case .destroyBuffer(let buffer, analysisAtEntry: let analysis):
-				return .destroyBuffer(capability: try substitute(buffer), analysisAtEntry: analysis)
-				
-				case .getElement(let dataType, of: let buffer, offset: let offset, to: let destination, analysisAtEntry: let analysis):
-				return try .getElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(destination), analysisAtEntry: analysis)
-				
-				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
-				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
-				
-				case .invoke(target: let target, data: let data, analysisAtEntry: let analysis):
-				return try .invoke(target: substitute(target), data: substitute(data), analysisAtEntry: analysis)
-				
-			}
-			
+			try updated(
+				using:			CoalesceLocations(removedLocation: removedLocation, retainedLocation: retainedLocation, declarations: declarations),
+				analysis:		&analysis,
+				configuration:	configuration
+			)
 		}
 		
 	}

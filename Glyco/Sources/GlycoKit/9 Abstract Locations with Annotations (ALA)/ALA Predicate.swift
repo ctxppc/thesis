@@ -36,24 +36,24 @@ extension ALA {
 			}
 		}
 		
-		/// Returns a copy of `self` with updated analysis at entry.
+		/// Returns a transformed copy of `self` with updated analysis at entry.
 		///
-		/// For each contained effect, the transformation is applied first. If the transformed effect contains children, it is applied to those children as well.
+		/// The transformation is applied first. If the transformed predicate contains predicates or effects, it is applied to those as well.
 		///
 		/// - Parameters:
-		///    - transform: A function that transforms effects. The default function returns the provided effect unaltered.
+		///    - transform: A transformation.
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///    - configuration: The compilation configuration.
 		///
-		/// - Returns: A copy of `self` where any contained effects have been transformed using `transform` and with updated analysis at entry.
-		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
-			try analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
-			switch self {
+		/// - Returns: `transform(self)` with updated analysis at entry.
+		func updated(using transform: ALALocalTransformation, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
+			switch try transform(self) {
 				
 				case .constant(let holds, analysisAtEntry: _):
 				return .constant(holds, analysisAtEntry: analysis)
 				
 				case .relation(let lhs, let relation, let rhs, analysisAtEntry: _):
+				try analysis.update(defined: [], possiblyUsed: [lhs, rhs].compactMap(\.location))
 				return .relation(lhs, relation, rhs, analysisAtEntry: analysis)
 				
 				case .if(let condition, then: let affirmative, else: let negative, analysisAtEntry: _):
@@ -91,19 +91,6 @@ extension ALA {
 			}
 		}
 		
-		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [Location] {
-			switch self {
-				
-				case .constant, .if, .do:
-				return []
-				
-				case .relation(let lhs, _, let rhs, analysisAtEntry: _):
-				return [lhs, rhs].compactMap(\.location)
-				
-			}
-		}
-		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
 		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
 			switch self {
@@ -121,32 +108,9 @@ extension ALA {
 					.reversed()
 					.lazy
 					.compactMap { $0.safelyCoalescableLocations() }
-					.first
-					?? predicate.safelyCoalescableLocations()
+					.first ?? predicate.safelyCoalescableLocations()
 				
 			}
-		}
-		
-		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the analysis at entry is updated accordingly.
-		///
-		/// - Parameters:
-		///   - removedLocation: The location that is replaced by `retainedLocation`.
-		///   - retainedLocation: The location that remains.
-		///   - declaration: The local declarations.
-		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
-		///   - configuration: The compilation configuration.
-		func coalescing(
-			_ removedLocation:		AbstractLocation,
-			into retainedLocation:	Location,
-			declarations:			Declarations,
-			analysis:				inout Analysis,
-			configuration:			CompilationConfiguration
-		) throws -> Self {
-			try updated(
-				using: 			{ try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations) },
-				analysis:		&analysis,
-				configuration:	configuration
-			)
 		}
 		
 	}
