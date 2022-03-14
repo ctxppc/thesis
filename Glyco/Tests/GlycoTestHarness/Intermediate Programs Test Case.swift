@@ -7,18 +7,25 @@ import XCTest
 final class IntermediateProgramsTestCase : XCTestCase {
 	
 	func testPrograms() throws {
-		
-		guard let urls = try? FileManager.default.contentsOfDirectory(
-			at: .init(fileURLWithPath: "Tests/Test Programs"),
-			includingPropertiesForKeys: nil
-		) else { throw XCTSkip("Tests/Test Programs doesn't exist") }
-		
-		let urlsByGroupName = Dictionary(grouping: urls) { url in
-			url.deletingPathExtension().lastPathComponent
+		for target in CompilationConfiguration.Target.allCases {
+			for convention in CompilationConfiguration.CallingConvention.allCases {
+				try verifyPrograms(
+					programsURL:	.init(fileURLWithPath: "Tests/Test Programs/\(convention).\(target)"),
+					configuration:	.init(target: target, callingConvention: convention)
+				)
+			}
 		}
-		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language>") }
+	}
+	
+	func verifyPrograms(programsURL: URL, configuration: CompilationConfiguration) throws {
 		
-		var errors = TestErrors()
+		guard let urls = try? FileManager.default.contentsOfDirectory(at: programsURL, includingPropertiesForKeys: nil) else { return }
+		
+		let urlsByGroupName = Dictionary(grouping: urls) { $0.deletingPathExtension().lastPathComponent }
+		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language> for \(configuration)") }
+		
+		print("> Testing \(urlsByGroupName.count) test programs for \(configuration)")
+		var errors = TestErrors(configuration: configuration)
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
@@ -29,7 +36,9 @@ final class IntermediateProgramsTestCase : XCTestCase {
 					continue
 				}
 				print("consisting of \(programSispsByLanguageName.count) intermediate programs… ", terminator: "")
-				try HighestSupportedLanguage.iterate(DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName))
+				try HighestSupportedLanguage.iterate(
+					DecodeSourceAndTestIntermediateProgramsAction(programSispsByLanguageName: programSispsByLanguageName, configuration: configuration)
+				)
 				print("OK")
 			} catch {
 				print("failed")
@@ -44,10 +53,25 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	}
 	
 	struct TestErrors : Error, CustomStringConvertible {
+		
+		let configuration: CompilationConfiguration
+		
 		var errors = [TestGroupError]()
+		
 		var isEmpty: Bool { errors.isEmpty }
-		mutating func add(_ error: TestGroupError) { errors.append(error) }
-		var description: String { "\n\(errors.lazy.map(\.description).joined(separator: "\n"))\n" }
+		
+		mutating func add(_ error: TestGroupError) {
+			errors.append(error)
+		}
+		
+		var description: String { """
+			
+			Errors for \(configuration):
+			\(errors.lazy.map(\.description).joined(separator: "\n"))
+			
+			"""
+		}
+		
 	}
 	
 	struct TestGroupError : Error, CustomStringConvertible {
@@ -61,6 +85,7 @@ final class IntermediateProgramsTestCase : XCTestCase {
 private struct DecodeSourceAndTestIntermediateProgramsAction : LanguageAction {
 	
 	let programSispsByLanguageName: [String : String]
+	let configuration: CompilationConfiguration
 	
 	func callAsFunction<L : Language>(language: L.Type) throws -> ()? {
 		var programSispsByLanguageName = programSispsByLanguageName
@@ -71,7 +96,7 @@ private struct DecodeSourceAndTestIntermediateProgramsAction : LanguageAction {
 		} catch {
 			throw TestSourceError(languageName: language.name, error: error)
 		}
-		try L.reduce(sourceProgram, using: IntermediateProgramsTestReductor(programSispsByLanguageName: programSispsByLanguageName), configuration: .init(target: .sail))
+		try L.reduce(sourceProgram, using: IntermediateProgramsTestReductor(programSispsByLanguageName: programSispsByLanguageName), configuration: configuration)
 		return ()
 	}
 	

@@ -5,7 +5,7 @@ import Foundation
 public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
-	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil) {
+	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil, callingConvention: CallingConvention = .conventional) {
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
 			.default
@@ -14,6 +14,7 @@ public struct CompilationConfiguration {
 		self.systemURL = systemURL ?? self.toolchainURL
 			.appendingPathComponent("output")
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
+		self.callingConvention = callingConvention
 	}
 	
 	// MARK: - Target
@@ -33,7 +34,7 @@ public struct CompilationConfiguration {
 	// MARK: Procedure Calls
 	
 	/// The program's calling convention.
-	public var callingConvention: CallingConvention = .conventional
+	public var callingConvention: CallingConvention
 	public enum CallingConvention : String, CaseIterable {
 		
 		/// The Glyco Conventional Calling Convention (GCCC), a calling convention based on a traditional RISC-V calling convention.
