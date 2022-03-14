@@ -82,7 +82,8 @@ public enum RV : Language {
 								
 				\(try statements.lowered(in: &context).joined(separator: "\n"))
 								
-				rv.end:			.align 6
+								.data
+								.align 6
 								.global tohost
 				tohost:			.dword 0
 				""")

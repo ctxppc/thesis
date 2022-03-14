@@ -18,6 +18,11 @@ extension CE {
 		/// A region of memory consisting of a null capability.
 		case nullCapability
 		
+		/// A statement beginning the BSS section.
+		///
+		/// The section is readable, writeable, and nonexecutable. It does not occupy space in the ELF file but is allocated memory at runtime; data in it therefore can only be initialised at runtime.
+		case bssSection
+		
 		/// A region of memory described by given statement and associated with a label.
 		indirect case labelled(Label, Statement)
 		
@@ -40,6 +45,9 @@ extension CE {
 				
 				case .nullCapability:
 				Lower.Statement.nullCapability
+				
+				case .bssSection:
+				Lower.Statement.bssSection
 				
 				case .labelled(let label, let statement):
 				if let (first, tail) = try statement.lowered(in: &context).splittingFirst() {

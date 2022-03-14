@@ -20,6 +20,11 @@ extension RV {
 		/// A region of memory consisting of a null capability.
 		case nullCapability
 		
+		/// A statement beginning the BSS section.
+		///
+		/// The section is readable, writeable, and nonexecutable. It does not occupy space in the ELF file but is allocated memory at runtime; data in it therefore can only be initialised at runtime.
+		case bssSection
+		
 		/// A region of memory described by given statement and associated with a label.
 		indirect case labelled(Label, Statement)
 		
@@ -42,6 +47,9 @@ extension RV {
 				
 				case .nullCapability:
 				return "\(tabs).quad 0"
+				
+				case .bssSection:
+				return "\(tabs).bss"
 				
 				case .labelled(let label, .labelled(let innerLabel, let statement)):
 				let next = Self.labelled(innerLabel, statement).lowered(in: &context)

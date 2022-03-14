@@ -993,6 +993,7 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
 	<dd><code><strong>signedWord</strong>(Int)</code></dd>
 	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 
@@ -1015,6 +1016,7 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
 	<dd><code><strong>signedWord</strong>(Int)</code></dd>
 	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 <dl>
@@ -1122,6 +1124,7 @@ N/A
 	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
 	<dd><code><strong>signedWord</strong>(Int)</code></dd>
 	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 <dl>

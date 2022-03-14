@@ -317,26 +317,30 @@ public enum MM : Language {
 			var heap: [Lower.Statement] {
 				heapLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize)
 				heapEndLabel ~ .padding()
-			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
+			}
 			
 			// The stack.
 			@ArrayBuilder<Lower.Statement>
 			var stack: [Lower.Statement] {
 				stackLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.stackByteSize)
 				stackEndLabel ~ .padding()
-			}	// FIXME: Zeroed stack is emitted in ELF; define a (lazily zeroed) section instead?
+			}
 			
 			return try .init {
+				
 				runtime					// requires & preserves 4-byte alignment
 				allocationRoutine		// requires & preserves 4-byte alignment
 				if configuration.callingConvention.requiresCallRoutine {
 					scallRoutine		// requires & preserves 4-byte alignment
 				}
 				try user				// requires & preserves 4-byte alignment
+				
+				Lower.Statement.bssSection
 				heap					// does not require alignment
 				if configuration.callingConvention.usesContiguousCallStack {
 					stack				// does not require alignment
 				}
+				
 			}
 			
 		}
