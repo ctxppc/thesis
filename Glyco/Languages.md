@@ -960,7 +960,7 @@ A language that introduces a runtime system and runtime routines.
 <code>Target</code>
 <dl>
 	<dt><code>RT.Program</code></dt>
-	<dd><code>([Effect])</code></dd>
+	<dd><code>([Statement])</code></dd>
 </dl>
 <dl>
 	<dt><code>RT.Effect</code></dt>
@@ -985,8 +985,15 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
 	<dd><code><strong>callRuntimeRoutine</strong>(Label, <strong>using:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
-	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
-	<dd><code><strong>buffer</strong>(DataType, <strong>count:</strong> Int)</code></dd>
+</dl>
+<dl>
+	<dt><code>RT.Statement</code></dt>
+	<dd><code><strong>effect</strong>(Effect)</code></dd>
+	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
+	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
+	<dd><code><strong>signedWord</strong>(Int)</code></dd>
+	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 
 <h2 id="CE">Grammar for CE (Canonical Effects)</h2>
@@ -999,7 +1006,16 @@ A language grouping related instructions under a single effect.
 <code>Register</code>
 <dl>
 	<dt><code>CE.Program</code></dt>
-	<dd><code>([Effect])</code></dd>
+	<dd><code>([Statement])</code></dd>
+</dl>
+<dl>
+	<dt><code>CE.Statement</code></dt>
+	<dd><code><strong>effect</strong>(Effect)</code></dd>
+	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
+	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
+	<dd><code><strong>signedWord</strong>(Int)</code></dd>
+	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
 <dl>
 	<dt><code>CE.Permission</code></dt>
@@ -1053,8 +1069,6 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
-	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
-	<dd><code><strong>buffer</strong>(DataType, <strong>count:</strong> Int)</code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>

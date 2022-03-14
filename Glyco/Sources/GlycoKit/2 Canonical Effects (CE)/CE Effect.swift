@@ -89,18 +89,12 @@ extension CE {
 		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
 		case `return`
 		
-		/// An effect that can jumped to using given label.
-		indirect case labelled(Label, Effect)
-		
-		/// A placeholder for a buffer containing `count` elements of given data type.
-		case buffer(DataType, count: Int)
-		
 		/// An effect that does nothing.
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
-		@ArrayBuilder<Lower.Statement>
-		func lowered(in context: inout ()) throws -> [Lower.Statement] {
+		@ArrayBuilder<Lower.Instruction>
+		func lowered(in context: inout ()) throws -> [Lower.Instruction] {
 			switch self {
 				
 				case .copy(.u8, into: let destination, from: let source),	// TODO: Copy u8 as s32 then mask out upper bits.
@@ -203,21 +197,6 @@ extension CE {
 				
 				case .return:
 				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
-				
-				case .labelled(let label, let effect):
-				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
-					Lower.Statement.labelled(label, first)
-					tail
-				}
-				
-				case .buffer(.s32, count: 1):
-				Lower.Statement.signedWord(0)
-				
-				case .buffer(.cap, count: 1):
-				Lower.Statement.nullCapability
-				
-				case .buffer(let dataType, count: let count):
-				Lower.Statement.filled(value: 0, datumByteSize: dataType.byteSize, copies: count)
 				
 			}
 		}

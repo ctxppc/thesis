@@ -48,8 +48,8 @@ public enum MM : Language {
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
 			// A routine that initialises the runtime, restricts the user's authority, and executes the user program. It touches all registers.
-			@ArrayBuilder<Lower.Effect>
-			var runtime: [Lower.Effect] {
+			@ArrayBuilder<Lower.Statement>
+			var runtime: [Lower.Statement] {
 				
 				// Initialise heap cap.
 				do {
@@ -221,8 +221,8 @@ public enum MM : Language {
 			}
 			
 			// A routine that allocates a buffer on the heap — see also MM.Label.allocationRoutineCapability.
-			@ArrayBuilder<Lower.Effect>
-			var allocationRoutine: [Lower.Effect] {
+			@ArrayBuilder<Lower.Statement>
+			var allocationRoutine: [Lower.Statement] {
 				
 				let lengthReg = Lower.Register.t0	// input
 				let bufferReg = Lower.Register.t0	// output (same location as input)
@@ -255,16 +255,16 @@ public enum MM : Language {
 				Lower.Effect.return
 				
 				// Heap capability.
-				heapCapLabel ~ .buffer(.cap, count: 1)
+				heapCapLabel ~ .nullCapability
 				
 				// Label end of routine.
-				allocEndLabel ~ .buffer(.s32, count: 1)
+				allocEndLabel ~ .padding()
 				
 			}
 			
 			// A routine that performs a secure function call transition — see also MM.Label.secureCallingRoutineCapability.
-			@ArrayBuilder<Lower.Effect>
-			var scallRoutine: [Lower.Effect] {
+			@ArrayBuilder<Lower.Statement>
+			var scallRoutine: [Lower.Statement] {
 				
 				let targetReg = Lower.Register.invocationData	// input
 				
@@ -285,45 +285,45 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
 				
 				// The seal capability.
-				sealCapLabel ~ .buffer(.cap, count: 1)
+				sealCapLabel ~ .nullCapability
 				
 				// Label end of routine.
-				scallEndLabel ~ .buffer(.s32, count: 1)
+				scallEndLabel ~ .padding()
 				
 			}
 			
 			// The user's region, consisting of code and authority.
-			@ArrayBuilder<Lower.Effect>
-			var user: [Lower.Effect] {
+			@ArrayBuilder<Lower.Statement>
+			var user: [Lower.Statement] {
 				get throws {
 					
 					// Alloc capability.
-					userLabel ~ (allocCapLabel ~ .buffer(.cap, count: 1))
+					userLabel ~ (allocCapLabel ~ .nullCapability)
 					
 					// Scall capability.
-					scallCapLabel ~ .buffer(.cap, count: 1)
+					scallCapLabel ~ .nullCapability
 					
 					// User code.
 					try effects.lowered(in: &context)
 					
 					// Label end of user.
-					userEndLabel ~ .buffer(.s32, count: 1)
+					userEndLabel ~ .padding()
 					
 				}
 			}
 			
 			// The heap.
-			@ArrayBuilder<Lower.Effect>
-			var heap: [Lower.Effect] {
-				heapLabel ~ .buffer(.u8, count: configuration.heapByteSize)
-				heapEndLabel ~ .buffer(.s32, count: 1)
+			@ArrayBuilder<Lower.Statement>
+			var heap: [Lower.Statement] {
+				heapLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize)
+				heapEndLabel ~ .padding()
 			}	// FIXME: Zeroed heap is emitted in ELF; define a (lazily zeroed) section instead?
 			
 			// The stack.
-			@ArrayBuilder<Lower.Effect>
-			var stack: [Lower.Effect] {
-				stackLabel ~ .buffer(.u8, count: configuration.stackByteSize)
-				stackEndLabel ~ .buffer(.s32, count: 1)
+			@ArrayBuilder<Lower.Statement>
+			var stack: [Lower.Statement] {
+				stackLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.stackByteSize)
+				stackEndLabel ~ .padding()
 			}	// FIXME: Zeroed stack is emitted in ELF; define a (lazily zeroed) section instead?
 			
 			return try .init {

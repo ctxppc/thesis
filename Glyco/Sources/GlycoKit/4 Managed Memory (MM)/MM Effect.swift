@@ -101,8 +101,8 @@ extension MM {
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
-		@ArrayBuilder<Lower.Effect>
-		func lowered(in context: inout Context) throws -> [Lower.Effect] {
+		@ArrayBuilder<Lower.Statement>
+		func lowered(in context: inout Context) throws -> [Lower.Statement] {
 			let temp = Lower.Register.t0
 			switch self {
 				
@@ -285,7 +285,7 @@ extension MM {
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered(in: &context).splittingFirst() {
-					Lower.Effect.labelled(label, first)
+					Lower.Statement.labelled(label, first)
 					tail
 				}
 				

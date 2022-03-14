@@ -7,18 +7,18 @@ public enum RT : Language {
 	/// An RT program.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given effects.
-		public init(_ effects: [Effect] = []) {
-			self.effects = effects
+		/// Creates a program with given statements.
+		public init(_ statements: [Statement] = []) {
+			self.statements = statements
 		}
 		
 		//sourcery: isInternalForm
-		public init(@ArrayBuilder<Effect> _ effects: () throws -> [Effect]) rethrows {
-			self.init(try effects())
+		public init(@ArrayBuilder<Statement> _ statements: () throws -> [Statement]) rethrows {
+			self.init(try statements())
 		}
 		
 		/// The program's effects.
-		public var effects: [Effect] = []
+		public var statements: [Statement] = []
 		
 		// See protocol.
 		public func optimise() -> Bool { false }
@@ -28,7 +28,7 @@ public enum RT : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			.init(try effects.lowered())
+			.init(try statements.lowered())
 		}
 		
 	}

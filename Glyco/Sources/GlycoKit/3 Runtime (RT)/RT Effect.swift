@@ -88,12 +88,6 @@ extension RT {
 		/// An effect that jumps to the address in `cra`, unsealing the latter first if it is a sentry capability.
 		case `return`
 		
-		/// An effect that can jumped to using given label.
-		indirect case labelled(Label, Effect)
-		
-		/// A placeholder for a buffer containing `count` elements of given data type.
-		case buffer(DataType, count: Int)
-		
 		/// An effect that does nothing.
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
@@ -167,24 +161,9 @@ extension RT {
 				case .return:
 				Lower.Effect.return
 				
-				case .labelled(let label, let effect):
-				if let (first, tail) = effect.lowered(in: &context).splittingFirst() {
-					Lower.Effect.labelled(label, first)
-					tail
-				} else {
-					Lower.Effect.labelled(label, .nop)
-				}
-				
-				case .buffer(let dataType, count: let count):
-				Lower.Effect.buffer(dataType, count: count)
-				
 			}
 		}
 		
 	}
 	
-}
-
-func ~ (label: RT.Label, effect: RT.Effect) -> RT.Effect {
-	.labelled(label, effect)
 }

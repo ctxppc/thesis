@@ -1,4 +1,4 @@
-// Generated using Sourcery 1.6.1 — https://github.com/krzysztofzablocki/Sourcery
+// Generated using Sourcery 1.7.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
 extension AL.Program {
@@ -122,7 +122,7 @@ extension CD.Procedure {
 
 extension CE.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effects = "_0"
+		case statements = "_0"
 	}
 }
 
@@ -266,7 +266,7 @@ extension PR.Block {
 
 extension RT.Program {
 	public enum CodingKeys : String, CodingKey {
-		case effects = "_0"
+		case statements = "_0"
 	}
 }
 
