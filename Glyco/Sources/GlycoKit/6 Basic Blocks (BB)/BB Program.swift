@@ -21,10 +21,10 @@ public enum BB : Language {
 		public var blocks: [Block]
 		
 		// See protocol.
-		public func optimise() -> Bool { false }	// TODO: Prune empty blocks
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }	// TODO: Prune empty blocks
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

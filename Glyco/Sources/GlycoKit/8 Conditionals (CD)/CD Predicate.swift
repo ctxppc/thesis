@@ -19,7 +19,7 @@ extension CD {
 		
 		// See protocol.
 		@discardableResult
-		public mutating func optimise() throws -> Bool {
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
 			switch self {
 				
 				case .constant:
@@ -37,25 +37,25 @@ extension CD {
 				return false
 				
 				case .if(.constant(true), then: var affirmative, else: _):
-				try affirmative.optimise()
+				try affirmative.optimise(configuration: configuration)
 				self = affirmative
 				return true
 				
 				case .if(.constant(false), then: _, else: var negative):
-				try negative.optimise()
+				try negative.optimise(configuration: configuration)
 				self = negative
 				return true
 				
 				case .if(var condition, then: var affirmative, else: var negative):
-				let conditionOptimised = try condition.optimise()
-				let affirmativeOptimised = try affirmative.optimise()
-				let negativeOptimised = try negative.optimise()
+				let conditionOptimised = try condition.optimise(configuration: configuration)
+				let affirmativeOptimised = try affirmative.optimise(configuration: configuration)
+				let negativeOptimised = try negative.optimise(configuration: configuration)
 				self = .if(condition, then: affirmative, else: negative)
 				return conditionOptimised || affirmativeOptimised || negativeOptimised
 				
 				case .do(var effects, then: var predicate):
-				let effectsOptimised = try effects.optimise()
-				let predicateOptimised = try predicate.optimise()
+				let effectsOptimised = try effects.optimise(configuration: configuration)
+				let predicateOptimised = try predicate.optimise(configuration: configuration)
 				self = .do(effects, then: predicate)
 				return effectsOptimised || predicateOptimised
 				

@@ -21,14 +21,14 @@ public enum CD : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public mutating func optimise() throws -> Bool {
-			let effectOptimised = try effect.optimise()
-			let proceduresOptimised = try procedures.optimise()
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
+			let effectOptimised = try effect.optimise(configuration: configuration)
+			let proceduresOptimised = try procedures.optimise(configuration: configuration)
 			return effectOptimised || proceduresOptimised
 		}
 		
 		// See protocol.
-		public func validate() throws {
+		public func validate(configuration: CompilationConfiguration) throws {
 			guard effect.returns else { throw LoweringError.someExecutionPathsDoNotTerminate }
 		}
 		

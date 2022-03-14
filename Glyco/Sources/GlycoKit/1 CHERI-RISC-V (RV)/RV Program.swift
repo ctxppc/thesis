@@ -16,10 +16,10 @@ public enum RV : Language {
 		public var statements: [Statement]
 		
 		// See protocol.
-		public func optimise() -> Bool { false }
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

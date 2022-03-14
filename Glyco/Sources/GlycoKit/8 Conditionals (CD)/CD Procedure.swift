@@ -23,8 +23,8 @@ extension CD {
 		}
 		
 		// See protocol.
-		public mutating func optimise() throws -> Bool {
-			try effect.optimise()
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
+			try effect.optimise(configuration: configuration)
 		}
 		
 	}

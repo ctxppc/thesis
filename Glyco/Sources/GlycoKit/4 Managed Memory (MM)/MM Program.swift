@@ -16,10 +16,10 @@ public enum MM : Language {
 		public var effects: [Effect] = []
 		
 		// See protocol.
-		public func optimise() -> Bool { false }
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
@@ -198,6 +198,7 @@ public enum MM : Language {
 					switch configuration.callingConvention {
 							
 						case .conventional:
+						Lower.Effect.copy(.cap, into: .fp, from: .zero)	// clear cfp
 						Lower.Effect.jump(to: .register(userCapReg), link: .zero)	// tail-call
 						
 						case .heap:

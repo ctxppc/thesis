@@ -98,7 +98,7 @@ extension CC {
 					
 					// Caller-save registers in abstract locations to limit their liveness across a call.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
-						for register in Lower.Register.callerSavedRegistersInCHERIRVABI {
+						for register in context.configuration.callerSavedRegisters {
 							Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
 						}
 					}
@@ -155,7 +155,7 @@ extension CC {
 					
 					// Restore caller-saved registers from abstract locations.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
-						for register in Lower.Register.callerSavedRegistersInCHERIRVABI {
+						for register in context.configuration.callerSavedRegisters {
 							Lowered.set(.register(register), to: .abstract(context.saveLocation(for: register)))
 						}
 					}
@@ -174,7 +174,7 @@ extension CC {
 					
 					// If lowering a procedure, restore callee-saved registers (except fp) from abstract locations — reverse of prologue.
 					if context.loweredProcedure != nil {
-						for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
+						for register in context.configuration.calleeSavedRegisters {
 							Lowered.set(.register(register), to: .abstract(context.saveLocation(for: register)))
 						}
 					}

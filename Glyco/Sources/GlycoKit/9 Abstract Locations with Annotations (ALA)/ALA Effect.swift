@@ -138,19 +138,24 @@ extension ALA {
 		/// - Parameters:
 		///    - transform: A function that transforms effects.
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///    - configuration: The compilation configuration.
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
-		func updated(using transform: Transformation, analysis: inout Analysis) throws -> Self {
+		func updated(using transform: Transformation, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
 			let transformed = try transform(self)
-			try analysis.update(defined: transformed.definedLocations(), possiblyUsed: transformed.possiblyUsedLocations())
+			try analysis.update(
+				defined:		transformed.definedLocations(configuration: configuration),
+				possiblyUsed:	transformed.possiblyUsedLocations(configuration: configuration)
+			)
 			switch transformed {
 				
 				case .do(let effects, analysisAtEntry: _):
+				// Update effects in reverse order so that analysis flows backwards, then reverse sequence back to normal order
 				return .do(
 					try effects
 						.reversed()
-						.map { try $0.updated(using: transform, analysis: &analysis) }	// update effects in reverse order so that analysis flows backwards
-						.reversed(),													// reverse back to normal order
+						.map { try $0.updated(using: transform, analysis: &analysis, configuration: configuration) }
+						.reversed(),
 					analysisAtEntry: analysis
 				)
 				
@@ -196,12 +201,16 @@ extension ALA {
 					 */
 					
 					var analysisAtAffirmativeEntry = analysis
-					let updatedAffirmative = try affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = try affirmative.updated(
+						using:			transform,
+						analysis:		&analysisAtAffirmativeEntry,
+						configuration:	configuration
+					)
 					
-					let updatedNegative = try negative.updated(using: transform, analysis: &analysis)
+					let updatedNegative = try negative.updated(using: transform, analysis: &analysis, configuration: configuration)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis)
+					let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis, configuration: configuration)
 					
 					return .if(updatedPredicate, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					
@@ -253,7 +262,11 @@ extension ALA {
 		}
 		
 		/// Returns the locations defined by `self`.
-		private func definedLocations() -> [Location] {
+		///
+		/// - Parameter configuration: The compilation configuration.
+		///
+		/// - Returns: The locations defined by `self`.
+		private func definedLocations(configuration: CompilationConfiguration) -> [Location] {
 			switch self {
 				
 				case .do, .destroyBuffer, .setElement, .if, .popScope, .invoke, .return:	// TODO: Is invoke really like return?
@@ -266,7 +279,7 @@ extension ALA {
 				return [destination]
 				
 				case .pushScope:
-				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
+				return configuration.calleeSavedRegisters.map { .register($0) }
 				
 				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
 				let sparedRegisters = Set(sparedRegisters)
@@ -275,13 +288,17 @@ extension ALA {
 					.map { .register($0) }
 				
 				case .call:
-				return Lower.Register.callerSavedRegistersInCHERIRVABI.map { .register($0) }	// includes args and cra
+				return configuration.callerSavedRegisters.map { .register($0) }	// includes args and cra
 				
 			}
 		}
 		
 		/// Returns the locations possibly used by `self`.
-		private func possiblyUsedLocations() -> [Location] {
+		///
+		/// - Parameter configuration: The compilation configuration.
+		///
+		/// - Returns: The locations possibly used by `self`.
+		private func possiblyUsedLocations(configuration: CompilationConfiguration) -> [Location] {
 			switch self {
 				
 				case .do,
@@ -309,7 +326,7 @@ extension ALA {
 				return [index].compactMap(\.location) + [buffer]
 				
 				case .popScope:
-				return Lower.Register.calleeSavedRegistersInCHERIRVABI.map { .register($0) }
+				return configuration.calleeSavedRegisters.map { .register($0) }
 				
 				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
@@ -321,6 +338,8 @@ extension ALA {
 		}
 		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
+		///
+		/// - Returns: A pair of locations that can be safely coalesced, or `nil` if no such pair is known.
 		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
 			switch self {
 				
@@ -362,17 +381,19 @@ extension ALA {
 		///   - retainedLocation: The location that remains.
 		///   - declarations: The local declarations.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///   - configuration: The compilation configuration.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
 		func coalescing(
 			_ removedLocation:		AbstractLocation,
 			into retainedLocation:	Location,
 			declarations:			Declarations,
-			analysis:				inout Analysis
+			analysis:				inout Analysis,
+			configuration:			CompilationConfiguration
 		) throws -> Self {
 			try updated(using: {
 				try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations)
-			}, analysis: &analysis)
+			}, analysis: &analysis, configuration: configuration)
 		}
 		
 		/// Returns a copy of `self` where `removedLocation` is coalesced into `retainedLocation`, without updating any children effects or analysis information.
@@ -382,6 +403,7 @@ extension ALA {
 		/// - Parameters:
 		///   - removedLocation: The location that is replaced by `retainedLocation`.
 		///   - retainedLocation: The location that is retained.
+		///   - declarations: The local declarations.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
 		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location, declarations: Declarations) throws -> Self {

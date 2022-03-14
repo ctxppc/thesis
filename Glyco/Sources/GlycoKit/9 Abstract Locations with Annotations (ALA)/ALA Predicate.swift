@@ -43,9 +43,10 @@ extension ALA {
 		/// - Parameters:
 		///    - transform: A function that transforms effects. The default function returns the provided effect unaltered.
 		///    - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///    - configuration: The compilation configuration.
 		///
 		/// - Returns: A copy of `self` where any contained effects have been transformed using `transform` and with updated analysis at entry.
-		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis) throws -> Self {
+		func updated(using transform: Effect.Transformation = { $0 }, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
 			try analysis.update(defined: [], possiblyUsed: possiblyUsedLocations())
 			switch self {
 				
@@ -59,24 +60,30 @@ extension ALA {
 				do {
 					
 					var analysisAtAffirmativeEntry = analysis
-					let updatedAffirmative = try affirmative.updated(using: transform, analysis: &analysisAtAffirmativeEntry)
+					let updatedAffirmative = try affirmative.updated(
+						using:			transform,
+						analysis:		&analysisAtAffirmativeEntry,
+						configuration:	configuration
+					)
 					
-					let updatedNegative = try negative.updated(using: transform, analysis: &analysis)
+					let updatedNegative = try negative.updated(using: transform, analysis: &analysis, configuration: configuration)
 					analysis.formUnion(with: analysisAtAffirmativeEntry)
 					
-					let updatedCondition = try condition.updated(using: transform, analysis: &analysis)
+					let updatedCondition = try condition.updated(using: transform, analysis: &analysis, configuration: configuration)
 					
 					return .if(updatedCondition, then: updatedAffirmative, else: updatedNegative, analysisAtEntry: analysis)
 					
 				}
 				
 				case .do(let effects, then: let predicate, analysisAtEntry: _):
-				let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis)	// analysis flows backwards: first update predicate
+				// Analysis flows backwards: first update predicate.
+				let updatedPredicate = try predicate.updated(using: transform, analysis: &analysis, configuration: configuration)
+				// Update subeffects in reverse order so that analysis flows backwards then reverse sequence back to normal order.
 				return try .do(
 					effects
 						.reversed()
-						.map { try $0.updated(using: transform, analysis: &analysis) }	// update subeffects in reverse order so that analysis flows backwards
-						.reversed(),													// reverse back to normal order
+						.map { try $0.updated(using: transform, analysis: &analysis, configuration: configuration) }
+						.reversed(),
 					then: updatedPredicate,
 					analysisAtEntry: analysis
 				)
@@ -96,7 +103,6 @@ extension ALA {
 				
 			}
 		}
-		
 		
 		/// Returns a pair of locations that can be safely coalesced, or `nil` if no such pair is known.
 		func safelyCoalescableLocations() -> (AbstractLocation, Location)? {
@@ -128,13 +134,19 @@ extension ALA {
 		///   - retainedLocation: The location that remains.
 		///   - declaration: The local declarations.
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
+		///   - configuration: The compilation configuration.
 		func coalescing(
-			_ removedLocation: AbstractLocation,
-			into retainedLocation: Location,
-			declarations: Declarations,
-			analysis: inout Analysis
+			_ removedLocation:		AbstractLocation,
+			into retainedLocation:	Location,
+			declarations:			Declarations,
+			analysis:				inout Analysis,
+			configuration:			CompilationConfiguration
 		) throws -> Self {
-			try updated(using: { try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations) }, analysis: &analysis)
+			try updated(
+				using: 			{ try $0.coalescingLocally(removedLocation, into: retainedLocation, declarations: declarations) },
+				analysis:		&analysis,
+				configuration:	configuration
+			)
 		}
 		
 	}

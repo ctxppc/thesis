@@ -9,7 +9,7 @@ public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertib
 	init(fromEncoded encoded: String) throws
 	
 	/// Validates `self`.
-	func validate() throws
+	func validate(configuration: CompilationConfiguration) throws
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram
@@ -54,11 +54,11 @@ extension Never : Program {
 		switch self {}
 	}
 	
-	public func optimise() -> Bool {
+	public func optimise(configuration: CompilationConfiguration) -> Bool {
 		switch self {}
 	}
 	
-	public func validate() {
+	public func validate(configuration: CompilationConfiguration) {
 		switch self {}
 	}
 	

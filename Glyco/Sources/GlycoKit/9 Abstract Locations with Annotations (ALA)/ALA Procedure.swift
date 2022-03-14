@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, SimplyLowerable, Optimisable {
+	public struct Procedure : Codable, Equatable, Optimisable {
 		
 		/// Creates a procedure with given name, locals, and effect.
 		public init(_ name: Label, locals: Declarations, in effect: Effect) {
@@ -22,22 +22,23 @@ extension ALA {
 		public var effect: Effect
 		
 		// See protocol.
-		public mutating func optimise() throws -> Bool {
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
 			var coalesced = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				coalesced = true
 				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
-				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis)
+				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis, configuration: configuration)
 			}
 			return coalesced
 		}
 		
-		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.Procedure {	// procedures don't take a context
+		/// Lowers `self` to a procedure in the lower language.
+		func lowered(configuration: CompilationConfiguration) throws -> Lower.Procedure {
 			var context = ALA.Context(
 				declarations:	locals,
-				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry)
+				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry),
+				configuration:	configuration
 			)
 			return .init(name, in: try effect.lowered(in: &context))
 		}

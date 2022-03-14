@@ -23,18 +23,18 @@ public enum AL : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public func optimise() -> Bool { false }
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var analysis = Lower.Analysis()
 			return try .init(
 				locals:		locals,
-				in:			effect.lowered().updated(using: { $0 }, analysis: &analysis),
-				procedures:	procedures.lowered()
+				in:			effect.lowered().updated(using: { $0 }, analysis: &analysis, configuration: configuration),
+				procedures:	procedures.map { try $0.lowered(configuration: configuration) }
 			)
 		}
 		

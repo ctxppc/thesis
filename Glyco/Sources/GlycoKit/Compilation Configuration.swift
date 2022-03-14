@@ -6,6 +6,7 @@ public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
 	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil, callingConvention: CallingConvention = .conventional) {
+		
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
 			.default
@@ -15,6 +16,14 @@ public struct CompilationConfiguration {
 			.appendingPathComponent("output")
 			.appendingPathComponent("rootfs-riscv64-purecap", isDirectory: true)
 		self.callingConvention = callingConvention
+		
+		(callerSavedRegisters, calleeSavedRegisters) = {
+			switch callingConvention {
+				case .conventional:	return (AL.Register.callerSavedRegistersInRVABI, AL.Register.calleeSavedRegistersInRVABI)
+				case .heap:			return (AL.Register.callerSavedRegistersInCHERIRVABI, AL.Register.calleeSavedRegistersInCHERIRVABI)
+			}
+		}()
+		
 	}
 	
 	// MARK: - Target
@@ -63,6 +72,12 @@ public struct CompilationConfiguration {
 	
 	/// The registers used for passing arguments, in argument order.
 	public var argumentRegisters: [AL.Register] = AL.Register.argumentRegistersInRVABI
+	
+	/// The registers that a callee must save before redefining.
+	public var calleeSavedRegisters: [AL.Register]
+	
+	/// The registers that a caller must save or discard before invoking a procedure.
+	public var callerSavedRegisters: [AL.Register]
 	
 	/// A Boolean value indicating whether the lifetime of caller-saved registers is limited by copying their contents to abstract locations.
 	public var limitsCallerSavedRegisterLifetimes: Bool = true

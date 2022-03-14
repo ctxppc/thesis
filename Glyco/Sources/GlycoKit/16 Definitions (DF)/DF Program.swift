@@ -19,10 +19,10 @@ public enum DF : Language {
 		public var functions: [Function]
 		
 		// See protocol.
-		public func optimise() -> Bool { false }
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

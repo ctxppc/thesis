@@ -41,7 +41,7 @@ extension CC {
 				Lower.Effect.pushScope
 				
 				// Callee-save registers (except fp) in abstract locations to limit their liveness.
-				for register in Lower.Register.calleeSavedRegistersInCHERIRVABI {
+				for register in context.configuration.calleeSavedRegisters {
 					Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
 				}
 				

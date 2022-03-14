@@ -19,10 +19,10 @@ public enum CA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public func optimise() -> Bool { false }
+		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

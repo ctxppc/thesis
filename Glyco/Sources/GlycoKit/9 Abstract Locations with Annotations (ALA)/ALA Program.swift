@@ -23,27 +23,31 @@ public enum ALA : Language {
 		public var procedures: [Procedure]
 		
 		// See protocol.
-		public mutating func optimise() throws -> Bool {
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
 			var optimised = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
-				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis)
+				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis, configuration: configuration)
 				optimised = true
 			}
 			return optimised
 		}
 		
 		// See protocol.
-		public func validate() {}
+		public func validate(configuration: CompilationConfiguration) {}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(
 				declarations:	locals,
-				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry)
+				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry),
+				configuration:	configuration
 			)
-			return try .init(effect.lowered(in: &context), procedures: procedures.lowered())
+			return try .init(
+				effect.lowered(in: &context),
+				procedures: procedures.map { try $0.lowered(configuration: configuration) }
+			)
 		}
 		
 	}

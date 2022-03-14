@@ -91,10 +91,10 @@ extension Language {
 		
 		var program = program
 		if configuration.optimise {
-			try program.optimiseUntilFixedPoint()
+			try program.optimiseUntilFixedPoint(configuration: configuration)
 		}
 		if configuration.validate {
-			try program.validate()
+			try program.validate(configuration: configuration)
 		}
 		
 		var reductor = reductor

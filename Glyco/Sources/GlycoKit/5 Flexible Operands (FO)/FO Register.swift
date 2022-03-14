@@ -22,13 +22,13 @@ extension FO {
 		public static let resultRegistersInRVABI: OrderedSet = [Self.a0, .a1]
 		
 		/// The set of registers that a procedure must save before invoking a procedure in RISC-V ABIs.
-		public static let callerSavedRegistersInRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInRVABI)
+		public static let callerSavedRegistersInRVABI = Array(AL.Register.savedRegisters.subtracting(calleeSavedRegistersInRVABI))
 		
 		/// The set of registers that a procedure must save before using in RISC-V ABIs.
 		public static let calleeSavedRegistersInRVABI = registers(inClass: "s")
 		
 		/// The set of registers that a procedure must save before invoking a procedure in hybrid CHERI-RISC-V ABIs.
-		public static let callerSavedRegistersInCHERIRVABI = AL.Register.savedRegisters.subtracting(calleeSavedRegistersInCHERIRVABI)
+		public static let callerSavedRegistersInCHERIRVABI = Array(AL.Register.savedRegisters.subtracting(calleeSavedRegistersInCHERIRVABI))
 		
 		/// The set of registers that a procedure must save before using in hybrid CHERI-RISC-V ABIs.
 		public static let calleeSavedRegistersInCHERIRVABI = [Self]()

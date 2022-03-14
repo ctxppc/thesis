@@ -11,6 +11,9 @@ extension ALA {
 		/// The assignment of locations to physical locations.
 		var assignments: Location.Assignments
 		
+		/// The compilation configuration.
+		let configuration: CompilationConfiguration
+		
 	}
 	
 }
