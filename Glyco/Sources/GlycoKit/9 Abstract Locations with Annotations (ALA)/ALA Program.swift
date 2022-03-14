@@ -24,6 +24,7 @@ public enum ALA : Language {
 		
 		// See protocol.
 		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
+			
 			var optimised = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
 				locals.remove(.abstract(removedLocation))
@@ -31,7 +32,14 @@ public enum ALA : Language {
 				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis, configuration: configuration)
 				optimised = true
 			}
+			
+			for index in procedures.indices {
+				let procedureOptimised = try procedures[index].optimise(configuration: configuration)
+				optimised = optimised || procedureOptimised
+			}
+			
 			return optimised
+			
 		}
 		
 		// See protocol.
