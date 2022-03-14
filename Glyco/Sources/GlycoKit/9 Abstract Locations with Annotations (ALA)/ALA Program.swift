@@ -27,9 +27,9 @@ public enum ALA : Language {
 			
 			var optimised = false
 			while let (removedLocation, retainedLocation) = effect.safelyCoalescableLocations() {
-				locals.remove(.abstract(removedLocation))
 				var analysis = Analysis()
 				effect = try effect.coalescing(removedLocation, into: retainedLocation, declarations: locals, analysis: &analysis, configuration: configuration)
+				locals.remove(.abstract(removedLocation))	// must be done after coalescing — cf. Effect.coalescing(…)
 				optimised = true
 			}
 			

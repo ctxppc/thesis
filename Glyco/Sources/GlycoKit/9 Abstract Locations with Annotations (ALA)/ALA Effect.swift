@@ -383,6 +383,8 @@ extension ALA {
 		///   - analysis: On method entry, analysis at exit of `self`. On method exit, the analysis at entry of `self`.
 		///   - configuration: The compilation configuration.
 		///
+		/// - Requires: `declarations` contains a declaration for `removedLocation`. The declaration should be removed after global coalescing is done. 
+		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation` and the effect's analysis at entry is updated accordingly.
 		func coalescing(
 			_ removedLocation:		AbstractLocation,
@@ -404,6 +406,8 @@ extension ALA {
 		///   - removedLocation: The location that is replaced by `retainedLocation`.
 		///   - retainedLocation: The location that is retained.
 		///   - declarations: The local declarations.
+		///
+		/// - Requires: `declarations` contains a declaration for `removedLocation`. The declaration should be removed after global coalescing is done.
 		///
 		/// - Returns: A copy of `self` where `removedLocation` is coalesced into `retainedLocation`.
 		func coalescingLocally(_ removedLocation: AbstractLocation, into retainedLocation: Location, declarations: Declarations) throws -> Self {
