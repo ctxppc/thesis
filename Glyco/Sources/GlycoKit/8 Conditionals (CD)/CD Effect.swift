@@ -51,9 +51,6 @@ extension CD {
 		/// An effect that calls the procedure with given name.
 		case call(Label)
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source)
-		
 		/// An effect that returns to the caller.
 		case `return`
 		
@@ -78,7 +75,7 @@ extension CD {
 					.if,
 					.pushFrame, .popFrame,
 					.clearAll,
-					.call, .invoke, .return:
+					.call, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -119,7 +116,7 @@ extension CD {
 				case .if(_, then: let affirmative, else: let negative):
 				return affirmative.returns && negative.returns
 				
-				case .invoke, .return:
+				case .return:
 				return true
 				
 			}
@@ -302,9 +299,6 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			let returnPoint = context.bag.uniqueName(from: "ret")
 			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
-			
-			case .invoke(target: let target, data: let data):
-			return [.init(name: entryLabel, do: previousEffects, then: .invoke(target: target, data: data))]
 			
 			case .return:
 			return [.init(name: entryLabel, do: previousEffects, then: .return)]

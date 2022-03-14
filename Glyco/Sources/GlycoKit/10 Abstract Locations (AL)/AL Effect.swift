@@ -55,9 +55,6 @@ extension AL {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source)
-		
 		/// An effect that returns to the caller.
 		case `return`
 		
@@ -105,9 +102,6 @@ extension AL {
 				
 				case .call(let name, parameters: let parameters):
 				return .call(name, parameters: parameters, analysisAtEntry: .init())
-				
-				case .invoke(target: let target, data: let data):
-				return .invoke(target: target, data: data, analysisAtEntry: .init())
 				
 				case .return:
 				return .return(analysisAtEntry: .init())

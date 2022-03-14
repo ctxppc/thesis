@@ -86,9 +86,6 @@ extension MM {
 		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
 		case call(Label)
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Register, data: Register)
-		
 		/// An effect that returns control to the caller.
 		///
 		/// If scall invocations are used, this effect invokes the code capability `cra` with the data capability `cfp` thereby unsealing both for the caller. Otherwise, this effect jumps to the address in `cra`, unsealing it first if it is a sentry capability.
@@ -273,9 +270,6 @@ extension MM {
 					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)	// restore fp
 					
 				}
-				
-				case .invoke(target: let target, data: let data):
-				try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
 				
 				case .return:
 				switch context.configuration.callingConvention {

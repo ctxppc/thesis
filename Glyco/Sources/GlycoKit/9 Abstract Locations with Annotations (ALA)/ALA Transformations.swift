@@ -79,9 +79,6 @@ extension ALA {
 				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
 				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
 				
-				case .invoke(target: let target, data: let data, analysisAtEntry: let analysis):
-				return try .invoke(target: substitute(target), data: substitute(data), analysisAtEntry: analysis)
-				
 			}
 		}
 		

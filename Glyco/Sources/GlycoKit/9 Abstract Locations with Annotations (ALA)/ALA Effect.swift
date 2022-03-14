@@ -59,9 +59,6 @@ extension ALA {
 		/// A call effect "defines" caller-saved registers.
 		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source, analysisAtEntry: Analysis)
-		
 		/// An effect that returns to the caller.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program.
@@ -121,9 +118,6 @@ extension ALA {
 				
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
-				
-				case .invoke(target: let target, data: let data, analysisAtEntry: _):
-				try Lowered.invoke(target: target.lowered(in: &context), data: data.lowered(in: &context))
 				
 				case .return(analysisAtEntry: _):
 				Lowered.return
@@ -228,9 +222,6 @@ extension ALA {
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
-				case .invoke(target: let target, data: let data, analysisAtEntry: _):
-				return .invoke(target: target, data: data, analysisAtEntry: analysis)
-				
 				case .return(analysisAtEntry: _):
 				return .return(analysisAtEntry: analysis)
 				
@@ -255,7 +246,6 @@ extension ALA {
 					.popScope(analysisAtEntry: let analysis),
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
-					.invoke(target: _, data: _, analysisAtEntry: let analysis),
 					.return(analysisAtEntry: let analysis):
 				return analysis
 			}
@@ -269,7 +259,7 @@ extension ALA {
 		private func definedLocations(configuration: CompilationConfiguration) -> [Location] {
 			switch self {
 				
-				case .do, .destroyBuffer, .setElement, .if, .popScope, .invoke, .return:	// TODO: Is invoke really like return?
+				case .do, .destroyBuffer, .setElement, .if, .popScope, .return:
 				return []
 				
 				case .set(let destination, to: _, analysisAtEntry: _),
@@ -331,8 +321,8 @@ extension ALA {
 				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
-				case .invoke, .return:	// TODO: Is invoke really like return?
-				return [.register(.a0)]
+				case .return:
+				return [.register(.a0), .register(.ra)]
 				
 			}
 		}
@@ -363,7 +353,7 @@ extension ALA {
 					.getElement, .setElement,
 					.pushScope, .popScope,
 					.clearAll,
-					.call, .invoke, .return:
+					.call, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):

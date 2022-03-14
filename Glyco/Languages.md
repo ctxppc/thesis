@@ -467,7 +467,6 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -528,7 +527,6 @@ A language that infers declarations from definitions.
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -583,7 +581,6 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 
@@ -657,7 +654,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
@@ -718,7 +714,6 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -753,7 +748,6 @@ A language that introduces predicates in branches.
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -795,7 +789,6 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(Source, BranchRelation, Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 </dl>
 <dl>
@@ -836,7 +829,6 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Source, <strong>data:</strong> Source)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -902,7 +894,6 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target)</code></dd>
 	<dd><code><strong>call</strong>(Label)</code></dd>
-	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
 	<dd><code><strong>return</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>

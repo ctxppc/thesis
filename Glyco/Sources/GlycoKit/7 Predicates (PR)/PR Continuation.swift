@@ -14,9 +14,6 @@ extension PR {
 		/// A continuation that calls the procedure with given label then returns to the block labelled `returnPoint`.
 		case call(Label, returnPoint: Label)
 		
-		/// A continuation that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source)
-		
 		/// A continuation that returns to the caller.
 		case `return`
 		
@@ -38,9 +35,6 @@ extension PR {
 				
 				case .call(let name, returnPoint: let returnPoint):
 				return .call(name, returnPoint: returnPoint)
-				
-				case .invoke(target: let target, data: let data):
-				return .invoke(target: target, data: data)
 				
 				case .return:
 				return .return

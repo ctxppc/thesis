@@ -58,9 +58,6 @@ extension FO {
 		/// An effect that calls the procedure with given name.
 		case call(Label)
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source)
-		
 		/// An effect that returns to the caller.
 		case `return`
 		
@@ -182,13 +179,6 @@ extension FO {
 				
 				case .call(let label):
 				Lower.Effect.call(label)
-				
-				case .invoke(target: let target, data: let data):
-				let (loadTarget, target) = try load(.cap, from: target, using: temp1)
-				let (loadData, data) = try load(.cap, from: data, using: temp2)
-				loadTarget
-				loadData
-				Lower.Effect.invoke(target: target, data: data)
 				
 				case .return:
 				Lower.Effect.return

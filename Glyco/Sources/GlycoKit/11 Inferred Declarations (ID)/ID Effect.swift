@@ -55,9 +55,6 @@ extension ID {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Label, parameters: [Register])
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		case invoke(target: Source, data: Source)
-		
 		/// An effect that returns to the caller.
 		case `return`
 		
@@ -109,9 +106,6 @@ extension ID {
 				
 				case .call(let name, parameters: let parameters):
 				Lowered.call(name, parameters: parameters)
-				
-				case .invoke(target: let target, data: let data):
-				Lowered.invoke(target: target, data: data)
 				
 				case .return:
 				Lowered.return

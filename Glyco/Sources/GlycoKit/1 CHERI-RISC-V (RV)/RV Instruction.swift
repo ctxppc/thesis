@@ -24,7 +24,7 @@ extension RV {
 		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
 		case computeWithImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
-		/// An instruction that loads the word byte memory at the address in `address`, with the address offset by `offset`.
+		/// An instruction that loads the word byte memory at the address in `address` and puts it in `destination`.
 		case loadByte(destination: Register, address: Register)
 		
 		/// An instruction that loads the word from memory at the address in `address` and puts it in `destination`.
