@@ -163,7 +163,7 @@ extension MM {
 					}
 					
 					// Restrict its bounds. Its base might move downwards, its length might increase.
-					Lower.Effect.setCapabilityBounds(destination: buffer, source: buffer, length: try bytes.lowered())
+					Lower.Effect.setCapabilityBounds(destination: buffer, base: buffer, length: try bytes.lowered())
 					
 					// Move stack capability over the allocated region.
 					Lower.Effect.getCapabilityAddress(destination: temp, source: buffer)

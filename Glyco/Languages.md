@@ -972,7 +972,7 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Source)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>base:</strong> Register, <strong>length:</strong> Source)</code></dd>
 	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>
@@ -1059,7 +1059,7 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Source)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>base:</strong> Register, <strong>length:</strong> Source)</code></dd>
 	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>
@@ -1151,8 +1151,8 @@ N/A
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>
 	<dd><code><strong>offsetCapabilityWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityLength</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Register)</code></dd>
-	<dd><code><strong>setCapabilityBoundsWithImmediate</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>length:</strong> Int)</code></dd>
+	<dd><code><strong>setCapabilityBounds</strong>(<strong>destination:</strong> Register, <strong>base:</strong> Register, <strong>length:</strong> Register)</code></dd>
+	<dd><code><strong>setCapabilityBoundsWithImmediate</strong>(<strong>destination:</strong> Register, <strong>base:</strong> Register, <strong>length:</strong> Int)</code></dd>
 	<dd><code><strong>getCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>setCapabilityAddress</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>getCapabilityDistance</strong>(<strong>destination:</strong> Register, <strong>cs1:</strong> Register, <strong>cs2:</strong> Register)</code></dd>

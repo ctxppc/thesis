@@ -31,10 +31,10 @@ extension RT {
 		/// An effect that determines the (integer) length of the capability in `source` and puts it in `destination`.
 		case getCapabilityLength(destination: Register, source: Register)
 		
-		/// An effect that copies the capability from `source` to `destination` then adjusts its length to the length in `length`.
+		/// An effect that copies the capability from `base` to `destination`, sets its base to the address of `base`, and adjusts its length to `length`.
 		///
 		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
-		case setCapabilityBounds(destination: Register, source: Register, length: Source)
+		case setCapabilityBounds(destination: Register, base: Register, length: Source)
 		
 		/// An effect that determines the (integer) address of the capability in `source` and puts it in `destination`.
 		case getCapabilityAddress(destination: Register, source: Register)
@@ -120,8 +120,8 @@ extension RT {
 				case .getCapabilityLength(destination: let destination, source: let source):
 				Lower.Effect.getCapabilityLength(destination: destination, source: source)
 				
-				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
-				Lower.Effect.setCapabilityBounds(destination: destination, source: source, length: length)
+				case .setCapabilityBounds(destination: let destination, base: let base, length: let length):
+				Lower.Effect.setCapabilityBounds(destination: destination, base: base, length: length)
 				
 				case .getCapabilityAddress(destination: let destination, source: let source):
 				Lower.Effect.getCapabilityAddress(destination: destination, source: source)

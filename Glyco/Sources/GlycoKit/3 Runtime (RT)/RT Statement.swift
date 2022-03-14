@@ -6,7 +6,9 @@ extension RT {
 		/// A machine effect.
 		case effect(Effect)
 		
-		/// A region of memory occupied by sufficient space to ensure subsequent statements are lowered in `byteAlignment`-byte-aligned memory.
+		/// A region of memory occupied by sufficient space to ensure the next statement is lowered in `byteAlignment`-byte-aligned memory.
+		///
+		/// The default alignment is 4 bytes, which is appropriate for (uncompressed) CHERI-RISC-V instructions.
 		case padding(byteAlignment: Int = 4)
 		
 		/// A region of memory filled with `copies` copies of the `datumByteSize`-byte datum with value `value`.

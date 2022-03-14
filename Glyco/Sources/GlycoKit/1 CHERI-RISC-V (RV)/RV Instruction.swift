@@ -57,15 +57,15 @@ extension RV {
 		/// An instruction that determines the (integer) length of the capability in `source` and puts it in `destination`.
 		case getCapabilityLength(destination: Register, source: Register)
 		
-		/// An instruction that copies the capability from `source` to `destination` then adjusts its length to the length in `length`.
+		/// An instruction that copies the capability from `base` to `destination`, sets its base to the address of `base`, and adjusts its length to the length in `length`.
 		///
 		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
-		case setCapabilityBounds(destination: Register, source: Register, length: Register)
+		case setCapabilityBounds(destination: Register, base: Register, length: Register)
 		
-		/// An instruction that copies the capability from `source` to `destination` then adjusts its length to `length` bytes.
+		/// An instruction that copies the capability from `base` to `destination`, sets its base to the address of `base`, and adjusts its length to `length` bytes.
 		///
 		/// If the bounds cannot be represented exactly, the base may be adjusted downwards and the length upwards. A hardware exception is raised if the adjusted bounds exceed the bounds of the source capability.
-		case setCapabilityBoundsWithImmediate(destination: Register, source: Register, length: Int)
+		case setCapabilityBoundsWithImmediate(destination: Register, base: Register, length: Int)
 		
 		/// An instruction that determines the (integer) address of the capability in `source` and puts it in `destination`.
 		case getCapabilityAddress(destination: Register, source: Register)
@@ -171,11 +171,11 @@ extension RV {
 				case .getCapabilityLength(destination: let destination, source: let source):
 				return "cgetlen \(destination.x), \(source.c)"
 				
-				case .setCapabilityBounds(destination: let destination, source: let source, length: let length):
-				return "csetbounds \(destination.c), \(source.c), \(length.x)"
+				case .setCapabilityBounds(destination: let destination, base: let base, length: let length):
+				return "csetbounds \(destination.c), \(base.c), \(length.x)"
 				
-				case .setCapabilityBoundsWithImmediate(destination: let destination, source: let source, length: let length):
-				return "csetboundsimm \(destination.c), \(source.c), \(length)"
+				case .setCapabilityBoundsWithImmediate(destination: let destination, base: let base, length: let length):
+				return "csetboundsimm \(destination.c), \(base.c), \(length)"
 				
 				case .getCapabilityAddress(destination: let destination, source: let source):
 				return "cgetaddr \(destination.x), \(source.c)"

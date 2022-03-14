@@ -46,7 +46,7 @@ extension RV {
 				return "\(tabs).dword \(value)"
 				
 				case .nullCapability:
-				return "\(tabs).quad 0"
+				return "\(tabs).octa 0"
 				
 				case .bssSection:
 				return "\(tabs).bss"

@@ -34,8 +34,8 @@ public enum MM : Language {
 			let heapEndLabel = context.labels.uniqueName(from: "mm.heap.end")
 			let heapCapLabel = context.labels.uniqueName(from: "mm.heap.cap")
 			
-			let stackLabel = context.labels.uniqueName(from: "mm.stack")
-			let stackEndLabel = context.labels.uniqueName(from: "mm.stack.end")
+			let stackLowLabel = context.labels.uniqueName(from: "mm.stack.low")
+			let stackHighLabel = context.labels.uniqueName(from: "mm.stack.high")
 			
 			let scallLabel = context.labels.uniqueName(from: "mm.scall")
 			let scallEndLabel = context.labels.uniqueName(from: "mm.scall.end")
@@ -51,6 +51,8 @@ public enum MM : Language {
 			@ArrayBuilder<Lower.Statement>
 			var runtime: [Lower.Statement] {
 				
+				Lower.Statement.padding()
+				
 				// Initialise heap cap.
 				do {
 					
@@ -59,11 +61,11 @@ public enum MM : Language {
 					(.runtime) ~ .deriveCapabilityFromLabel(destination: heapCapReg, label: heapLabel)
 					
 					// Restrict heap cap bounds.
-					let heapCapEndReg = Lower.Register.t1
-					let heapCapLengthReg = Lower.Register.t1
-					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapEndReg, label: heapEndLabel)
-					Lower.Effect.getCapabilityDistance(destination: heapCapLengthReg, cs1: heapCapEndReg, cs2: heapCapReg)
-					Lower.Effect.setCapabilityBounds(destination: heapCapReg, source: heapCapReg, length: .register(heapCapLengthReg))
+					let heapEndCapReg = Lower.Register.t1
+					let heapSizeReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: heapEndCapReg, label: heapEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: heapSizeReg, cs1: heapEndCapReg, cs2: heapCapReg)
+					Lower.Effect.setCapabilityBounds(destination: heapCapReg, base: heapCapReg, length: .register(heapSizeReg))
 					
 					// Restrict heap cap permissions.
 					let bitmaskReg = Lower.Register.t1
@@ -80,17 +82,22 @@ public enum MM : Language {
 				if configuration.callingConvention.usesContiguousCallStack {
 					
 					// Derive stack cap.
-					Lower.Effect.deriveCapabilityFromLabel(destination: .sp, label: stackLabel)
+					Lower.Effect.deriveCapabilityFromLabel(destination: .sp, label: stackLowLabel)
 					
 					// Restrict stack cap bounds.
-					let stackCapEndReg = Lower.Register.t1
-					let stackCapLengthReg = Lower.Register.t1
-					Lower.Effect.deriveCapabilityFromLabel(destination: stackCapEndReg, label: stackEndLabel)
-					Lower.Effect.getCapabilityDistance(destination: stackCapLengthReg, cs1: stackCapEndReg, cs2: .sp)
-					Lower.Effect.setCapabilityBounds(destination: .sp, source: .sp, length: .register(stackCapLengthReg))
+					let stackHighCapReg = Lower.Register.t0
+					let stackSizeReg = Lower.Register.t1
+					Lower.Effect.deriveCapabilityFromLabel(destination: stackHighCapReg, label: stackHighLabel)
+					Lower.Effect.getCapabilityDistance(destination: stackSizeReg, cs1: stackHighCapReg, cs2: .sp)
+					Lower.Effect.setCapabilityBounds(destination: .sp, base: .sp, length: .register(stackSizeReg))
+					
+					// Move stack cap to upper bound since the stack grows downwards.
+					let stackHighAddressReg = Lower.Register.t0
+					Lower.Effect.getCapabilityAddress(destination: stackHighAddressReg, source: stackHighCapReg)
+					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: stackHighAddressReg)
 					
 					// Restrict stack cap permissions.
-					let bitmaskReg = Lower.Register.t1
+					let bitmaskReg = Lower.Register.t0
 					Lower.Effect.permit(Self.stackCapabilityPermissions, destination: .sp, source: .sp, using: bitmaskReg)
 					
 				}
@@ -104,7 +111,7 @@ public enum MM : Language {
 					
 					// Restrict seal cap bounds to seal with otype 0 only.
 					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
-					Lower.Effect.setCapabilityBounds(destination: sealCapReg, source: sealCapReg, length: .constant(1))
+					Lower.Effect.setCapabilityBounds(destination: sealCapReg, base: sealCapReg, length: .constant(1))
 					
 					// Restrict seal cap permissions.
 					let bitmaskReg = Lower.Register.t1
@@ -129,7 +136,7 @@ public enum MM : Language {
 					let allocCapLengthReg = Lower.Register.t1
 					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapEndReg, label: allocEndLabel)
 					Lower.Effect.getCapabilityDistance(destination: allocCapLengthReg, cs1: allocCapEndReg, cs2: allocCapReg)
-					Lower.Effect.setCapabilityBounds(destination: allocCapReg, source: allocCapReg, length: .register(allocCapLengthReg))
+					Lower.Effect.setCapabilityBounds(destination: allocCapReg, base: allocCapReg, length: .register(allocCapLengthReg))
 					
 					// Restrict alloc cap permissions.
 					let bitmaskReg = Lower.Register.t1
@@ -155,7 +162,7 @@ public enum MM : Language {
 					let scallCapLengthReg = Lower.Register.t1
 					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapEndReg, label: scallEndLabel)
 					Lower.Effect.getCapabilityDistance(destination: scallCapLengthReg, cs1: scallCapEndReg, cs2: scallCapReg)
-					Lower.Effect.setCapabilityBounds(destination: scallCapReg, source: scallCapReg, length: .register(scallCapLengthReg))
+					Lower.Effect.setCapabilityBounds(destination: scallCapReg, base: scallCapReg, length: .register(scallCapLengthReg))
 					
 					// Restrict scall cap permissions.
 					let bitmaskReg = Lower.Register.t1
@@ -181,17 +188,18 @@ public enum MM : Language {
 					let userLengthReg = Lower.Register.t0
 					Lower.Effect.deriveCapabilityFromLabel(destination: userEndReg, label: userEndLabel)
 					Lower.Effect.getCapabilityDistance(destination: userLengthReg, cs1: userEndReg, cs2: userCapReg)
-					Lower.Effect.setCapabilityBounds(destination: userCapReg, source: userCapReg, length: .register(userLengthReg))
+					Lower.Effect.setCapabilityBounds(destination: userCapReg, base: userCapReg, length: .register(userLengthReg))
 					
 					// Restrict user cap permissions.
 					let bitmaskReg = Lower.Register.t0
 					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
 					
-					// Call user program.
+					// Call user program & return to OS/framework.
 					switch configuration.callingConvention {
 							
 						case .conventional:
 						Lower.Effect.jump(to: .register(userCapReg), link: .ra)
+						Lower.Effect.return
 						
 						case .heap:
 						do {
@@ -227,6 +235,8 @@ public enum MM : Language {
 				let lengthReg = Lower.Register.t0	// input
 				let bufferReg = Lower.Register.t0	// output (same location as input)
 				
+				Lower.Statement.padding()
+				
 				// Derive heap cap cap and load heap cap.
 				let heapCapCapReg1 = Lower.Register.t1
 				let heapCapReg = Lower.Register.t1
@@ -234,7 +244,7 @@ public enum MM : Language {
 				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1)
 				
 				// Derive buffer cap into ca0 using length in a0.
-				Lower.Effect.setCapabilityBounds(destination: bufferReg, source: heapCapReg, length: .register(lengthReg))
+				Lower.Effect.setCapabilityBounds(destination: bufferReg, base: heapCapReg, length: .register(lengthReg))
 				
 				// Determine (possibly rounded-up) length of allocated buffer.
 				let actualLengthReg = Lower.Register.t2
@@ -267,6 +277,8 @@ public enum MM : Language {
 			var scallRoutine: [Lower.Statement] {
 				
 				let targetReg = Lower.Register.invocationData	// input
+				
+				Lower.Statement.padding()
 				
 				// Load seal cap.
 				let sealCapCap = Lower.Register.t1
@@ -304,6 +316,7 @@ public enum MM : Language {
 					scallCapLabel ~ .nullCapability
 					
 					// User code.
+					Lower.Statement.padding()
 					try effects.lowered(in: &context)
 					
 					// Label end of user.
@@ -322,23 +335,23 @@ public enum MM : Language {
 			// The stack.
 			@ArrayBuilder<Lower.Statement>
 			var stack: [Lower.Statement] {
-				stackLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.stackByteSize)
-				stackEndLabel ~ .padding()
+				stackLowLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.stackByteSize)
+				stackHighLabel ~ .padding()
 			}
 			
 			return try .init {
 				
-				runtime					// requires & preserves 4-byte alignment
-				allocationRoutine		// requires & preserves 4-byte alignment
+				runtime
+				allocationRoutine
 				if configuration.callingConvention.requiresCallRoutine {
-					scallRoutine		// requires & preserves 4-byte alignment
+					scallRoutine
 				}
-				try user				// requires & preserves 4-byte alignment
+				try user
 				
 				Lower.Statement.bssSection
-				heap					// does not require alignment
+				heap
 				if configuration.callingConvention.usesContiguousCallStack {
-					stack				// does not require alignment
+					stack
 				}
 				
 			}
