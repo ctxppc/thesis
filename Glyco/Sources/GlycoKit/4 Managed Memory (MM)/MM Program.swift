@@ -194,31 +194,22 @@ public enum MM : Language {
 					let bitmaskReg = Lower.Register.t0
 					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
 					
-					// Call user program & return to OS/framework.
+					// Tail-call user program.
 					switch configuration.callingConvention {
 							
 						case .conventional:
-						Lower.Effect.jump(to: .register(userCapReg), link: .ra)
-						Lower.Effect.return
+						Lower.Effect.jump(to: .register(userCapReg), link: .zero)	// tail-call
 						
 						case .heap:
 						do {
 							
-							// Copy cra to cfp to preserve it across the scall — we don't need an actual frame in the runtime.
-							let savedRABeforeScallReg = Lower.Register.fp
-							Lower.Effect.copy(.cap, into: savedRABeforeScallReg, from: .ra)
-							
-							// Clear all registers except (selected) user authority.
-							let preservedRegisters = [savedRABeforeScallReg, userCapReg]	// Set is probably less efficient for 2 elements
+							// Clear all registers except (selected) user authority — no need to retain cfp.
+							let preservedRegisters = [.ra, userCapReg]	// Set is probably less efficient for 2 elements
 							Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
 							
 							// Perform scall.
 							let scallCapReg = Lower.Register.t0
-							Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)
-							
-							// Return to OS/framework.
-							let savedRAAfterScallReg = Lower.Register.invocationData
-							Lower.Effect.jump(to: .register(savedRAAfterScallReg), link: .zero)
+							Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: scallCapReg)	// tail-call
 							
 						}
 							
