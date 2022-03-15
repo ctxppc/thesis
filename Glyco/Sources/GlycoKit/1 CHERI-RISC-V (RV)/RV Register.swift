@@ -47,7 +47,7 @@ extension RV {
 		public var x: String { rawValue }
 		
 		/// The capability register's identifier.
-		public var c: String { self == .zero ? "c0" : "c\(rawValue)" }
+		public var c: String { self == .zero ? "cnull" : "c\(rawValue)" }
 		
 		/// The register's ordinal.
 		public var ordinal: Int { Self.ordinalsByRegister[self] !! "Unknown register" }

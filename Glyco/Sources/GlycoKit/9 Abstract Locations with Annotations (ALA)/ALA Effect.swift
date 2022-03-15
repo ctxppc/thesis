@@ -307,13 +307,11 @@ extension ALA {
 				case .compute(_, let lhs, _, let rhs, analysisAtEntry: _):
 				return [lhs, rhs].compactMap(\.location)
 				
-				case .getElement(_, of: let buffer, offset: .constant, to: _, analysisAtEntry: _),
-					.setElement(_, of: let buffer, offset: .constant, to: _, analysisAtEntry: _):
-				return [buffer]
-				
-				case .getElement(_, of: let buffer, offset: let index, to: _, analysisAtEntry: _),
-					.setElement(_, of: let buffer, offset: let index, to: _, analysisAtEntry: _):
+				case .getElement(_, of: let buffer, offset: let index, to: _, analysisAtEntry: _):
 				return [index].compactMap(\.location) + [buffer]
+				
+				case .setElement(_, of: let buffer, offset: let index, to: let element, analysisAtEntry: _):
+				return [index, element].compactMap(\.location) + [buffer]
 				
 				case .popScope:
 				return configuration.calleeSavedRegisters.map { .register($0) }
