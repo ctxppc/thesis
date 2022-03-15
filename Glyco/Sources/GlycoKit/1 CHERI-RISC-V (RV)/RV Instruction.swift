@@ -120,6 +120,9 @@ extension RV {
 		func lowered(in context: inout Context) -> String {
 			switch self {
 				
+				case .computeWithRegister(operation: .add, rd: .zero, rs1: .zero, rs2: .zero):
+				return "nop"
+				
 				case .copyWord(destination: let destination, source: let source):
 				return "mv \(destination.x), \(source.x)"
 				

@@ -17,11 +17,30 @@ public enum BB : Language {
 		
 		/// The program's blocks.
 		///
-		/// Exactly one block must be labelled with `.entry`.
+		/// Exactly one block must be labelled with `.programEntry`.
 		public var blocks: [Block]
 		
 		// See protocol.
-		public func optimise(configuration: CompilationConfiguration) -> Bool { false }	// TODO: Prune empty blocks
+		public mutating func optimise(configuration: CompilationConfiguration) throws -> Bool {
+			
+			var optimised = false
+			
+			// Substitute each empty block with a continue continuation with the block's successor.
+			for removedBlockIndex in blocks.indices.reversed() {
+				let removedBlock = blocks[removedBlockIndex]
+				guard removedBlock.effects.isEmpty else { continue }
+				guard removedBlock.name != .programEntry else { continue }
+				guard case .continue(let newSuccessor) = removedBlock.continuation else { continue }
+				blocks.remove(at: removedBlockIndex)
+				for index in blocks.indices {
+					blocks[index].continuation.substitute(removedBlock.name, by: newSuccessor)
+				}
+				optimised = true
+			}
+			
+			return optimised
+			
+		}
 		
 		// See protocol.
 		public func validate(configuration: CompilationConfiguration) {}

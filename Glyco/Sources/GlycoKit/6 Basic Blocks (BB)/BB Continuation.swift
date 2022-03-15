@@ -17,6 +17,32 @@ extension BB {
 		/// A continuation that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
 		
+		/// Replaces any occurrences of `removedBlockName` by `newBlockName`.
+		mutating func substitute(_ removedBlockName: Block.Name, by newBlockName: Block.Name) {
+			
+			func substituting(_ label: Label) -> Label {
+				guard label == removedBlockName else { return label }
+				return newBlockName
+			}
+			
+			switch self {
+				
+				case .continue(to: let successor):
+				self = .continue(to: substituting(successor))
+				
+				case .branch(let lhs, let relation, let rhs, then: let affirmative, else: let negative):
+				self = .branch(lhs, relation, rhs, then: substituting(affirmative), else: substituting(negative))
+				
+				case .call(let name, returnPoint: let returnPoint):
+				self = .call(name, returnPoint: substituting(returnPoint))
+				
+				case .return:
+				break
+				
+			}
+			
+		}
+		
 	}
 	
 }
