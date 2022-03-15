@@ -179,6 +179,9 @@ extension CC {
 						}
 					}
 					
+					// Restore return capability from abstract location — the return effect cannot use an abstract location since the scope is popped by then.
+					Lowered.set(.register(.ra), to: .abstract(context.returnLocation))
+					
 					// If using a secure CC, clear all registers except for the result value and sealed return–frame capabilities.
 					if context.configuration.callingConvention != .conventional {
 						Lowered.clearAll(except: [resultRegister, .ra])
@@ -188,7 +191,7 @@ extension CC {
 					Lowered.popScope
 					
 					// Return.
-					Lowered.return(to: .abstract(context.returnLocation))
+					Lowered.return(to: .register(.ra, .codeCap))
 					
 				}
 				
