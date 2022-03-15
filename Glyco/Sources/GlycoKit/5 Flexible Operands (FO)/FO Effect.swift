@@ -146,7 +146,7 @@ extension FO {
 				let (storeElement, dest) = try store(type, to: destination, using: temp3)
 				loadBuffer
 				loadOffset
-				Lower.Effect.loadElement(type, into: dest, buffer: buffer, offset: offset)
+				Lower.Effect.loadElement(type, into: dest, buffer: buffer, offset: .register(offset))
 				storeElement
 				
 				case .setElement(let type, of: let vector, offset: let offset, to: let element):
@@ -156,7 +156,7 @@ extension FO {
 				loadBuffer
 				loadOffset
 				loadElement
-				Lower.Effect.storeElement(type, buffer: buffer, offset: offset, from: element)
+				Lower.Effect.storeElement(type, buffer: buffer, offset: .register(offset), from: element)
 				
 				case .pushFrame(let frame):
 				Lower.Effect.pushFrame(frame)

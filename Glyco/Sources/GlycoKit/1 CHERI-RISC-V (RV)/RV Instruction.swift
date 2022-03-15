@@ -30,8 +30,10 @@ extension RV {
 		/// An instruction that loads the word from memory at the address in `address` and puts it in `destination`.
 		case loadSignedWord(destination: Register, address: Register)
 		
-		/// An instruction that loads the capability from memory at the address in `address` and puts it in `destination`.
-		case loadCapability(destination: Register, address: Register)
+		/// An instruction that loads the capability from memory at the address in `address` and puts it in `destination`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case loadCapability(destination: Register, address: Register, offset: Int)
 		
 		/// An instruction that retrieves the byte from `source` and stores it in memory at the address in `address`.
 		case storeByte(source: Register, address: Register)
@@ -39,8 +41,10 @@ extension RV {
 		/// An instruction that retrieves the word from `source` and stores it in memory at the address in `address`.
 		case storeSignedWord(source: Register, address: Register)
 		
-		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`.
-		case storeCapability(source: Register, address: Register)
+		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case storeCapability(source: Register, address: Register, offset: Int)
 		
 		/// An instruction that derives a capability from PCC to the memory location labelled `label` and puts it in `destination`.
 		case deriveCapabilityFromLabel(destination: Register, label: Label)
@@ -147,8 +151,8 @@ extension RV {
 				case .loadSignedWord(destination: let rd, address: let address):
 				return "lw.cap \(rd.x), 0(\(address.c))"
 				
-				case .loadCapability(destination: let cd, address: let address):
-				return "lc.cap \(cd.c), 0(\(address.c))"
+				case .loadCapability(destination: let cd, address: let address, offset: let offset):
+				return "clc \(cd.c), \(offset)(\(address.c))"
 				
 				case .storeByte(source: let rs, address: let address):
 				return "sbu.cap \(rs.x), 0(\(address.c))"
@@ -156,8 +160,8 @@ extension RV {
 				case .storeSignedWord(source: let rs, address: let address):
 				return "sw.cap \(rs.x), 0(\(address.c))"
 				
-				case .storeCapability(source: let cs, address: let address):
-				return "sc.cap \(cs.c), 0(\(address.c))"
+				case .storeCapability(source: let cs, address: let address, offset: let offset):
+				return "csc \(cs.c), \(offset)(\(address.c))"
 				
 				case .deriveCapabilityFromLabel(destination: let cd, label: let label):
 				return "cllc \(cd.c), \(label.rawValue)"

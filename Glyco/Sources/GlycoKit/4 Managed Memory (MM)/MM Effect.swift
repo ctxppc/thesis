@@ -31,10 +31,10 @@ extension MM {
 		case destroyBuffer(capability: Register)
 		
 		/// An effect that loads the datum at byte offset `offset` in the buffer at `buffer` and puts it in `into`.
-		case loadElement(DataType, into: Register, buffer: Register, offset: Register)
+		case loadElement(DataType, into: Register, buffer: Register, offset: Source)
 		
 		/// An effect that retrieves the datum from `from` and stores it at byte offset `offset` in the buffer at `buffer`.
-		case storeElement(DataType, buffer: Register, offset: Register, from: Register)
+		case storeElement(DataType, buffer: Register, offset: Source, from: Register)
 		
 		/// An effect that derives a capability to given label and puts it in given register.
 		case deriveCapability(in: Register, to: Label)
@@ -100,6 +100,7 @@ extension MM {
 		// See protocol.
 		@ArrayBuilder<Lower.Statement>
 		func lowered(in context: inout Context) throws -> [Lower.Statement] {
+			let immediateOffsetRange = -(1 << 11)..<(1 << 11)
 			let temp = Lower.Register.t0
 			switch self {
 				
@@ -109,9 +110,15 @@ extension MM {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				try Lower.Effect.compute(destination: destination.lowered(), lhs.lowered(), operation, rhs.lowered())
 				
+				case .load(.cap, into: let destination, from: let source) where immediateOffsetRange.contains(source.offset):
+				Lower.Effect.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)
+				
 				case .load(let dataType, into: let destination, from: let source):
 				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(source.offset))
 				Lower.Effect.load(dataType, destination: try destination.lowered(), address: temp)
+				
+				case .store(.cap, into: let destination, from: let source) where immediateOffsetRange.contains(destination.offset):
+				Lower.Effect.storeCapability(address: .fp, source: try source.lowered(), offset: destination.offset)
 				
 				case .store(let dataType, into: let destination, from: let source):
 				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(destination.offset))
@@ -176,12 +183,18 @@ extension MM {
 					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(temp))
 				}
 				
+				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: .constant(let offset)) where immediateOffsetRange.contains(offset):
+				try Lower.Effect.loadCapability(destination: destination.lowered(), address: buffer.lowered(), offset: offset)
+				
 				case .loadElement(let dataType, into: let destination, buffer: let buffer, offset: let offset):
-				try Lower.Effect.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: .register(offset.lowered()))
+				try Lower.Effect.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())
 				try Lower.Effect.load(dataType, destination: destination.lowered(), address: destination.lowered())
 				
+				case .storeElement(.cap, buffer: let buffer, offset: .constant(let offset), from: let source) where immediateOffsetRange.contains(offset):
+				try Lower.Effect.storeCapability(address: buffer.lowered(), source: source.lowered(), offset: offset)
+				
 				case .storeElement(let dataType, buffer: let buffer, offset: let offset, from: let source):
-				try Lower.Effect.offsetCapability(destination: temp, source: buffer.lowered(), offset: .register(offset.lowered()))
+				try Lower.Effect.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())
 				try Lower.Effect.store(dataType, address: temp, source: source.lowered())
 				
 				case .deriveCapability(in: let destination, to: let label):

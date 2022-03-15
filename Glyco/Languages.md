@@ -885,8 +885,8 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>store</strong>(DataType, <strong>into:</strong> Frame.Location, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>createBuffer</strong>(<strong>bytes:</strong> Source, <strong>capability:</strong> Register, <strong>onFrame:</strong> Bool)</code></dd>
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Register)</code></dd>
-	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Register)</code></dd>
-	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Register, <strong>from:</strong> Register)</code></dd>
+	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Source)</code></dd>
+	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Source, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>deriveCapability</strong>(<strong>in:</strong> Register, <strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
@@ -965,7 +965,9 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>storeCapability</strong>(<strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
@@ -1052,7 +1054,9 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
+	<dd><code><strong>storeCapability</strong>(<strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
@@ -1140,10 +1144,10 @@ N/A
 	<dd><code><strong>computeWithImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
 	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
 	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Register)</code></dd>

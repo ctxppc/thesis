@@ -16,8 +16,18 @@ extension RT {
 		/// An effect that loads the datum at `address` and puts it in `destination`.
 		case load(DataType, destination: Register, address: Register)
 		
+		/// An effect that loads the capability at `address`, offset by `offset` bytes, and puts it in `destination`.
+		///
+		/// `offset` must be in the range [-2048; 2047]. When `offset` is 0, this effect is equivalent to `load(.cap, destination: destination, address: address)`.
+		case loadCapability(destination: Register, address: Register, offset: Int)
+		
 		/// An effect that retrieves the datum from `source` and stores it at `address`.
 		case store(DataType, address: Register, source: Register)
+		
+		/// An effect that retrieves the datum from `source` and stores it at `address`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047]. When `offset` is 0, this effect is equivalent to `store(.cap, address: address, source: source)`.
+		case storeCapability(address: Register, source: Register, offset: Int)
 		
 		/// An effect that derives a capability from PCC, adds `upperBits` to after left-shifting it by 12, and puts the resulting capability in `destination`.
 		case deriveCapabilityFromPCC(destination: Register, upperBits: UInt)
@@ -105,8 +115,14 @@ extension RT {
 				case .load(let dataType, destination: let destination, address: let address):
 				Lower.Effect.load(dataType, destination: destination, address: address)
 				
+				case .loadCapability(destination: let destination, address: let address, offset: let offset):
+				Lower.Effect.loadCapability(destination: destination, address: address, offset: offset)
+				
 				case .store(let dataType, address: let address, source: let source):
 				Lower.Effect.store(dataType, address: address, source: source)
+				
+				case .storeCapability(address: let address, source: let source, offset: let offset):
+				Lower.Effect.storeCapability(address: address, source: source, offset: offset)
 				
 				case .deriveCapabilityFromLabel(destination: let destination, label: let label):
 				Lower.Effect.deriveCapabilityFromLabel(destination: destination, label: label)
