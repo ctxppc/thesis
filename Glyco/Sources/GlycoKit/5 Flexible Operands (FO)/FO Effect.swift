@@ -114,12 +114,23 @@ extension FO {
 				case .set(let dataType, _, to: .capability(to: let label)):
 				throw LoweringError.settingNoncapabilityToLabel(dataType, label)
 				
+				case .compute(let destination, let lhs, .mul, .constant(let rhs)):
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
+				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
+				Lower.Effect.put(into: temp1, value: rhs)
+				loadLHS
+				Lower.Effect.compute(destination: dest, lhs, .mul, .register(temp1))
+				storeResult
+				
 				case .compute(let destination, let lhs, let operation, .constant(let rhs)):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
 				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
 				loadLHS
 				Lower.Effect.compute(destination: dest, lhs, operation, .constant(rhs))
 				storeResult
+				
+				case .compute(let destination, .constant(let lhs), .add, .register(let rhs)):
+				try Self.compute(destination, .register(rhs), .add, .constant(lhs)).lowered()
 				
 				case .compute(let destination, let lhs, let operation, let rhs):
 				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)

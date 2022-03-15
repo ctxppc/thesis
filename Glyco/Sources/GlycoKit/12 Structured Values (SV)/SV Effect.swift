@@ -142,7 +142,7 @@ extension SV {
 				case .getElement(of: let vector, index: let index, to: let destination):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
-					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount))
+					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(elementType.byteSize.trailingZeroBitCount))
 					Lowered.getElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: destination)
 				} else {
 					throw LoweringError.noVectorType(vector)
@@ -151,7 +151,7 @@ extension SV {
 				case .setElement(of: let vector, index: let index, to: let source):
 				if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
-					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(1 << elementType.byteSize.trailingZeroBitCount))
+					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(elementType.byteSize.trailingZeroBitCount))
 					Lowered.setElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: try source.lowered(in: &context))
 				} else {
 					throw LoweringError.noVectorType(vector)

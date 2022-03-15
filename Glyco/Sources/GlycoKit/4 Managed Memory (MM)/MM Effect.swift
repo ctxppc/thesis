@@ -9,6 +9,8 @@ extension MM {
 		case copy(DataType, into: Register, from: Register)
 		
 		/// An effect that performs *x* `operation` *y* where *x* is the value in the second given register and *y* is the value from given source, and puts in `destination`.
+		///
+		/// The source cannot be a constant if `operation` is  `.mul`.
 		case compute(destination: Register, Register, BinaryOperator, Source)
 		
 		/// Returns an effect that puts `value` in `destination`.
@@ -207,11 +209,10 @@ extension MM {
 					do {
 						
 						// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
-						Lower.Effect.offsetCapability(destination: temp, source: .sp, offset: .constant(-DataType.cap.byteSize))
-						Lower.Effect.store(.cap, address: temp, source: .fp)
+						Lower.Effect.storeCapability(address: .sp, source: .fp, offset: -DataType.cap.byteSize)
 						
 						// Set up fp for new frame — using deferred sp.
-						Lower.Effect.copy(.cap, into: .fp, from: temp)
+						Lower.Effect.offsetCapability(destination: .fp, source: .sp, offset: .constant(-DataType.cap.byteSize))
 						
 						// Allocate space for frame by pushing sp downward.
 						Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .constant(-frame.allocatedByteSize))

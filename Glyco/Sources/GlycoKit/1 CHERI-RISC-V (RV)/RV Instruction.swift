@@ -22,6 +22,8 @@ extension RV {
 		case computeWithRegister(operation: BinaryOperator, rd: Register, rs1: Register, rs2: Register)
 		
 		/// An instruction that performs *x* `operation` `imm` and puts the result in `rd`, where *x* is the value in `rs1`.
+		///
+		/// `operation` cannot be `.mul`.
 		case computeWithImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
 		/// An instruction that loads the word byte memory at the address in `address` and puts it in `destination`.

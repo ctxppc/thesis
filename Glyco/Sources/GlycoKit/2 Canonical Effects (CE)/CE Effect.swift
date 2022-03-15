@@ -11,6 +11,8 @@ extension CE {
 		case copy(DataType, into: Register, from: Register)
 		
 		/// An effect that performs *x* `operation` *y* where *x* is the value in the second given register and *y* is the value from given source, and puts in `destination`.
+		///
+		/// The source cannot be a constant if `operation` is  `.mul`.
 		case compute(destination: Register, Register, BinaryOperator, Source)
 		
 		/// An effect that loads the datum at `address` and puts it in `destination`.
