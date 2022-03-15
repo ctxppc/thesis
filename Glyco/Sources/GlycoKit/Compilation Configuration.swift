@@ -80,7 +80,7 @@ public struct CompilationConfiguration {
 	public var callerSavedRegisters: [AL.Register]
 	
 	/// A Boolean value indicating whether the lifetime of caller-saved registers is limited by copying their contents to abstract locations.
-	public var limitsCallerSavedRegisterLifetimes: Bool = true
+	public var limitsCallerSavedRegisterLifetimes: Bool = false
 	
 	// MARK: - Memory
 	

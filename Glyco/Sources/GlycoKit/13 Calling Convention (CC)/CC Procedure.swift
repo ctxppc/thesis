@@ -45,6 +45,9 @@ extension CC {
 					Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
 				}
 				
+				// Bind return capability.
+				Lower.Effect.set(.abstract(context.returnLocation), to: .register(.ra, .codeCap))
+				
 				// Determine parameter assignments.
 				let assignments = parameterAssignments(in: context.configuration)
 				

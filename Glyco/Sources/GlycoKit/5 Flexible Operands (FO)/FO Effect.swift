@@ -58,8 +58,8 @@ extension FO {
 		/// An effect that calls the procedure with given name.
 		case call(Label)
 		
-		/// An effect that returns to the caller.
-		case `return`
+		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
+		case `return`(to: Source)
 		
 		/// An effect that can jumped to using given label.
 		indirect case labelled(Label, Effect)
@@ -180,8 +180,18 @@ extension FO {
 				case .call(let label):
 				Lower.Effect.call(label)
 				
-				case .return:
-				Lower.Effect.return
+				case .return(to: .constant(let value)):
+				throw LoweringError.returningToConstant(value)
+				
+				case .return(to: .capability(to: let caller)):
+				Lower.Effect.return(to: .label(caller))
+				
+				case .return(to: .register(let caller)):
+				Lower.Effect.return(to: .register(try caller.lowered()))
+				
+				case .return(to: .frame(let caller)):
+				Lower.Effect.load(.cap, into: temp1, from: caller)
+				Lower.Effect.return(to: .register(temp1))
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered().splittingFirst() {
@@ -228,6 +238,9 @@ extension FO {
 		
 		enum LoweringError : LocalizedError {
 			
+			/// An error indicating that a return is being attempt using a constant.
+			case returningToConstant(Int)
+			
 			/// An error indicating that a capability is being set using a constant.
 			case settingCapabilityUsingConstant(Int)
 			
@@ -237,6 +250,9 @@ extension FO {
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
+					
+					case .returningToConstant(let value):
+					return "Cannot return to the constant value \(value)"
 					
 					case .settingCapabilityUsingConstant(let value):
 					return "Cannot set a capability location using the constant value \(value)"

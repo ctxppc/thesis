@@ -188,7 +188,7 @@ extension CC {
 					Lowered.popScope
 					
 					// Return.
-					Lowered.return
+					Lowered.return(to: .abstract(context.returnLocation))
 					
 				}
 				

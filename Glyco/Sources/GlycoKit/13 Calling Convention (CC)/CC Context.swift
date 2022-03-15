@@ -36,6 +36,9 @@ extension CC {
 		/// The locations by saved register.
 		private var saveLocationByRegister = [Lower.Register : Location]()
 		
+		/// The location of the return capability.
+		private(set) lazy var returnLocation = locations.uniqueName(from: "retcap")
+		
 	}
 	
 }

@@ -86,10 +86,10 @@ extension MM {
 		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
 		case call(Label)
 		
-		/// An effect that returns control to the caller.
+		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
-		/// If scall invocations are used, this effect invokes the code capability `cra` with the data capability `cfp` thereby unsealing both for the caller. Otherwise, this effect jumps to the address in `cra`, unsealing it first if it is a sentry capability.
-		case `return`
+		/// If scall invocations are used, this effect invokes the target code capability, which is usually `cra`, with the data capability `cfp` thereby unsealing both for the caller. Otherwise, this effect jumps to the target, unsealing it first if it is a sentry capability.
+		case `return`(to: Target)
 		
 		/// An effect that can jumped to using given label.
 		indirect case labelled(Label, Effect)
@@ -271,10 +271,19 @@ extension MM {
 					
 				}
 				
-				case .return:
-				switch context.configuration.callingConvention {
-					case .conventional:	Lower.Effect.return
-					case .heap:			Lower.Effect.invoke(target: .ra, data: .fp)
+				case .return(to: let caller):
+				switch (context.configuration.callingConvention, caller) {
+					
+					case (.conventional, _):
+					Lower.Effect.jump(to: try caller.lowered(), link: .zero)
+					
+					case (.heap, .register(let caller)):
+					Lower.Effect.invoke(target: try caller.lowered(), data: .fp)
+					
+					case (.heap, .label(let caller)):
+					Lower.Effect.deriveCapabilityFromLabel(destination: temp, label: caller)
+					Lower.Effect.invoke(target: temp, data: .fp)
+					
 				}
 				
 				case .labelled(let label, let effect):

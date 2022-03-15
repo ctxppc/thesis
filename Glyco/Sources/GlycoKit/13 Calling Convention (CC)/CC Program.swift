@@ -32,6 +32,9 @@ public enum CC : Language {
 				// Prepare new scope.
 				Lower.Effect.pushScope
 				
+				// Bind return capability.
+				Lower.Effect.set(.abstract(context.returnLocation), to: .register(.ra, .codeCap))
+				
 				// Execute main effect.
 				try effect.lowered(in: &context)
 				

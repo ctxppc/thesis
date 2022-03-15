@@ -15,7 +15,7 @@ final class ArithmeticTests : XCTestCase {
 				.set(.abstract(location), to: .constant(1)),
 				.compute(.abstract(location), .constant(2), .add, .abstract(location)),
 				.set(.register(.a0), to: .abstract(location)),
-				.return,
+				.return(to: .register(.ra, .cap)),
 			]),
 			procedures: []
 		)
@@ -164,7 +164,7 @@ final class ArithmeticTests : XCTestCase {
 					else:	.set(.abstract(isEven), to: .constant(0))
 				),
 				.set(.register(.a0), to: .abstract(isEven)),
-				.return,
+				.return(to: .register(.ra, .cap)),
 			]),
 			procedures:	[]
 		)

@@ -52,7 +52,7 @@ struct CompileCommand : ParsableCommand {
 	var validate: Bool = true
 	
 	@Flag(name: .customLong("caller-saved-copying"), inversion: .prefixedNo, help: "Enable/disable caller-saved register copying around procedure calls to limit their lifetime.")
-	var limitsCallerSavedRegisterLifetimes: Bool = true
+	var limitsCallerSavedRegisterLifetimes: Bool = false
 	
 	@Option(name: .customLong("line"), help: "The (suggested) maximum line length of output programs.")
 	var maximumLineLength = 120

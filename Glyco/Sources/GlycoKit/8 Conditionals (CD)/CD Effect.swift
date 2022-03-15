@@ -51,8 +51,8 @@ extension CD {
 		/// An effect that calls the procedure with given name.
 		case call(Label)
 		
-		/// An effect that returns to the caller.
-		case `return`
+		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
+		case `return`(to: Source)
 		
 		/// Returns a representation of `self` in a lower language.
 		///
@@ -300,8 +300,8 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			
-			case .return:
-			return [.init(name: entryLabel, do: previousEffects, then: .return)]
+			case .return(to: let caller):
+			return [.init(name: entryLabel, do: previousEffects, then: .return(to: caller))]
 			
 		}
 	}

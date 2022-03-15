@@ -59,10 +59,10 @@ extension ALA {
 		/// A call effect "defines" caller-saved registers.
 		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
 		
-		/// An effect that returns to the caller.
+		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program.
-		case `return`(analysisAtEntry: Analysis)
+		case `return`(to: Source, analysisAtEntry: Analysis)
 		
 		// See protocol.
 		@EffectBuilder<Lowered>
@@ -119,8 +119,8 @@ extension ALA {
 				case .call(let name, parameters: _, analysisAtEntry: _):
 				Lowered.call(name)
 				
-				case .return(analysisAtEntry: _):
-				Lowered.return
+				case .return(to: let caller, analysisAtEntry: _):
+				Lowered.return(to: try caller.lowered(in: &context))
 				
 			}
 		}
@@ -222,8 +222,8 @@ extension ALA {
 				case .call(let name, parameters: let parameters, analysisAtEntry: _):
 				return .call(name, parameters: parameters, analysisAtEntry: analysis)
 				
-				case .return(analysisAtEntry: _):
-				return .return(analysisAtEntry: analysis)
+				case .return(to: let caller, analysisAtEntry: _):
+				return .return(to: caller, analysisAtEntry: analysis)
 				
 			}
 		}
@@ -246,7 +246,7 @@ extension ALA {
 					.popScope(analysisAtEntry: let analysis),
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
-					.return(analysisAtEntry: let analysis):
+					.return(to: _, analysisAtEntry: let analysis):
 				return analysis
 			}
 		}
@@ -321,8 +321,8 @@ extension ALA {
 				case .call(_, parameters: let parameters, analysisAtEntry: _):
 				return parameters.map { .register($0) }
 				
-				case .return:
-				return [.register(.a0), .register(.ra)]
+				case .return(to: let caller, analysisAtEntry: _):
+				return [caller].compactMap(\.location) + [.register(.a0)]
 				
 			}
 		}

@@ -14,8 +14,8 @@ extension PR {
 		/// A continuation that calls the procedure with given label then returns to the block labelled `returnPoint`.
 		case call(Label, returnPoint: Label)
 		
-		/// A continuation that returns to the caller.
-		case `return`
+		/// A continuation that returns control to the caller with given target code capability (which is usually `cra`).
+		case `return`(to: Source)
 		
 		// See protocol.
 		public func lowered(in context: inout Context) -> Lower.Continuation {
@@ -36,8 +36,8 @@ extension PR {
 				case .call(let name, returnPoint: let returnPoint):
 				return .call(name, returnPoint: returnPoint)
 				
-				case .return:
-				return .return
+				case .return(to: let caller):
+				return .return(to: caller)
 				
 			}
 		}
