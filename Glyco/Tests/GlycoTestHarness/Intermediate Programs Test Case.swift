@@ -20,12 +20,10 @@ final class IntermediateProgramsTestCase : XCTestCase {
 	func verifyPrograms(programsURL: URL, configuration: CompilationConfiguration) throws {
 		
 		guard let urls = try? FileManager.default.contentsOfDirectory(at: programsURL, includingPropertiesForKeys: nil) else { return }
-		
 		let urlsByGroupName = Dictionary(grouping: urls) { $0.deletingPathExtension().lastPathComponent }
-		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language> for \(configuration)") }
+		var errors = TestErrors(configuration: configuration)
 		
 		print("> Testing \(urlsByGroupName.count) test programs for \(configuration)")
-		var errors = TestErrors(configuration: configuration)
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")

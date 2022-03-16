@@ -26,6 +26,7 @@ rv.begin:		ccall rv.runtime
 				li gp, 1
 				j _exit
 				
+				.align 4
 rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.heap.end
 				csub t1, ct1, ct0
@@ -33,14 +34,15 @@ rv.runtime:		cllc ct0, mm.heap
 				addi t1, zero, 7
 				candperm ct0, ct0, t1
 				cllc ct1, mm.heap.cap
-				sc.cap ct0, 0(ct1)
-				auipcc ct0, 0
-				csetaddr ct0, ct0, zero
-				csetboundsimm ct0, ct0, 1
-				addi t1, zero, 7
-				candperm ct0, ct0, t1
-				cllc ct1, mm.seal.cap
-				sc.cap ct0, 0(ct1)
+				csc ct0, 0(ct1)
+				cllc csp, mm.stack.low
+				cllc ct0, mm.stack.high
+				csub t1, ct0, csp
+				csetbounds csp, csp, t1
+				cgetaddr t0, ct0
+				csetaddr csp, csp, t0
+				addi t0, zero, 7
+				candperm csp, csp, t0
 				cllc ct0, mm.alloc
 				cllc ct1, mm.alloc.end
 				csub t1, ct1, ct0
@@ -49,74 +51,69 @@ rv.runtime:		cllc ct0, mm.heap
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
-				sc.cap ct0, 0(ct1)
-				cllc ct0, mm.scall
-				cllc ct1, mm.scall.end
-				csub t1, ct1, ct0
-				csetbounds ct0, ct0, t1
-				addi t1, zero, 5
-				candperm ct0, ct0, t1
-				csealentry ct0, ct0
-				cllc ct1, mm.scall.cap
-				sc.cap ct0, 0(ct1)
-				cllc ct0, rv.main
-				cllc ct1, mm.user.end
-				csub t1, ct1, ct0
-				csetbounds ct0, ct0, t1
-				addi t1, zero, 11
-				candperm ct0, ct0, t1
-				cmove cfp, cra
-				cllc ct1, mm.scall.cap
-				lc.cap ct1, 0(ct1)
-				clear 0, 159
-				clear 1, 254
-				clear 2, 255
-				clear 3, 255
-				cjalr cra, ct1
-				cjalr c0, ct6
+				csc ct0, 0(ct1)
+				cllc ct6, rv.main
+				cllc ct0, mm.user.end
+				csub t0, ct0, ct6
+				csetbounds ct6, ct6, t0
+				addi t0, zero, 11
+				candperm ct6, ct6, t0
+				cmove cfp, cnull
+				cjalr cnull, ct6
+				.align 4
 mm.alloc:		cllc ct1, mm.heap.cap
-				lc.cap ct1, 0(ct1)
+				clc ct1, 0(ct1)
 				csetbounds ct0, ct1, t0
 				cgetlen t2, ct0
 				cincoffset ct1, ct1, t2
 				cllc ct2, mm.heap.cap
-				sc.cap ct1, 0(ct2)
+				csc ct1, 0(ct2)
 				clear 0, 192
-				cjalr c0, cra
-mm.heap.cap:	.quad 0
-mm.alloc.end:	.dword 0
-mm.scall:		cllc ct1, mm.seal.cap
-				lc.cap ct1, 0(ct1)
-				cseal cra, cra, ct1
-				cseal csp, cfp, ct1
-				clear 0, 64
-				clear 1, 1
-				cjalr c0, ct0
-mm.seal.cap:	.quad 0
-mm.scall.end:	.dword 0
+				cjalr cnull, cra
+mm.heap.cap:	.octa 0
+mm.alloc.end:	.align 4
 mm.user:
-mm.alloc.cap:	.quad 0
-mm.scall.cap:	.quad 0
-rv.main:		cincoffsetimm ct0, csp, -8
-				sc.cap cfp, 0(ct0)
-				cmove cfp, ct0
-				cincoffsetimm csp, csp, -8
+mm.alloc.cap:	.octa 0
+mm.scall.cap:	.octa 0
+				.align 4
+rv.main:		csc cfp, -8(csp)
+				cincoffsetimm cfp, csp, -8
+				cincoffsetimm csp, csp, -16
+				csc cra, -8(cfp)
 				cjal cra, f
-cd.ret:			cincoffsetimm csp, cfp, 8
-				lc.cap cfp, 0(cfp)
-				cjalr c0, cra
-f:				cincoffsetimm ct0, csp, -8
-				sc.cap cfp, 0(ct0)
-				cmove cfp, ct0
-				cincoffsetimm csp, csp, -8
-				addi a0, zero, 42
+cd.ret:			clc cra, -8(cfp)
 				cincoffsetimm csp, cfp, 8
-				lc.cap cfp, 0(cfp)
-				cjalr c0, cra
-mm.user.end:	.dword 0
+				clc cfp, 0(cfp)
+				cjalr cnull, cra
+f:				csc cfp, -8(csp)
+				cincoffsetimm cfp, csp, -8
+				cincoffsetimm csp, csp, -8
+cd.then:		cmove ca4, cs2
+				cmove ca5, cs3
+				cmove ca6, cs4
+				cmove ca7, cs5
+cd.then$4:		cmove ca2, cs10
+				cmove ca3, cs11
+				cmove ca1, cra
+				addi a0, zero, 42
+cd.then$5:		cmove cs2, ca4
+				cmove cs3, ca5
+				cmove cs4, ca6
+				cmove cs5, ca7
+cd.then$9:		cmove cs10, ca2
+				cmove cs11, ca3
+				cmove cra, ca1
+				cincoffsetimm csp, cfp, 8
+				clc cfp, 0(cfp)
+				cjalr cnull, cra
+mm.user.end:	.align 4
+				.bss
 mm.heap:		.fill 1048576, 1, 0
-mm.heap.end:	.dword 0
+mm.heap.end:	.align 4
+mm.stack.low:	.fill 1048576, 1, 0
+mm.stack.high:	.align 4
 				
-rv.end:			.align 6
+				.data
+				.align 6
 				.global tohost
 tohost:			.dword 0
