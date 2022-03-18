@@ -64,7 +64,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct0, mm.user.end
 				csub t0, ct0, ct6
 				csetbounds ct6, ct6, t0
-				addi t0, zero, 263
+				addi t0, zero, 319
 				candperm ct6, ct6, t0
 				cmove cfp, ct6
 				clear 0, 253
@@ -85,6 +85,7 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
+				.align 8
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
@@ -94,8 +95,10 @@ mm.scall:		cllc ct0, mm.seal.cap
 				cseal cfp, cfp, ct0
 				clear 0, 32
 				cjalr cnull, ct6
+				.align 8
 mm.seal.cap:	.octa 0
 mm.scall.end:	.align 4
+				.align 8
 mm.user:
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0

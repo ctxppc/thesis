@@ -244,6 +244,7 @@ public enum MM : Language {
 				
 				// Derive buffer cap.
 				Lower.Effect.setCapabilityBounds(destination: bufferReg, base: heapCapReg, length: .register(lengthReg))
+				// FIXME: Align buffer to 8-byte boundaries to ensure that capabilities (and vectors/records thereof) are capability-aligned.
 				
 				// Determine (possibly rounded-up) length of allocated buffer.
 				let actualLengthReg = tempRegisterD
@@ -264,6 +265,7 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(returnReg), link: .zero)
 				
 				// Heap capability.
+				Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
 				heapCapLabel ~ .nullCapability
 				
 				// Label end of routine.
@@ -296,6 +298,7 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
 				
 				// The seal capability.
+				Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
 				sealCapLabel ~ .nullCapability
 				
 				// Label end of routine.
@@ -309,6 +312,7 @@ public enum MM : Language {
 				get throws {
 					
 					// Alloc capability.
+					Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
 					userLabel ~ (allocCapLabel ~ .nullCapability)
 					
 					// Scall capability.
@@ -381,7 +385,7 @@ public enum MM : Language {
 		static let sealCapabilityPermissions = [Permission.global, .seal]
 		
 		/// The user's PPC capability permissions.
-		static let userPPCPermissions = [Permission.global, .execute, .load, .invoke]
+		static let userPPCPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability, .invoke]
 		
 	}
 	

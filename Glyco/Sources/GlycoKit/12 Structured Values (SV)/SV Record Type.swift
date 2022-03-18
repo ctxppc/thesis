@@ -46,7 +46,7 @@ extension SV {
 			let index = typesByFieldName.keys.firstIndex(of: field.name) !! "Expected field named “\(field.name)”"
 			return self[..<index]
 				.lazy
-				.map(\.valueType.byteSize)
+				.map(\.valueType.byteSize)	// FIXME: Capabilities must be capability-aligned
 				.reduce(0, +)
 		}
 		
@@ -73,7 +73,7 @@ extension SV {
 		func fieldByteOffsetPairs() -> UnfoldSequence<(Field, offset: Int), (fields: TypesByFieldName.Elements.SubSequence, offset: Int)> {
 			sequence(state: (fields: typesByFieldName.elements[...], offset: 0)) { state -> (Field, offset: Int)? in
 				guard let (name, valueType) = state.fields.popFirst() else { return nil }
-				defer { state.offset += valueType.byteSize }
+				defer { state.offset += valueType.byteSize }	// FIXME: Capabilities must be capability-aligned
 				return (.init(name: name, valueType: valueType), state.offset)
 			}
 		}

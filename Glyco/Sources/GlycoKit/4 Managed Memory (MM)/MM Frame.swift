@@ -24,6 +24,7 @@ extension MM {
 		
 		/// Allocates space for `count` data of type `type` and returns its location.
 		public mutating func allocate(_ type: DataType, count: Int = 1) -> Location {
+			// FIXME: Capabilities must be capability-aligned
 			defer { allocatedByteSize += type.byteSize * count }	// fp[-allocatedByteSize] points to next free cell
 			return .init(offset: -allocatedByteSize)
 		}
