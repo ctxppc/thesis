@@ -76,11 +76,12 @@ rv.runtime:		cllc ct0, mm.heap
 				cjalr ct0, ct0
 				.align 4
 mm.alloc:		cllc ct2, mm.heap.cap
-				clc ct3, 0(ct2)
-				csetbounds ct0, ct3, t0
+				clc ct2, 0(ct2)
+				csetbounds ct0, ct2, t0
 				cgetlen t3, ct0
-				cincoffset ct3, ct3, t3
-				csc ct3, 0(ct2)
+				cincoffset ct2, ct2, t3
+				cllc ct3, mm.heap.cap
+				csc ct2, 0(ct3)
 				clear 0, 128
 				clear 3, 16
 				cjalr ct1, ct1

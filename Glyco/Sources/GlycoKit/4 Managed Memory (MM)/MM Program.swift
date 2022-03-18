@@ -237,10 +237,10 @@ public enum MM : Language {
 				Lower.Statement.padding()
 				
 				// Derive heap cap cap and load heap cap.
-				let heapCapCapReg = tempRegisterC
-				let heapCapReg = tempRegisterD
-				allocLabel ~ .deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
-				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg)
+				let heapCapCapReg1 = tempRegisterC
+				let heapCapReg = tempRegisterC
+				allocLabel ~ .deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
+				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1)
 				
 				// Derive buffer cap.
 				Lower.Effect.setCapabilityBounds(destination: bufferReg, base: heapCapReg, length: .register(lengthReg))
@@ -253,10 +253,12 @@ public enum MM : Language {
 				Lower.Effect.offsetCapability(destination: heapCapReg, source: heapCapReg, offset: .register(actualLengthReg))
 				
 				// Store updated heap cap using heap cap cap.
-				Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg)
+				let heapCapCapReg2 = tempRegisterD	// derive again to limit liveness
+				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
+				Lower.Effect.store(.cap, address: heapCapCapReg2, source: heapCapReg)
 				
 				// Clear authority.
-				Lower.Effect.clear([heapCapReg, heapCapCapReg])
+				Lower.Effect.clear([heapCapReg, heapCapCapReg2])
 				
 				// Return to caller.
 				Lower.Effect.jump(to: .register(returnReg), link: returnReg)
