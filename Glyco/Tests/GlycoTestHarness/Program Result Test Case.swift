@@ -7,18 +7,25 @@ import XCTest
 final class ProgramResultTestCase : XCTestCase {
 	
 	func testPrograms() throws {
-		
 		guard let simulatorPath = ProcessInfo.processInfo.environment["simulator"] else { throw XCTSkip("Missing “simulator” environment variable") }
-		
-		guard let urls = try? FileManager.default.contentsOfDirectory(at: .init(fileURLWithPath: "Tests/Test Programs"), includingPropertiesForKeys: nil)
-		else { throw XCTSkip("Tests/Test Programs doesn't exist") }
-		
-		let urlsByGroupName = Dictionary(grouping: urls) { url in
-			url.deletingPathExtension().lastPathComponent
+		for target in CompilationConfiguration.Target.allCases {
+			for convention in CompilationConfiguration.CallingConvention.allCases {
+				try verifyPrograms(
+					programsURL:	.init(fileURLWithPath: "Tests/Test Programs/\(convention).\(target)"),
+					simulatorURL:	.init(fileURLWithPath: simulatorPath),
+					configuration:	.init(target: target, callingConvention: convention)
+				)
+			}
 		}
-		guard !urlsByGroupName.isEmpty else { throw XCTSkip("No candidate programs named <name>.<source-language>") }
+	}
+	
+	func verifyPrograms(programsURL: URL, simulatorURL: URL, configuration: CompilationConfiguration) throws {
 		
+		guard let urls = try? FileManager.default.contentsOfDirectory(at: programsURL, includingPropertiesForKeys: nil) else { return }
+		let urlsByGroupName = Dictionary(grouping: urls) { $0.deletingPathExtension().lastPathComponent }
 		var errors = TestErrors()
+		
+		print("> Testing \(urlsByGroupName.count) test programs for \(configuration) using \(simulatorURL.path)")
 		for (groupName, urls) in urlsByGroupName {
 			do {
 				print(">> Testing “\(groupName)” ", terminator: "")
@@ -30,8 +37,9 @@ final class ProgramResultTestCase : XCTestCase {
 				try HighestSupportedLanguage.iterate(
 					DecodeSourceAndSimulateProgramsAction(
 						sourceURLsByLanguageName:	sourceURLsByLanguageName,
-						simulatorURL:				.init(fileURLWithPath: simulatorPath),
-						expectedResult:				expectedResult
+						simulatorURL:				simulatorURL,
+						expectedResult:				expectedResult,
+						configuration:				configuration
 					)
 				)
 				print("OK")
@@ -65,6 +73,7 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 	let sourceURLsByLanguageName: [String : URL]
 	let simulatorURL: URL
 	let expectedResult: Int
+	let configuration: CompilationConfiguration
 	
 	func callAsFunction<L : Language>(language: L.Type) throws -> ()? {
 		
@@ -72,7 +81,7 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 		guard let sourceURL = sourceURLsByLanguageName.removeValue(forKey: language.name) else { return nil }
 		
 		let sourceProgram = try SispDecoder(from: .init(contentsOf: sourceURL)).decode(L.Program.self)
-		let elfData = try L.elf(from: sourceProgram, configuration: .init(target: .sail))
+		let elfData = try L.elf(from: sourceProgram, configuration: configuration)
 		
 		let tempDirectoryURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
 		defer { try! FileManager.default.removeItem(at: tempDirectoryURL) }

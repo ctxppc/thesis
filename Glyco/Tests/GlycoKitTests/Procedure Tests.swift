@@ -100,15 +100,15 @@ final class ProcedureTests : XCTestCase {
 						cmove cfp, cnull
 						cjalr cnull, ct6
 						.align 4
-		mm.alloc:		cllc ct1, mm.heap.cap
-						clc ct1, 0(ct1)
-						csetbounds ct0, ct1, t0
-						cgetlen t2, ct0
-						cincoffset ct1, ct1, t2
-						cllc ct2, mm.heap.cap
-						csc ct1, 0(ct2)
-						clear 0, 192
-						cjalr cnull, cra
+		mm.alloc:		cllc ct2, mm.heap.cap
+						clc ct3, 0(ct2)
+						csetbounds ct0, ct3, t0
+						cgetlen t3, ct0
+						cincoffset ct3, ct3, t3
+						csc ct3, 0(ct2)
+						clear 0, 128
+						clear 3, 16
+						cjalr ct1, ct1
 		mm.heap.cap:	.octa 0
 		mm.alloc.end:	.align 4
 		mm.user:
@@ -120,8 +120,8 @@ final class ProcedureTests : XCTestCase {
 						cincoffsetimm csp, csp, -16
 						csc cra, -8(cfp)
 						cjal cra, fortytwo
-		cd.ret:			mv a0, a0
-						mv a0, a0
+		cd.ret:			mv ra, a0
+						mv a0, ra
 						clc cra, -8(cfp)
 						cincoffsetimm csp, cfp, 8
 						clc cfp, 0(cfp)
@@ -129,31 +129,31 @@ final class ProcedureTests : XCTestCase {
 		fortytwo:		csc cfp, -8(csp)
 						cincoffsetimm cfp, csp, -8
 						cincoffsetimm csp, csp, -8
-						cmove ca2, cs1
-						cmove ca5, cs2
-						cmove ca6, cs3
-						cmove ca7, cs4
-						cmove cs5, cs5
+						cmove cs1, cs1
+						cmove ca4, cs2
+						cmove ca5, cs3
+						cmove ca6, cs4
+						cmove ca7, cs5
 						cmove cs6, cs6
 						cmove cs7, cs7
 						cmove cs8, cs8
 						cmove cs9, cs9
-						cmove ca3, cs10
-						cmove ca4, cs11
+						cmove ca2, cs10
+						cmove ca3, cs11
 						cmove ca1, cra
-						addi s1, zero, 42
-						mv a0, s1
-						cmove cs1, ca2
-						cmove cs2, ca5
-						cmove cs3, ca6
-						cmove cs4, ca7
-						cmove cs5, cs5
+						addi ra, zero, 42
+						mv a0, ra
+						cmove cs1, cs1
+						cmove cs2, ca4
+						cmove cs3, ca5
+						cmove cs4, ca6
+						cmove cs5, ca7
 						cmove cs6, cs6
 						cmove cs7, cs7
 						cmove cs8, cs8
 						cmove cs9, cs9
-						cmove cs10, ca3
-						cmove cs11, ca4
+						cmove cs10, ca2
+						cmove cs11, ca3
 						cmove cra, ca1
 						cincoffsetimm csp, cfp, 8
 						clc cfp, 0(cfp)

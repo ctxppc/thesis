@@ -95,15 +95,15 @@ final class ArithmeticTests : XCTestCase {
 						cmove cfp, cnull
 						cjalr cnull, ct6
 						.align 4
-		mm.alloc:		cllc ct1, mm.heap.cap
-						clc ct1, 0(ct1)
-						csetbounds ct0, ct1, t0
-						cgetlen t2, ct0
-						cincoffset ct1, ct1, t2
-						cllc ct2, mm.heap.cap
-						csc ct1, 0(ct2)
-						clear 0, 192
-						cjalr cnull, cra
+		mm.alloc:		cllc ct2, mm.heap.cap
+						clc ct3, 0(ct2)
+						csetbounds ct0, ct3, t0
+						cgetlen t3, ct0
+						cincoffset ct3, ct3, t3
+						csc ct3, 0(ct2)
+						clear 0, 128
+						clear 3, 16
+						cjalr ct1, ct1
 		mm.heap.cap:	.octa 0
 		mm.alloc.end:	.align 4
 		mm.user:
@@ -228,25 +228,25 @@ final class ArithmeticTests : XCTestCase {
 						cmove cfp, cnull
 						cjalr cnull, ct6
 						.align 4
-		mm.alloc:		cllc ct1, mm.heap.cap
-						clc ct1, 0(ct1)
-						csetbounds ct0, ct1, t0
-						cgetlen t2, ct0
-						cincoffset ct1, ct1, t2
-						cllc ct2, mm.heap.cap
-						csc ct1, 0(ct2)
-						clear 0, 192
-						cjalr cnull, cra
+		mm.alloc:		cllc ct2, mm.heap.cap
+						clc ct3, 0(ct2)
+						csetbounds ct0, ct3, t0
+						cgetlen t3, ct0
+						cincoffset ct3, ct3, t3
+						csc ct3, 0(ct2)
+						clear 0, 128
+						clear 3, 16
+						cjalr ct1, ct1
 		mm.heap.cap:	.octa 0
 		mm.alloc.end:	.align 4
 		mm.user:
 		mm.alloc.cap:	.octa 0
 		mm.scall.cap:	.octa 0
 						.align 4
-		rv.main:		addi t3, zero, 12
-						addi s1, t3, -11
-						addi t4, zero, 1
-						beq s1, t4, cd.then
+		rv.main:		addi t4, zero, 12
+						addi s1, t4, -11
+						addi t5, zero, 1
+						beq s1, t5, cd.then
 		cd.else:		addi s1, zero, 0
 		cd.endif:		mv a0, s1
 						cjalr cnull, cra

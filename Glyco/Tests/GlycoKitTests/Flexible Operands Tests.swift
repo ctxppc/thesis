@@ -20,8 +20,8 @@ final class FlexibleOperandsTests : XCTestCase {
 		let expected = MM.Program([
 			.load(.s32, into: .t4, from: .init(offset: -8)),
 			.load(.s32, into: .t5, from: .init(offset: -12)),
-			.compute(destination: .invocationData, .t4, .add, .register(.t5)),
-			.store(.s32, into: .init(offset: -16), from: .invocationData),
+			.compute(destination: .t4, .t4, .add, .register(.t5)),
+			.store(.s32, into: .init(offset: -16), from: .t4),
 		])
 		
 		XCTAssertEqual(actual, expected)
