@@ -31,7 +31,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.heap.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 7
+				addi t1, zero, 61
 				candperm ct0, ct0, t1
 				cllc ct1, mm.heap.cap
 				csc ct0, 0(ct1)
@@ -41,13 +41,13 @@ rv.runtime:		cllc ct0, mm.heap
 				csetbounds csp, csp, t1
 				cgetaddr t0, ct0
 				csetaddr csp, csp, t0
-				addi t0, zero, 7
+				addi t0, zero, 124
 				candperm csp, csp, t0
 				cllc ct0, mm.alloc
 				cllc ct1, mm.alloc.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 5
+				addi t1, zero, 51
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
@@ -56,7 +56,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct0, mm.user.end
 				csub t0, ct0, ct6
 				csetbounds ct6, ct6, t0
-				addi t0, zero, 11
+				addi t0, zero, 263
 				candperm ct6, ct6, t0
 				cmove cfp, cnull
 				cjalr cnull, ct6
@@ -70,7 +70,7 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				csc ct2, 0(ct3)
 				clear 0, 128
 				clear 3, 16
-				cjalr ct1, ct1
+				cjalr cnull, ct1
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 mm.user:

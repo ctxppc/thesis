@@ -261,7 +261,7 @@ public enum MM : Language {
 				Lower.Effect.clear([heapCapReg, heapCapCapReg2])
 				
 				// Return to caller.
-				Lower.Effect.jump(to: .register(returnReg), link: returnReg)
+				Lower.Effect.jump(to: .register(returnReg), link: .zero)
 				
 				// Heap capability.
 				heapCapLabel ~ .nullCapability
@@ -360,28 +360,28 @@ public enum MM : Language {
 		/// The stack capability's permissions.
 		///
 		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions.
-		static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability]
+		static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability]
 		
 		/// The heap capability's permissions.
 		///
 		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
-		static let heapCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability]
+		static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability]
 		
 		/// The allocation routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
-		static let allocCapabilityPermissions = [Permission.loadCapability, .storeCapability, .execute]
+		static let allocCapabilityPermissions = [Permission.global, .execute, .loadCapability, .storeCapability]
 		
 		/// The secure calling routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
-		static let scallCapabilityPermissions = [Permission.loadCapability, .execute]
+		static let scallCapabilityPermissions = [Permission.global, .execute, .loadCapability]
 		
 		/// The seal capability's permissions.
-		static let sealCapabilityPermissions = [Permission.seal]
+		static let sealCapabilityPermissions = [Permission.global, .seal]
 		
 		/// The user's PPC capability permissions.
-		static let userPPCPermissions = [Permission.load, .execute, .invoke]
+		static let userPPCPermissions = [Permission.global, .execute, .load, .invoke]
 		
 	}
 	

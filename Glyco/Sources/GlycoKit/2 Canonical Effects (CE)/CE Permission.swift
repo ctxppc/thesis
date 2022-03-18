@@ -55,7 +55,7 @@ extension Sequence where Element == CE.Permission {
 	/// A bitmask representing the permissions in `self`.
 	var bitmask: UInt {
 		self.lazy
-			.map { UInt($0.bitmaskIndex) }
+			.map { 1 << UInt($0.bitmaskIndex) }
 			.reduce(0, |)
 	}
 	
