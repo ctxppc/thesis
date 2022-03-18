@@ -921,7 +921,6 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>s9</strong></code></dd>
 	<dd><code><strong>s10</strong></code></dd>
 	<dd><code><strong>s11</strong></code></dd>
-	<dd><code><strong>t3</strong></code></dd>
 	<dd><code><strong>t4</strong></code></dd>
 	<dd><code><strong>t5</strong></code></dd>
 	<dd><code><strong>invocationData</strong></code></dd>
@@ -983,8 +982,7 @@ A language that introduces a runtime system and runtime routines.
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
-	<dd><code><strong>callRuntimeRoutine</strong>(Label, <strong>using:</strong> Register)</code></dd>
-	<dd><code><strong>return</strong></code></dd>
+	<dd><code><strong>callRuntimeRoutine</strong>(<strong>capability:</strong> Label, <strong>link:</strong> Register)</code></dd>
 </dl>
 <dl>
 	<dt><code>RT.Statement</code></dt>
@@ -1072,7 +1070,6 @@ A language grouping related instructions under a single effect.
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target, <strong>link:</strong> Register)</code></dd>
 	<dd><code><strong>invoke</strong>(<strong>target:</strong> Register, <strong>data:</strong> Register)</code></dd>
-	<dd><code><strong>return</strong></code></dd>
 </dl>
 
 <h2 id="RV">Grammar for RV (CHERI-RISC-V)</h2>
@@ -1180,6 +1177,7 @@ N/A
 	<dt><code>RV.BinaryOperator</code></dt>
 	<dd><code><strong>add</strong></code></dd>
 	<dd><code><strong>sub</strong></code></dd>
+	<dd><code><strong>mul</strong></code></dd>
 	<dd><code><strong>and</strong></code></dd>
 	<dd><code><strong>or</strong></code></dd>
 	<dd><code><strong>xor</strong></code></dd>

@@ -103,7 +103,6 @@ extension MM {
 		@ArrayBuilder<Lower.Statement>
 		func lowered(in context: inout Context) throws -> [Lower.Statement] {
 			let immediateOffsetRange = -(1 << 11)..<(1 << 11)
-			let temp = Lower.Register.t0
 			switch self {
 				
 				case .copy(let dataType, into: let destination, from: let source):
@@ -116,23 +115,23 @@ extension MM {
 				Lower.Effect.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)
 				
 				case .load(let dataType, into: let destination, from: let source):
-				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(source.offset))
-				Lower.Effect.load(dataType, destination: try destination.lowered(), address: temp)
+				Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(source.offset))
+				Lower.Effect.load(dataType, destination: try destination.lowered(), address: tempRegisterA)
 				
 				case .store(.cap, into: let destination, from: let source) where immediateOffsetRange.contains(destination.offset):
 				Lower.Effect.storeCapability(address: .fp, source: try source.lowered(), offset: destination.offset)
 				
 				case .store(let dataType, into: let destination, from: let source):
-				Lower.Effect.offsetCapability(destination: temp, source: .fp, offset: .constant(destination.offset))
-				Lower.Effect.store(dataType, address: temp, source: try source.lowered())
+				Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(destination.offset))
+				Lower.Effect.store(dataType, address: tempRegisterA, source: try source.lowered())
 				
 				case .createBuffer(bytes: let bytes, capability: let destinationBuffer, onFrame: false):
-				let lengthReg = Lower.Register.t0	// cf. alloc routine
-				let bufferReg = Lower.Register.t0	// cf. alloc routine
-				let allocCapReg = Lower.Register.t1
+				let lengthReg = tempRegisterA	// cf. alloc routine
+				let bufferReg = tempRegisterA	// cf. alloc routine — same register as length
+				let linkReg = tempRegisterB		// cf. alloc routine
 				let destinationBufferReg = try destinationBuffer.lowered()
 				Lower.Effect.compute(destination: lengthReg, .zero, .add, try bytes.lowered())
-				Lower.Effect.callRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
+				Lower.Effect.callRuntimeRoutine(capability: .allocationRoutineCapability, link: linkReg)	// cf. pushFrame (about linkReg clearing)
 				if bufferReg != destinationBufferReg {
 					Lower.Effect.copy(.cap, into: destinationBufferReg, from: bufferReg)
 				}
@@ -163,8 +162,8 @@ extension MM {
 						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .constant(-bytes))
 						
 						case .register(let bytesReg):
-						Lower.Effect.compute(destination: temp, .zero, .sub, .register(try bytesReg.lowered()))
-						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .register(temp))
+						Lower.Effect.compute(destination: tempRegisterA, .zero, .sub, .register(try bytesReg.lowered()))
+						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .register(tempRegisterA))
 						
 					}
 					
@@ -172,8 +171,8 @@ extension MM {
 					Lower.Effect.setCapabilityBounds(destination: buffer, base: buffer, length: try bytes.lowered())
 					
 					// Move stack capability over the allocated region.
-					Lower.Effect.getCapabilityAddress(destination: temp, source: buffer)
-					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: temp)
+					Lower.Effect.getCapabilityAddress(destination: tempRegisterA, source: buffer)
+					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: tempRegisterA)
 					
 				} else {
 					try Self.createBuffer(bytes: bytes, capability: buffer, onFrame: false).lowered(in: &context)
@@ -181,8 +180,8 @@ extension MM {
 				
 				case .destroyBuffer(let buffer):
 				if context.configuration.callingConvention.usesContiguousCallStack {
-					Lower.Effect.getCapabilityLength(destination: temp, source: try buffer.lowered())
-					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(temp))
+					Lower.Effect.getCapabilityLength(destination: tempRegisterA, source: try buffer.lowered())
+					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(tempRegisterA))
 				}
 				
 				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: .constant(let offset)) where immediateOffsetRange.contains(offset):
@@ -196,8 +195,8 @@ extension MM {
 				try Lower.Effect.storeCapability(address: buffer.lowered(), source: source.lowered(), offset: offset)
 				
 				case .storeElement(let dataType, buffer: let buffer, offset: let offset, from: let source):
-				try Lower.Effect.offsetCapability(destination: temp, source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Effect.store(dataType, address: temp, source: source.lowered())
+				try Lower.Effect.offsetCapability(destination: tempRegisterA, source: buffer.lowered(), offset: offset.lowered())
+				try Lower.Effect.store(dataType, address: tempRegisterA, source: source.lowered())
 				
 				case .deriveCapability(in: let destination, to: let label):
 				Lower.Effect.deriveCapabilityFromLabel(destination: try destination.lowered(), label: label)
@@ -223,11 +222,15 @@ extension MM {
 					do {
 						
 						// Allocate frame on heap.
-						let lengthReg = Lower.Register.t0	// cf. alloc routine
-						let bufferReg = Lower.Register.t0	// cf. alloc routine
-						let allocCapReg = Lower.Register.t1
+						let lengthReg = tempRegisterA	// cf. alloc routine
+						let bufferReg = tempRegisterA	// cf. alloc routine
+						let linkReg = tempRegisterB		// cf. alloc routine
 						Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(frame.allocatedByteSize))
-						Lower.Effect.callRuntimeRoutine(.allocationRoutineCapability, using: allocCapReg)
+						Lower.Effect.callRuntimeRoutine(capability: .allocationRoutineCapability, link: linkReg)
+						// The alloc routine *does not* overwrite linkReg but non-runtime MM code such as this is part of userland anyway.
+						// Temporaries —incl. linkReg— are either cleared or assigned a safe value when calling into or return from other procedures.
+						// For the paranoid, uncomment the following line:
+						// 		Lower.Effect.clear([linkReg])
 						
 						// Save previous fp in offset 0 of newly allocated frame.
 						Lower.Effect.store(.cap, address: bufferReg, source: .fp)
@@ -259,7 +262,7 @@ extension MM {
 				}
 				
 				case .permit(let permissions, destination: let destination, source: let source):
-				try Lower.Effect.permit(permissions, destination: destination.lowered(), source: source.lowered(), using: temp)
+				try Lower.Effect.permit(permissions, destination: destination.lowered(), source: source.lowered(), using: tempRegisterA)
 				
 				case .clearAll(except: let sparedRegisters):
 				let sparedRegisters = Set(try sparedRegisters.lowered()).union([.sp, .gp, .tp, .fp])
@@ -280,7 +283,7 @@ extension MM {
 						
 					case .heap:
 					Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
-					Lower.Effect.callRuntimeRoutine(.secureCallingRoutineCapability, using: temp)	// also links cra
+					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: .ra)
 					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)	// restore fp
 					
 				}
@@ -295,8 +298,8 @@ extension MM {
 					Lower.Effect.invoke(target: try caller.lowered(), data: .fp)
 					
 					case (.heap, .label(let caller)):
-					Lower.Effect.deriveCapabilityFromLabel(destination: temp, label: caller)
-					Lower.Effect.invoke(target: temp, data: .fp)
+					Lower.Effect.deriveCapabilityFromLabel(destination: tempRegisterA, label: caller)
+					Lower.Effect.invoke(target: tempRegisterA, data: .fp)
 					
 				}
 				
@@ -310,23 +313,5 @@ extension MM {
 		}
 		
 	}
-	
-}
-
-extension MM.Label {
-	
-	/// The label for the capability to the allocation routine.
-	///
-	/// The allocation routine takes a length in `t0` and returns a buffer capability in `ct0`. The routine may also touch `ct1` and `ct2` but will not leak any unintended new authority.
-	static var allocationRoutineCapability: Self { "mm.alloc.cap" }
-	
-	/// The label for the capability to the secure calling (scall) routine.
-	///
-	/// The scall routine takes a target capability in `invocationData`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. It returns the same frame capability in `invocationData` and any function results in argument registers.
-	///
-	/// The routine may touch any register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
-	///
-	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
-	static var secureCallingRoutineCapability: Self { "mm.scall.cap" }
 	
 }

@@ -24,7 +24,7 @@ extension MM {
 		case s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
 		
 		/// A register for temporaries.
-		case t3, t4, t5
+		case t4, t5
 		
 		/// A register for passing data through an invocation, i.e., `t6`/`ct6`.
 		///
@@ -55,7 +55,6 @@ extension MM {
 				case .s9:				return .s9
 				case .s10:				return .s10
 				case .s11:				return .s11
-				case .t3:				return .t3
 				case .t4:				return .t4
 				case .t5:				return .t5
 				case .invocationData:	return .t6

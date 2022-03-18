@@ -98,9 +98,6 @@ extension CE {
 		/// * if `target` contains a capability that points outside its bounds.
 		case invoke(target: Register, data: Register)
 		
-		/// An effect that jumps to address *x*, where *x* is the value in `cra`.
-		case `return`
-		
 		/// An effect that does nothing.
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
@@ -212,9 +209,6 @@ extension CE {
 				
 				case .invoke(target: let target, data: let data):
 				Lower.Instruction.invoke(target: target, data: data)
-				
-				case .return:
-				Lower.Instruction.jumpWithRegister(target: .ra, link: .zero)
 				
 			}
 		}

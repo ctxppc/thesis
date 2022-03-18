@@ -92,20 +92,17 @@ extension RT {
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `ct6` after unsealing it.
 		case invoke(target: Register, data: Register)
 		
-		/// An effect that puts the next PCC in `cra` then jumps to the runtime routine user capability with given label.
+		/// An effect that puts the next PCC in `link` then jumps to the runtime routine with given labelled capability.
 		///
-		/// The calling convention is dictated by the routine. The effect uses given register to prepare the target capability.
-		case callRuntimeRoutine(Label, using: Register)
-		
-		/// An effect that jumps to the address in `cra`, unsealing the latter first if it is a sentry capability.
-		case `return`
+		/// `link` is also used to prepare the target capability and therefore must not be `.zero`. The calling convention is dictated by the routine.
+		case callRuntimeRoutine(capability: Label, link: Register)
 		
 		/// An effect that does nothing.
 		static var nop: Self { .compute(destination: .zero, .zero, .add, .register(.zero)) }
 		
 		// See protocol.
 		@ArrayBuilder<Lower.Effect>
-		func lowered(in context: inout ()) -> [Lower.Effect] {
+		func lowered(in context: inout ()) throws -> [Lower.Effect] {
 			switch self {
 				
 				case .copy(let dataType, into: let destination, from: let source):
@@ -171,15 +168,30 @@ extension RT {
 				case .invoke(target: let target, data: let data):
 				Lower.Effect.invoke(target: target, data: data)
 				
-				case .callRuntimeRoutine(let name, using: let targetCapability):
-				Lower.Effect.deriveCapabilityFromLabel(destination: targetCapability, label: name)
-				Lower.Effect.load(.cap, destination: targetCapability, address: targetCapability)
-				Lower.Effect.jump(to: .register(targetCapability), link: .ra)
+				case .callRuntimeRoutine(capability: let capabilityLabel, link: .zero):
+				throw LoweringError.zeroRuntimeRoutineLinkRegister(capability: capabilityLabel)
 				
-				case .return:
-				Lower.Effect.return
+				case .callRuntimeRoutine(capability: let capabilityLabel, link: let linkReg):
+				Lower.Effect.deriveCapabilityFromLabel(destination: linkReg, label: capabilityLabel)
+				Lower.Effect.load(.cap, destination: linkReg, address: linkReg)
+				Lower.Effect.jump(to: .register(linkReg), link: linkReg)
 				
 			}
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating that a `.zero` link register is specified for calling a runtime routine with given capability.
+			case zeroRuntimeRoutineLinkRegister(capability: Label)
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					case .zeroRuntimeRoutineLinkRegister(capability: let label):
+					return "Cannot invoke runtime routine “\(label)” with link register cnull."
+				}
+			}
+			
 		}
 		
 	}

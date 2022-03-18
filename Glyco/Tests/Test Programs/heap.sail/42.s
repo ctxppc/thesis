@@ -66,31 +66,32 @@ rv.runtime:		cllc ct0, mm.heap
 				csetbounds ct6, ct6, t0
 				addi t0, zero, 11
 				candperm ct6, ct6, t0
+				cmove cfp, ct6
 				clear 0, 253
-				clear 1, 255
+				clear 1, 254
 				clear 2, 255
 				clear 3, 127
 				cllc ct0, mm.scall.cap
 				clc ct0, 0(ct0)
-				cjalr cra, ct0
+				cjalr ct0, ct0
 				.align 4
-mm.alloc:		cllc ct1, mm.heap.cap
-				clc ct1, 0(ct1)
-				csetbounds ct0, ct1, t0
-				cgetlen t2, ct0
-				cincoffset ct1, ct1, t2
-				cllc ct2, mm.heap.cap
-				csc ct1, 0(ct2)
-				clear 0, 192
-				cjalr cnull, cra
+mm.alloc:		cllc ct2, mm.heap.cap
+				clc ct3, 0(ct2)
+				csetbounds ct0, ct3, t0
+				cgetlen t3, ct0
+				cincoffset ct3, ct3, t3
+				csc ct3, 0(ct2)
+				clear 0, 128
+				clear 3, 16
+				cjalr ct1, ct1
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
-mm.scall:		cllc ct1, mm.seal.cap
-				clc ct1, 0(ct1)
-				cseal cra, cra, ct1
-				cseal cfp, cfp, ct1
-				clear 0, 64
+mm.scall:		cllc ct0, mm.seal.cap
+				clc ct0, 0(ct0)
+				cseal cra, cra, ct0
+				cseal cfp, cfp, ct0
+				clear 0, 32
 				cjalr cnull, ct6
 mm.seal.cap:	.octa 0
 mm.scall.end:	.align 4
@@ -101,7 +102,7 @@ mm.scall.cap:	.octa 0
 rv.main:		addi t0, zero, 16
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
-				cjalr cra, ct1
+				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
 				csc cra, -8(cfp)
@@ -110,9 +111,9 @@ rv.main:		addi t0, zero, 16
 				clear 2, 255
 				clear 3, 255
 				cllc ct6, f
-				cllc ct0, mm.scall.cap
-				clc ct0, 0(ct0)
-				cjalr cra, ct0
+				cllc cra, mm.scall.cap
+				clc cra, 0(cra)
+				cjalr cra, cra
 				cmove cfp, ct6
 cd.ret:			clc cra, -8(cfp)
 				clear 0, 225
@@ -124,7 +125,7 @@ cd.ret:			clc cra, -8(cfp)
 f:				addi t0, zero, 8
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
-				cjalr cra, ct1
+				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
 				addi a0, zero, 42

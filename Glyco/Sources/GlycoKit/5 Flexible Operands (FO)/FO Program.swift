@@ -28,6 +28,9 @@ public enum FO : Language {
 		
 	}
 	
+	/// A temporary register reserved for FO.
+	static let (tempRegisterA, tempRegisterB) = (Lower.Register.t4, Lower.Register.t5)
+	
 	// See protocol.
 	public typealias Lower = MM
 	

@@ -61,15 +61,15 @@ rv.runtime:		cllc ct0, mm.heap
 				cmove cfp, cnull
 				cjalr cnull, ct6
 				.align 4
-mm.alloc:		cllc ct1, mm.heap.cap
-				clc ct1, 0(ct1)
-				csetbounds ct0, ct1, t0
-				cgetlen t2, ct0
-				cincoffset ct1, ct1, t2
-				cllc ct2, mm.heap.cap
-				csc ct1, 0(ct2)
-				clear 0, 192
-				cjalr cnull, cra
+mm.alloc:		cllc ct2, mm.heap.cap
+				clc ct3, 0(ct2)
+				csetbounds ct0, ct3, t0
+				cgetlen t3, ct0
+				cincoffset ct3, ct3, t3
+				csc ct3, 0(ct2)
+				clear 0, 128
+				clear 3, 16
+				cjalr ct1, ct1
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 mm.user:

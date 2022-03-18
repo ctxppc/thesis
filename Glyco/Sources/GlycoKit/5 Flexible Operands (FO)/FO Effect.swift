@@ -70,9 +70,6 @@ extension FO {
 		// See protocol.
 		@ArrayBuilder<Lower.Effect>
 		public func lowered(in context: inout ()) throws -> [Lower.Effect] {
-			let temp1 = Lower.Register.t3
-			let temp2 = Lower.Register.t4
-			let temp3 = Lower.Register.t5
 			switch self {
 				
 				case .set(.u8, .register(let dest), to: .constant(let value)):
@@ -96,35 +93,35 @@ extension FO {
 				case .set(.cap, .frame, to: .constant(let value)):
 				throw LoweringError.settingCapabilityUsingConstant(value)
 				
-				case .set(let type, .frame(let dest), to: .constant(let imm)):
-				Lower.Effect.put(into: temp1, value: imm)
-				Lower.Effect.store(type, into: dest, from: temp1)
+				case .set(let type, .frame(let dest), to: .constant(let value)):
+				Lower.Effect.put(into: tempRegisterA, value: value)
+				Lower.Effect.store(type, into: dest, from: tempRegisterA)
 				
 				case .set(let type, .frame(let dest), to: .register(let src)):
 				try Lower.Effect.store(type, into: dest, from: src.lowered())
 				
 				case .set(let type, .frame(let dest), to: .frame(let src)):
-				Lower.Effect.load(type, into: temp1, from: src)
-				Lower.Effect.store(type, into: dest, from: temp1)
+				Lower.Effect.load(type, into: tempRegisterA, from: src)
+				Lower.Effect.store(type, into: dest, from: tempRegisterA)
 				
 				case .set(.cap, .frame(let dest), to: .capability(to: let label)):
-				Lower.Effect.deriveCapability(in: temp1, to: label)
-				Lower.Effect.store(.cap, into: dest, from: temp1)
+				Lower.Effect.deriveCapability(in: tempRegisterA, to: label)
+				Lower.Effect.store(.cap, into: dest, from: tempRegisterA)
 				
 				case .set(let dataType, _, to: .capability(to: let label)):
 				throw LoweringError.settingNoncapabilityToLabel(dataType, label)
 				
 				case .compute(let destination, let lhs, .mul, .constant(let rhs)):
-				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
-				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
-				Lower.Effect.put(into: temp1, value: rhs)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: tempRegisterA)
+				let (storeResult, dest) = try store(.s32, to: destination, using: tempRegisterB)
+				Lower.Effect.put(into: tempRegisterA, value: rhs)
 				loadLHS
-				Lower.Effect.compute(destination: dest, lhs, .mul, .register(temp1))
+				Lower.Effect.compute(destination: dest, lhs, .mul, .register(tempRegisterA))
 				storeResult
 				
 				case .compute(let destination, let lhs, let operation, .constant(let rhs)):
-				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
-				let (storeResult, dest) = try store(.s32, to: destination, using: temp2)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: tempRegisterA)
+				let (storeResult, dest) = try store(.s32, to: destination, using: tempRegisterB)
 				loadLHS
 				Lower.Effect.compute(destination: dest, lhs, operation, .constant(rhs))
 				storeResult
@@ -133,41 +130,41 @@ extension FO {
 				try Self.compute(destination, .register(rhs), .add, .constant(lhs)).lowered()
 				
 				case .compute(let destination, let lhs, let operation, let rhs):
-				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
-				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
-				let (storeResult, dest) = try store(.s32, to: destination, using: temp3)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: tempRegisterA)
+				let (loadRHS, rhs) = try loadAsSource(.s32, from: rhs, using: tempRegisterB)
+				let (storeResult, dest) = try store(.s32, to: destination, using: tempRegisterA)
 				loadLHS
 				loadRHS
-				Lower.Effect.compute(destination: dest, lhs, operation, .register(rhs))
+				Lower.Effect.compute(destination: dest, lhs, operation, rhs)
 				storeResult
 				
 				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: let onFrame):
-				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: temp1)
+				let (storeBufferCap, bufferCap) = try store(.cap, to: buffer, using: tempRegisterA)
 				Lower.Effect.createBuffer(bytes: .constant(bytes), capability: bufferCap, onFrame: onFrame)
 				storeBufferCap
 				
 				case .destroyBuffer(capability: let buffer):
-				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: temp1)
+				let (loadBufferCap, bufferCap) = try load(.cap, from: buffer, using: tempRegisterA)
 				loadBufferCap
 				Lower.Effect.destroyBuffer(capability: bufferCap)
 				
 				case .getElement(let type, of: let buffer, offset: let offset, to: let destination):
-				let (loadBuffer, buffer) = try load(type, from: .init(buffer), using: temp1)
-				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
-				let (storeElement, dest) = try store(type, to: destination, using: temp3)
+				let (loadBuffer, buffer) = try load(type, from: .init(buffer), using: tempRegisterA)
+				let (loadOffset, offset) = try loadAsSource(type, from: offset, using: tempRegisterB)
+				let (storeElement, dest) = try store(type, to: destination, using: tempRegisterA)
 				loadBuffer
 				loadOffset
-				Lower.Effect.loadElement(type, into: dest, buffer: buffer, offset: .register(offset))
+				Lower.Effect.loadElement(type, into: dest, buffer: buffer, offset: offset)
 				storeElement
 				
 				case .setElement(let type, of: let vector, offset: let offset, to: let element):
-				let (loadBuffer, buffer) = try load(type, from: .init(vector), using: temp1)
-				let (loadOffset, offset) = try load(type, from: offset, using: temp2)
-				let (loadElement, element) = try load(type, from: element, using: temp3)
+				let (loadBuffer, buffer) = try load(type, from: .init(vector), using: tempRegisterA)
+				let (loadOffset, offset) = try loadAsSource(type, from: offset, using: tempRegisterB)
+				let (loadElement, element) = try load(type, from: element, using: .invocationData)	// FIXME: Register not reserved by MM!
 				loadBuffer
 				loadOffset
 				loadElement
-				Lower.Effect.storeElement(type, buffer: buffer, offset: .register(offset), from: element)
+				Lower.Effect.storeElement(type, buffer: buffer, offset: offset, from: element)
 				
 				case .pushFrame(let frame):
 				Lower.Effect.pushFrame(frame)
@@ -179,8 +176,8 @@ extension FO {
 				Lower.Effect.clearAll(except: try sparedRegisters.lowered())
 				
 				case .branch(to: let target, let lhs, let relation, let rhs):
-				let (loadLHS, lhs) = try load(.s32, from: lhs, using: temp1)
-				let (loadRHS, rhs) = try load(.s32, from: rhs, using: temp2)
+				let (loadLHS, lhs) = try load(.s32, from: lhs, using: tempRegisterA)
+				let (loadRHS, rhs) = try load(.s32, from: rhs, using: tempRegisterB)
 				loadLHS
 				loadRHS
 				Lower.Effect.branch(to: target, lhs, relation, rhs)
@@ -201,8 +198,8 @@ extension FO {
 				Lower.Effect.return(to: .register(try caller.lowered()))
 				
 				case .return(to: .frame(let caller)):
-				Lower.Effect.load(.cap, into: temp1, from: caller)
-				Lower.Effect.return(to: .register(temp1))
+				Lower.Effect.load(.cap, into: tempRegisterA, from: caller)
+				Lower.Effect.return(to: .register(tempRegisterA))
 				
 				case .labelled(let label, let effect):
 				if let (first, tail) = try effect.lowered().splittingFirst() {
@@ -217,7 +214,9 @@ extension FO {
 		
 		/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register.
 		///
-		/// - Returns: A pair consisting of the instructions to perform before the main effect, and the register where the loaded datum is located.
+		/// No loads with overlapping lifetimes may use the same `temporaryRegister`.
+		///
+		/// - Returns: A pair consisting of the effects to perform before the main effect, and the register where the loaded datum is located.
 		private func load(_ dataType: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 			switch source {
 				
@@ -237,9 +236,29 @@ extension FO {
 			}
 		}
 		
+		/// Loads the datum in `source` in `temporaryRegister` if `source` isn't a register or constant value.
+		///
+		/// No loads with overlapping lifetimes may use the same `temporaryRegister`.
+		///
+		/// - Returns: A pair consisting of the effects to perform before the main effect, and the source from which the datum can be retrieved.
+		private func loadAsSource(_ dataType: DataType, from source: Source, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Source) {
+			switch source {
+				
+				case .constant(let value):
+				return ([], .constant(value))
+				
+				case .register, .frame, .capability:
+				let (effects, register) = try load(dataType, from: source, using: temporaryRegister)
+				return (effects, .register(register))
+				
+			}
+		}
+		
 		/// Stores the datum in `temporaryRegister` in `destination` if `destination` isn't a register.
 		///
-		/// - Returns: A pair consisting of the instructions to perform after the main effect, and the register wherein to put the result of the effect.
+		/// A load whose lifetime ends on the store may use the same `temporaryRegister` as the store.
+		///
+		/// - Returns: A pair consisting of the effects to perform after the main effect, and the register wherein to put the result of the effect.
 		private func store(_ type: DataType, to destination: Location, using temporaryRegister: Lower.Register) throws -> ([Lower.Effect], Lower.Register) {
 			switch destination {
 				case .register(let r):	return ([], try r.lowered())

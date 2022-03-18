@@ -61,15 +61,15 @@ rv.runtime:		cllc ct0, mm.heap
 				cmove cfp, cnull
 				cjalr cnull, ct6
 				.align 4
-mm.alloc:		cllc ct1, mm.heap.cap
-				clc ct1, 0(ct1)
-				csetbounds ct0, ct1, t0
-				cgetlen t2, ct0
-				cincoffset ct1, ct1, t2
-				cllc ct2, mm.heap.cap
-				csc ct1, 0(ct2)
-				clear 0, 192
-				cjalr cnull, cra
+mm.alloc:		cllc ct2, mm.heap.cap
+				clc ct3, 0(ct2)
+				csetbounds ct0, ct3, t0
+				cgetlen t3, ct0
+				cincoffset ct3, ct3, t3
+				csc ct3, 0(ct2)
+				clear 0, 128
+				clear 3, 16
+				cjalr ct1, ct1
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 mm.user:
@@ -107,51 +107,51 @@ recFib:			csc cfp, -8(csp)
 				cincoffsetimm csp, csp, -24
 				csc cs1, -8(cfp)
 cd.then$31:		csc cra, -16(cfp)
-				mv a4, a0
-				mv a6, a1
-				cmove ca5, ca2
-				mv s1, a4
-				mv a0, a6
+				mv a3, a0
+				mv a5, a1
+				cmove ca4, ca2
+				mv ra, a3
+				mv s1, a5
 cd.pred:		nop
-				bgt s1, a0, cd.then$32
-cd.else:		mv s1, a4
-				addi a0, zero, 2
-				sub a1, s1, a0
-				mv s1, a4
-				addi a0, zero, 1
-				sub a2, s1, a0
-				mv s1, a4
-				addi a0, zero, 1
-				add a3, s1, a0
-				cmove ca0, ca5
-				mv s1, a1
-				slli s1, s1, 2
-				cincoffset ca1, ca0, s1
-				lw.cap a1, 0(ca1)
-				cmove ca0, ca5
-				mv s1, a2
-				slli s1, s1, 2
-				cincoffset cs1, ca0, s1
-				lw.cap s1, 0(cs1)
-				add a0, a1, s1
-				cmove ca1, ca5
-				mv s1, a4
-				slli s1, s1, 2
-				cincoffset ct0, ca1, s1
-				sw.cap a0, 0(ct0)
-				mv a0, a3
-				mv a1, a6
-				cmove ca2, ca5
+				bgt ra, s1, cd.then$32
+cd.else:		mv ra, a3
+				addi s1, zero, 2
+				sub a0, ra, s1
+				mv ra, a3
+				addi s1, zero, 1
+				sub a1, ra, s1
+				mv ra, a3
+				addi s1, zero, 1
+				add a2, ra, s1
+				cmove cs1, ca4
+				mv ra, a0
+				slli ra, ra, 2
+				cincoffset ca0, cs1, ra
+				lw.cap a0, 0(ca0)
+				cmove cs1, ca4
+				mv ra, a1
+				slli ra, ra, 2
+				cincoffset cra, cs1, ra
+				lw.cap ra, 0(cra)
+				add s1, a0, ra
+				cmove ca0, ca4
+				mv ra, a3
+				slli ra, ra, 2
+				cincoffset ct0, ca0, ra
+				sw.cap s1, 0(ct0)
+				mv a0, a2
+				mv a1, a5
+				cmove ca2, ca4
 				cjal cra, recFib
 cd.ret$2:		clc cs1, -8(cfp)
 cd.then$52:		clc cra, -16(cfp)
 				cincoffsetimm csp, cfp, 8
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-cd.then$32:		cmove ca0, ca5
-				mv s1, a6
-				slli s1, s1, 2
-				cincoffset ca0, ca0, s1
+cd.then$32:		cmove cs1, ca4
+				mv ra, a5
+				slli ra, ra, 2
+				cincoffset ca0, cs1, ra
 				lw.cap a0, 0(ca0)
 				clc cs1, -8(cfp)
 cd.then$42:		clc cra, -16(cfp)
