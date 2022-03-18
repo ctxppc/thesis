@@ -54,7 +54,7 @@ extension MM {
 		///
 		/// This effect's semantics depend on the currently active calling convention:
 		/// * If GCCC is used, this effect copies `cfp` to `csp` and pops `cfp` from the stack.
-		/// * If GHSCC is used, this effect loads the previous (still sealed) frame capability into `cfp`.
+		/// * If GHSCC is used, this effect loads the previous (still sealed) frame capability from the current frame and puts it into `cfp`.
 		///
 		/// This effect must be executed exactly once before any effects accessing the previous call frame. If GHSCC is used, an additional return is required before the previous call frame is available.
 		case popFrame
@@ -257,7 +257,7 @@ extension MM {
 					}
 					
 					case .heap:
-					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)
+					Lower.Effect.load(.cap, destination: .fp, address: .fp)
 					
 				}
 				

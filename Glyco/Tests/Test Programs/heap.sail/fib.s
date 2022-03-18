@@ -127,7 +127,7 @@ cd.ret:			clc cra, -8(cfp)
 				clear 1, 250
 				clear 2, 255
 				clear 3, 255
-				cmove cfp, ct6
+				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 fib:			addi t0, zero, 16
 				cllc ct1, mm.alloc.cap
@@ -159,7 +159,7 @@ cd.ret$1:		clc cra, -8(cfp)
 				clear 1, 250
 				clear 2, 255
 				clear 3, 255
-				cmove cfp, ct6
+				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 cd.then:		mv a0, a1
 				clc cra, -8(cfp)
@@ -167,7 +167,7 @@ cd.then:		mv a0, a1
 				clear 1, 250
 				clear 2, 255
 				clear 3, 255
-				cmove cfp, ct6
+				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 mm.user.end:	.align 4
 				.bss
