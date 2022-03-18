@@ -88,22 +88,22 @@ cd.ret:			clc cra, -8(cfp)
 f:				csc cfp, -8(csp)
 				cincoffsetimm cfp, csp, -8
 				cincoffsetimm csp, csp, -8
-cd.then:		cmove ca4, cs2
-				cmove ca5, cs3
-				cmove ca6, cs4
-				cmove ca7, cs5
-cd.then$4:		cmove ca2, cs10
-				cmove ca3, cs11
-				cmove ca1, cra
-				addi a0, zero, 42
-cd.then$5:		cmove cs2, ca4
-				cmove cs3, ca5
-				cmove cs4, ca6
-				cmove cs5, ca7
-cd.then$9:		cmove cs10, ca2
-				cmove cs11, ca3
-				cmove cra, ca1
-				cincoffsetimm csp, cfp, 8
+cd.then:		cmove ca3, cs2
+				cmove ca4, cs3
+				cmove ca5, cs4
+				cmove ca6, cs5
+				cmove ca7, cs6
+cd.then$3:		cmove ca1, cs10
+				cmove ca2, cs11
+cd.then$4:		addi a0, zero, 42
+cd.then$5:		cmove cs2, ca3
+				cmove cs3, ca4
+				cmove cs4, ca5
+				cmove cs5, ca6
+				cmove cs6, ca7
+cd.then$8:		cmove cs10, ca1
+				cmove cs11, ca2
+cd.then$9:		cincoffsetimm csp, cfp, 8
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 mm.user.end:	.align 4

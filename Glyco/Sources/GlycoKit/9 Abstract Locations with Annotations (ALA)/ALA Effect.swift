@@ -273,7 +273,7 @@ extension ALA {
 				
 				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
 				let sparedRegisters = Set(sparedRegisters)
-				return Register.allCases
+				return Register.assignableRegisters
 					.filter { !sparedRegisters.contains($0) }
 					.map { .register($0) }
 				

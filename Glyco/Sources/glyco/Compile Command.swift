@@ -68,8 +68,7 @@ struct CompileCommand : ParsableCommand {
 		let environment = ProcessInfo.processInfo.environment
 		let toolchainURL = environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:))
 		let systemURL = environment["CHERISYSROOT"].map(URL.init(fileURLWithPath:))
-		let configuration = with(CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL)) {
-			$0.callingConvention = callingConvention
+		let configuration = with(CompilationConfiguration(target: target, toolchainURL: toolchainURL, systemURL: systemURL, callingConvention: callingConvention)) {
 			$0.argumentRegisters = argumentRegisters
 			$0.optimise = optimise
 			$0.validate = validate

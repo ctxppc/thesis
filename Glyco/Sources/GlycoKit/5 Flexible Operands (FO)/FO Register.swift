@@ -10,10 +10,7 @@ extension FO {
 		/// The set of registers that can be used for storing data.
 		///
 		/// The order is semantically insignificant but it's fixed to make assignment more deterministic.
-		static let assignableRegisters = OrderedSet(allCases).subtracting([.zero, .ra])
-		
-		/// The set of registers that are either caller-saved or callee-saved.
-		static let savedRegisters = OrderedSet(allCases).subtracting([.zero])
+		static let assignableRegisters = OrderedSet(allCases).subtracting([.zero])
 		
 		/// The set of registers that are used for passing arguments to procedures, in argument order, in RISC-V ABIs.
 		public static let argumentRegistersInRVABI = registers(inClass: "a")
@@ -22,13 +19,13 @@ extension FO {
 		public static let resultRegistersInRVABI: OrderedSet = [Self.a0, .a1]
 		
 		/// The set of registers that a procedure must save before invoking a procedure in RISC-V ABIs.
-		public static let callerSavedRegistersInRVABI = Array(AL.Register.savedRegisters.subtracting(calleeSavedRegistersInRVABI))
+		public static let callerSavedRegistersInRVABI = Array(AL.Register.assignableRegisters.subtracting(calleeSavedRegistersInRVABI))
 		
 		/// The set of registers that a procedure must save before using in RISC-V ABIs.
 		public static let calleeSavedRegistersInRVABI = registers(inClass: "s")
 		
 		/// The set of registers that a procedure must save before invoking a procedure in hybrid CHERI-RISC-V ABIs.
-		public static let callerSavedRegistersInCHERIRVABI = Array(AL.Register.savedRegisters.subtracting(calleeSavedRegistersInCHERIRVABI))
+		public static let callerSavedRegistersInCHERIRVABI = Array(AL.Register.assignableRegisters.subtracting(calleeSavedRegistersInCHERIRVABI))
 		
 		/// The set of registers that a procedure must save before using in hybrid CHERI-RISC-V ABIs.
 		public static let calleeSavedRegistersInCHERIRVABI = [Self]()
@@ -94,7 +91,7 @@ extension FO {
 }
 
 extension FO.Register : Comparable {
-	public static func < (lhs: Self, rhs: Self) -> Bool {
+	public static func <(lhs: Self, rhs: Self) -> Bool {
 		lhs.rawValue < rhs.rawValue
 	}
 }

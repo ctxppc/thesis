@@ -20,7 +20,7 @@ final class ArithmeticTests : XCTestCase {
 			procedures: []
 		)
 		
-		let configuration = CompilationConfiguration(target: .sail)
+		let configuration = CompilationConfiguration(target: .sail, callingConvention: .conventional)
 		let loweredProgram = try program.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
@@ -151,7 +151,7 @@ final class ArithmeticTests : XCTestCase {
 			procedures:	[]
 		)
 		
-		let configuration = CompilationConfiguration(target: .sail)
+		let configuration = CompilationConfiguration(target: .sail, callingConvention: .conventional)
 		let loweredProgram = try program.lowered(configuration: configuration)
 			.lowered(configuration: configuration)
 			.lowered(configuration: configuration)

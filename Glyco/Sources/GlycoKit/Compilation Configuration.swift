@@ -5,7 +5,7 @@ import Foundation
 public struct CompilationConfiguration {
 	
 	/// Creates a configuration.
-	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil, callingConvention: CallingConvention = .conventional) {
+	public init(target: Target, toolchainURL: URL? = nil, systemURL: URL? = nil, callingConvention: CallingConvention) {
 		
 		self.target = target
 		self.toolchainURL = toolchainURL ?? FileManager
@@ -43,7 +43,7 @@ public struct CompilationConfiguration {
 	// MARK: Procedure Calls
 	
 	/// The program's calling convention.
-	public var callingConvention: CallingConvention
+	public let callingConvention: CallingConvention
 	public enum CallingConvention : String, CaseIterable {
 		
 		/// The Glyco Conventional Calling Convention (GCCC), a calling convention based on a traditional RISC-V calling convention.

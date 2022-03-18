@@ -124,33 +124,22 @@ cd.ret:			clc cra, -8(cfp)
 				clear 3, 255
 				cmove cfp, ct6
 				cinvoke cra, cfp
-fib:			addi t0, zero, 104
+fib:			addi t0, zero, 16
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
 				cjalr cra, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cs1, -16(cfp)
-				csc cs2, -40(cfp)
-				csc cs3, -48(cfp)
-				csc cs4, -56(cfp)
-				csc cs5, -64(cfp)
-				csc cs6, -72(cfp)
-				csc cs7, -80(cfp)
-				csc cs8, -88(cfp)
-				csc cs9, -96(cfp)
-				csc cs10, -24(cfp)
-				csc cs11, -32(cfp)
 				csc cra, -8(cfp)
 				mv a3, a0
-				mv s1, a2
-				addi a0, zero, 0
+				mv ra, a2
+				addi s1, zero, 0
 cd.pred:		nop
-				ble s1, a0, cd.then
+				ble ra, s1, cd.then
 cd.else:		mv a0, a1
 				add a1, a3, a1
-				addi s1, zero, 1
-				sub a2, a2, s1
+				addi ra, zero, 1
+				sub a2, a2, ra
 				clear 0, 227
 				clear 1, 226
 				clear 2, 255
@@ -160,18 +149,7 @@ cd.else:		mv a0, a1
 				clc ct0, 0(ct0)
 				cjalr cra, ct0
 				cmove cfp, ct6
-cd.ret$1:		clc cs1, -16(cfp)
-				clc cs2, -40(cfp)
-				clc cs3, -48(cfp)
-				clc cs4, -56(cfp)
-				clc cs5, -64(cfp)
-				clc cs6, -72(cfp)
-				clc cs7, -80(cfp)
-				clc cs8, -88(cfp)
-				clc cs9, -96(cfp)
-				clc cs10, -24(cfp)
-				clc cs11, -32(cfp)
-				clc cra, -8(cfp)
+cd.ret$1:		clc cra, -8(cfp)
 				clear 0, 225
 				clear 1, 250
 				clear 2, 255
@@ -179,17 +157,6 @@ cd.ret$1:		clc cs1, -16(cfp)
 				cmove cfp, ct6
 				cinvoke cra, cfp
 cd.then:		mv a0, a1
-				clc cs1, -16(cfp)
-				clc cs2, -40(cfp)
-				clc cs3, -48(cfp)
-				clc cs4, -56(cfp)
-				clc cs5, -64(cfp)
-				clc cs6, -72(cfp)
-				clc cs7, -80(cfp)
-				clc cs8, -88(cfp)
-				clc cs9, -96(cfp)
-				clc cs10, -24(cfp)
-				clc cs11, -32(cfp)
 				clc cra, -8(cfp)
 				clear 0, 225
 				clear 1, 250

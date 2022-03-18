@@ -1,0 +1,172 @@
+(
+	locals: abstract(cc.retcap, cap),
+	in: do(
+		pushScope(
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.retcap), register(a0))
+					(abstract(cc.retcap), register(a1))
+					(abstract(cc.retcap), register(a2))
+					(abstract(cc.retcap), register(a3))
+					(abstract(cc.retcap), register(a4))
+					(abstract(cc.retcap), register(a5))
+					(abstract(cc.retcap), register(a6))
+					(abstract(cc.retcap), register(a7))
+					(abstract(cc.retcap), register(invocationData))
+					(abstract(cc.retcap), register(ra))
+					(abstract(cc.retcap), register(s1))
+					(abstract(cc.retcap), register(s10))
+					(abstract(cc.retcap), register(s11))
+					(abstract(cc.retcap), register(s2))
+					(abstract(cc.retcap), register(s3))
+					(abstract(cc.retcap), register(s4))
+					(abstract(cc.retcap), register(s5))
+					(abstract(cc.retcap), register(s6))
+					(abstract(cc.retcap), register(s7))
+					(abstract(cc.retcap), register(s8))
+					(abstract(cc.retcap), register(s9))
+				),
+				possiblyLiveLocations: register(ra)
+			)
+		)
+		set(
+			abstract(cc.retcap),
+			to: register(ra, cap),
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.retcap), register(a0))
+					(abstract(cc.retcap), register(a1))
+					(abstract(cc.retcap), register(a2))
+					(abstract(cc.retcap), register(a3))
+					(abstract(cc.retcap), register(a4))
+					(abstract(cc.retcap), register(a5))
+					(abstract(cc.retcap), register(a6))
+					(abstract(cc.retcap), register(a7))
+					(abstract(cc.retcap), register(invocationData))
+					(abstract(cc.retcap), register(ra))
+					(abstract(cc.retcap), register(s1))
+					(abstract(cc.retcap), register(s10))
+					(abstract(cc.retcap), register(s11))
+					(abstract(cc.retcap), register(s2))
+					(abstract(cc.retcap), register(s3))
+					(abstract(cc.retcap), register(s4))
+					(abstract(cc.retcap), register(s5))
+					(abstract(cc.retcap), register(s6))
+					(abstract(cc.retcap), register(s7))
+					(abstract(cc.retcap), register(s8))
+					(abstract(cc.retcap), register(s9))
+				),
+				possiblyLiveLocations: register(ra)
+			)
+		)
+		clearAll(
+			except: ,
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.retcap), register(a0))
+					(abstract(cc.retcap), register(a1))
+					(abstract(cc.retcap), register(a2))
+					(abstract(cc.retcap), register(a3))
+					(abstract(cc.retcap), register(a4))
+					(abstract(cc.retcap), register(a5))
+					(abstract(cc.retcap), register(a6))
+					(abstract(cc.retcap), register(a7))
+					(abstract(cc.retcap), register(invocationData))
+					(abstract(cc.retcap), register(ra))
+					(abstract(cc.retcap), register(s1))
+					(abstract(cc.retcap), register(s10))
+					(abstract(cc.retcap), register(s11))
+					(abstract(cc.retcap), register(s2))
+					(abstract(cc.retcap), register(s3))
+					(abstract(cc.retcap), register(s4))
+					(abstract(cc.retcap), register(s5))
+					(abstract(cc.retcap), register(s6))
+					(abstract(cc.retcap), register(s7))
+					(abstract(cc.retcap), register(s8))
+					(abstract(cc.retcap), register(s9))
+				),
+				possiblyLiveLocations: abstract(cc.retcap)
+			)
+		)
+		call(
+			f,
+			parameters: ,
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.retcap), register(a0))
+					(abstract(cc.retcap), register(a1))
+					(abstract(cc.retcap), register(a2))
+					(abstract(cc.retcap), register(a3))
+					(abstract(cc.retcap), register(a4))
+					(abstract(cc.retcap), register(a5))
+					(abstract(cc.retcap), register(a6))
+					(abstract(cc.retcap), register(a7))
+					(abstract(cc.retcap), register(invocationData))
+					(abstract(cc.retcap), register(ra))
+					(abstract(cc.retcap), register(s1))
+					(abstract(cc.retcap), register(s10))
+					(abstract(cc.retcap), register(s11))
+					(abstract(cc.retcap), register(s2))
+					(abstract(cc.retcap), register(s3))
+					(abstract(cc.retcap), register(s4))
+					(abstract(cc.retcap), register(s5))
+					(abstract(cc.retcap), register(s6))
+					(abstract(cc.retcap), register(s7))
+					(abstract(cc.retcap), register(s8))
+					(abstract(cc.retcap), register(s9))
+				),
+				possiblyLiveLocations: abstract(cc.retcap)
+			)
+		)
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0)))
+		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0)))
+		set(
+			register(ra),
+			to: abstract(cc.retcap),
+			analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0))
+		)
+		clearAll(except: a0 ra, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
+		popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
+		return(to: register(ra, cap), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra))),
+		analysisAtEntry: (
+			conflicts: (
+				(abstract(cc.retcap), register(a0))
+				(abstract(cc.retcap), register(a1))
+				(abstract(cc.retcap), register(a2))
+				(abstract(cc.retcap), register(a3))
+				(abstract(cc.retcap), register(a4))
+				(abstract(cc.retcap), register(a5))
+				(abstract(cc.retcap), register(a6))
+				(abstract(cc.retcap), register(a7))
+				(abstract(cc.retcap), register(invocationData))
+				(abstract(cc.retcap), register(ra))
+				(abstract(cc.retcap), register(s1))
+				(abstract(cc.retcap), register(s10))
+				(abstract(cc.retcap), register(s11))
+				(abstract(cc.retcap), register(s2))
+				(abstract(cc.retcap), register(s3))
+				(abstract(cc.retcap), register(s4))
+				(abstract(cc.retcap), register(s5))
+				(abstract(cc.retcap), register(s6))
+				(abstract(cc.retcap), register(s7))
+				(abstract(cc.retcap), register(s8))
+				(abstract(cc.retcap), register(s9))
+			),
+			possiblyLiveLocations: register(ra)
+		)
+	),
+	procedures: (
+		f,
+		locals: ,
+		in: do(
+			pushScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
+			do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
+			set(register(a0), to: constant(42), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
+			do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
+			clearAll(except: a0 ra, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
+			popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
+			return(to: register(ra, cap), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra))),
+			analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra))
+		)
+	)
+)

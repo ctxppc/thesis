@@ -16,7 +16,7 @@ final class FlexibleOperandsTests : XCTestCase {
 			.compute(.frame(c), .frame(a), .add, .frame(b))
 		])
 		
-		let actual = try source.lowered(configuration: .init(target: .sail))
+		let actual = try source.lowered(configuration: .init(target: .sail, callingConvention: .conventional))
 		let expected = MM.Program([
 			.load(.s32, into: .t3, from: .init(offset: -8)),
 			.load(.s32, into: .t4, from: .init(offset: -12)),

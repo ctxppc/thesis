@@ -127,21 +127,7 @@ f:				addi t0, zero, 8
 				cjalr cra, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-cd.then:		cmove ca4, cs2
-				cmove ca5, cs3
-				cmove ca6, cs4
-				cmove ca7, cs5
-cd.then$4:		cmove ca2, cs10
-				cmove ca3, cs11
-				cmove ca1, cra
 				addi a0, zero, 42
-cd.then$5:		cmove cs2, ca4
-				cmove cs3, ca5
-				cmove cs4, ca6
-				cmove cs5, ca7
-cd.then$9:		cmove cs10, ca2
-				cmove cs11, ca3
-				cmove cra, ca1
 				clear 0, 225
 				clear 1, 250
 				clear 2, 255

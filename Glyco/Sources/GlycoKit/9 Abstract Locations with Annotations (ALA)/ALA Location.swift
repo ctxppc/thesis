@@ -75,9 +75,9 @@ extension ALA {
 			
 			/// A mapping from registers to locations assigned to that register.
 			///
-			/// - Invariant: Every register location is assigned to its corresponding register.
+			/// - Invariant: Every assignable register location is assigned to its corresponding register.
 			private var locationsByRegister: [Lower.Register : Set<Location>] = .init(
-				uniqueKeysWithValues: Lower.Register.allCases.lazy.map { ($0, [.register($0)]) }
+				uniqueKeysWithValues: Lower.Register.assignableRegisters.lazy.map { ($0, [.register($0)]) }
 			)
 			
 			/// The frame on which spilled data are stored.

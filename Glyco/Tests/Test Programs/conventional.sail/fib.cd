@@ -29,8 +29,8 @@
 			set(s32, register(a3), to: register(a0))
 			if(
 				do(
-					set(s32, register(s1), to: register(a2)) set(s32, register(a0), to: constant(0)),
-					then: relation(register(s1), le, register(a0))
+					set(s32, register(ra), to: register(a2)) set(s32, register(s1), to: constant(0)),
+					then: relation(register(ra), le, register(s1))
 				),
 				then: do(
 					set(s32, register(a0), to: register(a1))
@@ -52,8 +52,8 @@
 				else: do(
 					set(s32, register(a0), to: register(a1))
 					compute(register(a1), register(a3), add, register(a1))
-					set(s32, register(s1), to: constant(1))
-					compute(register(a2), register(a2), sub, register(s1))
+					set(s32, register(ra), to: constant(1))
+					compute(register(a2), register(a2), sub, register(ra))
 					call(fib)
 					set(cap, register(s1), to: frame((offset: -8)))
 					do()

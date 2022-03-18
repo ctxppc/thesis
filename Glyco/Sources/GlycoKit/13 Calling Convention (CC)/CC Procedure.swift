@@ -40,7 +40,7 @@ extension CC {
 				// Prepare new scope.
 				Lower.Effect.pushScope
 				
-				// Callee-save registers (except fp) in abstract locations to limit their liveness.
+				// Bind assignable callee-saved registers to abstract locations to limit their liveness.
 				for register in context.configuration.calleeSavedRegisters {
 					Lower.Effect.set(.abstract(context.saveLocation(for: register)), to: .register(register, .registerDatum))
 				}

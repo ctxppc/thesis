@@ -172,7 +172,7 @@ extension CC {
 					Lowered.set(.register(resultRegister), to: try result.lowered(in: &context))
 					// TODO: Write to a global abstract location to ensure consistent return type, and infer return type from that.
 					
-					// If lowering a procedure, restore callee-saved registers (except fp) from abstract locations — reverse of prologue.
+					// If lowering a procedure, restore assignable callee-saved registers from abstract locations — reverse of prologue.
 					if context.loweredProcedure != nil {
 						for register in context.configuration.calleeSavedRegisters {
 							Lowered.set(.register(register), to: .abstract(context.saveLocation(for: register)))

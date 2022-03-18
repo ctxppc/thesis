@@ -94,14 +94,14 @@ fib:			csc cfp, -8(csp)
 				csc cs1, -8(cfp)
 cd.then$9:		csc cra, -16(cfp)
 				mv a3, a0
-				mv s1, a2
-				addi a0, zero, 0
+				mv ra, a2
+				addi s1, zero, 0
 cd.pred:		nop
-				ble s1, a0, cd.then$10
+				ble ra, s1, cd.then$10
 cd.else:		mv a0, a1
 				add a1, a3, a1
-				addi s1, zero, 1
-				sub a2, a2, s1
+				addi ra, zero, 1
+				sub a2, a2, ra
 				cjal cra, fib
 cd.ret$1:		clc cs1, -8(cfp)
 cd.then$30:		clc cra, -16(cfp)
