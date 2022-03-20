@@ -72,8 +72,8 @@ public enum RV : Language {
 								
 				_exit:			auipcc ct5, 0x1
 								cllc ct0, tohost
-								cincoffset ct0, ct0, gp
-								csc ct5, 0(ct0)
+								cincoffset ct5, ct5, t0
+								csw gp, 0(ct5)
 								j _exit
 								
 				rv.begin:		ccall \(Label.runtime.rawValue)
