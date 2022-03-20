@@ -12,7 +12,7 @@ public enum FO : Language {
 			self.effects = effects
 		}
 		
-		/// The effects of the program.
+		/// The effects of the program, starting with the program's first effect.
 		public var effects: [Effect]
 		
 		// See protocol.

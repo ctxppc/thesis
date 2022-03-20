@@ -42,7 +42,6 @@ public enum MM : Language {
 			let scallCapLabel = Label.secureCallingRoutineCapability
 			let sealCapLabel = context.labels.uniqueName(from: "mm.seal.cap")
 			
-			let userLabel = context.labels.uniqueName(from: "mm.user")
 			let userEndLabel = context.labels.uniqueName(from: "mm.user.end")
 			
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
@@ -196,7 +195,7 @@ public enum MM : Language {
 					
 					// Tail-call user program.
 					switch configuration.callingConvention {
-							
+						
 						case .conventional:
 						Lower.Effect.copy(.cap, into: .fp, from: .zero)	// clear cfp
 						Lower.Effect.jump(to: .register(userCapReg), link: .zero)
@@ -219,7 +218,7 @@ public enum MM : Language {
 							// By making this a tail-call we avoid having to store the previous cra somewhere or as a fake cfp arg to scall. No need for complexity here!
 							
 						}
-							
+						
 					}
 					
 				}
@@ -311,16 +310,16 @@ public enum MM : Language {
 			var user: [Lower.Statement] {
 				get throws {
 					
-					// Alloc capability.
-					Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
-					userLabel ~ (allocCapLabel ~ .nullCapability)
-					
-					// Scall capability.
-					scallCapLabel ~ .nullCapability
-					
 					// User code.
 					Lower.Statement.padding()
 					try effects.lowered(in: &context)
+					
+					// Alloc capability.
+					Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
+					allocCapLabel ~ .nullCapability
+					
+					// Scall capability.
+					scallCapLabel ~ .nullCapability
 					
 					// Label end of user.
 					userEndLabel ~ .padding()

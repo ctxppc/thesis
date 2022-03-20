@@ -88,7 +88,7 @@ public enum BB : Language {
 				}
 			}
 			
-			try appendBlockOrJumpToBlock(named: .programEntry)
+			try appendBlockOrJumpToBlock(named: .programEntry)	// first block must be program entry
 			while let blockName = remainingBlocksByName.keys.first {
 				try appendBlockOrJumpToBlock(named: blockName)
 			}

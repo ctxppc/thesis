@@ -74,10 +74,6 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				.align 8
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
-				.align 8
-mm.user:
-mm.alloc.cap:	.octa 0
-mm.scall.cap:	.octa 0
 				.align 4
 rv.main:		csc cfp, -8(csp)
 				cincoffsetimm cfp, csp, -8
@@ -161,6 +157,9 @@ cd.then$42:		clc cra, -16(cfp)
 				cincoffsetimm csp, cfp, 8
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
+				.align 8
+mm.alloc.cap:	.octa 0
+mm.scall.cap:	.octa 0
 mm.user.end:	.align 4
 				.bss
 mm.heap:		.fill 1048576, 1, 0

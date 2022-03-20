@@ -98,10 +98,6 @@ mm.scall:		cllc ct0, mm.seal.cap
 				.align 8
 mm.seal.cap:	.octa 0
 mm.scall.end:	.align 4
-				.align 8
-mm.user:
-mm.alloc.cap:	.octa 0
-mm.scall.cap:	.octa 0
 				.align 4
 rv.main:		addi t0, zero, 16
 				cllc ct1, mm.alloc.cap
@@ -139,6 +135,9 @@ f:				addi t0, zero, 8
 				clear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
+				.align 8
+mm.alloc.cap:	.octa 0
+mm.scall.cap:	.octa 0
 mm.user.end:	.align 4
 				.bss
 mm.heap:		.fill 1048576, 1, 0
