@@ -11,14 +11,8 @@ extension RV {
 		/// A region of memory occupied by sufficient space to ensure subsequent statements are lowered in `byteAlignment`-byte-aligned memory.
 		case padding(byteAlignment: Int)
 		
-		/// A region of memory filled with `copies` copies of the `datumByteSize`-byte datum with value `value`.
-		case filled(value: Int, datumByteSize: Int, copies: Int)
-		
-		/// A region of memory consisting of given signed word.
-		case signedWord(Int)
-		
-		/// A region of memory consisting of a null capability.
-		case nullCapability
+		/// A region of memory filled with `count` copies of the `datumByteSize`-byte datum with value `value`.
+		case data(value: Int, datumByteSize: Int, count: Int)
 		
 		/// A statement beginning the BSS section.
 		///
@@ -39,14 +33,14 @@ extension RV {
 				case .padding(byteAlignment: let byteAlignment):
 				return "\(tabs).align \(byteAlignment)"
 				
-				case .filled(value: let value, datumByteSize: let datumByteSize, copies: let copies):
-				return "\(tabs).fill \(copies), \(datumByteSize), \(value)"
-				
-				case .signedWord(let value):
+				case .data(value: let value, datumByteSize: 4, count: 1):
 				return "\(tabs).dword \(value)"
 				
-				case .nullCapability:
-				return "\(tabs).octa 0"
+				case .data(value: let value, datumByteSize: 16, count: 1):
+				return "\(tabs).octa \(value)"
+				
+				case .data(value: let value, datumByteSize: let datumByteSize, count: let count):
+				return "\(tabs).fill \(count), \(datumByteSize), \(value)"
 				
 				case .bssSection:
 				return "\(tabs).bss"

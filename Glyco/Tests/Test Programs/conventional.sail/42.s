@@ -71,22 +71,22 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 8
+				.align 16
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
-rv.main:		csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
-				csc cra, -8(cfp)
+rv.main:		csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -32
+				csc cra, -16(cfp)
 				cjal cra, f
-cd.ret:			clc cra, -8(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.ret:			clc cra, -16(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-f:				csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -8
+f:				csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -16
 cd.then:		cmove ca3, cs2
 				cmove ca4, cs3
 				cmove ca5, cs4
@@ -102,10 +102,10 @@ cd.then$5:		cmove cs2, ca3
 				cmove cs6, ca7
 cd.then$8:		cmove cs10, ca1
 				cmove cs11, ca2
-cd.then$9:		cincoffsetimm csp, cfp, 8
+cd.then$9:		cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-				.align 8
+				.align 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
 mm.user.end:	.align 4

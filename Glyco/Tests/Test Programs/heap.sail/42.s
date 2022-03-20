@@ -85,7 +85,7 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 8
+				.align 16
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
@@ -95,17 +95,17 @@ mm.scall:		cllc ct0, mm.seal.cap
 				cseal cfp, cfp, ct0
 				clear 0, 32
 				cjalr cnull, ct6
-				.align 8
+				.align 16
 mm.seal.cap:	.octa 0
 mm.scall.end:	.align 4
 				.align 4
-rv.main:		addi t0, zero, 16
+rv.main:		addi t0, zero, 32
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, -8(cfp)
+				csc cra, -16(cfp)
 				clear 0, 227
 				clear 1, 254
 				clear 2, 255
@@ -115,14 +115,14 @@ rv.main:		addi t0, zero, 16
 				clc cra, 0(cra)
 				cjalr cra, cra
 				cmove cfp, ct6
-cd.ret:			clc cra, -8(cfp)
+cd.ret:			clc cra, -16(cfp)
 				clear 0, 225
 				clear 1, 250
 				clear 2, 255
 				clear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
-f:				addi t0, zero, 8
+f:				addi t0, zero, 16
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
@@ -135,7 +135,7 @@ f:				addi t0, zero, 8
 				clear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
-				.align 8
+				.align 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
 mm.user.end:	.align 4

@@ -8,10 +8,10 @@ extension CE {
 		/// An unsigned byte or 1-byte integer.
 		case u8
 		
-		/// A signed 4-byte integer.
+		/// A signed 4-byte (32-bit) integer.
 		case s32
 		
-		/// An 8-byte capability.
+		/// A 16-byte (128-bit) capability.
 		case cap
 		
 		/// The size of a datum of this type, in bytes.
@@ -19,7 +19,7 @@ extension CE {
 			switch self {
 				case .u8:	return 1
 				case .s32:	return 4
-				case .cap:	return 8
+				case .cap:	return 16
 			}
 		}
 		

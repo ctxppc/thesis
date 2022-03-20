@@ -71,25 +71,25 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 8
+				.align 16
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
-rv.main:		csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
-				csc cra, -8(cfp)
+rv.main:		csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -32
+				csc cra, -16(cfp)
 				addi a0, zero, 1
 				addi a1, zero, 1
 				cjal cra, fib
-cd.ret:			clc cra, -8(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.ret:			clc cra, -16(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-fib:			csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
-cd.then$10:		csc cra, -8(cfp)
+fib:			csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -32
+cd.then$10:		csc cra, -16(cfp)
 				addi a0, zero, 2
 				addi a1, zero, 29
 				cincoffsetimm ca2, csp, -120
@@ -97,15 +97,15 @@ cd.then$10:		csc cra, -8(cfp)
 				cgetaddr t0, ca2
 				csetaddr csp, csp, t0
 				cjal cra, recFib
-cd.then$21:		clc cra, -8(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.then$21:		clc cra, -16(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-recFib:			csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -24
-				csc cs1, -8(cfp)
-cd.then$31:		csc cra, -16(cfp)
+recFib:			csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -48
+				csc cs1, -16(cfp)
+cd.then$31:		csc cra, -32(cfp)
 				mv a3, a0
 				mv a5, a1
 				cmove ca4, ca2
@@ -142,9 +142,9 @@ cd.else:		mv ra, a3
 				mv a1, a5
 				cmove ca2, ca4
 				cjal cra, recFib
-cd.ret$2:		clc cs1, -8(cfp)
-cd.then$52:		clc cra, -16(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.ret$2:		clc cs1, -16(cfp)
+cd.then$52:		clc cra, -32(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 cd.then$32:		cmove cs1, ca4
@@ -152,12 +152,12 @@ cd.then$32:		cmove cs1, ca4
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
 				lw.cap a0, 0(ca0)
-				clc cs1, -8(cfp)
-cd.then$42:		clc cra, -16(cfp)
-				cincoffsetimm csp, cfp, 8
+				clc cs1, -16(cfp)
+cd.then$42:		clc cra, -32(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-				.align 8
+				.align 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
 mm.user.end:	.align 4

@@ -243,7 +243,7 @@ public enum MM : Language {
 				
 				// Derive buffer cap.
 				Lower.Effect.setCapabilityBounds(destination: bufferReg, base: heapCapReg, length: .register(lengthReg))
-				// FIXME: Align buffer to 8-byte boundaries to ensure that capabilities (and vectors/records thereof) are capability-aligned.
+				// FIXME: Align buffer to 16-byte boundaries to ensure that capabilities (and vectors/records thereof) are capability-aligned.
 				
 				// Determine (possibly rounded-up) length of allocated buffer.
 				let actualLengthReg = tempRegisterD
@@ -264,8 +264,8 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(returnReg), link: .zero)
 				
 				// Heap capability.
-				Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
-				heapCapLabel ~ .nullCapability
+				Lower.Statement.padding(alignment: DataType.cap)
+				heapCapLabel ~ .data(type: .cap)
 				
 				// Label end of routine.
 				allocEndLabel ~ .padding()
@@ -297,8 +297,8 @@ public enum MM : Language {
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
 				
 				// The seal capability.
-				Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
-				sealCapLabel ~ .nullCapability
+				Lower.Statement.padding(alignment: DataType.cap)
+				sealCapLabel ~ .data(type: .cap)
 				
 				// Label end of routine.
 				scallEndLabel ~ .padding()
@@ -315,11 +315,11 @@ public enum MM : Language {
 					try effects.lowered(in: &context)
 					
 					// Alloc capability.
-					Lower.Statement.padding(byteAlignment: DataType.cap.byteSize)
-					allocCapLabel ~ .nullCapability
+					Lower.Statement.padding(alignment: DataType.cap)
+					allocCapLabel ~ .data(type: .cap)
 					
 					// Scall capability.
-					scallCapLabel ~ .nullCapability
+					scallCapLabel ~ .data(type: .cap)
 					
 					// Label end of user.
 					userEndLabel ~ .padding()
@@ -330,14 +330,14 @@ public enum MM : Language {
 			// The heap.
 			@ArrayBuilder<Lower.Statement>
 			var heap: [Lower.Statement] {
-				heapLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.heapByteSize)
+				heapLabel ~ .data(type: .u8, count: configuration.heapByteSize)
 				heapEndLabel ~ .padding()
 			}
 			
 			// The stack.
 			@ArrayBuilder<Lower.Statement>
 			var stack: [Lower.Statement] {
-				stackLowLabel ~ .filled(value: 0, datumByteSize: 1, copies: configuration.stackByteSize)
+				stackLowLabel ~ .data(type: .u8, count: configuration.stackByteSize)
 				stackHighLabel ~ .padding()
 			}
 			

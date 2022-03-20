@@ -1,18 +1,18 @@
 (
 	do(
-		pushFrame((allocatedByteSize: 16))
-		set(cap, frame((offset: -8)), to: register(ra))
+		pushFrame((allocatedByteSize: 32))
+		set(cap, frame((offset: -16)), to: register(ra))
 		set(s32, register(a0), to: constant(1))
 		set(s32, register(a1), to: constant(1))
 		call(fib)
-		set(cap, register(ra), to: frame((offset: -8)))
+		set(cap, register(ra), to: frame((offset: -16)))
 		popFrame()
 		return(to: register(ra))
 	),
 	procedures: (
 		fib,
 		in: do(
-			pushFrame((allocatedByteSize: 16))
+			pushFrame((allocatedByteSize: 32))
 			do()
 			do()
 			do()
@@ -24,7 +24,7 @@
 			do()
 			do()
 			do()
-			set(cap, frame((offset: -8)), to: register(ra))
+			set(cap, frame((offset: -16)), to: register(ra))
 			set(s32, register(a0), to: constant(2))
 			set(s32, register(a1), to: constant(29))
 			createBuffer(bytes: 120, capability: register(a2), onFrame: true)
@@ -40,7 +40,7 @@
 			do()
 			do()
 			do()
-			set(cap, register(ra), to: frame((offset: -8)))
+			set(cap, register(ra), to: frame((offset: -16)))
 			popFrame()
 			return(to: register(ra))
 		)
@@ -48,8 +48,8 @@
 	(
 		recFib,
 		in: do(
-			pushFrame((allocatedByteSize: 24))
-			set(cap, frame((offset: -8)), to: register(s1))
+			pushFrame((allocatedByteSize: 48))
+			set(cap, frame((offset: -16)), to: register(s1))
 			do()
 			do()
 			do()
@@ -60,7 +60,7 @@
 			do()
 			do()
 			do()
-			set(cap, frame((offset: -16)), to: register(ra))
+			set(cap, frame((offset: -32)), to: register(ra))
 			set(s32, register(a3), to: register(a0))
 			set(s32, register(a5), to: register(a1))
 			set(cap, register(a4), to: register(a2))
@@ -74,7 +74,7 @@
 					set(s32, register(ra), to: register(a5))
 					compute(register(ra), register(ra), sll, constant(2))
 					getElement(s32, of: register(s1), offset: register(ra), to: register(a0))
-					set(cap, register(s1), to: frame((offset: -8)))
+					set(cap, register(s1), to: frame((offset: -16)))
 					do()
 					do()
 					do()
@@ -85,7 +85,7 @@
 					do()
 					do()
 					do()
-					set(cap, register(ra), to: frame((offset: -16)))
+					set(cap, register(ra), to: frame((offset: -32)))
 					popFrame()
 					return(to: register(ra))
 				),
@@ -116,7 +116,7 @@
 					set(s32, register(a1), to: register(a5))
 					set(cap, register(a2), to: register(a4))
 					call(recFib)
-					set(cap, register(s1), to: frame((offset: -8)))
+					set(cap, register(s1), to: frame((offset: -16)))
 					do()
 					do()
 					do()
@@ -127,7 +127,7 @@
 					do()
 					do()
 					do()
-					set(cap, register(ra), to: frame((offset: -16)))
+					set(cap, register(ra), to: frame((offset: -32)))
 					popFrame()
 					return(to: register(ra))
 				)

@@ -7,16 +7,10 @@ extension CE {
 		case effect(Effect)
 		
 		/// A region of memory occupied by sufficient space to ensure subsequent statements are lowered in `byteAlignment`-byte-aligned memory.
-		case padding(byteAlignment: Int)
+		case padding(alignment: DataType)
 		
-		/// A region of memory filled with `copies` copies of the `datumByteSize`-byte datum with value `value`.
-		case filled(value: Int, datumByteSize: Int, copies: Int)
-		
-		/// A region of memory consisting of given signed word.
-		case signedWord(Int)
-		
-		/// A region of memory consisting of a null capability.
-		case nullCapability
+		/// A region of memory filled with `count` copies of the `type` datum `value`.
+		case data(type: DataType, value: Int = 0, count: Int = 1)
 		
 		/// A statement beginning the BSS section.
 		///
@@ -34,17 +28,11 @@ extension CE {
 				case .effect(let effect):
 				try effect.lowered().map { .instruction($0) }
 				
-				case .padding(byteAlignment: let byteAlignment):
-				Lower.Statement.padding(byteAlignment: byteAlignment)
+				case .padding(alignment: let dataType):
+				Lower.Statement.padding(byteAlignment: dataType.byteSize)
 				
-				case .filled(value: let value, datumByteSize: let datumByteSize, copies: let copies):
-				Lower.Statement.filled(value: value, datumByteSize: datumByteSize, copies: copies)
-				
-				case .signedWord(let value):
-				Lower.Statement.signedWord(value)
-				
-				case .nullCapability:
-				Lower.Statement.nullCapability
+				case .data(type: let type, value: let value, count: let count):
+				Lower.Statement.data(value: value, datumByteSize: type.byteSize, count: count)
 				
 				case .bssSection:
 				Lower.Statement.bssSection

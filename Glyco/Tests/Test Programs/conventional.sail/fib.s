@@ -71,27 +71,27 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 8
+				.align 16
 mm.heap.cap:	.octa 0
 mm.alloc.end:	.align 4
 				.align 4
-rv.main:		csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -16
-				csc cra, -8(cfp)
+rv.main:		csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -32
+				csc cra, -16(cfp)
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
 				cjal cra, fib
-cd.ret:			clc cra, -8(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.ret:			clc cra, -16(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-fib:			csc cfp, -8(csp)
-				cincoffsetimm cfp, csp, -8
-				cincoffsetimm csp, csp, -24
-				csc cs1, -8(cfp)
-cd.then$9:		csc cra, -16(cfp)
+fib:			csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -48
+				csc cs1, -16(cfp)
+cd.then$9:		csc cra, -32(cfp)
 				mv a3, a0
 				mv ra, a2
 				addi s1, zero, 0
@@ -102,18 +102,18 @@ cd.else:		mv a0, a1
 				addi ra, zero, 1
 				sub a2, a2, ra
 				cjal cra, fib
-cd.ret$1:		clc cs1, -8(cfp)
-cd.then$30:		clc cra, -16(cfp)
-				cincoffsetimm csp, cfp, 8
+cd.ret$1:		clc cs1, -16(cfp)
+cd.then$30:		clc cra, -32(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 cd.then$10:		mv a0, a1
-				clc cs1, -8(cfp)
-cd.then$20:		clc cra, -16(cfp)
-				cincoffsetimm csp, cfp, 8
+				clc cs1, -16(cfp)
+cd.then$20:		clc cra, -32(cfp)
+				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-				.align 8
+				.align 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
 mm.user.end:	.align 4
