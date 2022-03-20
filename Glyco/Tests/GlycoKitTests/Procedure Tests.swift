@@ -70,7 +70,7 @@ final class ProcedureTests : XCTestCase {
 						cllc ct1, mm.heap.end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
-						addi t1, zero, 7
+						addi t1, zero, 61
 						candperm ct0, ct0, t1
 						cllc ct1, mm.heap.cap
 						csc ct0, 0(ct1)
@@ -80,13 +80,13 @@ final class ProcedureTests : XCTestCase {
 						csetbounds csp, csp, t1
 						cgetaddr t0, ct0
 						csetaddr csp, csp, t0
-						addi t0, zero, 7
+						addi t0, zero, 124
 						candperm csp, csp, t0
 						cllc ct0, mm.alloc
 						cllc ct1, mm.alloc.end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
-						addi t1, zero, 5
+						addi t1, zero, 51
 						candperm ct0, ct0, t1
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc.cap
@@ -95,7 +95,7 @@ final class ProcedureTests : XCTestCase {
 						cllc ct0, mm.user.end
 						csub t0, ct0, ct6
 						csetbounds ct6, ct6, t0
-						addi t0, zero, 11
+						addi t0, zero, 319
 						candperm ct6, ct6, t0
 						cmove cfp, cnull
 						cjalr cnull, ct6
@@ -109,12 +109,10 @@ final class ProcedureTests : XCTestCase {
 						csc ct2, 0(ct3)
 						clear 0, 128
 						clear 3, 16
-						cjalr ct1, ct1
+						cjalr cnull, ct1
+						.align 8
 		mm.heap.cap:	.octa 0
 		mm.alloc.end:	.align 4
-		mm.user:
-		mm.alloc.cap:	.octa 0
-		mm.scall.cap:	.octa 0
 						.align 4
 		rv.main:		csc cfp, -8(csp)
 						cincoffsetimm cfp, csp, -8
@@ -159,6 +157,9 @@ final class ProcedureTests : XCTestCase {
 						cincoffsetimm csp, cfp, 8
 						clc cfp, 0(cfp)
 						cjalr cnull, cra
+						.align 8
+		mm.alloc.cap:	.octa 0
+		mm.scall.cap:	.octa 0
 		mm.user.end:	.align 4
 						.bss
 		mm.heap:		.fill 1048576, 1, 0
