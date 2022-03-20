@@ -31,7 +31,7 @@ extension RV {
 				return "\(tabs)\(instruction.lowered(in: &context))"
 				
 				case .padding(byteAlignment: let byteAlignment):
-				return "\(tabs).align \(byteAlignment)"
+				return "\(tabs).balign \(byteAlignment)"
 				
 				case .data(value: let value, datumByteSize: 4, count: 1):
 				return "\(tabs).dword \(value)"

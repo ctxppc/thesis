@@ -26,7 +26,7 @@ rv.begin:		ccall rv.runtime
 				li gp, 1
 				j _exit
 				
-				.align 4
+				.balign 4
 rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.heap.end
 				csub t1, ct1, ct0
@@ -74,7 +74,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct0, mm.scall.cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
-				.align 4
+				.balign 4
 mm.alloc:		cllc ct2, mm.heap.cap
 				clc ct2, 0(ct2)
 				csetbounds ct0, ct2, t0
@@ -85,20 +85,20 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 16
+				.balign 16
 mm.heap.cap:	.octa 0
-mm.alloc.end:	.align 4
-				.align 4
+mm.alloc.end:	.balign 4
+				.balign 4
 mm.scall:		cllc ct0, mm.seal.cap
 				clc ct0, 0(ct0)
 				cseal cra, cra, ct0
 				cseal cfp, cfp, ct0
 				clear 0, 32
 				cjalr cnull, ct6
-				.align 16
+				.balign 16
 mm.seal.cap:	.octa 0
-mm.scall.end:	.align 4
-				.align 4
+mm.scall.end:	.balign 4
+				.balign 4
 rv.main:		addi t0, zero, 32
 				cllc ct1, mm.alloc.cap
 				clc ct1, 0(ct1)
@@ -165,13 +165,13 @@ cd.then:		mv a0, a1
 				clear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
-				.align 16
+				.balign 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
-mm.user.end:	.align 4
+mm.user.end:	.balign 4
 				.bss
 mm.heap:		.fill 1048576, 1, 0
-mm.heap.end:	.align 4
+mm.heap.end:	.balign 4
 				
 				.data
 				.align 6

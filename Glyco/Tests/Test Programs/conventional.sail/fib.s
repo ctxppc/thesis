@@ -26,7 +26,7 @@ rv.begin:		ccall rv.runtime
 				li gp, 1
 				j _exit
 				
-				.align 4
+				.balign 4
 rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.heap.end
 				csub t1, ct1, ct0
@@ -60,7 +60,7 @@ rv.runtime:		cllc ct0, mm.heap
 				candperm ct6, ct6, t0
 				cmove cfp, cnull
 				cjalr cnull, ct6
-				.align 4
+				.balign 4
 mm.alloc:		cllc ct2, mm.heap.cap
 				clc ct2, 0(ct2)
 				csetbounds ct0, ct2, t0
@@ -71,10 +71,10 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				clear 0, 128
 				clear 3, 16
 				cjalr cnull, ct1
-				.align 16
+				.balign 16
 mm.heap.cap:	.octa 0
-mm.alloc.end:	.align 4
-				.align 4
+mm.alloc.end:	.balign 4
+				.balign 4
 rv.main:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -32
@@ -113,15 +113,15 @@ cd.then$20:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-				.align 16
+				.balign 16
 mm.alloc.cap:	.octa 0
 mm.scall.cap:	.octa 0
-mm.user.end:	.align 4
+mm.user.end:	.balign 4
 				.bss
 mm.heap:		.fill 1048576, 1, 0
-mm.heap.end:	.align 4
+mm.heap.end:	.balign 4
 mm.stack.low:	.fill 1048576, 1, 0
-mm.stack.high:	.align 4
+mm.stack.high:	.balign 4
 				
 				.data
 				.align 6
