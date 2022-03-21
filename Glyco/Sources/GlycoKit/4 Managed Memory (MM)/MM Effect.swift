@@ -22,7 +22,7 @@ extension MM {
 		/// An effect that retrieves the datum from `from` and stores it in the frame at `into`.
 		case store(DataType, into: Frame.Location, from: Register)
 		
-		/// An effect that allocates a buffer of `bytes` bytes and puts a capability for that buffer in given register.
+		/// An effect that allocates a capability-aligned buffer of `bytes` bytes and puts a capability for that buffer in given register.
 		///
 		/// If `onFrame` is `true` and a contiguous call stack is used, the buffer is allocated in the current call frame and automatically deallocated when the frame is popped, after which it must not be accessed; otherwise, the buffer is allocated on the heap.
 		case createBuffer(bytes: Source, capability: Register, onFrame: Bool)
@@ -136,7 +136,7 @@ extension MM {
 					Lower.Effect.copy(.cap, into: destinationBufferReg, from: bufferReg)
 				}
 				
-				case .createBuffer(bytes: let bytes, capability: let buffer, onFrame: true):
+				case .createBuffer(bytes: .constant(let bytes), capability: let buffer, onFrame: true):
 				if context.configuration.callingConvention.usesContiguousCallStack {
 					
 					/*
@@ -156,26 +156,47 @@ extension MM {
 					
 					// Derive buffer capability (without bounding it yet).
 					let buffer = try buffer.lowered()
-					switch bytes {
-						
-						case .constant(let bytes):
-						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .constant(-bytes))
-						
-						case .register(let bytesReg):
-						Lower.Effect.compute(destination: tempRegisterA, .zero, .sub, .register(try bytesReg.lowered()))
-						Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .register(tempRegisterA))
-						
-					}
+					Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .constant(-bytes.aligned(.cap)))
 					
 					// Restrict its bounds. Its base might move downwards, its length might increase.
-					Lower.Effect.setCapabilityBounds(destination: buffer, base: buffer, length: try bytes.lowered())
+					Lower.Effect.setCapabilityBounds(destination: buffer, base: buffer, length: .constant(bytes.aligned(.cap)))
 					
 					// Move stack capability over the allocated region.
 					Lower.Effect.getCapabilityAddress(destination: tempRegisterA, source: buffer)
 					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: tempRegisterA)
 					
 				} else {
-					try Self.createBuffer(bytes: bytes, capability: buffer, onFrame: false).lowered(in: &context)
+					try Self.createBuffer(bytes: .constant(bytes), capability: buffer, onFrame: false).lowered(in: &context)
+				}
+				
+				case .createBuffer(bytes: .register(let bytesReg), capability: let buffer, onFrame: true):
+				if context.configuration.callingConvention.usesContiguousCallStack {
+					
+					// Round length up to nearest capability alignment boundary.
+					let bytesReg = try bytesReg.lowered()
+					let alignmentReg = tempRegisterA
+					let lengthReg = tempRegisterB
+					let alignmentMinusOne = DataType.cap.byteSize - 1	// 15
+					Lower.Effect.compute(destination: alignmentReg, .zero, .add, .constant(alignmentMinusOne))		// M = 15
+					Lower.Effect.compute(destination: lengthReg, bytesReg, .add, .register(alignmentReg))			// La = L + 15
+					Lower.Effect.compute(destination: alignmentReg, alignmentReg, .xor, .constant(-1))				// M = ~15
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .and, .register(alignmentReg))			// Lb = (L + 15) & ~15
+					
+					// Derive buffer capability (without bounding it yet).
+					let offsetReg = tempRegisterC
+					let buffer = try buffer.lowered()
+					Lower.Effect.compute(destination: offsetReg, .zero, .sub, .register(lengthReg))					// O = -Lb
+					Lower.Effect.offsetCapability(destination: buffer, source: .sp, offset: .register(offsetReg))	// csp -= Lb
+					
+					// Restrict its bounds. Its base might move downwards, its length might increase.
+					Lower.Effect.setCapabilityBounds(destination: buffer, base: buffer, length: .register(bytesReg))
+					
+					// Move stack capability over the allocated region.
+					Lower.Effect.getCapabilityAddress(destination: tempRegisterA, source: buffer)
+					Lower.Effect.setCapabilityAddress(destination: .sp, source: .sp, address: tempRegisterA)
+					
+				} else {
+					try Self.createBuffer(bytes: .register(bytesReg), capability: buffer, onFrame: false).lowered(in: &context)
 				}
 				
 				case .destroyBuffer(let buffer):
@@ -316,4 +337,12 @@ extension MM {
 		
 	}
 	
+}
+
+extension BinaryInteger {
+	func aligned(_ type: MM.DataType) -> Self {
+		// Adapted from https://stackoverflow.com/a/1766566/732792
+		let alignmentMinusOne = Self(type.byteSize) - 1
+		return (self + alignmentMinusOne) & ~alignmentMinusOne
+	}
 }

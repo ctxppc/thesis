@@ -28,15 +28,15 @@ rv.begin:		ccall rv.runtime
 				
 				.balign 4
 rv.runtime:		cllc ct0, mm.heap
-				cllc ct1, mm.heap.end
+				cllc ct1, mm.heap_end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
 				addi t1, zero, 61
 				candperm ct0, ct0, t1
-				cllc ct1, mm.heap.cap
+				cllc ct1, mm.heap_cap
 				csc ct0, 0(ct1)
-				cllc csp, mm.stack.low
-				cllc ct0, mm.stack.high
+				cllc csp, mm.stack_low
+				cllc ct0, mm.stack_high
 				csub t1, ct0, csp
 				csetbounds csp, csp, t1
 				cgetaddr t0, ct0
@@ -44,36 +44,40 @@ rv.runtime:		cllc ct0, mm.heap
 				addi t0, zero, 124
 				candperm csp, csp, t0
 				cllc ct0, mm.alloc
-				cllc ct1, mm.alloc.end
+				cllc ct1, mm.alloc_end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
 				addi t1, zero, 63
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
-				cllc ct1, mm.alloc.cap
+				cllc ct1, mm.alloc_cap
 				csc ct0, 0(ct1)
 				cllc ct6, rv.main
-				cllc ct0, mm.user.end
+				cllc ct0, mm.user_end
 				csub t0, ct0, ct6
 				csetbounds ct6, ct6, t0
 				addi t0, zero, 319
 				candperm ct6, ct6, t0
-				cmove cfp, cnull
+				.4byte 4276355291 # cclear 1, 1
 				cjalr cnull, ct6
 				.balign 4
-mm.alloc:		cllc ct2, mm.heap.cap
+mm.alloc:		addi t2, zero, 15
+				add t0, t0, t2
+				xori t2, t2, -1
+				and t0, t0, t2
+				cllc ct2, mm.heap_cap
 				clc ct2, 0(ct2)
 				csetbounds ct0, ct2, t0
 				cgetlen t3, ct0
 				cincoffset ct2, ct2, t3
-				cllc ct3, mm.heap.cap
+				cllc ct3, mm.heap_cap
 				csc ct2, 0(ct3)
 				.4byte 4276224091 # cclear 0, 128
 				.4byte 4276881499 # cclear 3, 16
 				cjalr cnull, ct1
 				.balign 16
-mm.heap.cap:	.octa 0
-mm.alloc.end:	.balign 4
+mm.heap_cap:	.octa 0
+mm.alloc_end:	.balign 4
 				.balign 4
 rv.main:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
@@ -106,14 +110,16 @@ cd.then$9:		cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 				.balign 16
-mm.alloc.cap:	.octa 0
-mm.scall.cap:	.octa 0
-mm.user.end:	.balign 4
+mm.alloc_cap:	.octa 0
+mm.scall_cap:	.octa 0
+mm.user_end:	.balign 4
 				.bss
+				.balign 16
 mm.heap:		.fill 1048576, 1, 0
-mm.heap.end:	.balign 4
-mm.stack.low:	.fill 1048576, 1, 0
-mm.stack.high:	.balign 4
+mm.heap_end:	.balign 4
+				.balign 16
+mm.stack_low:	.fill 1048576, 1, 0
+mm.stack_high:	.balign 4
 				
 				.data
 				.align 6

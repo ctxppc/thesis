@@ -256,10 +256,19 @@ public enum MM : Language {
 				
 				Lower.Statement.padding()
 				
+				// Round length up to nearest capability byte size multiple to ensure capability-aligned allocations.
+				// Adapted from https://stackoverflow.com/a/1766566/732792
+				let alignmentReg = tempRegisterC
+				let alignmentMinusOne = DataType.cap.byteSize - 1	// 15
+				allocLabel ~ Lower.Effect.compute(destination: alignmentReg, .zero, .add, .constant(alignmentMinusOne))	// M = 15
+				Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .register(alignmentReg))		// L = L + 15
+				Lower.Effect.compute(destination: alignmentReg, alignmentReg, .xor, .constant(-1))			// M = ~15
+				Lower.Effect.compute(destination: lengthReg, lengthReg, .and, .register(alignmentReg))		// L = (L + 15) & ~15
+				
 				// Derive heap cap cap and load heap cap.
 				let heapCapCapReg1 = tempRegisterC
 				let heapCapReg = tempRegisterC
-				allocLabel ~ .deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
+				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
 				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1)
 				
 				// Derive buffer cap.
@@ -351,6 +360,7 @@ public enum MM : Language {
 			// The heap.
 			@ArrayBuilder<Lower.Statement>
 			var heap: [Lower.Statement] {
+				Lower.Statement.padding(alignment: .cap)	// heap allocations are capability-aligned
 				heapLabel ~ .data(type: .u8, count: configuration.heapByteSize)
 				heapEndLabel ~ .padding()
 			}
@@ -358,7 +368,8 @@ public enum MM : Language {
 			// The stack.
 			@ArrayBuilder<Lower.Statement>
 			var stack: [Lower.Statement] {
-				stackLowLabel ~ .data(type: .u8, count: configuration.stackByteSize)
+				Lower.Statement.padding(alignment: .cap)	// stack frames are capability-aligned
+				stackLowLabel ~ .data(type: .u8, count: configuration.stackByteSize.aligned(.cap))
 				stackHighLabel ~ .padding()
 			}
 			
@@ -427,7 +438,7 @@ extension MM.Label {
 	
 	/// The label for the capability to the allocation routine.
 	///
-	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid buffer capability in `MM.tempRegisterA`. The routine may also touch `MM.tempRegisterC` and `MM.tempRegisterD` but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
+	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid, capability-aligned buffer capability in `MM.tempRegisterA`. The routine may also touch `MM.tempRegisterC` and `MM.tempRegisterD` but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
 	static var allocationRoutineCapability: Self { "mm.alloc_cap" }
 	
 	/// The label for the capability to the secure calling (scall) routine.

@@ -83,7 +83,11 @@ mm.ret:			cllc ct0, mm.savedRA
 				.balign 16
 mm.savedRA:		.octa 0
 				.balign 4
-mm.alloc:		cllc ct2, mm.heap_cap
+mm.alloc:		addi t2, zero, 15
+				add t0, t0, t2
+				xori t2, t2, -1
+				and t0, t0, t2
+				cllc ct2, mm.heap_cap
 				clc ct2, 0(ct2)
 				csetbounds ct0, ct2, t0
 				cgetlen t3, ct0
@@ -149,6 +153,7 @@ mm.alloc_cap:	.octa 0
 mm.scall_cap:	.octa 0
 mm.user_end:	.balign 4
 				.bss
+				.balign 16
 mm.heap:		.fill 1048576, 1, 0
 mm.heap_end:	.balign 4
 				

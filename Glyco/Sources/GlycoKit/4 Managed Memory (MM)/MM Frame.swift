@@ -7,6 +7,8 @@ extension MM {
 	/// A value that keeps track of allocated frame cells in a single frame.
 	///
 	/// A call frame consists of two segments: a caller-managed segment for any provided arguments and a callee-managed segment for allocated frame locations. The first allocated frame location always contains the caller's frame capability.
+	///
+	/// A call frame is capability-aligned, i.e., a frame location with offset 0 points to a location that is appropriately aligned for a capability.
 	public struct Frame : Codable, Equatable {
 		
 		/// An initial frame, containing one allocated location for the caller's frame capability.
@@ -22,11 +24,16 @@ extension MM {
 		/// The number of bytes that have been allocated on the frame.
 		public private(set) var allocatedByteSize: Int
 		
-		/// Allocates space for `count` data of type `type` and returns its location.
+		/// Allocates appropriately aligned space for `count` data of type `type` and returns its location.
 		public mutating func allocate(_ type: DataType, count: Int = 1) -> Location {
-			// FIXME: Capabilities must be capability-aligned
+			allocateAlignmentPadding(for: type)
 			defer { allocatedByteSize += type.byteSize * count }	// fp[-allocatedByteSize] points to next free cell
 			return .init(offset: -allocatedByteSize)
+		}
+		
+		/// Allocates sufficient padding to ensure that a `dataType` datum is appropriately aligned.
+		private mutating func allocateAlignmentPadding(for dataType: DataType) {
+			allocatedByteSize += allocatedByteSize % dataType.byteSize
 		}
 		
 		/// A location to a datum on a frame.
