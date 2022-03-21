@@ -40,10 +40,12 @@ extension ALA {
 			/// Determines an assignment using given analysis at the scope's entry.
 			///
 			/// The initialiser assigns homes to all used locations, by increasing degree of conflict.
-			init(declarations: Declarations, analysisAtScopeEntry: Analysis) throws {
+			init(declarations: Declarations, analysisAtScopeEntry: Analysis, configuration: CompilationConfiguration) throws {
 				
 				self.declarations = declarations
 				self.analysisAtScopeEntry = analysisAtScopeEntry
+				self.configuration = configuration
+				self.frame = .initial(configuration: configuration)
 				
 				let partition = analysisAtScopeEntry.conflicts.degreePartition
 				let locationsOrderedByDegree = declarations
@@ -70,6 +72,9 @@ extension ALA {
 			/// The analysis at the scope's entry.
 			let analysisAtScopeEntry: Analysis
 			
+			/// The compilation configuration.
+			let configuration: CompilationConfiguration
+			
 			/// A mapping from abstract locations to physical locations.
 			private var homesByLocation = [AbstractLocation : Lower.Location]()
 			
@@ -81,7 +86,7 @@ extension ALA {
 			)
 			
 			/// The frame on which spilled data are stored.
-			private(set) var frame = Lower.Frame.initial
+			private(set) var frame: Lower.Frame
 			
 			/// Assigns a physical location to `location`.
 			private mutating func addAssignment(for location: AbstractLocation) throws {
@@ -90,7 +95,7 @@ extension ALA {
 					home = .register(register)
 					locationsByRegister[register, default: []].insert(.abstract(location))
 				} else {
-					home = .frame(frame.allocate(try declarations.type(of: Location.abstract(location))))
+					home = .frame(frame.allocate(try declarations.type(of: Location.abstract(location)), configuration: configuration))
 				}
 				homesByLocation[location] = home
 			}

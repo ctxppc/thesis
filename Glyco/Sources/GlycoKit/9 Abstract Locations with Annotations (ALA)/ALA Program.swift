@@ -56,7 +56,7 @@ public enum ALA : Language {
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Context(
 				declarations:	locals,
-				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry),
+				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry, configuration: configuration),
 				configuration:	configuration
 			)
 			return try .init(

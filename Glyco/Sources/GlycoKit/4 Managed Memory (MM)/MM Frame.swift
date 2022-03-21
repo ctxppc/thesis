@@ -6,14 +6,16 @@ extension MM {
 	
 	/// A value that keeps track of allocated frame cells in a single frame.
 	///
-	/// A call frame consists of two segments: a caller-managed segment for any provided arguments and a callee-managed segment for allocated frame locations. The first allocated frame location always contains the caller's frame capability.
+	/// In GCCC, a call frame consists of two segments: a caller-managed segment for any provided arguments and a callee-managed segment for allocated frame locations. The first segment grows in memory order whereas the second segment grows opposite, in stack order. In GHSCC, a call frame only consists of allocated frame locations and grows in memory order.
 	///
-	/// A call frame is capability-aligned, i.e., a frame location with offset 0 points to a location that is appropriately aligned for a capability.
+	/// The first allocated frame location always contains the caller's frame capability. A call frame is capability-aligned, i.e., a frame location with offset 0 points to a location that is appropriately aligned for a capability.
 	public struct Frame : Codable, Equatable {
 		
-		/// An initial frame, containing one allocated location for the caller's frame capability.
-		public static let initial: Self = with(Self(allocatedByteSize: 0)) {
-			_ = $0.allocate(.cap)	// caller's frame capability
+		/// Returns an initial frame, containing one allocated location for the caller's frame capability.
+		public static func initial(configuration: CompilationConfiguration) -> Self {
+			with(Self(allocatedByteSize: 0)) {
+				_ = $0.allocate(.cap, configuration: configuration)	// caller's frame capability
+			}
 		}
 		
 		/// Creates a frame.
@@ -25,10 +27,13 @@ extension MM {
 		public private(set) var allocatedByteSize: Int
 		
 		/// Allocates appropriately aligned space for `count` data of type `type` and returns its location.
-		public mutating func allocate(_ type: DataType, count: Int = 1) -> Location {
+		public mutating func allocate(_ type: DataType, count: Int = 1, configuration: CompilationConfiguration) -> Location {
 			allocateAlignmentPadding(for: type)
-			defer { allocatedByteSize += type.byteSize * count }	// fp[-allocatedByteSize] points to next free cell
-			return .init(offset: -allocatedByteSize)
+			defer { allocatedByteSize += type.byteSize * count }	// fp[±allocatedByteSize] points to next free location
+			switch configuration.callingConvention {
+				case .conventional:	return .init(offset: -allocatedByteSize)
+				case .heap:			return .init(offset: allocatedByteSize)
+			}
 		}
 		
 		/// Allocates sufficient padding to ensure that a `dataType` datum is appropriately aligned.
@@ -46,7 +51,7 @@ extension MM {
 			
 			/// The location's offset from the frame base, in bytes.
 			///
-			/// The caller's frame capability is stored at offset 0, allocated frame locations have positive offsets, and argument frame locations have negative offsets.
+			/// The caller's frame capability is stored at offset 0. In GCCC, argument frame locations have positive offsets, and allocated frame locations have negative offsets. In GHSCC, allocated frame locations have positive offsets; there are no argument frame locations.
 			public var offset: Int
 			
 		}

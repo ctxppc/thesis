@@ -117,7 +117,7 @@ rv.main:		addi t0, zero, 32
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, -16(cfp)
+				csc cra, 16(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
@@ -128,7 +128,7 @@ rv.main:		addi t0, zero, 32
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 mm.ret$1:		cmove cfp, ct6
-cd.ret:			clc cra, -16(cfp)
+cd.ret:			clc cra, 16(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

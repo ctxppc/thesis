@@ -44,7 +44,7 @@ extension ALA {
 		func lowered(configuration: CompilationConfiguration) throws -> Lower.Procedure {
 			var context = ALA.Context(
 				declarations:	locals,
-				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry),
+				assignments:	try .init(declarations: locals, analysisAtScopeEntry: effect.analysisAtEntry, configuration: configuration),
 				configuration:	configuration
 			)
 			return .init(name, in: try effect.lowered(in: &context))

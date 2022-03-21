@@ -117,7 +117,7 @@ rv.main:		addi t0, zero, 32
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, -16(cfp)
+				csc cra, 16(cfp)
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
@@ -131,7 +131,7 @@ rv.main:		addi t0, zero, 32
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 mm.ret$1:		cmove cfp, ct6
-cd.ret:			clc cra, -16(cfp)
+cd.ret:			clc cra, 16(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
@@ -144,7 +144,7 @@ fib:			addi t0, zero, 32
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, -16(cfp)
+				csc cra, 16(cfp)
 				mv a3, a0
 				mv ra, a2
 				addi s1, zero, 0
@@ -164,7 +164,7 @@ cd.else:		mv a0, a1
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 mm.ret$2:		cmove cfp, ct6
-cd.ret$1:		clc cra, -16(cfp)
+cd.ret$1:		clc cra, 16(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
@@ -172,7 +172,7 @@ cd.ret$1:		clc cra, -16(cfp)
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 cd.then:		mv a0, a1
-				clc cra, -16(cfp)
+				clc cra, 16(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

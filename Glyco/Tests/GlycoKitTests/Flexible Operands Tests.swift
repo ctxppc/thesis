@@ -7,16 +7,18 @@ final class FlexibleOperandsTests : XCTestCase {
 	
 	func testPass() throws {
 		
-		var frame = FO.Frame.initial
-		let a = frame.allocate(.s32)
-		let b = frame.allocate(.s32)
-		let c = frame.allocate(.s32)
+		let configuration = CompilationConfiguration(target: .sail, callingConvention: .conventional)
+		
+		var frame = FO.Frame.initial(configuration: configuration)
+		let a = frame.allocate(.s32, configuration: configuration)
+		let b = frame.allocate(.s32, configuration: configuration)
+		let c = frame.allocate(.s32, configuration: configuration)
 		
 		let source = FO.Program([
 			.compute(.frame(c), .frame(a), .add, .frame(b))
 		])
 		
-		let actual = try source.lowered(configuration: .init(target: .sail, callingConvention: .conventional))
+		let actual = try source.lowered(configuration: configuration)
 		let expected = MM.Program([
 			.load(.s32, into: .t4, from: .init(offset: -8)),
 			.load(.s32, into: .t5, from: .init(offset: -12)),

@@ -987,10 +987,8 @@ A language that introduces a runtime system and runtime routines.
 <dl>
 	<dt><code>RT.Statement</code></dt>
 	<dd><code><strong>effect</strong>(Effect)</code></dd>
-	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
-	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
-	<dd><code><strong>signedWord</strong>(Int)</code></dd>
-	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>padding</strong>(<strong>alignment:</strong> DataType)</code></dd>
+	<dd><code><strong>data</strong>(<strong>type:</strong> DataType, <strong>value:</strong> Int, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
@@ -1010,10 +1008,8 @@ A language grouping related instructions under a single effect.
 <dl>
 	<dt><code>CE.Statement</code></dt>
 	<dd><code><strong>effect</strong>(Effect)</code></dd>
-	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
-	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
-	<dd><code><strong>signedWord</strong>(Int)</code></dd>
-	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>padding</strong>(<strong>alignment:</strong> DataType)</code></dd>
+	<dd><code><strong>data</strong>(<strong>type:</strong> DataType, <strong>value:</strong> Int, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
@@ -1120,9 +1116,7 @@ N/A
 	<dt><code>RV.Statement</code></dt>
 	<dd><code><strong>instruction</strong>(Instruction)</code></dd>
 	<dd><code><strong>padding</strong>(<strong>byteAlignment:</strong> Int)</code></dd>
-	<dd><code><strong>filled</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>copies:</strong> Int)</code></dd>
-	<dd><code><strong>signedWord</strong>(Int)</code></dd>
-	<dd><code><strong>nullCapability</strong></code></dd>
+	<dd><code><strong>data</strong>(<strong>value:</strong> Int, <strong>datumByteSize:</strong> Int, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>bssSection</strong></code></dd>
 	<dd><code><strong>labelled</strong>(Label, Statement)</code></dd>
 </dl>
