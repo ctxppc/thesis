@@ -282,9 +282,11 @@ extension MM {
 					Lower.Effect.jump(to: .label(name), link: .ra)
 						
 					case .heap:
+					let ret = context.labels.uniqueName(from: "ret")
+					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)	// scall doesn't support sentries so we need to link cra manually
 					Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
-					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: .ra)
-					Lower.Effect.copy(.cap, into: .fp, from: .invocationData)	// restore fp
+					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: tempRegisterA)	// can't use cnull link register for routine calls
+					ret ~ .copy(.cap, into: .fp, from: .invocationData)	// restore cfp
 					
 				}
 				

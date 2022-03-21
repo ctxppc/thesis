@@ -26,23 +26,26 @@ public enum MM : Language {
 			
 			var context = Context(configuration: configuration)
 			
-			let allocLabel = context.labels.uniqueName(from: "mm.alloc")
-			let allocEndLabel = context.labels.uniqueName(from: "mm.alloc.end")
+			let allocLabel = context.labels.uniqueName(from: "alloc")
+			let allocEndLabel = context.labels.uniqueName(from: "alloc_end")
 			let allocCapLabel = Label.allocationRoutineCapability
 			
-			let heapLabel = context.labels.uniqueName(from: "mm.heap")
-			let heapEndLabel = context.labels.uniqueName(from: "mm.heap.end")
-			let heapCapLabel = context.labels.uniqueName(from: "mm.heap.cap")
+			let heapLabel = context.labels.uniqueName(from: "heap")
+			let heapEndLabel = context.labels.uniqueName(from: "heap_end")
+			let heapCapLabel = context.labels.uniqueName(from: "heap_cap")
 			
-			let stackLowLabel = context.labels.uniqueName(from: "mm.stack.low")
-			let stackHighLabel = context.labels.uniqueName(from: "mm.stack.high")
+			let stackLowLabel = context.labels.uniqueName(from: "stack_low")
+			let stackHighLabel = context.labels.uniqueName(from: "stack_high")
 			
-			let scallLabel = context.labels.uniqueName(from: "mm.scall")
-			let scallEndLabel = context.labels.uniqueName(from: "mm.scall.end")
+			let scallLabel = context.labels.uniqueName(from: "scall")
+			let scallEndLabel = context.labels.uniqueName(from: "scall_end")
 			let scallCapLabel = Label.secureCallingRoutineCapability
-			let sealCapLabel = context.labels.uniqueName(from: "mm.seal.cap")
+			let sealCapLabel = context.labels.uniqueName(from: "seal_cap")
 			
-			let userEndLabel = context.labels.uniqueName(from: "mm.user.end")
+			let userEndLabel = context.labels.uniqueName(from: "user_end")
+			
+			let savedRA = context.labels.uniqueName(from: "savedRA")
+			let ret = context.labels.uniqueName(from: "ret")
 			
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
@@ -193,29 +196,47 @@ public enum MM : Language {
 					let bitmaskReg = tempRegisterA
 					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
 					
-					// Tail-call user program.
+					// Call user program.
 					switch configuration.callingConvention {
 						
 						case .conventional:
-						Lower.Effect.copy(.cap, into: .fp, from: .zero)	// clear cfp
+						Lower.Effect.clear([.fp])
 						Lower.Effect.jump(to: .register(userCapReg), link: .zero)
 						// This is a tail-call so we don't link, thereaby avoiding the need to store the previous cra (to the OS) somewhere.
 						
 						case .heap:
 						do {
 							
+							// Save return cap.
+							let savedRACapReg = tempRegisterA
+							Lower.Effect.deriveCapabilityFromLabel(destination: savedRACapReg, label: savedRA)
+							Lower.Effect.store(.cap, address: savedRACapReg, source: .ra)
+							
 							// cfp can be anything but must be a valid unsealed capability for the scall. (It will be sealed by the scall.)
 							Lower.Effect.copy(.cap, into: .fp, from: userCapReg)
+							
+							// Manually link cra to avoid it becoming a sentry for the scall (which requires unsealed cra).
+							Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
 							
 							// Clear all registers except (selected) user authority.
 							let preservedRegisters = [.ra, .fp, userCapReg]	// Set is probably less efficient for merely 3 elements
 							Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
 							
 							// Perform scall.
-							let scallCapReg = tempRegisterA
+							let scallCapReg = tempRegisterA	// don't replace manually linked cra
 							Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: scallCapReg)
-							// This is a tail-call so we don't link cra, but we can't pass .zero either, so we pass a free register instead.
-							// By making this a tail-call we avoid having to store the previous cra somewhere or as a fake cfp arg to scall. No need for complexity here!
+							
+							// Restore saved return cap.
+							let savedRACapReg2 = tempRegisterA
+							ret ~ .deriveCapabilityFromLabel(destination: savedRACapReg2, label: savedRA)
+							Lower.Effect.load(.cap, destination: .ra, address: savedRACapReg2)
+							
+							// Return to OS/framework.
+							Lower.Effect.jump(to: .register(.ra), link: .zero)
+							
+							// The saved return cap.
+							Lower.Statement.padding(alignment: .cap)
+							savedRA ~ .data(type: .cap)
 							
 						}
 						
@@ -406,18 +427,18 @@ extension MM.Label {
 	
 	/// The label for the capability to the allocation routine.
 	///
-	/// The allocation routine takes a length in `MM.tempRegisterA`, a return capability in `MM.tempRegisterB`, and returns a buffer capability in `MM.tempRegisterA`. The routine may also touch `MM.tempRegisterC` and `MM.tempRegisterD` but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
-	static var allocationRoutineCapability: Self { "mm.alloc.cap" }
+	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid buffer capability in `MM.tempRegisterA`. The routine may also touch `MM.tempRegisterC` and `MM.tempRegisterD` but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
+	static var allocationRoutineCapability: Self { "mm.alloc_cap" }
 	
 	/// The label for the capability to the secure calling (scall) routine.
 	///
-	/// The scall routine takes a target capability in `invocationData`, a return capability in `cra`, a frame capability in `cfp`, and function arguments in argument registers. The target and return capabilities must be valid executable capabilities that are either unsealed or sentry capabilities. The frame capability must be a valid unsealed capability.
+	/// The scall routine takes a valid, executable target capability in `invocationData`, a valid, *unsealed*, executable return capability in `cra`, a valid, unsealed frame capability in `cfp`, and function arguments in argument registers. The target capability must be either unsealed or a sentry capability.
 	///
 	/// It returns the same frame capability in `invocationData` and any function results in argument registers.
 	///
 	/// The routine may touch any register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
 	///
 	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
-	static var secureCallingRoutineCapability: Self { "mm.scall.cap" }
+	static var secureCallingRoutineCapability: Self { "mm.scall_cap" }
 	
 }
