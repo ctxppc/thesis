@@ -57,25 +57,25 @@ final class ProcedureTests : XCTestCase {
 						
 		_exit:			auipcc ct5, 0x1
 						cllc ct0, tohost
-						cincoffset ct0, ct0, gp
-						csc ct5, 0(ct0)
+						cincoffset ct5, ct5, t0
+						csw gp, 0(ct5)
 						j _exit
 						
 		rv.begin:		ccall rv.runtime
 						li gp, 1
 						j _exit
 						
-						.align 4
+						.balign 4
 		rv.runtime:		cllc ct0, mm.heap
-						cllc ct1, mm.heap.end
+						cllc ct1, mm.heap_end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
-						addi t1, zero, 61
+						addi t1, zero, 317
 						candperm ct0, ct0, t1
-						cllc ct1, mm.heap.cap
+						cllc ct1, mm.heap_cap
 						csc ct0, 0(ct1)
-						cllc csp, mm.stack.low
-						cllc ct0, mm.stack.high
+						cllc csp, mm.stack_low
+						cllc ct0, mm.stack_high
 						csub t1, ct0, csp
 						csetbounds csp, csp, t1
 						cgetaddr t0, ct0
@@ -83,51 +83,55 @@ final class ProcedureTests : XCTestCase {
 						addi t0, zero, 124
 						candperm csp, csp, t0
 						cllc ct0, mm.alloc
-						cllc ct1, mm.alloc.end
+						cllc ct1, mm.alloc_end
 						csub t1, ct1, ct0
 						csetbounds ct0, ct0, t1
-						addi t1, zero, 51
+						addi t1, zero, 63
 						candperm ct0, ct0, t1
 						csealentry ct0, ct0
-						cllc ct1, mm.alloc.cap
+						cllc ct1, mm.alloc_cap
 						csc ct0, 0(ct1)
 						cllc ct6, rv.main
-						cllc ct0, mm.user.end
+						cllc ct0, mm.user_end
 						csub t0, ct0, ct6
 						csetbounds ct6, ct6, t0
 						addi t0, zero, 319
 						candperm ct6, ct6, t0
-						cmove cfp, cnull
+						.4byte 4276355291 # cclear 1, 1
 						cjalr cnull, ct6
-						.align 4
-		mm.alloc:		cllc ct2, mm.heap.cap
+						.balign 4
+		mm.alloc:		addi t2, zero, 15
+						add t0, t0, t2
+						xori t2, t2, -1
+						and t0, t0, t2
+						cllc ct2, mm.heap_cap
 						clc ct2, 0(ct2)
 						csetbounds ct0, ct2, t0
 						cgetlen t3, ct0
 						cincoffset ct2, ct2, t3
-						cllc ct3, mm.heap.cap
+						cllc ct3, mm.heap_cap
 						csc ct2, 0(ct3)
-						clear 0, 128
-						clear 3, 16
+						.4byte 4276224091 # cclear 0, 128
+						.4byte 4276881499 # cclear 3, 16
 						cjalr cnull, ct1
-						.align 8
-		mm.heap.cap:	.octa 0
-		mm.alloc.end:	.align 4
-						.align 4
-		rv.main:		csc cfp, -8(csp)
-						cincoffsetimm cfp, csp, -8
-						cincoffsetimm csp, csp, -16
-						csc cra, -8(cfp)
+						.balign 16
+		mm.heap_cap:	.octa 0
+		mm.alloc_end:	.balign 4
+						.balign 4
+		rv.main:		csc cfp, -16(csp)
+						cincoffsetimm cfp, csp, -16
+						cincoffsetimm csp, csp, -32
+						csc cra, -16(cfp)
 						cjal cra, fortytwo
 		cd.ret:			mv ra, a0
 						mv a0, ra
-						clc cra, -8(cfp)
-						cincoffsetimm csp, cfp, 8
+						clc cra, -16(cfp)
+						cincoffsetimm csp, cfp, 16
 						clc cfp, 0(cfp)
 						cjalr cnull, cra
-		fortytwo:		csc cfp, -8(csp)
-						cincoffsetimm cfp, csp, -8
-						cincoffsetimm csp, csp, -8
+		fortytwo:		csc cfp, -16(csp)
+						cincoffsetimm cfp, csp, -16
+						cincoffsetimm csp, csp, -16
 						cmove cs1, cs1
 						cmove ca4, cs2
 						cmove ca5, cs3
@@ -154,18 +158,20 @@ final class ProcedureTests : XCTestCase {
 						cmove cs10, ca2
 						cmove cs11, ca3
 						cmove cra, ca1
-						cincoffsetimm csp, cfp, 8
+						cincoffsetimm csp, cfp, 16
 						clc cfp, 0(cfp)
 						cjalr cnull, cra
-						.align 8
-		mm.alloc.cap:	.octa 0
-		mm.scall.cap:	.octa 0
-		mm.user.end:	.align 4
+						.balign 16
+		mm.alloc_cap:	.octa 0
+		mm.scall_cap:	.octa 0
+		mm.user_end:	.balign 4
 						.bss
+						.balign 16
 		mm.heap:		.fill 1048576, 1, 0
-		mm.heap.end:	.align 4
-		mm.stack.low:	.fill 1048576, 1, 0
-		mm.stack.high:	.align 4
+		mm.heap_end:	.balign 4
+						.balign 16
+		mm.stack_low:	.fill 1048576, 1, 0
+		mm.stack_high:	.balign 4
 						
 						.data
 						.align 6

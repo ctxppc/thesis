@@ -213,7 +213,10 @@ public enum MM : Language {
 							Lower.Effect.store(.cap, address: savedRACapReg, source: .ra)
 							
 							// cfp can be anything but must be a valid unsealed capability for the scall. (It will be sealed by the scall.)
+							// It must be nonexecutable for cinvoke.
+							let bitmaskReg = tempRegisterA
 							Lower.Effect.copy(.cap, into: .fp, from: userCapReg)
+							Lower.Effect.permit(Self.heapCapabilityPermissions, destination: .fp, source: .fp, using: bitmaskReg)
 							
 							// Manually link cra to avoid it becoming a sentry for the scall (which requires unsealed cra).
 							Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
@@ -400,7 +403,7 @@ public enum MM : Language {
 		/// The heap capability's permissions.
 		///
 		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
-		static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability]
+		static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]	// invoke needed for cinvoke cra, cfp
 		
 		/// The allocation routine capability's permissions.
 		///

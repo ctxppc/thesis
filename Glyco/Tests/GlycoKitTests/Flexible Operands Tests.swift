@@ -20,10 +20,10 @@ final class FlexibleOperandsTests : XCTestCase {
 		
 		let actual = try source.lowered(configuration: configuration)
 		let expected = MM.Program([
-			.load(.s32, into: .t4, from: .init(offset: -8)),
-			.load(.s32, into: .t5, from: .init(offset: -12)),
+			.load(.s32, into: .t4, from: .init(offset: -16)),
+			.load(.s32, into: .t5, from: .init(offset: -20)),
 			.compute(destination: .t4, .t4, .add, .register(.t5)),
-			.store(.s32, into: .init(offset: -16), from: .t4),
+			.store(.s32, into: .init(offset: -24), from: .t4),
 		])
 		
 		XCTAssertEqual(actual, expected)

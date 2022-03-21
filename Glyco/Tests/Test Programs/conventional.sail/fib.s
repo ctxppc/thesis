@@ -31,7 +31,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.heap_end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 61
+				addi t1, zero, 317
 				candperm ct0, ct0, t1
 				cllc ct1, mm.heap_cap
 				csc ct0, 0(ct1)
