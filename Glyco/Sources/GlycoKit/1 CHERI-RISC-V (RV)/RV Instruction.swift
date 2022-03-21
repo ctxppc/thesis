@@ -205,7 +205,14 @@ extension RV {
 				return "candperm \(destination.c), \(source.c), \(mask.x)"
 				
 				case .clear(quarter: let quarter, mask: let mask):
-				return "clear \(quarter), \(mask)"
+				// LLVM doesn't seem to support cclear and clear is not available on merged-register ISAs, so it's time to bit-fiddle!
+				//                  0x7f    0xe   q  m[7:5]  0x0  m[4:0]  0x5b
+				let instruction = 0b1111111_01110_00_000_____000__00000___1011011 as UInt32
+				let quarterMask = UInt32(quarter) << 18
+				let highMaskMask = (UInt32(mask) & 0b11100000) << (15 - 5)
+				let lowMaskMask = (UInt32(mask) & 0b00011111) << 7
+				let encoding = (instruction | quarterMask | highMaskMask | lowMaskMask)
+				return ".4byte \(encoding) # cclear \(quarter), \(mask)"
 				
 				case .branch(rs1: let rs1, relation: let relation, rs2: let rs2, target: let target):
 				return "b\(relation.rawValue) \(rs1.x), \(rs2.x), \(target.rawValue)"

@@ -67,10 +67,10 @@ rv.runtime:		cllc ct0, mm.heap
 				addi t0, zero, 319
 				candperm ct6, ct6, t0
 				cmove cfp, ct6
-				clear 0, 253
-				clear 1, 254
-				clear 2, 255
-				clear 3, 127
+				.4byte 4276326107 # cclear 0, 253
+				.4byte 4276588379 # cclear 1, 254
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4276981723 # cclear 3, 127
 				cllc ct0, mm.scall.cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -82,8 +82,8 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				cincoffset ct2, ct2, t3
 				cllc ct3, mm.heap.cap
 				csc ct2, 0(ct3)
-				clear 0, 128
-				clear 3, 16
+				.4byte 4276224091 # cclear 0, 128
+				.4byte 4276881499 # cclear 3, 16
 				cjalr cnull, ct1
 				.balign 16
 mm.heap.cap:	.octa 0
@@ -93,7 +93,7 @@ mm.scall:		cllc ct0, mm.seal.cap
 				clc ct0, 0(ct0)
 				cseal cra, cra, ct0
 				cseal cfp, cfp, ct0
-				clear 0, 32
+				.4byte 4276125787 # cclear 0, 32
 				cjalr cnull, ct6
 				.balign 16
 mm.seal.cap:	.octa 0
@@ -106,20 +106,20 @@ rv.main:		addi t0, zero, 32
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
 				csc cra, -16(cfp)
-				clear 0, 227
-				clear 1, 254
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322779 # cclear 0, 227
+				.4byte 4276588379 # cclear 1, 254
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				cllc ct6, f
 				cllc cra, mm.scall.cap
 				clc cra, 0(cra)
 				cjalr cra, cra
 				cmove cfp, ct6
 cd.ret:			clc cra, -16(cfp)
-				clear 0, 225
-				clear 1, 250
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322523 # cclear 0, 225
+				.4byte 4276587867 # cclear 1, 250
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 f:				addi t0, zero, 16
@@ -129,10 +129,10 @@ f:				addi t0, zero, 16
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
 				addi a0, zero, 42
-				clear 0, 225
-				clear 1, 250
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322523 # cclear 0, 225
+				.4byte 4276587867 # cclear 1, 250
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 				.balign 16
