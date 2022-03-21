@@ -46,7 +46,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.alloc.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 51
+				addi t1, zero, 63
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
@@ -55,7 +55,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.scall.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 19
+				addi t1, zero, 23
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.scall.cap

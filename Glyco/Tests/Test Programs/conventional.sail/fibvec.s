@@ -47,7 +47,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.alloc.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 51
+				addi t1, zero, 63
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
@@ -68,8 +68,8 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				cincoffset ct2, ct2, t3
 				cllc ct3, mm.heap.cap
 				csc ct2, 0(ct3)
-				clear 0, 128
-				clear 3, 16
+				.4byte 4276224091 # cclear 0, 128
+				.4byte 4276881499 # cclear 3, 16
 				cjalr cnull, ct1
 				.balign 16
 mm.heap.cap:	.octa 0

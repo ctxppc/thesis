@@ -46,7 +46,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.alloc.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 51
+				addi t1, zero, 63
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc.cap
@@ -55,7 +55,7 @@ rv.runtime:		cllc ct0, mm.heap
 				cllc ct1, mm.scall.end
 				csub t1, ct1, ct0
 				csetbounds ct0, ct0, t1
-				addi t1, zero, 19
+				addi t1, zero, 23
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.scall.cap
@@ -67,10 +67,10 @@ rv.runtime:		cllc ct0, mm.heap
 				addi t0, zero, 319
 				candperm ct6, ct6, t0
 				cmove cfp, ct6
-				clear 0, 253
-				clear 1, 254
-				clear 2, 255
-				clear 3, 127
+				.4byte 4276326107 # cclear 0, 253
+				.4byte 4276588379 # cclear 1, 254
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4276981723 # cclear 3, 127
 				cllc ct0, mm.scall.cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -82,8 +82,8 @@ mm.alloc:		cllc ct2, mm.heap.cap
 				cincoffset ct2, ct2, t3
 				cllc ct3, mm.heap.cap
 				csc ct2, 0(ct3)
-				clear 0, 128
-				clear 3, 16
+				.4byte 4276224091 # cclear 0, 128
+				.4byte 4276881499 # cclear 3, 16
 				cjalr cnull, ct1
 				.balign 16
 mm.heap.cap:	.octa 0
@@ -93,7 +93,7 @@ mm.scall:		cllc ct0, mm.seal.cap
 				clc ct0, 0(ct0)
 				cseal cra, cra, ct0
 				cseal cfp, cfp, ct0
-				clear 0, 32
+				.4byte 4276125787 # cclear 0, 32
 				cjalr cnull, ct6
 				.balign 16
 mm.seal.cap:	.octa 0
@@ -109,20 +109,20 @@ rv.main:		addi t0, zero, 32
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
-				clear 0, 227
-				clear 1, 226
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322779 # cclear 0, 227
+				.4byte 4276584795 # cclear 1, 226
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				cllc ct6, fib
 				cllc cra, mm.scall.cap
 				clc cra, 0(cra)
 				cjalr cra, cra
 				cmove cfp, ct6
 cd.ret:			clc cra, -16(cfp)
-				clear 0, 225
-				clear 1, 250
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322523 # cclear 0, 225
+				.4byte 4276587867 # cclear 1, 250
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 fib:			addi t0, zero, 32
@@ -141,28 +141,28 @@ cd.else:		mv a0, a1
 				add a1, a3, a1
 				addi ra, zero, 1
 				sub a2, a2, ra
-				clear 0, 227
-				clear 1, 226
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322779 # cclear 0, 227
+				.4byte 4276584795 # cclear 1, 226
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				cllc ct6, fib
 				cllc cra, mm.scall.cap
 				clc cra, 0(cra)
 				cjalr cra, cra
 				cmove cfp, ct6
 cd.ret$1:		clc cra, -16(cfp)
-				clear 0, 225
-				clear 1, 250
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322523 # cclear 0, 225
+				.4byte 4276587867 # cclear 1, 250
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 cd.then:		mv a0, a1
 				clc cra, -16(cfp)
-				clear 0, 225
-				clear 1, 250
-				clear 2, 255
-				clear 3, 255
+				.4byte 4276322523 # cclear 0, 225
+				.4byte 4276587867 # cclear 1, 250
+				.4byte 4276850651 # cclear 2, 255
+				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
 				.balign 16

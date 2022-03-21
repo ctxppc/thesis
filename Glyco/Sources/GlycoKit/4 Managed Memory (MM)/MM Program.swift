@@ -373,12 +373,12 @@ public enum MM : Language {
 		/// The allocation routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
-		static let allocCapabilityPermissions = [Permission.global, .execute, .loadCapability, .storeCapability]
+		static let allocCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
 		
 		/// The secure calling routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
-		static let scallCapabilityPermissions = [Permission.global, .execute, .loadCapability]
+		static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability]
 		
 		/// The seal capability's permissions.
 		static let sealCapabilityPermissions = [Permission.global, .seal]
