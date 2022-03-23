@@ -3,7 +3,7 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Ensuring Memory Safety using Capabilities}
-Most security bugs classified as “serious” in large projects such as the Chromium browser engine are memory safety bugs,\cite{chromium} such as out-of-bounds array or call stack accesses that either arise from the use of “memory-unsafe” programming languages such as C, the use of memory safety opt-outs (such as Rust’s unsafe) in “memory-safe” programming languages, or bugs in the compiler or standard library implementation of a memory-safe programming language or runtime environment such as the Java VM or an ECMAScript interpreter.
+Most security bugs classified as “serious” in large projects such as the Chromium browser engine are memory safety bugs,\cite{chromium} such as out-of-bounds array or call stack accesses that either arise from the use of “memory-unsafe” programming languages such as C, the use of memory safety opt-outs (such as Rust’s \texttt{unsafe}) in “memory-safe” programming languages, or bugs in the compiler or standard library implementation of a memory-safe programming language or runtime environment such as the Java VM or an ECMAScript interpreter.
 
 Common approaches to mitigating attacks or restricting the attack vector that such a bug can cause include reintroducing compiler-inserted array bounds checks in memory-unsafe programming languages and enforcing page-level permissions in the virtual memory system of the operating system. However, runtime checks introduce a runtime cost, and virtual memory protection doesn’t protect against a compromised or vulnerable library such as Apache Log4j accessing potentially sensitive data in the process’ address space such as TLS session keys stored in an in-process OpenSSL data structure.
 
@@ -18,7 +18,7 @@ CHERI-RISC-V defines several capability-aware instructions that can validly modi
 
 \begin{figure}
 	\begin{center}
-		\includegraphics[scale=0.6]{CHERI Concentrate Layout.pdf}
+		\includegraphics{Images/CHERI Concentrate Layout.pdf}
 	\end{center}
 	\caption{A simplified layout of a 256-bit CHERI capability compressed into 128 bits using the CHERI Concentrate encoding. CHERI-RISC-V defines one flag bit and reserves the other two bits for future use. The validity tag bit is stored out-of-band, usually in tagged memory not directly accessible by user programs.}
 	\label{fig:chericoncentrate}
@@ -34,22 +34,22 @@ CHERI-RISC-V defines several capability-aware instructions that can validly modi
 
 \begin{figure}
 	\begin{center}
-		\includegraphics[scale=0.6]{Deriving Authority.pdf}
+		\includegraphics{Images/Deriving Authority.pdf}
 	\end{center}
 	\caption{Provenance and monotonicity in action in protecting process memory, the call stack, and a call frame. The size of the depicted memory regions are not to scale. Similar illustrations can be made about a process' heap and heap-allocated memory.}
 	\label{fig:derivingauth}
 \end{figure}
 
 \section{Sealed Capabilities}
-CHERI provides a capability protection mechanism called \emph{sealing}, whereby the capability holder is restricted from modifying or dereferencing the capability. The inverse operation, i.e., \emph{unsealing}, is only allowed under specific circumstances. Sealing comes in two forms: sealing using a \emph{seal capability} or sealing as a \emph{sentry (sealed entry) capability}. The sealed state of a capability is encoded in its \emph{object type} field; the object type of an unsealed capability has the value $-1$.
+CHERI provides a capability protection mechanism called \emph{sealing}, whereby the capability holder is restricted from modifying or dereferencing the capability. The inverse operation, i.e., \emph{unsealing}, is only allowed under specific circumstances. Sealing comes in two forms: sealing using a \emph{seal capability} or sealing as a \emph{sentry (sealed entry) capability}. The sealed state of a capability is encoded in its \emph{object type} field; the object type of an unsealed capability has the special value $-1$ whereas a sentry capability's object type has the special value $-2$.
 
 \paragraph{Sealing using a seal capability} A capability with the \emph{permit seal} permission (the \emph{seal capability}) can be used to seal another capability (the \emph{sealed capability}). The object type of the sealed capability is set to the seal capability's "address". A capability with the \emph{permit unseal} permission (the \emph{unseal capability}) can be used to unseal a sealed capability provided that the sealed capability's object type matches the unseal capability's “address” exactly. A seal capability can also act as an unseal capability if it has both permissions.
 
-As would be expected from normal pointer-like capabilities, the seal/unseal capability's address must be within its bounds lest a machine trap be thrown when attempting to seal or unseal. By carefully controlling access to and bounding capabilities with the \emph{permit seal} and \emph{permit unseal} permissions, sealing can be used for higher-level features such as encapsulation.
+As would be expected from normal pointer-like capabilities, the (un)seal capability's address must be within its bounds when (un)sealing; otherwise a machine trap ensues. By carefully controlling access to and bounding capabilities with the \emph{permit seal} and \emph{permit unseal} permissions, sealing can be used for higher-level features such as encapsulation.
 
-CHERI-RISC-V additionally provides a \texttt{CInvoke} instruction that takes a code and data capability that are sealed with the same object type. It unseals them simultaneously and calls the code capability, thereby giving the callee access to the unsealed data capability. This feature enables secure domain transitions, wherein the caller cannot dereference the code or data capability (which may belong to a closure, for example), but can use them to perform an invocation.
+Sealing and unsealing can be done using the \texttt{CSeal} respectively \texttt{CUnseal} instructions. CHERI-RISC-V additionally provides a \texttt{CInvoke} instruction that takes a code and data capability pair with matching object type, unseals them, and jumps to the code capability's address. This feature enables secure domain transitions, wherein the caller cannot dereference the code or data capability (which may belong to a closure, for example), but can use them to perform an invocation.
 
-\paragraph{Sealing as a sentry capability} % TODO
+\paragraph{Sealing as a sentry capability} An executable capability can be sealed by itself as a sentry capability using the \texttt{CSealEntry} instruction. CHERI-RISC-V defines a \texttt{CJALR} instruction that jumps to the address of a given target capability, unsealing the capability if it is a sentry capability. Similar to RISC-V's \texttt{JALR} instruction, the instruction also accepts a link register wherein it puts the return address. Unlike \texttt{JALR}, \texttt{CJALR} also seals the return capability as a sentry capability, ensuring that the callee can only use it to return to the caller.
 
 \section{Local State Encapsulation \& Well-Bracketed Control Flow}
 Capabilities are CHERI’s building blocks on which security features can be built, akin to how cryptographic primitives form the basis of cryptographic algorithms. One low-level application of capabilities is in (1) protecting a component's local state, the so-called local state encapsulation property, and (2) enforcing the return-to-caller principle, a property named well-bracketed control flow.

@@ -12,7 +12,7 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \nanopass{} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
 
-Glyco currently defines 17 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
+Glyco currently defines 19 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
 
 \section{Basic Abstractions over Assembly}
 
