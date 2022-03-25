@@ -13,7 +13,7 @@
 
 \usepackage{amsmath}							% Math support
 \usepackage{babel}								% Language support
-\usepackage[autostyle=true]{csquotes}			% Curly quotes
+\usepackage[autostyle]{csquotes}				% Curly quotes
 
 \usepackage[dvipsnames]{xcolor}					% Named colours — keep before hyperref
 \usepackage{hyperref}							% Hyperlinking and PDF metadata.
@@ -73,9 +73,12 @@
 \end{abstract*}
 
 \mainmatter
+\subfile{intro}
 \subfile{cheri}
 \subfile{glyco}
 \subfile{ghscc}
+\subfile{objects}
+\subfile{conclusion}
 
 \backmatter
 \glsaddall

@@ -22,4 +22,20 @@
 }
 \newcommand{\lowerlang}{\gls{lowerlang}}
 
+\newglossaryentry{cc}{
+	name=calling convention,
+	description=a set of rules governing the invocation of procedures on a specific platform\, dealing with matters such as parameter \& result passing\, register availability\, call frame structure\, jumping to the callee\, and returning to the caller.
+}
+\newcommand{\cc}{\gls{cc}}
+\newcommand{\ccs}{\glspl{cc}}
+
+\newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \cc{}}
+\newcommand{\gccc}{\gls{gccc}}
+
+\newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \cc{} implemented in Glyco that ensures \lce{} by securely allocating call frames on the heap and sealing return \& frame capabilities with a unique seal before invocation}
+\newcommand{\ghscc}{\gls{ghscc}}
+
+\newdualentry{lce}{LCE}{local state encapsulation}{a security property guaranteeing that a procedure's state cannot be accessed by adversarial code in the same address space}
+\newcommand{\lce}{\gls{lce}}
+
 \makeglossaries

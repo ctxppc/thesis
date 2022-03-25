@@ -3,12 +3,19 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Glyco Heap-based Secure Calling Convention}
-The previous chapter discussed the first milestone of the Glyco compiler, namely a nanopass compiler producing fairly traditional executables for CHERI-RISC-V targets, with close to no special considerations for capability machines, except for minor enhancements such as bounded heap-allocated buffers. This chapter discusses the second major milestone for the Glyco compiler, namely a secure heap-based calling convention adapted from the one described by \cite{cerise} named \textbf{Glyco Heap-based Secure Calling Convention} (\textbf{GHSCC}).
+The previous chapter discussed the first milestone of the Glyco compiler, namely a nanopass compiler producing fairly traditional executables for CHERI-RISC-V targets, with almost no special considerations for capability machines, except for minor enhancements such as bounded heap-allocated buffers. This chapter discusses the first significant upgrade of the Glyco compiler, namely one where procedure calls are implemented using a secure \cc{} named \textbf{\ghscc{}} and adapted from the heap-based \cc{} proposed by \cite{cerise}.
 
-The calling convention relies on a couple of runtime routines with access to capabilities not available to the user's source code. As Glyco is developed almost entirely in isolation, it cannot rely on an operating system or dynamic linker to provide these routines and therefore provides them itself. It is expected that a production compiler would be able to rely on an OS-provided standard library instead, thereby removing the need to trust the compiler.
+We begin this chapter by describing the desired security properties of a \enquote{secure} \cc{} and listing some theoretical \ccs{} proposed in the literature that have those properties. We then describe the implementation of two runtime routines that form the basis of \ghscc{}, and how they interact with the new \cc{}. We finish with an evaluation of \ghscc{} against \gccc{} in terms of \lce{}, changes to the compiler and its \ils{}, generated codesize, and runtime performance.
 
-\section{Secure Calling Conventions}
-One notable difference between GHSCC and more traditional calling conventions such as GCCC is the use of heap-allocated call frames, as opposed to pushing call frames on a call stack. The main reason for it is the difficulty in revoking stack or frame capabilities.
+% TODO: Move paragraph to implementation discussion
+The \cc{} relies on a couple of runtime routines with access to capabilities not available to the user's source code. As Glyco is developed almost entirely in isolation, it cannot rely on an operating system or dynamic linker to provide these routines and therefore provides them itself. It is expected that a production compiler would be able to rely on an OS-provided standard library instead, thereby removing the need to trust the compiler.
+
+\section{Background: Secure Calling Conventions}
+A traditional \cc{} such as \gccc{} works with a single stack of call frames per thread, with each call frame holding ephemeral state (such as local variables) associated with a specific procedure call. When calling a procedure, a new call frame is pushed on the stack, the caller puts a return address in a designated register or location on the call frame, and passes control to the callee. When returning, the most recent call frame on the stack is popped and the callee jumps to the caller-provided return address. The exact details and distribution of responsibilities are mandated by the \cc{} in use.
+
+Such a \cc{}, however, provides no security in the face of adversarial code that operates in the same address space. It's unreasonable to trust all loaded code, even if it originates from the same author: one overflow attack on a stack-allocated buffer in vulnerable (yet trusted) code can compromise the call stack.
+
+% TODO: WBCF
 
 A caller can restrict the stack capability before calling a procedure so that the callee only gets access to the unused part of the stack. However, as illustrated in \cref{fig:savedstackcap}, an adversary can save a copy of their stack capability in a first call. If the adversary is called a second time when their stack capability is lower in the stack (due to the stack containing more call frames than during the first call), it can use the saved stack capability to gain access to memory used by other call frames. Several solutions have been proposed to this problem.
 
@@ -16,7 +23,7 @@ A caller can restrict the stack capability before calling a procedure so that th
 	\begin{center}
 		\includegraphics{Images/Saved Stack Cap.pdf}
 	\end{center}
-	\caption{An adversary can save their stack capability for use during a later invocation. Even if the subsequent invocation's stack capability provides authority over a smaller part of the call stack, the saved stack capability continues to provide the adversary with authority over the larger region, which may include memory now occupied by other call frames. Note that the stack grows downward.}
+	\caption{The call stack in a first invocation (left) and a second invocation (right) of the adversary. During the first invocation, the adversary saves their stack capability for use during a later invocation. Even though the stack capability in the second invocation provides authority over a smaller part of the call stack, the previously saved stack capability continues to provide the adversary with authority over the larger region, which now includes memory occupied by other call frames. Note that the stack grows downward.}
 	\label{fig:savedstackcap}
 \end{figure}
 
