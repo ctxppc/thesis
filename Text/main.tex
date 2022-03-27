@@ -13,6 +13,7 @@
 
 \usepackage{amsmath}							% Math support
 \usepackage{babel}								% Language support
+\usepackage[margin=10pt, font=small]{caption}	% Customised captions to distinguish them from main text
 \usepackage[autostyle]{csquotes}				% Curly quotes
 
 \usepackage[dvipsnames]{xcolor}					% Named colours — keep before hyperref
@@ -38,9 +39,7 @@
 \newcommand{\notinsubfile}[1]{}
 
 \DeclareDocumentCommand{\newdualentry}{ O{} O{} m m m m } {
-	\newglossaryentry{gls-#3}{name={#5},text={#5\glsadd{#3}},
-	description={#6},#1
-	}
+	\newglossaryentry{gls-#3}{name={#5}, text={#5\glsadd{#3}}, description={#6}, #1}
 	\makeglossaries
 	\newacronym[see={{gls-#3}},#2]{#3}{#4}{#5\glsadd{gls-#3}}
 }

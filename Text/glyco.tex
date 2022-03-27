@@ -6,15 +6,17 @@
 
 Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-Glyco is built following a \emph{nanopass} compiler design, described by several authors in the context of compiler education \cite{:educomp} and commercial compiler development \cite{:commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\nanopasses{}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \nanopasses{} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to LLVM for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We then describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. Later chapters discuss extensions and changes to this first version of the compiler.
 
-The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \nanopass{} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \nanopass{}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
+\section{Background: Nanopass Compilers}
+Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\glspl{nanopass}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \glspl{nanopass} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to LLVM for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
 
-An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \nanopass{} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
+The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \gls{nanopass} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \gls{nanopass}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
 
-Glyco currently defines 19 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from an educational compiler in a compilers course targeting x86-64 systems, taught at Vrije Universiteit Brussel \cite{:compcourse} and University of British Columbia.
+An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as the LLVM compiler toolchain.
 
 \section{Basic Abstractions over Assembly}
+The first version of Glyco defines 19 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from the educational compiler by \cite{compcourse}.
 
 The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI-RISC-V assembly language that are useful in higher abstractions.
 
@@ -27,9 +29,9 @@ The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI
 	\label{bnf:s}
 \end{figure}
 
-\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{:compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \Cref{bnf:rv}.
+\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \Cref{bnf:rv}.
 
-One important deviation from \cite{:compcourse} across the whole compiler pipeline is the support for multiple data types in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data. Another important deviation is the addition of a \texttt{call} instruction which provides additional hardware features that cannot be implemented using other instructions.\footnote{This is not true in the current version of Glyco which uses a simple calling convention but it's expected that it will be in a future version supporting a secure calling convention.}
+One important deviation from \cite{compcourse} across the whole compiler pipeline is the support for multiple data types in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data. Another important deviation is the addition of a \texttt{call} instruction which provides additional hardware features that cannot be implemented using other instructions.\footnote{This is not true in the current version of Glyco which uses a simple calling convention but it's expected that it will be in a future version supporting a secure calling convention.}
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -59,7 +61,7 @@ One important deviation from \cite{:compcourse} across the whole compiler pipeli
 
 \paragraph{Call Frame (CF)} This language introduces the call frame, hence its name, as well as effects that operate on it, and restricts memory operations to either the call frame or allocated buffers. Its main purpose is to hide the stack and frame capability registers early on, i.e., from most abstractions in the compiler. An abridged grammar is shown in \Cref{bnf:cf}.
 
-CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, the load and store effects for data on the call frame are different from those for data in an allocated buffer. Additionally, CF provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, CF introduces statically allocated buffers, a feature not present in the \cite{:compcourse} compiler.
+CF is an adaptation of \texttt{paren-x86-mops} in \cite{compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, the load and store effects for data on the call frame are different from those for data in an allocated buffer. Additionally, CF provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, CF introduces statically allocated buffers, a feature not present in the \cite{compcourse} compiler.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -94,7 +96,7 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 	\label{bnf:cf}
 \end{figure}
 
-\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to refer directly to a location on the call frame besides referring to a register. This is an adaptation from \texttt{para-asm-lang} in \cite{:compcourse} with the same deviations as in FL. An abridged grammar is presented in \Cref{bnf:fo}.
+\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to refer directly to a location on the call frame besides referring to a register. This is an adaptation from \texttt{para-asm-lang} in \cite{compcourse} with the same deviations as in FL. An abridged grammar is presented in \Cref{bnf:fo}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -121,7 +123,7 @@ CF is an adaptation of \texttt{paren-x86-mops} in \cite{:compcourse} with severa
 \section{Structured Jumps \& Branches}
 The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're easier to reason about in optimisations and higher abstracts.
 
-\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exited at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch. The initial block is named using a dedicated program entry label. The \il{} adapts \texttt{block-asm-lang} from \cite{:compcourse} with similar deviations from FO, including a special \texttt{call} continuation. An abridged grammar is shown in \Cref{bnf:bb}.
+\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exited at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch. The initial block is named using a dedicated program entry label. The \il{} adapts \texttt{block-asm-lang} from \cite{compcourse} with similar deviations from FO, including a special \texttt{call} continuation. An abridged grammar is shown in \Cref{bnf:bb}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -149,7 +151,7 @@ The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're ea
 	\label{bnf:bb}
 \end{figure}
 
-\paragraph{Predicates (PR)} The next language removes the fixed relation specification from \texttt{branch} continuations and replaces it with a basic predicate syntax. It adapts \texttt{block-pred-lang} from \cite{:compcourse} with similar deviations from BB. An abridged grammar is presented in \Cref{bnf:pr}.
+\paragraph{Predicates (PR)} The next language removes the fixed relation specification from \texttt{branch} continuations and replaces it with a basic predicate syntax. It adapts \texttt{block-pred-lang} from \cite{compcourse} with similar deviations from BB. An abridged grammar is presented in \Cref{bnf:pr}.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -178,7 +180,7 @@ The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're ea
 
 With these more deterministic control flows, CD can abstract basic blocks away. A program in CD consists of a main effect and zero or more procedures. Each procedure has a unique name and a main effect. An abridged grammar is presented in \Cref{bnf:cd}.
 
-CD is a partial adaptation of \texttt{nested-asm-lang} from \cite{:compcourse}. CD does not define a \texttt{return-point} effect and instead relies on the \texttt{call} and \texttt{return} effects to push and pop a return address on the call stack. The underlying language defines a \texttt{call} effect which cannot be implemented using a combination of \texttt{jump} and other effects.
+CD is a partial adaptation of \texttt{nested-asm-lang} from \cite{compcourse}. CD does not define a \texttt{return-point} effect and instead relies on the \texttt{call} and \texttt{return} effects to push and pop a return address on the call stack. The underlying language defines a \texttt{call} effect which cannot be implemented using a combination of \texttt{jump} and other effects.
 
 \begin{figure}[ht]
 	\begin{grammar}
@@ -211,6 +213,15 @@ CD is a partial adaptation of \texttt{nested-asm-lang} from \cite{:compcourse}. 
 \section{Abstract Locations}
 The next 2 \ils{}, AL and ALA, introduce an abstraction over physical locations, whether on the call frame or in registers. The two \ils{} are tightly coupled.
 
+% TODO
+
+\section{A Conventional Calling Convention}
+% TODO
+
+\section{An Expression Language}
+% TODO
+
+\section{Evaluation}
 % TODO
 
 \biblio{}

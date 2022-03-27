@@ -1,4 +1,32 @@
-\newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a nanopass as part of the compiler's routine}
+\newglossaryentry{sealing}{
+	name=sealing,
+	description=the act of setting the object type of an unsealed capability to either the address of a \sealcap{} or to a special value indicating that it's a \sentry{}\, so that it can no longer be modified or dereferenced until it\'s \glslink{unsealing}{unsealed} again
+}
+
+\newglossaryentry{unsealing}{
+	name=unsealing,
+	description=the act of setting the object type of a sealed capability to $-1$ so that it's no longer sealed and thus can be used normally
+}
+
+\newglossaryentry{sentry}{
+	name=sentry capability,
+	description=a sealed entry capability\, a sealed capability created with the \texttt{CSealEntry} instruction which can only be unsealed by jumping to its address using the \texttt{CJALR} instruction
+}
+\newcommand{\sentry}{\gls{sentry}}
+
+\newglossaryentry{sealcap}{
+	name=seal capability,
+	description=a capability with the \emph{Permit seal} permission which can be used with the \texttt{CSeal} instruction to seal an unsealed capability with the seal capability's address
+}
+\newcommand{\sealcap}{\gls{sealcap}}
+
+\newglossaryentry{unsealcap}{
+	name=unseal capability,
+	description=a capability with the \emph{Permit unseal} permission which can be used with the \texttt{CUnseal} instruction to unseal a capability sealed with the unseal capability's address
+}
+\newcommand{\unsealcap}{\gls{unsealcap}}
+
+\newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a \gls{nanopass} as part of the compiler's routine}
 \newcommand{\il}{\gls{il}}
 \newcommand{\ils}{\glspl{il}}
 
@@ -13,8 +41,6 @@
 	description=a function that transforms a program in one \gls{il} to a program in another \gls{il},
 	plural=nanopasses
 }
-\newcommand{\nanopass}{\gls{nanopass}}
-\newcommand{\nanopasses}{\glspl{nanopass}}
 
 \newglossaryentry{lowerlang}{
 	name=lower language,
@@ -35,7 +61,16 @@
 \newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \cc{} implemented in Glyco that ensures \lce{} by securely allocating call frames on the heap and sealing return \& frame capabilities with a unique seal before invocation}
 \newcommand{\ghscc}{\gls{ghscc}}
 
-\newdualentry{lce}{LCE}{local state encapsulation}{a security property guaranteeing that a procedure's state cannot be accessed by adversarial code in the same address space}
-\newcommand{\lce}{\gls{lce}}
+\newglossaryentry{lse}{
+	name=local state encapsulation,
+	description=a security property guaranteeing that a procedure's state cannot be accessed by adversarial code in the same address space
+}
+\newcommand{\lse}{\gls{lse}}
+
+\newglossaryentry{wbcf}{
+	name=well-bracketed control flow,
+	description=a security property guaranteeing that a procedure can only invoke other procedures\, return to its caller\, or diverge
+}
+\newcommand{\wbcf}{\gls{wbcf}}
 
 \makeglossaries
