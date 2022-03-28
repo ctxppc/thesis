@@ -37,6 +37,10 @@
 
 \newcommand{\onlyinsubfile}[1]{#1}
 \newcommand{\notinsubfile}[1]{}
+\newcommand{\g}[1]{\gls{#1}}
+\newcommand{\G}[1]{\Gls{#1}}
+\newcommand{\gs}[1]{\glspl{#1}}
+\newcommand{\Gs}[1]{\Glspl{#1}}
 
 \DeclareDocumentCommand{\newdualentry}{ O{} O{} m m m m } {
 	\newglossaryentry{gls-#3}{name={#5}, text={#5\glsadd{#3}}, description={#6}, #1}
