@@ -56,21 +56,22 @@
 \newcommand{\ccs}{\glspl{cc}}
 
 \newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \cc{}}
-\newcommand{\gccc}{\gls{gccc}}
 
 \newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \cc{} implemented in Glyco that ensures \lce{} by securely allocating call frames on the heap and sealing return \& frame capabilities with a unique seal before invocation}
-\newcommand{\ghscc}{\gls{ghscc}}
 
 \newglossaryentry{lse}{
 	name=local state encapsulation,
 	description=a security property guaranteeing that a procedure's state cannot be accessed by adversarial code in the same address space
 }
-\newcommand{\lse}{\gls{lse}}
 
 \newglossaryentry{wbcf}{
 	name=well-bracketed control flow,
 	description=a security property guaranteeing that a procedure can only invoke other procedures\, return to its caller\, or diverge
 }
-\newcommand{\wbcf}{\gls{wbcf}}
+
+\newglossaryentry{retcap}{
+	name=return capability,
+	description=a capability containing a return address allowing a procedure to return to its caller
+}
 
 \makeglossaries
