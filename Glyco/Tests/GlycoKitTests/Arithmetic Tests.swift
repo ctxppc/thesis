@@ -50,10 +50,9 @@ final class ArithmeticTests : XCTestCase {
 		_trap_vector:	li gp, 3
 						j _exit
 						
-		_exit:			auipcc ct5, 0x1
+		_exit:			li t5, 1
 						cllc ct0, tohost
-						cincoffset ct5, ct5, t0
-						csw gp, 0(ct5)
+						csw t5, 0(ct0)
 						j _exit
 						
 		rv.begin:		ccall rv.runtime
@@ -191,10 +190,9 @@ final class ArithmeticTests : XCTestCase {
 		_trap_vector:	li gp, 3
 						j _exit
 						
-		_exit:			auipcc ct5, 0x1
+		_exit:			li t5, 1
 						cllc ct0, tohost
-						cincoffset ct5, ct5, t0
-						csw gp, 0(ct5)
+						csw t5, 0(ct0)
 						j _exit
 						
 		rv.begin:		ccall rv.runtime

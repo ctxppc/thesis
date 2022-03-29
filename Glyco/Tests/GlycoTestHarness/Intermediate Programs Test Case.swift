@@ -27,8 +27,11 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
-				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.map { ($0.pathExtension.uppercased(), try String(contentsOf: $0)) })
-				programSispsByLanguageName.removeValue(forKey: "OUT")
+				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.compactMap { url -> (String, String)? in
+					let language = url.pathExtension.uppercased()
+					guard !language.isEmpty, language != "OUT" else { return nil }
+					return (language, try .init(contentsOf: url))
+				})
 				if programSispsByLanguageName.count < 2 {
 					print("which does not have any additional intermediate programs to test against… skipped")
 					continue
