@@ -104,10 +104,12 @@ mm.heap_cap:	.octa 0
 mm.alloc_end:	.balign 4
 				.balign 4
 mm.scall:		cllc ct0, mm.seal_cap
-				clc ct0, 0(ct0)
-				cseal cra, cra, ct0
-				cseal cfp, cfp, ct0
-				.4byte 4276125787 # cclear 0, 32
+				clc ct1, 0(ct0)
+				cseal cra, cra, ct1
+				cseal cfp, cfp, ct1
+				cincoffsetimm ct1, ct1, 1
+				csc ct1, 0(ct0)
+				.4byte 4276191323 # cclear 0, 96
 				cjalr cnull, ct6
 				.balign 16
 mm.seal_cap:	.octa 0

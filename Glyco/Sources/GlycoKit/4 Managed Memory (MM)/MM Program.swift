@@ -315,7 +315,7 @@ public enum MM : Language {
 				
 				// Load seal cap.
 				let sealCapCap = tempRegisterA
-				let sealCap = tempRegisterA
+				let sealCap = tempRegisterB
 				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: sealCapLabel)
 				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
 				
@@ -323,8 +323,12 @@ public enum MM : Language {
 				Lower.Effect.seal(destination: .ra, source: .ra, seal: sealCap)
 				Lower.Effect.seal(destination: .fp, source: .fp, seal: sealCap)
 				
+				// Update seal cap for next invocation.
+				Lower.Effect.offsetCapability(destination: sealCap, source: sealCap, offset: .constant(1))
+				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap)
+				
 				// Clear authority.
-				Lower.Effect.clear([sealCap])
+				Lower.Effect.clear([sealCapCap, sealCap])
 				
 				// Jump to callee — while preserving link.
 				Lower.Effect.jump(to: .register(targetReg), link: .zero)
@@ -450,7 +454,7 @@ extension MM.Label {
 	///
 	/// It returns the same frame capability in `invocationData` and any function results in argument registers.
 	///
-	/// The routine may touch any register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
+	/// The routine may touch any non-argument register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
 	///
 	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
 	static var secureCallingRoutineCapability: Self { "mm.scall_cap" }
