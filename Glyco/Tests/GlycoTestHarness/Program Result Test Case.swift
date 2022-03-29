@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import DepthKit
 import GlycoKit
 import Sisp
 import XCTest
@@ -25,14 +26,20 @@ final class ProgramResultTestCase : XCTestCase {
 		let urlsByGroupName = Dictionary(grouping: urls) { $0.deletingPathExtension().lastPathComponent }
 		var errors = TestErrors()
 		
-		print("> Testing \(urlsByGroupName.count) test programs for \(configuration) using \(simulatorURL.path)")
-		for (groupName, urls) in urlsByGroupName {
+		print("> Running test programs using \(simulatorURL.path) for \(configuration)")
+		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
-				print(">> Testing “\(groupName)” ", terminator: "")
-				var sourceURLsByLanguageName = Dictionary(uniqueKeysWithValues: urls.map { ($0.pathExtension.uppercased(), $0) })
-				guard let expectedResultString = try sourceURLsByLanguageName.removeValue(forKey: "OUT").map(String.init(contentsOf:)) else { continue }
-				guard let expectedResult = Int(expectedResultString.trimmingCharacters(in: .whitespacesAndNewlines))
-				else { throw ProgramResultTestError.invalidExpectedResult(expectedResultString) }
+				
+				var sourceURLsByLanguageName = Dictionary(
+					uniqueKeysWithValues: urls.filter { !$0.pathExtension.isEmpty }.map { ($0.pathExtension.uppercased(), $0) }
+				)
+				guard let expectedResultURL = sourceURLsByLanguageName.removeValue(forKey: "OUT") else { continue }
+				
+				print(">> Simulating “\(groupName)” ", terminator: "")
+				let expectedResultString = try String(contentsOf: expectedResultURL)
+				guard let expectedResult = Int(expectedResultString.trimmingCharacters(in: .whitespacesAndNewlines)) else {
+					throw ProgramResultTestError.invalidExpectedResult(expectedResultString)
+				}
 				print("with expected result \(expectedResult)… ", terminator: "")
 				try HighestSupportedLanguage.iterate(
 					DecodeSourceAndSimulateProgramsAction(
@@ -83,13 +90,14 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 		let sourceProgram = try SispDecoder(from: .init(contentsOf: sourceURL)).decode(L.Program.self)
 		let elfData = try L.elf(from: sourceProgram, configuration: configuration)
 		
-		let tempDirectoryURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: nil, create: true)
+		let tempDirectoryURL = try FileManager.default.url(for: .itemReplacementDirectory, in: .userDomainMask, appropriateFor: configuration.toolchainURL, create: true)
 		defer { try! FileManager.default.removeItem(at: tempDirectoryURL) }
 		
 		let elfURL = tempDirectoryURL.appendingPathComponent("prog", isDirectory: false)
 		try elfData.write(to: elfURL)
 		
 		let outputURL = tempDirectoryURL.appendingPathComponent("execution", isDirectory: false)
+		try Data().write(to: outputURL)
 		let outputHandle = try FileHandle(forWritingTo: outputURL)
 		
 		let sim = Process()
@@ -100,7 +108,37 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 		sim.waitUntilExit()
 		
 		let output = try String(contentsOf: outputURL)
-		XCTAssert(output.contains("\(expectedResult)"), "Simulator output doesn't contain expected result \(expectedResult)")	// TODO: Match string
+		var actualResult: Int?
+		var parsingError: Error?
+		output.enumerateSubstrings(in: output.startIndex..., options: [.byLines, .reverse]) { substring, _, _, stop in
+			
+			let substring = substring !! "Expected substring"
+			guard substring.hasPrefix("x10 <-") else { return }
+			stop = true
+			
+			do {
+				
+				let components = substring.components(separatedBy: .init(charactersIn: " :"))
+				guard let offsetKeyIndex = components.firstIndex(of: "offset") else { throw ProgramResultTestError.noOffsetKey }
+				var offsetValueString = components[offsetKeyIndex + 1]
+				
+				guard offsetValueString.hasPrefix("0x") else { throw ProgramResultTestError.unprefixedOffsetValueString(offsetValueString) }
+				offsetValueString.removeFirst(2)
+				
+				guard let offsetValue = Int(offsetValueString, radix: 16) else { throw ProgramResultTestError.nonnumericOffsetValueString(offsetValueString) }
+				actualResult = offsetValue
+				
+			} catch {
+				parsingError = error
+			}
+			
+		}
+		
+		if let parsingError = parsingError {
+			throw parsingError
+		}
+		
+		XCTAssertEqual(actualResult, expectedResult)
 		
 		return ()
 		
@@ -109,5 +147,8 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 }
 
 enum ProgramResultTestError : Error {
+	case noOffsetKey
+	case unprefixedOffsetValueString(String)
+	case nonnumericOffsetValueString(String)
 	case invalidExpectedResult(String)
 }
