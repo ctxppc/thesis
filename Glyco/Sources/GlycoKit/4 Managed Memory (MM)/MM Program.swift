@@ -111,9 +111,8 @@ public enum MM : Language {
 					let sealCapReg = tempRegisterA
 					Lower.Effect.deriveCapabilityFromPCC(destination: sealCapReg, upperBits: 0)
 					
-					// Restrict seal cap bounds to seal with otype 0 only.
+					// Initialise address to 0 — it will be increased with every scall.
 					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
-					Lower.Effect.setCapabilityBounds(destination: sealCapReg, base: sealCapReg, length: .constant(1))
 					
 					// Restrict seal cap permissions.
 					let bitmaskReg = tempRegisterB
@@ -416,8 +415,8 @@ public enum MM : Language {
 		
 		/// The secure calling routine capability's permissions.
 		///
-		/// The capability is used for executing the routine as well as to load the seal capability which is stored inside the routine's memory region.
-		static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability]
+		/// The capability is used for executing the routine as well as to load & store (update) the seal capability which is stored inside the routine's memory region.
+		static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
 		
 		/// The seal capability's permissions.
 		static let sealCapabilityPermissions = [Permission.global, .seal]
