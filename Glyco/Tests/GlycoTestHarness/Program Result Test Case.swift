@@ -24,7 +24,7 @@ final class ProgramResultTestCase : XCTestCase {
 		
 		guard let urls = try? FileManager.default.contentsOfDirectory(at: programsURL, includingPropertiesForKeys: nil) else { return }
 		let urlsByGroupName = Dictionary(grouping: urls) { $0.deletingPathExtension().lastPathComponent }
-		var errors = TestErrors()
+		var errors = TestErrors(configuration: configuration)
 		
 		print("> Running test programs using \(simulatorURL.path) for \(configuration)")
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
@@ -60,17 +60,6 @@ final class ProgramResultTestCase : XCTestCase {
 			throw errors
 		}
 		
-	}
-	
-	struct TestErrors : Error {
-		var errors: [TestError] = []
-		var isEmpty: Bool { errors.isEmpty }
-		mutating func add(_ error: TestError) { errors.append(error) }
-	}
-	
-	struct TestError : Error {
-		let groupName: String
-		let error: Error
 	}
 	
 }

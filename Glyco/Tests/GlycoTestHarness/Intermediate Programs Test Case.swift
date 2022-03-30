@@ -53,34 +53,6 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		
 	}
 	
-	struct TestErrors : Error, CustomStringConvertible {
-		
-		let configuration: CompilationConfiguration
-		
-		var errors = [TestGroupError]()
-		
-		var isEmpty: Bool { errors.isEmpty }
-		
-		mutating func add(_ error: TestGroupError) {
-			errors.append(error)
-		}
-		
-		var description: String { """
-			
-			Errors for \(configuration):
-			\(errors.lazy.map(\.description).joined(separator: "\n"))
-			
-			"""
-		}
-		
-	}
-	
-	struct TestGroupError : Error, CustomStringConvertible {
-		let groupName: String
-		let error: Error
-		var description: String { "(*) Test for “\(groupName)” failed: \(error)" }
-	}
-	
 }
 
 private struct DecodeSourceAndTestIntermediateProgramsAction : LanguageAction {
@@ -151,4 +123,33 @@ private struct IntermediateProgramsTestReductor : ProgramReductor {
 		}
 	}
 	
+}
+
+struct TestErrors : Error, CustomStringConvertible {
+	
+	let configuration: CompilationConfiguration
+	
+	var errors = [TestGroupError]()
+	
+	var isEmpty: Bool { errors.isEmpty }
+	
+	mutating func add(_ error: TestGroupError) {
+		errors.append(error)
+	}
+	
+	var description: String {
+		"""
+
+		Errors for \(configuration):
+		\(errors.lazy.map(\.description).joined(separator: "\n"))
+
+		"""
+	}
+	
+}
+
+struct TestGroupError : Error, CustomStringConvertible {
+	let groupName: String
+	let error: Error
+	var description: String { "(*) Test for “\(groupName)” failed: \(error)" }
 }

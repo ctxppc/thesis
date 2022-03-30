@@ -120,38 +120,28 @@ public enum MM : Language {
 					let bitmaskReg = tempRegisterB
 					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: bitmaskReg)
 					
-					// Prepare seal caps' length.
-					let lengthReg = tempRegisterB
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .constant(1))
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(19))
-					
 					if configuration.callingConvention.requiresCallRoutine {
 						
-						// Restrict scall seal cap bounds.
-						let scallSealCapReg = tempRegisterC
-						Lower.Effect.setCapabilityBounds(destination: scallSealCapReg, base: sealCapReg, length: .register(lengthReg))
-						
-						// Initialise address to 0 — it will be increased with every scall.
-						Lower.Effect.setCapabilityAddress(destination: scallSealCapReg, source: scallSealCapReg, address: .zero)
+						// Assign first otype — it will be increased with every scall.
+						Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
 						
 						// Derive scall seal cap cap and store scall seal cap.
-						let scallSealCapCapReg = tempRegisterD
-						Lower.Effect.deriveCapabilityFromLabel(destination: scallSealCapCapReg, label: scallSealCapLabel)
-						Lower.Effect.store(.cap, address: scallSealCapCapReg, source: scallSealCapReg)
+						let sealCapCapReg = tempRegisterB
+						Lower.Effect.deriveCapabilityFromLabel(destination: sealCapCapReg, label: scallSealCapLabel)
+						Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg)
 						
 					}
 					
-					// Restrict cseal seal cap bounds.
-					let csealSealCapReg = tempRegisterA
-					Lower.Effect.setCapabilityBounds(destination: csealSealCapReg, base: sealCapReg, length: .register(lengthReg))
-					
-					// Initialise address — it will be increased with every cseal.
-					Lower.Effect.setCapabilityAddress(destination: csealSealCapReg, source: csealSealCapReg, address: lengthReg)
+					// Assign first otype — it will be increased with every cseal.
+					let lengthReg = tempRegisterB
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .constant(1))
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(19))
+					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: lengthReg)
 					
 					// Derive cseal seal cap cap and store cseal seal cap.
 					let csealSealCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: csealSealCapCapReg, label: csealSealCapLabel)
-					Lower.Effect.store(.cap, address: csealSealCapCapReg, source: csealSealCapReg)
+					Lower.Effect.store(.cap, address: csealSealCapCapReg, source: sealCapReg)
 					
 				}
 				

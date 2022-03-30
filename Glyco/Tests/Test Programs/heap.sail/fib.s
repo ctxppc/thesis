@@ -37,13 +37,11 @@ rv.runtime:		cllc ct0, mm.heap
 				auipcc ct0, 0
 				addi t1, zero, 129
 				candperm ct0, ct0, t1
+				csetaddr ct0, ct0, zero
+				cllc ct1, mm.scall_seal_cap
+				csc ct0, 0(ct1)
 				addi t1, t1, 1
 				slli t1, t1, 19
-				csetbounds ct2, ct0, t1
-				csetaddr ct2, ct2, zero
-				cllc ct3, mm.scall_seal_cap
-				csc ct2, 0(ct3)
-				csetbounds ct0, ct0, t1
 				csetaddr ct0, ct0, t1
 				cllc ct1, mm.cseal_seal_cap
 				csc ct0, 0(ct1)
