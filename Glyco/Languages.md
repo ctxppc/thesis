@@ -3,6 +3,7 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
+[`OB`](#OB) →
 [`NT`](#NT) →
 [`EX`](#EX) →
 [`LS`](#LS) →
@@ -68,6 +69,87 @@ A program written in some language `XY` should be stored in a file with extensio
 	<dd><kbd>%</kbd></dd>
 </dl>
 
+
+<h2 id="OB">Grammar for OB (Objects)</h2>
+A language that introduces objects, i.e., encapsulated values with methods.
+
+**Inherited from NT:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>RecordType</code>, 
+<code>Symbol</code>
+<dl>
+	<dt><code>OB.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>typeDefinitions:</strong> [TypeDefinition])</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Function</code></dt>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Value</code></dt>
+	<dd><code><strong>self</strong></code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.ValueType</code></dt>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
+	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
+	<dd><code><strong>codeCap</strong></code></dd>
+	<dd><code><strong>sealCap</strong></code></dd>
+	<dd><code><strong>objectCap</strong></code></dd>
+	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Context</code></dt>
+</dl>
+<dl>
+	<dt><code>OB.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.TypeDefinition</code></dt>
+	<dd><code>(Symbol, ValueType)</code></dd>
+</dl>
 
 <h2 id="NT">Grammar for NT (Named Types)</h2>
 A language that introduces named types in a structural type system.
@@ -214,7 +296,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
-A language that introduces lexical scopes of definitions
+A language that introduces lexical scopes of definitions, thereby removing name collisions.
 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
@@ -512,7 +594,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 
 <h2 id="SV">Grammar for SV (Structured Values)</h2>
-A language that introduces structured values (vectors and records).
+A language that introduces structured values, i.e., vectors and records.
 
 **Inherited from ID:**
 <code>AbstractLocation</code>, 

@@ -281,6 +281,37 @@ extension NT.Function {
 	}
 }
 
+extension OB.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+		case typeDefinitions = "typeDefinitions"
+	}
+}
+
+extension OB.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension OB.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension OB.TypeDefinition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
+	}
+}
+
 extension PR.Program {
 	public enum CodingKeys : String, CodingKey {
 		case blocks = "_0"
