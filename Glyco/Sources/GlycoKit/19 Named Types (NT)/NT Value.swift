@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension EX {
+extension NT {
 	
 	public enum Value : Codable, Equatable, SimplyLowerable {
 		
@@ -48,58 +48,34 @@ extension EX {
 			switch self {
 				
 				case .constant(let value):
-				return .source(.constant(value))
+				return .constant(value)
 					
 				case .named(let symbol):
-				return .source(.named(symbol))
+				return .named(symbol)
 				
 				case .record(let type):
 				return .record(type)
 				
 				case .field(let fieldName, of: let record):
-				let rec = context.bag.uniqueName(from: "rec")
-				return try .let([
-					.init(rec, record.lowered(in: &context)),
-				], in: .field(fieldName, of: rec))
+				return .field(fieldName, of: try record.lowered(in: &context))
 				
 				case .vector(let valueType, count: let count):
-				return .vector(valueType, count: count)
+				return .vector(try valueType.lowered(in: &context), count: count)
 				
 				case .element(of: let vector, at: let index):
-				let vec = context.bag.uniqueName(from: "vec")
-				let idx = context.bag.uniqueName(from: "idx")
-				return try .let([
-					.init(vec, vector.lowered(in: &context)),
-					.init(idx, index.lowered(in: &context))
-				], in: .element(of: vec, at: .named(idx)))
+				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
 				
 				case .seal:
 				return .seal
 				
 				case .sealed(let cap, with: let seal):
-				let c = context.bag.uniqueName(from: "cap")
-				let s = context.bag.uniqueName(from: "seal")
-				return try .let([
-					.init(c, cap.lowered(in: &context)),
-					.init(s, seal.lowered(in: &context))
-				], in: .sealed(c, with: s))
+				return try .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
 				
 				case .binary(let lhs, let op, let rhs):
-				let l = context.bag.uniqueName(from: "lhs")
-				let r = context.bag.uniqueName(from: "rhs")
-				return try .let([
-					.init(l, lhs.lowered(in: &context)),
-					.init(r, rhs.lowered(in: &context))
-				], in: .binary(.named(l), op, .named(r)))
+				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
-				let argumentNamesAndLoweredValues = try arguments.map {
-					(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
-				}
-				return .let(
-					argumentNamesAndLoweredValues.map { .init($0.0, $0.1) },
-					in: .evaluate(name, argumentNamesAndLoweredValues.map { .named($0.0) })
-				)
+				return .evaluate(name, try arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

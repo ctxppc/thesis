@@ -250,6 +250,37 @@ extension MM.Frame {
 	}
 }
 
+extension NT.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+		case typeDefinitions = "typeDefinitions"
+	}
+}
+
+extension NT.TypeDefinition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
+	}
+}
+
+extension NT.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension NT.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
 extension PR.Program {
 	public enum CodingKeys : String, CodingKey {
 		case blocks = "_0"
