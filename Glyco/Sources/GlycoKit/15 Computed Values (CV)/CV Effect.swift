@@ -52,6 +52,9 @@ extension CV {
 				case .set(let destination, to: .seal):
 				Lowered.set(destination, to: .seal)
 				
+				case .set(let destination, to: .sealed(let source, with: let seal)):
+				Lowered.set(destination, to: .sealed(source, with: seal))
+				
 				case .set(let destination, to: .evaluate(let procedure, let arguments)):
 				Lowered.call(procedure, arguments, result: destination)
 				

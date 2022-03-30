@@ -400,7 +400,7 @@ public enum MM : Language {
 			
 			// A routine that creates a new seal capability — see also MM.Label.secureCallingRoutineCapability.
 			@ArrayBuilder<Lower.Statement>
-			var sealRoutine: [Lower.Statement] {
+			var createSealRoutine: [Lower.Statement] {
 				
 				let returnReg = tempRegisterA					// argument
 				let sealCap = Lower.Register.invocationData		// result
@@ -448,7 +448,9 @@ public enum MM : Language {
 					allocCapLabel ~ .data(type: .cap)
 					
 					// Scall capability.
-					scallCapLabel ~ .data(type: .cap)
+					if configuration.callingConvention.requiresCallRoutine {
+						scallCapLabel ~ .data(type: .cap)
+					}
 					
 					// Create seal capability.
 					csealCapLabel ~ .data(type: .cap)
@@ -482,6 +484,7 @@ public enum MM : Language {
 				if configuration.callingConvention.requiresCallRoutine {
 					scallRoutine
 				}
+				createSealRoutine
 				try user
 				
 				Lower.Statement.bssSection

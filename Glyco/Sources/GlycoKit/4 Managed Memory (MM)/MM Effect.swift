@@ -44,6 +44,9 @@ extension MM {
 		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given register.
 		case createSeal(in: Register)
 		
+		/// An effect that seals the capability in `source` using the address of the capability in `seal` as the object type and puts it in `into`.
+		case seal(into: Register, source: Register, seal: Register)
+		
 		/// An effect that pushes given frame to the call stack.
 		///
 		/// This effect's semantics depend on the currently active calling convention:
@@ -233,6 +236,9 @@ extension MM {
 				if sealReg != destination {
 					Lower.Effect.copy(.cap, into: destination, from: sealReg)
 				}
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				try Lower.Effect.seal(destination: destination.lowered(), source: source.lowered(), seal: seal.lowered())
 				
 				case .pushFrame(let frame):
 				switch context.configuration.callingConvention {

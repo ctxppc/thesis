@@ -82,6 +82,9 @@ extension ALA {
 				case .createSeal(in: let destination, analysisAtEntry: let analysis):
 				return .createSeal(in: substitute(destination), analysisAtEntry: analysis)
 				
+				case .seal(into: let destination, source: let source, seal: let seal, analysisAtEntry: let analysis):
+				return .seal(into: substitute(destination), source: substitute(source), seal: substitute(seal), analysisAtEntry: analysis)
+				
 			}
 		}
 		

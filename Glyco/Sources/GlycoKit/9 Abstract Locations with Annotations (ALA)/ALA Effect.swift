@@ -33,6 +33,9 @@ extension ALA {
 		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
 		case createSeal(in: Location, analysisAtEntry: Analysis)
 		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location, analysisAtEntry: Analysis)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect, analysisAtEntry: Analysis)
 		
@@ -110,6 +113,13 @@ extension ALA {
 				case .createSeal(in: let destination, analysisAtEntry: _):
 				Lowered.createSeal(in: try destination.lowered(in: &context))
 				
+				case .seal(into: let destination, source: let source, seal: let seal, analysisAtEntry: _):
+				try Lowered.seal(
+					into:	destination.lowered(in: &context),
+					source:	source.lowered(in: &context),
+					seal:	seal.lowered(in: &context)
+				)
+				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
@@ -179,6 +189,9 @@ extension ALA {
 				
 				case .createSeal(in: let destination, analysisAtEntry: _):
 				return .createSeal(in: destination, analysisAtEntry: analysis)
+				
+				case .seal(into: let destination, source: let source, seal: let seal, analysisAtEntry: _):
+				return .seal(into: destination, source: source, seal: seal, analysisAtEntry: analysis)
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):
 				do {
@@ -251,6 +264,7 @@ extension ALA {
 					.getElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.setElement(_, of: _, offset: _, to: _, analysisAtEntry: let analysis),
 					.createSeal(in: _, analysisAtEntry: let analysis),
+					.seal(into: _, source: _, seal: _, analysisAtEntry: let analysis),
 					.if(_, then: _, else: _, analysisAtEntry: let analysis),
 					.pushScope(analysisAtEntry: let analysis),
 					.popScope(analysisAtEntry: let analysis),
@@ -276,7 +290,8 @@ extension ALA {
 					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
 					.compute(let destination, _, _, _, analysisAtEntry: _),
 					.createBuffer(bytes: _, capability: let destination, scoped: _, analysisAtEntry: _),
-					.createSeal(in: let destination, analysisAtEntry: _):
+					.createSeal(in: let destination, analysisAtEntry: _),
+					.seal(into: let destination, source: _, seal: _, analysisAtEntry: _):
 				return [destination]
 				
 				case .pushScope:
@@ -325,6 +340,9 @@ extension ALA {
 				case .setElement(_, of: let buffer, offset: let index, to: let element, analysisAtEntry: _):
 				return [index, element].compactMap(\.location) + [buffer]
 				
+				case .seal(into: _, source: let source, seal: let seal, analysisAtEntry: _):
+				return [source, seal]
+				
 				case .popScope:
 				return configuration.calleeSavedRegisters.map { .register($0) }
 				
@@ -363,7 +381,7 @@ extension ALA {
 				case .set, .compute,
 					.createBuffer, .destroyBuffer,
 					.getElement, .setElement,
-					.createSeal,
+					.createSeal, .seal,
 					.pushScope, .popScope,
 					.clearAll,
 					.call, .return:

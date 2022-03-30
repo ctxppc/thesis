@@ -25,6 +25,9 @@ extension CA {
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
+		/// A value that evaluates to the capability in the first given location after sealing it with the seal capability in `with`.
+		case sealed(Location, with: Location)
+		
 	}
 	
 }

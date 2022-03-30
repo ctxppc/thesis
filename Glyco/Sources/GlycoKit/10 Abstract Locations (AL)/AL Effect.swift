@@ -33,6 +33,9 @@ extension AL {
 		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
 		case createSeal(in: Location)
 		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -88,6 +91,9 @@ extension AL {
 				
 				case .createSeal(in: let destination):
 				return .createSeal(in: destination, analysisAtEntry: .init())
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				return .seal(into: destination, source: source, seal: seal, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(

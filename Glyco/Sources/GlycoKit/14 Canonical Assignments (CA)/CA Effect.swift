@@ -55,6 +55,9 @@ extension CA {
 				case .set(let destination, to: .seal):
 				Lowered.createSeal(in: destination)
 				
+				case .set(let destination, to: .sealed(let source, with: let seal)):
+				Lowered.seal(into: destination, source: source, seal: seal)
+				
 				case .setField(let fieldName, of: let record, to: let element):
 				Lowered.setField(fieldName, of: record, to: element)
 				

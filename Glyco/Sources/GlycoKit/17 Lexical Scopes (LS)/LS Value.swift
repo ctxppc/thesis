@@ -25,6 +25,9 @@ extension LS {
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
+		/// A value that evaluates to the first named capability after sealing it with the (second named) seal capability.
+		case sealed(Symbol, with: Symbol)
+		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
 		
@@ -61,6 +64,9 @@ extension LS {
 				
 				case .seal:
 				return .seal
+				
+				case .sealed(let cap, with: let seal):
+				return .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, try arguments.lowered(in: &context))

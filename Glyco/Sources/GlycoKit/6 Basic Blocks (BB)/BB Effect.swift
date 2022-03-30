@@ -30,6 +30,9 @@ extension BB {
 		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
 		case createSeal(in: Location)
 		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// Pushes given frame to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -67,6 +70,9 @@ extension BB {
 				
 				case .createSeal(in: let destination):
 				return .createSeal(in: destination)
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				return .seal(into: destination, source: source, seal: seal)
 				
 				case .pushFrame(let frame):
 				return .pushFrame(frame)

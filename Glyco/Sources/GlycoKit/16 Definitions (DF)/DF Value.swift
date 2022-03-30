@@ -25,6 +25,9 @@ extension DF {
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
+		/// A value that evaluates to the capability in the first given location after sealing it with the seal capability in `with`.
+		case sealed(Location, with: Location)
+		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
 		
@@ -61,6 +64,9 @@ extension DF {
 				
 				case .seal:
 				return .seal
+				
+				case .sealed(let cap, with: let seal):
+				return .sealed(cap, with: seal)
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, arguments)

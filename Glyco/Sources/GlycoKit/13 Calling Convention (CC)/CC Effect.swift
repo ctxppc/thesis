@@ -42,6 +42,9 @@ extension CC {
 		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
 		case createSeal(in: Location)
 		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// An effect that destroys the scoped vector or record referred to by the capability from given source.
 		///
 		/// This effect must only be used with *scoped* values created in the *current* scope. For any two values *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroyed *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
@@ -95,6 +98,9 @@ extension CC {
 				
 				case .createSeal(in: let seal):
 				Lowered.createSeal(in: .abstract(seal))
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				Lowered.seal(into: .abstract(destination), source: .abstract(source), seal: .abstract(seal))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
