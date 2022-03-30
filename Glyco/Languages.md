@@ -91,6 +91,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
@@ -167,6 +168,7 @@ A language that introduces lexical scopes of definitions
 	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Symbol)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -254,6 +256,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -312,6 +315,7 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -363,6 +367,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 </dl>
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
@@ -409,6 +414,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
@@ -441,6 +447,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
 	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
 	<dd><code><strong>codeCap</strong></code></dd>
+	<dd><code><strong>sealCap</strong></code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
@@ -463,6 +470,7 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -523,6 +531,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -577,6 +586,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -650,6 +660,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -710,6 +721,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
@@ -781,6 +793,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
@@ -824,6 +837,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
@@ -888,6 +902,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Source)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Source, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>deriveCapability</strong>(<strong>in:</strong> Register, <strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Register)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>

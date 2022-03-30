@@ -22,6 +22,9 @@ extension EX {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value that evaluates to a unique capability that can be used for sealing.
+		case seal
+		
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
@@ -66,6 +69,9 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
 				], in: .element(of: vec, at: .named(idx)))
+				
+				case .seal:
+				return .seal
 				
 				case .binary(let lhs, let op, let rhs):
 				let l = context.bag.uniqueName(from: "lhs")

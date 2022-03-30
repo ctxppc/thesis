@@ -22,6 +22,9 @@ extension DF {
 		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
 		case element(of: Location, at: Source)
 		
+		/// A value that evaluates to a unique capability that can be used for sealing.
+		case seal
+		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
 		
@@ -55,6 +58,9 @@ extension DF {
 				
 				case .element(of: let vector, at: let index):
 				return .element(of: vector, at: index)
+				
+				case .seal:
+				return .seal
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, arguments)

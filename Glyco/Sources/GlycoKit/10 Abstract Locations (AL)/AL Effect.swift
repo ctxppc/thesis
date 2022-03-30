@@ -30,6 +30,9 @@ extension AL {
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -82,6 +85,9 @@ extension AL {
 				
 				case .setElement(let elementType, of: let vector, offset: let offset, to: let element):
 				return .setElement(elementType, of: vector, offset: offset, to: element, analysisAtEntry: .init())
+				
+				case .createSeal(in: let destination):
+				return .createSeal(in: destination, analysisAtEntry: .init())
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(

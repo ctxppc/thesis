@@ -49,6 +49,9 @@ extension CV {
 				case .set(let destination, to: .element(of: let vector, at: let index)):
 				Lowered.set(destination, to: .element(of: vector, at: index))
 				
+				case .set(let destination, to: .seal):
+				Lowered.set(destination, to: .seal)
+				
 				case .set(let destination, to: .evaluate(let procedure, let arguments)):
 				Lowered.call(procedure, arguments, result: destination)
 				

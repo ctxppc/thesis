@@ -41,6 +41,9 @@ extension MM {
 		/// An effect that derives a capability to given label and puts it in given register.
 		case deriveCapability(in: Register, to: Label)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given register.
+		case createSeal(in: Register)
+		
 		/// An effect that pushes given frame to the call stack.
 		///
 		/// This effect's semantics depend on the currently active calling convention:
@@ -221,6 +224,15 @@ extension MM {
 				
 				case .deriveCapability(in: let destination, to: let label):
 				Lower.Effect.deriveCapabilityFromLabel(destination: try destination.lowered(), label: label)
+				
+				case .createSeal(in: let destination):
+				let destination = try destination.lowered()
+				let linkReg = tempRegisterA					// cf. create seal routine
+				let sealReg = Lower.Register.invocationData	// cf. create seal routine
+				Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: linkReg)
+				if sealReg != destination {
+					Lower.Effect.copy(.cap, into: destination, from: sealReg)
+				}
 				
 				case .pushFrame(let frame):
 				switch context.configuration.callingConvention {

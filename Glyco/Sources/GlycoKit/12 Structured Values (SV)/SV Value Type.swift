@@ -20,6 +20,9 @@ extension SV {
 		/// A capability to code.
 		case codeCap
 		
+		/// A capability that can be used to seal other capabilities.
+		case sealCap
+		
 		/// A datum with unspecified interpretation that fits in a register.
 		case registerDatum
 		
@@ -36,10 +39,16 @@ extension SV {
 		/// Returns a representation of `self` in a lower language.
 		func lowered() -> Lower.DataType {
 			switch self {
-				case .u8:								return .u8
-				case .s32:								return .s32
-				case .vectorCap, .recordCap, .codeCap:	return .cap
-				case .registerDatum:					return .cap
+				
+				case .u8:
+				return .u8
+				
+				case .s32:
+				return .s32
+				
+				case .vectorCap, .recordCap, .codeCap, .sealCap, .registerDatum:
+				return .cap
+				
 			}
 		}
 		

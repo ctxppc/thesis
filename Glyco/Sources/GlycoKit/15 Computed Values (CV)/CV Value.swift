@@ -22,6 +22,9 @@ extension CV {
 		/// A value that evaluates to the element at zero-based position `at` in the vector at `of`.
 		case element(of: Location, at: Source)
 		
+		/// A value that evaluates to a unique capability that can be used for sealing.
+		case seal
+		
 		/// A value that performs the procedure with given name and evaluates to that procedure's result.
 		case evaluate(Label, [Source])
 		

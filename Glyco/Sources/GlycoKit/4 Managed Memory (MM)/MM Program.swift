@@ -40,7 +40,12 @@ public enum MM : Language {
 			let scallLabel = context.labels.uniqueName(from: "scall")
 			let scallEndLabel = context.labels.uniqueName(from: "scall_end")
 			let scallCapLabel = Label.secureCallingRoutineCapability
-			let sealCapLabel = context.labels.uniqueName(from: "seal_cap")
+			let scallSealCapLabel = context.labels.uniqueName(from: "scall_seal_cap")
+			
+			let csealLabel = context.labels.uniqueName(from: "cseal")
+			let csealEndLabel = context.labels.uniqueName(from: "cseal_end")
+			let csealCapLabel = Label.createSealRoutineCapability
+			let csealSealCapLabel = context.labels.uniqueName(from: "cseal_seal_cap")
 			
 			let userEndLabel = context.labels.uniqueName(from: "user_end")
 			
@@ -104,24 +109,49 @@ public enum MM : Language {
 					
 				}
 				
-				// Initialise seal cap.
-				if configuration.callingConvention.requiresCallRoutine {
+				// Initialise seal caps.
+				do {
 					
 					// Derive seal cap from PCC.
 					let sealCapReg = tempRegisterA
 					Lower.Effect.deriveCapabilityFromPCC(destination: sealCapReg, upperBits: 0)
 					
-					// Initialise address to 0 — it will be increased with every scall.
-					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
-					
 					// Restrict seal cap permissions.
 					let bitmaskReg = tempRegisterB
 					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: bitmaskReg)
 					
-					// Derive seal cap cap and store seal cap.
-					let sealCapCapReg = tempRegisterB
-					Lower.Effect.deriveCapabilityFromLabel(destination: sealCapCapReg, label: sealCapLabel)
-					Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg)
+					// Prepare seal caps' length.
+					let lengthReg = tempRegisterB
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .constant(1))
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(19))
+					
+					if configuration.callingConvention.requiresCallRoutine {
+						
+						// Restrict scall seal cap bounds.
+						let scallSealCapReg = tempRegisterC
+						Lower.Effect.setCapabilityBounds(destination: scallSealCapReg, base: sealCapReg, length: .register(lengthReg))
+						
+						// Initialise address to 0 — it will be increased with every scall.
+						Lower.Effect.setCapabilityAddress(destination: scallSealCapReg, source: scallSealCapReg, address: .zero)
+						
+						// Derive scall seal cap cap and store scall seal cap.
+						let scallSealCapCapReg = tempRegisterD
+						Lower.Effect.deriveCapabilityFromLabel(destination: scallSealCapCapReg, label: scallSealCapLabel)
+						Lower.Effect.store(.cap, address: scallSealCapCapReg, source: scallSealCapReg)
+						
+					}
+					
+					// Restrict cseal seal cap bounds.
+					let csealSealCapReg = tempRegisterA
+					Lower.Effect.setCapabilityBounds(destination: csealSealCapReg, base: sealCapReg, length: .register(lengthReg))
+					
+					// Initialise address — it will be increased with every cseal.
+					Lower.Effect.setCapabilityAddress(destination: csealSealCapReg, source: csealSealCapReg, address: lengthReg)
+					
+					// Derive cseal seal cap cap and store cseal seal cap.
+					let csealSealCapCapReg = tempRegisterB
+					Lower.Effect.deriveCapabilityFromLabel(destination: csealSealCapCapReg, label: csealSealCapLabel)
+					Lower.Effect.store(.cap, address: csealSealCapCapReg, source: csealSealCapReg)
 					
 				}
 				
@@ -153,6 +183,7 @@ public enum MM : Language {
 				
 				// Initialise scall cap.
 				if configuration.callingConvention.requiresCallRoutine {
+					// TODO: Remove scall routine in favour of high-level implementation with create seal effects?
 					
 					// Derive scall cap.
 					let scallCapReg = tempRegisterA
@@ -174,6 +205,32 @@ public enum MM : Language {
 					let scallCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
 					Lower.Effect.store(.cap, address: scallCapCapReg, source: scallCapReg)
+					
+				}
+				
+				// Initialise create seal cap.
+				do {
+					
+					// Derive cseal cap.
+					let csealCapReg = tempRegisterA
+					Lower.Effect.deriveCapabilityFromLabel(destination: csealCapReg, label: csealLabel)
+					
+					// Restrict cseal cap bounds.
+					let csealCapEndReg = tempRegisterB
+					let csealCapLengthReg = tempRegisterB
+					Lower.Effect.deriveCapabilityFromLabel(destination: csealCapEndReg, label: csealEndLabel)
+					Lower.Effect.getCapabilityDistance(destination: csealCapLengthReg, cs1: csealCapEndReg, cs2: csealCapReg)
+					Lower.Effect.setCapabilityBounds(destination: csealCapReg, base: csealCapReg, length: .register(csealCapLengthReg))
+					
+					// Restrict cseal cap permissions.
+					let bitmaskReg = tempRegisterB
+					Lower.Effect.permit(Self.csealCapabilityPermissions, destination: csealCapReg, source: csealCapReg, using: bitmaskReg)
+					Lower.Effect.sealEntry(destination: csealCapReg, source: csealCapReg)
+					
+					// Derive cseal cap cap and store cseal cap.
+					let csealCapCapReg = tempRegisterB
+					Lower.Effect.deriveCapabilityFromLabel(destination: csealCapCapReg, label: csealCapLabel)
+					Lower.Effect.store(.cap, address: csealCapCapReg, source: csealCapReg)
 					
 				}
 				
@@ -308,14 +365,14 @@ public enum MM : Language {
 			@ArrayBuilder<Lower.Statement>
 			var scallRoutine: [Lower.Statement] {
 				
-				let targetReg = Lower.Register.invocationData	// input
+				let targetReg = Lower.Register.invocationData	// argument
 				
 				Lower.Statement.padding()
 				
 				// Load seal cap.
 				let sealCapCap = tempRegisterA
 				let sealCap = tempRegisterB
-				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: sealCapLabel)
+				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: scallSealCapLabel)
 				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
 				
 				// Seal return & frame capabilities.
@@ -334,10 +391,46 @@ public enum MM : Language {
 				
 				// The seal capability.
 				Lower.Statement.padding(alignment: DataType.cap)
-				sealCapLabel ~ .data(type: .cap)
+				scallSealCapLabel ~ .data(type: .cap)
 				
 				// Label end of routine.
 				scallEndLabel ~ .padding()
+				
+			}
+			
+			// A routine that creates a new seal capability — see also MM.Label.secureCallingRoutineCapability.
+			@ArrayBuilder<Lower.Statement>
+			var sealRoutine: [Lower.Statement] {
+				
+				let returnReg = tempRegisterA					// argument
+				let sealCap = Lower.Register.invocationData		// result
+				
+				Lower.Statement.padding()
+				
+				// Load seal cap.
+				let sealCapCap = tempRegisterB
+				csealLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: csealSealCapLabel)
+				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
+				
+				// Update seal cap for next invocation.
+				Lower.Effect.offsetCapability(destination: sealCap, source: sealCap, offset: .constant(1))
+				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap)
+				
+				// Restrict bounds of seal cap to be returned.
+				Lower.Effect.setCapabilityBounds(destination: sealCap, base: sealCap, length: .constant(1))
+				
+				// Clear authority.
+				Lower.Effect.clear([sealCapCap])
+				
+				// Return.
+				Lower.Effect.jump(to: .register(returnReg), link: .zero)
+				
+				// The seal capability.
+				Lower.Statement.padding(alignment: DataType.cap)
+				csealSealCapLabel ~ .data(type: .cap)
+				
+				// Label end of routine.
+				csealEndLabel ~ .padding()
 				
 			}
 			
@@ -356,6 +449,9 @@ public enum MM : Language {
 					
 					// Scall capability.
 					scallCapLabel ~ .data(type: .cap)
+					
+					// Create seal capability.
+					csealCapLabel ~ .data(type: .cap)
 					
 					// Label end of user.
 					userEndLabel ~ .padding()
@@ -401,28 +497,33 @@ public enum MM : Language {
 		/// The stack capability's permissions.
 		///
 		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions.
-		static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability]
+		private static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability]
 		
 		/// The heap capability's permissions.
 		///
 		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
-		static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]	// invoke needed for cinvoke cra, cfp
+		private static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]	// invoke needed for cinvoke cra, cfp
 		
 		/// The allocation routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
-		static let allocCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
+		private static let allocCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
 		
 		/// The secure calling routine capability's permissions.
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the seal capability which is stored inside the routine's memory region.
-		static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
+		private static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
 		
-		/// The seal capability's permissions.
-		static let sealCapabilityPermissions = [Permission.global, .seal]
+		/// The create seal routine capability's permissions.
+		///
+		/// The capability is used for executing the routine as well as to load & store (update) the seal capability which is stored inside the routine's memory region.
+		private static let csealCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
+		
+		/// The seal capabilities' permissions.
+		private static let sealCapabilityPermissions = [Permission.global, .seal]
 		
 		/// The user's PPC capability permissions.
-		static let userPPCPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability, .invoke]
+		private static let userPPCPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability, .invoke]
 		
 	}
 	
@@ -444,7 +545,7 @@ extension MM.Label {
 	
 	/// The label for the capability to the allocation routine.
 	///
-	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid, capability-aligned buffer capability in `MM.tempRegisterA`. The routine may also touch `MM.tempRegisterC` and `MM.tempRegisterD` but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
+	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid, capability-aligned buffer capability in `MM.tempRegisterA`. The routine may also touch any register reserved for MM, but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
 	static var allocationRoutineCapability: Self { "mm.alloc_cap" }
 	
 	/// The label for the capability to the secure calling (scall) routine.
@@ -457,5 +558,10 @@ extension MM.Label {
 	///
 	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
 	static var secureCallingRoutineCapability: Self { "mm.scall_cap" }
+	
+	/// The label for the capability to the create seal routine.
+	///
+	/// The routine takes a valid, executable return capability in `MM.tempRegisterA` and returns a unique seal capability in `invocationData`. It may touch any register reserved for MM but will not leak any unintended new authority.
+	static var createSealRoutineCapability: Self { "mm.cseal_cap" }
 	
 }

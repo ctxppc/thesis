@@ -27,7 +27,7 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
-				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.compactMap { url -> (String, String)? in
+				let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.compactMap { url -> (String, String)? in
 					let language = url.pathExtension.uppercased()
 					guard !language.isEmpty, language != "OUT" else { return nil }
 					return (language, try .init(contentsOf: url))

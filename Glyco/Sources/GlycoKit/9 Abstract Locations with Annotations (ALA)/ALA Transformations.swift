@@ -79,6 +79,9 @@ extension ALA {
 				case .setElement(let dataType, of: let buffer, offset: let offset, to: let source, analysisAtEntry: let analysis):
 				return try .setElement(dataType, of: substitute(buffer), offset: substitute(offset), to: substitute(source), analysisAtEntry: analysis)
 				
+				case .createSeal(in: let destination, analysisAtEntry: let analysis):
+				return .createSeal(in: substitute(destination), analysisAtEntry: analysis)
+				
 			}
 		}
 		
