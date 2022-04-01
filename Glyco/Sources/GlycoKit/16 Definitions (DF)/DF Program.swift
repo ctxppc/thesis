@@ -37,6 +37,7 @@ public enum DF : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias CapabilityType = Lower.CapabilityType
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.Location
 	public typealias Parameter = Lower.Parameter

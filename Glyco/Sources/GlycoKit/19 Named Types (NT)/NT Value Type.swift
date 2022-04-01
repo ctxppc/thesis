@@ -17,17 +17,8 @@ extension NT {
 		/// A signed 4-byte integer.
 		case s32
 		
-		/// A capability to elements of given type.
-		indirect case vectorCap(ValueType)
-		
-		/// A capability to a record of given type.
-		case recordCap(RecordType)
-		
-		/// A capability to code.
-		case codeCap
-		
-		/// A capability that can be used to seal other capabilities.
-		case sealCap
+		/// A capability of given type.
+		case cap(CapabilityType)
 		
 		/// A datum with unspecified interpretation that fits in a register.
 		case registerDatum
@@ -51,17 +42,8 @@ extension NT {
 				case .s32:
 				return .s32
 				
-				case .vectorCap(let valueType):
-				return .vectorCap(try valueType.lowered(in: &context))
-				
-				case .recordCap(let recordType):
-				return .recordCap(recordType)
-				
-				case .codeCap:
-				return .codeCap
-				
-				case .sealCap:
-				return .sealCap
+				case .cap(let type):
+				return .cap(try type.lowered(in: &context))
 				
 				case .registerDatum:
 				return .registerDatum

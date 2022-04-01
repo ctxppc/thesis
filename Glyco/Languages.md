@@ -132,15 +132,18 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
-	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
-	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
-	<dd><code><strong>codeCap</strong></code></dd>
-	<dd><code><strong>sealCap</strong></code></dd>
-	<dd><code><strong>objectCap</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Context</code></dt>
+</dl>
+<dl>
+	<dt><code>OB.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>object</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Definition</code></dt>
@@ -171,6 +174,13 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Result</code></dt>
@@ -216,10 +226,7 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
-	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
-	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
-	<dd><code><strong>codeCap</strong></code></dd>
-	<dd><code><strong>sealCap</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
@@ -236,6 +243,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 **Inherited from LS:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
 <code>RecordType</code>, 
@@ -301,6 +309,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Label</code>, 
 <code>RecordType</code>, 
 <code>ValueType</code>
@@ -376,6 +385,7 @@ A language that introduces definitions with function-wide namespacing.
 **Inherited from CV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
@@ -441,6 +451,7 @@ A language that allows a computation to be attached to a value.
 **Inherited from CA:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Context</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
@@ -493,6 +504,7 @@ A language that groups all effects that write to a location under one canonical 
 **Inherited from CC:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Context</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
@@ -543,6 +555,7 @@ A language that introduces parameters & result values in procedures via the low-
 **Inherited from SV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>RecordType</code>, 
@@ -612,10 +625,7 @@ A language that introduces structured values, i.e., vectors and records.
 	<dt><code>SV.ValueType</code></dt>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
-	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
-	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
-	<dd><code><strong>codeCap</strong></code></dd>
-	<dd><code><strong>sealCap</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
@@ -646,6 +656,13 @@ A language that introduces structured values, i.e., vectors and records.
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
+</dl>
+<dl>
+	<dt><code>SV.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>SV.RecordType</code></dt>

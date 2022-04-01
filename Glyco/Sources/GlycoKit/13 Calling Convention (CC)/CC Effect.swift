@@ -203,7 +203,7 @@ extension CC {
 					Lowered.popScope
 					
 					// Return.
-					Lowered.return(to: .register(.ra, .codeCap))
+					Lowered.return(to: .register(.ra, .cap(.code)))
 					
 				}
 				

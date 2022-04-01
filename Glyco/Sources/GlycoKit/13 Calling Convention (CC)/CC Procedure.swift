@@ -46,7 +46,7 @@ extension CC {
 				}
 				
 				// Bind return capability.
-				Lower.Effect.set(.abstract(context.returnLocation), to: .register(.ra, .codeCap))
+				Lower.Effect.set(.abstract(context.returnLocation), to: .register(.ra, .cap(.code)))
 				
 				// Determine parameter assignments.
 				let assignments = parameterAssignments(in: context.configuration)
@@ -69,7 +69,7 @@ extension CC {
 						)
 					}
 				} else {
-					parameterRecordType.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .vectorCap(.u8)))
+					parameterRecordType.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .cap(.vector(of: .u8, sealed: false))))
 					for (field, offset) in parameterRecordType.fieldByteOffsetPairs().dropFirst() {
 						Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(.init(offset: offset)))
 					}

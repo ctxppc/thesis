@@ -37,6 +37,7 @@ public enum EX : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias CapabilityType = Lower.CapabilityType
 	public typealias Label = Lower.Label
 	public typealias Parameter = Lower.Parameter
 	public typealias RecordType = Lower.RecordType

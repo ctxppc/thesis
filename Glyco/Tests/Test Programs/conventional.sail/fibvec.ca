@@ -19,7 +19,7 @@
 	)
 	(
 		recFib,
-		takes: (ls.index, s32()) (ls.lastIndex, s32()) (ls.nums, vectorCap(s32())),
+		takes: (ls.index, s32()) (ls.lastIndex, s32()) (ls.nums, cap(vector(of: s32(), sealed: false))),
 		returns: s32(),
 		in: if(
 			do(
