@@ -108,6 +108,8 @@ extension CC {
 				case .call(let name, let arguments, result: let result):
 				if let procedure = context.procedures[name] {
 					
+					// TODO: Update for calls of procedures with a sealed parameter.
+					
 					// Caller-save registers in abstract locations to limit their liveness across a call.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
 						for register in context.configuration.callerSavedRegisters {

@@ -94,6 +94,7 @@ extension CC.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case location = "_0"
 		case type = "_1"
+		case sealed = "sealed"
 	}
 }
 
@@ -290,6 +291,15 @@ extension OB.Program {
 }
 
 extension OB.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension OB.Method {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case parameters = "takes"

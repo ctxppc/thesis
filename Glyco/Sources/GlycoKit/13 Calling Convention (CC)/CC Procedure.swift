@@ -52,7 +52,8 @@ extension CC {
 				let assignments = parameterAssignments(in: context.configuration)
 				
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
-				for asn in assignments.viaRegisters {
+				// Sealed parameters are passed as part of the sealed invocation effect instead.
+				for asn in assignments.viaRegisters where !asn.parameter.sealed {
 					let parameter = asn.parameter
 					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type))
 				}
@@ -88,9 +89,14 @@ extension CC {
 			// Prepare empty assignment.
 			var assignments = Parameter.Assignments()
 			
-			// Prepare available arguments registers and remaining parameters.
-			var registers = configuration.argumentRegisters[...]
+			// Assign sealed parameter (if any) to invocation data register.
 			var parameters = self.parameters[...]
+			if let index = parameters.firstIndex(where: \.sealed) {
+				assignments.viaRegisters.append(.init(parameter: parameters.remove(at: index), register: .invocationData))
+			}
+			
+			// Prepare available arguments registers.
+			var registers = configuration.argumentRegisters[...]
 			
 			// If a discontiguous call stack is in use and an arguments record is required, reserve a register for the arguments record capability.
 			if !configuration.callingConvention.usesContiguousCallStack, parameters.count > registers.count {

@@ -27,9 +27,9 @@ extension OB {
 		case object	// TODO: Add type
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.CapabilityType {
+		func lowered(in context: inout ()) throws -> Lower.CapabilityType {
 			switch self {
-				case .vector(of: let elementType):	return .vector(of: try elementType.lowered(in: &context), sealed: false)
+				case .vector(of: let elementType):	return .vector(of: try elementType.lowered(), sealed: false)
 				case .record(let recordType):		return .record(recordType, sealed: false)
 				case .code:							return .code
 				case .object:						TODO.unimplemented

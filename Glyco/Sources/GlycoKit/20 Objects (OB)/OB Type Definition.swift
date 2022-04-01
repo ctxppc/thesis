@@ -18,7 +18,7 @@ extension OB {
 		public var type: ValueType
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.TypeDefinition {
+		func lowered(in context: inout ()) throws -> Lower.TypeDefinition {
 			.init(name, try type.lowered(in: &context))
 		}
 		

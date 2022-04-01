@@ -30,11 +30,11 @@ public enum OB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context()
+			var context = Context(inMethod: false)
 			return try .init(
 				result.lowered(in: &context),
-				functions: functions.lowered(in: &context),
-				typeDefinitions: typeDefinitions.lowered(in: &context)
+				functions: functions.lowered(),
+				typeDefinitions: typeDefinitions.lowered()
 			)
 		}
 		

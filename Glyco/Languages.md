@@ -146,6 +146,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>object</strong></code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Method</code></dt>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.Definition</code></dt>
 	<dd><code>(Symbol, Value)</code></dd>
 </dl>
@@ -569,7 +573,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Parameter</code></dt>
-	<dd><code>(Location, ValueType)</code></dd>
+	<dd><code>(Location, ValueType, <strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Predicate</code></dt>

@@ -5,7 +5,7 @@ extension NT {
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
 		
-		/// Creates a function with given name, parameters, result type, and effect.
+		/// Creates a function with given name, parameters, result type, and result.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
 			self.name = name
 			self.parameters = parameters
