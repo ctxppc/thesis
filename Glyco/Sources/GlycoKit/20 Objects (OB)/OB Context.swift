@@ -2,18 +2,14 @@
 
 extension OB {
 	
-	/// A value used while lowering.
+	/// A value used while lowering a program, function, or method.
 	struct Context {
 		
-		/// Creates a contextual value.
-		///
-		/// - Parameter inMethod: `true` if lowering a method; otherwise, `false`.
-		init(inMethod: Bool) {
-			selfName = inMethod ? symbols.uniqueName(from: "self") : nil
-		}
-		
 		/// The name of the current object, or `nil` if the current context isn't a method.
-		let selfName: Symbol?
+		var selfName: Symbol?
+		
+		/// The type definitions in the current scope.
+		var typeDefinitions: [TypeDefinition]
 		
 		/// A bag of symbols.
 		var symbols = Bag<Symbol>()

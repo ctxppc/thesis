@@ -7,7 +7,7 @@ public enum OB : Language {
 	/// A program on an OB machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function], typeDefinitions: [TypeDefinition]) {
+		public init(_ result: Result, functions: [Function], types typeDefinitions: [TypeDefinition]) {
 			self.result = result
 			self.functions = functions
 			self.typeDefinitions = typeDefinitions
@@ -30,12 +30,8 @@ public enum OB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(inMethod: false)
-			return try .init(
-				result.lowered(in: &context),
-				functions: functions.lowered(),
-				typeDefinitions: typeDefinitions.lowered()
-			)
+			var context = Context(selfName: nil, typeDefinitions: typeDefinitions)
+			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context), types: typeDefinitions.lowered())
 		}
 		
 	}
@@ -49,5 +45,6 @@ public enum OB : Language {
 	public typealias Parameter = Lower.Parameter
 	public typealias RecordType = Lower.RecordType
 	public typealias Symbol = Lower.Symbol
+	public typealias TypeName = Lower.TypeName
 	
 }

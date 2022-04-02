@@ -27,7 +27,9 @@ extension OB {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Function {
-			var context = OB.Context(inMethod: true)
+			let previousSelfName = context.selfName
+			context.selfName = context.symbols.uniqueName(from: "self")
+			defer { context.selfName = previousSelfName }
 			return try .init(name, takes: parameters, returns: resultType.lowered(), in: result.lowered(in: &context))
 		}
 		

@@ -255,7 +255,7 @@ extension NT.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case typeDefinitions = "typeDefinitions"
+		case typeDefinitions = "types"
 	}
 }
 
@@ -286,7 +286,7 @@ extension OB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case typeDefinitions = "typeDefinitions"
+		case typeDefinitions = "types"
 	}
 }
 

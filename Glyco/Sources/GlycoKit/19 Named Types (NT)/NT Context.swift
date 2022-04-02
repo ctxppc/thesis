@@ -6,7 +6,7 @@ extension NT {
 	struct Context {
 		
 		/// The value types by name.
-		let valueTypesByName: [Symbol : ValueType]
+		let valueTypesByName: [TypeName : ValueType]
 		
 	}
 	

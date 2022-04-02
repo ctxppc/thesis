@@ -9,7 +9,7 @@ extension NT {
 	public enum ValueType : Equatable, Codable, SimplyLowerable {
 		
 		/// A named type.
-		case named(Symbol)
+		case named(TypeName)
 		
 		/// An unsigned byte or 1-byte integer.
 		case u8
@@ -28,7 +28,7 @@ extension NT {
 			try lowered(in: &context, attemptedResolutions: [])
 		}
 		
-		private func lowered(in context: inout Context, attemptedResolutions: OrderedSet<Symbol>) throws -> Lower.ValueType {
+		private func lowered(in context: inout Context, attemptedResolutions: OrderedSet<TypeName>) throws -> Lower.ValueType {
 			switch self {
 				
 				case .named(let name):
@@ -54,10 +54,10 @@ extension NT {
 		enum LoweringError : LocalizedError {
 			
 			/// An error indicating that no type is defined with given name.
-			case undefinedType(Symbol)
+			case undefinedType(TypeName)
 			
 			/// An error indicating that given type is defined as itself.
-			case infiniteType(Symbol, cycle: OrderedSet<Symbol>)
+			case infiniteType(TypeName, cycle: OrderedSet<TypeName>)
 			
 			// See protocol.
 			var errorDescription: String? {

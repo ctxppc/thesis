@@ -6,7 +6,7 @@ extension OB {
 	public enum ValueType : Equatable, Codable, SimplyLowerable {
 		
 		/// A named type.
-		case named(Symbol)
+		case named(TypeName)
 		
 		/// An unsigned byte or 1-byte integer.
 		case u8

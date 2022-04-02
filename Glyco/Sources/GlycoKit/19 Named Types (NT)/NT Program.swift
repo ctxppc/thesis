@@ -9,7 +9,7 @@ public enum NT : Language {
 	/// A program on an NT machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function], typeDefinitions: [TypeDefinition]) {
+		public init(_ result: Result, functions: [Function], types typeDefinitions: [TypeDefinition]) {
 			self.result = result
 			self.functions = functions
 			self.typeDefinitions = typeDefinitions
@@ -33,7 +33,7 @@ public enum NT : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			
-			var valueTypesByName = [Symbol : ValueType]()
+			var valueTypesByName = [TypeName : ValueType]()
 			for definition in typeDefinitions {
 				let previous = valueTypesByName.updateValue(definition.type, forKey: definition.name)
 				if let previous = previous {
@@ -49,7 +49,7 @@ public enum NT : Language {
 		enum LoweringError : LocalizedError {
 			
 			/// An error indicating that given name is associated to two given value types.
-			case duplicateTypeDefinitions(Symbol, ValueType, ValueType)
+			case duplicateTypeDefinitions(TypeName, ValueType, ValueType)
 			
 			// See protocol.
 			var errorDescription: String? {

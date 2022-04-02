@@ -26,8 +26,10 @@ extension OB {
 		public var result: Result
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.Function {
-			var context = OB.Context(inMethod: false)
+		func lowered(in context: inout Context) throws -> Lower.Function {
+			let previousSelfName = context.selfName
+			context.selfName = nil
+			defer { context.selfName = previousSelfName }
 			return try .init(name, takes: parameters, returns: resultType.lowered(), in: result.lowered(in: &context))
 		}
 		

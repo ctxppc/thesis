@@ -3,13 +3,10 @@
 import Foundation
 import Sisp
 
-public protocol Program : Codable, Equatable, Optimisable, CustomStringConvertible {
+public protocol Program : Codable, Equatable, Optimisable, Validatable, CustomStringConvertible {
 	
 	/// Creates a program from given encoded representation.
 	init(fromEncoded encoded: String) throws
-	
-	/// Validates `self`.
-	func validate(configuration: CompilationConfiguration) throws
 	
 	/// Returns a representation of `self` in a lower language.
 	func lowered(configuration: CompilationConfiguration) throws -> LowerProgram
