@@ -15,21 +15,15 @@ extension CE {
 		/// The source cannot be a constant if `operation` is  `.mul`.
 		case compute(destination: Register, Register, BinaryOperator, Source)
 		
-		/// An effect that loads the datum at `address` and puts it in `destination`.
-		case load(DataType, destination: Register, address: Register)
-		
-		/// An effect that loads the capability at `address`, offset by `offset` bytes, and puts it in `destination`.
+		/// An effect that loads the datum at `address`, offset by `offset` bytes, and puts it in `destination`.
 		///
-		/// `offset` must be in the range [-2048; 2047]. When `offset` is 0, this effect is equivalent to `load(.cap, destination: destination, address: address)`.
-		case loadCapability(destination: Register, address: Register, offset: Int)
-		
-		/// An effect that retrieves the datum from `source` and stores it at `address`.
-		case store(DataType, address: Register, source: Register)
+		/// `offset` must be in the range [-2048; 2047].
+		case load(DataType, destination: Register, address: Register, offset: Int)
 		
 		/// An effect that retrieves the datum from `source` and stores it at `address`, offset by `offset` bytes.
 		///
-		/// `offset` must be in the range [-2048; 2047]. When `offset` is 0, this effect is equivalent to `store(.cap, address: address, source: source)`.
-		case storeCapability(address: Register, source: Register, offset: Int)
+		/// `offset` must be in the range [-2048; 2047].
+		case store(DataType, address: Register, source: Register, offset: Int)
 		
 		/// An effect that derives a capability from PCC, adds `upperBits` to after left-shifting it by 12, and puts the resulting capability in `destination`.
 		case deriveCapabilityFromPCC(destination: Register, upperBits: UInt)
@@ -119,28 +113,22 @@ extension CE {
 				case .compute(let destination, let rs1, let operation, .constant(let imm)):
 				Lower.Instruction.computeWithImmediate(operation: operation, rd: destination, rs1: rs1, imm: imm)
 				
-				case .load(.u8, destination: let destination, address: let address):
-				Lower.Instruction.loadByte(destination: destination, address: address)
+				case .load(.u8, destination: let destination, address: let address, offset: let offset):
+				Lower.Instruction.loadByte(destination: destination, address: address, offset: offset)
 				
-				case .load(.s32, destination: let destination, address: let address):
-				Lower.Instruction.loadSignedWord(destination: destination, address: address)
+				case .load(.s32, destination: let destination, address: let address, offset: let offset):
+				Lower.Instruction.loadSignedWord(destination: destination, address: address, offset: offset)
 				
-				case .load(.cap, destination: let destination, address: let address):
-				Lower.Instruction.loadCapability(destination: destination, address: address, offset: 0)
-				
-				case .loadCapability(destination: let destination, address: let address, offset: let offset):
+				case .load(.cap, destination: let destination, address: let address, offset: let offset):
 				Lower.Instruction.loadCapability(destination: destination, address: address, offset: offset)
 				
-				case .store(.u8, address: let address, source: let source):
-				Lower.Instruction.storeByte(source: source, address: address)
+				case .store(.u8, address: let address, source: let source, offset: let offset):
+				Lower.Instruction.storeByte(source: source, address: address, offset: offset)
 				
-				case .store(.s32, address: let address, source: let source):
-				Lower.Instruction.storeSignedWord(source: source, address: address)
+				case .store(.s32, address: let address, source: let source, offset: let offset):
+				Lower.Instruction.storeSignedWord(source: source, address: address, offset: offset)
 				
-				case .store(.cap, address: let address, source: let source):
-				Lower.Instruction.storeCapability(source: source, address: address, offset: 0)
-				
-				case .storeCapability(address: let address, source: let source, offset: let offset):
+				case .store(.cap, address: let address, source: let source, offset: let offset):
 				Lower.Instruction.storeCapability(source: source, address: address, offset: offset)
 				
 				case .deriveCapabilityFromLabel(destination: let destination, label: let label):

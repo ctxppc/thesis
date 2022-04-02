@@ -8,7 +8,7 @@
 	),
 	procedures: (
 		fib,
-		takes: (ls.prev, s32()) (ls.curr, s32()) (ls.iter, s32()),
+		takes: (ls.prev, s32(), sealed: false) (ls.curr, s32(), sealed: false) (ls.iter, s32(), sealed: false),
 		returns: s32(),
 		in: if(
 			do(

@@ -157,18 +157,18 @@ cd.else:		mv ra, a3
 				mv ra, a0
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
-				lw.cap a0, 0(ca0)
+				clw a0, 0(ca0)
 				cmove cs1, ca4
 				mv ra, a1
 				slli ra, ra, 2
 				cincoffset cra, cs1, ra
-				lw.cap ra, 0(cra)
+				clw ra, 0(cra)
 				add s1, a0, ra
 				cmove ca0, ca4
 				mv ra, a3
 				slli ra, ra, 2
 				cincoffset ct0, ca0, ra
-				sw.cap s1, 0(ct0)
+				csw s1, 0(ct0)
 				mv a0, a2
 				mv a1, a5
 				cmove ca2, ca4
@@ -182,7 +182,7 @@ cd.then$32:		cmove cs1, ca4
 				mv ra, a5
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
-				lw.cap a0, 0(ca0)
+				clw a0, 0(ca0)
 				clc cs1, -16(cfp)
 cd.then$42:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16

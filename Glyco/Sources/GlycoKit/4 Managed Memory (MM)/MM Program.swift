@@ -81,7 +81,7 @@ public enum MM : Language {
 					// Derive heap cap cap and store heap cap.
 					let heapCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg, label: heapCapLabel)
-					Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg)
+					Lower.Effect.store(.cap, address: heapCapCapReg, source: heapCapReg, offset: 0)
 					
 				}
 				
@@ -128,7 +128,7 @@ public enum MM : Language {
 						// Derive scall seal cap cap and store scall seal cap.
 						let sealCapCapReg = tempRegisterB
 						Lower.Effect.deriveCapabilityFromLabel(destination: sealCapCapReg, label: scallSealCapLabel)
-						Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg)
+						Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg, offset: 0)
 						
 					}
 					
@@ -141,7 +141,7 @@ public enum MM : Language {
 					// Derive cseal seal cap cap and store cseal seal cap.
 					let csealSealCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: csealSealCapCapReg, label: csealSealCapLabel)
-					Lower.Effect.store(.cap, address: csealSealCapCapReg, source: sealCapReg)
+					Lower.Effect.store(.cap, address: csealSealCapCapReg, source: sealCapReg, offset: 0)
 					
 				}
 				
@@ -167,7 +167,7 @@ public enum MM : Language {
 					// Derive alloc cap cap and store alloc cap.
 					let allocCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: allocCapCapReg, label: allocCapLabel)
-					Lower.Effect.store(.cap, address: allocCapCapReg, source: allocCapReg)
+					Lower.Effect.store(.cap, address: allocCapCapReg, source: allocCapReg, offset: 0)
 					
 				}
 				
@@ -194,7 +194,7 @@ public enum MM : Language {
 					// Derive scall cap cap and store scall cap.
 					let scallCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
-					Lower.Effect.store(.cap, address: scallCapCapReg, source: scallCapReg)
+					Lower.Effect.store(.cap, address: scallCapCapReg, source: scallCapReg, offset: 0)
 					
 				}
 				
@@ -220,7 +220,7 @@ public enum MM : Language {
 					// Derive cseal cap cap and store cseal cap.
 					let csealCapCapReg = tempRegisterB
 					Lower.Effect.deriveCapabilityFromLabel(destination: csealCapCapReg, label: csealCapLabel)
-					Lower.Effect.store(.cap, address: csealCapCapReg, source: csealCapReg)
+					Lower.Effect.store(.cap, address: csealCapCapReg, source: csealCapReg, offset: 0)
 					
 				}
 				
@@ -256,7 +256,7 @@ public enum MM : Language {
 							// Save return cap.
 							let savedRACapReg = tempRegisterA
 							Lower.Effect.deriveCapabilityFromLabel(destination: savedRACapReg, label: savedRA)
-							Lower.Effect.store(.cap, address: savedRACapReg, source: .ra)
+							Lower.Effect.store(.cap, address: savedRACapReg, source: .ra, offset: 0)
 							
 							// cfp can be anything but must be a valid unsealed capability for the scall. (It will be sealed by the scall.)
 							// It must be nonexecutable for cinvoke.
@@ -278,7 +278,7 @@ public enum MM : Language {
 							// Restore saved return cap.
 							let savedRACapReg2 = tempRegisterA
 							ret ~ .deriveCapabilityFromLabel(destination: savedRACapReg2, label: savedRA)
-							Lower.Effect.load(.cap, destination: .ra, address: savedRACapReg2)
+							Lower.Effect.load(.cap, destination: .ra, address: savedRACapReg2, offset: 0)
 							
 							// Return to OS/framework.
 							Lower.Effect.jump(to: .register(.ra), link: .zero)
@@ -318,7 +318,7 @@ public enum MM : Language {
 				let heapCapCapReg1 = tempRegisterC
 				let heapCapReg = tempRegisterC
 				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg1, label: heapCapLabel)
-				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1)
+				Lower.Effect.load(.cap, destination: heapCapReg, address: heapCapCapReg1, offset: 0)
 				
 				// Derive buffer cap.
 				Lower.Effect.setCapabilityBounds(destination: bufferReg, base: heapCapReg, length: .register(lengthReg))
@@ -334,7 +334,7 @@ public enum MM : Language {
 				// Store updated heap cap using heap cap cap.
 				let heapCapCapReg2 = tempRegisterD	// derive again to limit liveness
 				Lower.Effect.deriveCapabilityFromLabel(destination: heapCapCapReg2, label: heapCapLabel)
-				Lower.Effect.store(.cap, address: heapCapCapReg2, source: heapCapReg)
+				Lower.Effect.store(.cap, address: heapCapCapReg2, source: heapCapReg, offset: 0)
 				
 				// Clear authority.
 				Lower.Effect.clear([heapCapReg, heapCapCapReg2])
@@ -363,7 +363,7 @@ public enum MM : Language {
 				let sealCapCap = tempRegisterA
 				let sealCap = tempRegisterB
 				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: scallSealCapLabel)
-				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
+				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap, offset: 0)
 				
 				// Seal return & frame capabilities.
 				Lower.Effect.seal(destination: .ra, source: .ra, seal: sealCap)
@@ -371,7 +371,7 @@ public enum MM : Language {
 				
 				// Update seal cap for next invocation.
 				Lower.Effect.offsetCapability(destination: sealCap, source: sealCap, offset: .constant(1))
-				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap)
+				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap, offset: 0)
 				
 				// Clear authority.
 				Lower.Effect.clear([sealCapCap, sealCap])
@@ -400,11 +400,11 @@ public enum MM : Language {
 				// Load seal cap.
 				let sealCapCap = tempRegisterB
 				csealLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: csealSealCapLabel)
-				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap)
+				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap, offset: 0)
 				
 				// Update seal cap for next invocation.
 				Lower.Effect.offsetCapability(destination: sealCap, source: sealCap, offset: .constant(1))
-				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap)
+				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap, offset: 0)
 				
 				// Restrict bounds of seal cap to be returned.
 				Lower.Effect.setCapabilityBounds(destination: sealCap, base: sealCap, length: .constant(1))
