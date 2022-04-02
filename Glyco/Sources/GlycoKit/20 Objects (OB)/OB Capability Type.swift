@@ -25,7 +25,7 @@ extension OB {
 		
 		/// A capability to an object of given type.
 		///
-		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type.
+		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type. Note that the type of `self` in a method is not an object capability but a capability to the object's state record.
 		case object(TypeName)
 		
 		// See protocol.
@@ -33,7 +33,7 @@ extension OB {
 			switch self {
 				
 				case .vector(of: let elementType):
-				return .vector(of: try elementType.lowered(), sealed: false)
+				return .vector(of: try elementType.lowered(in: &context), sealed: false)
 				
 				case .record(let recordType):
 				return .record(recordType, sealed: false)
@@ -42,8 +42,9 @@ extension OB {
 				return .code
 				
 				case .object(let typeName):
-				guard let definition = context.typeDefinitions.first(where: { $0.name == typeName }) else { throw LoweringError.unknownObjectType(typeName) }
-				TODO.unimplemented
+				guard let definition = context.types.first(where: { $0.name == typeName }) else { throw LoweringError.unknownObjectType(typeName) }
+				guard case .object(_, let objectType) = definition else { throw LoweringError.unknownObjectType(typeName) }
+				return .record(objectType.stateRecordType, sealed: true)
 				
 			}
 		}
@@ -53,11 +54,19 @@ extension OB {
 			/// An error indicating that no object type is known by given name.
 			case unknownObjectType(TypeName)
 			
+			/// An error indicating the type defined with given name is not an object type.
+			case notAnObjectTypeDefinition(TypeName, actual: TypeDefinition)
+			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
+					
 					case .unknownObjectType(let typeName):
 					return "“\(typeName)” is not a known object type"
+					
+					case .notAnObjectTypeDefinition(let typeName, actual: let actual):
+					return "“\(typeName)” is defined as \(actual) and thus not an object type"
+					
 				}
 			}
 			

@@ -21,12 +21,12 @@ extension OB {
 		case registerDatum
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.ValueType {
+		func lowered(in context: inout Context) throws -> Lower.ValueType {
 			switch self {
 				case .named(let name):	return .named(name)
 				case .u8:				return .u8
 				case .s32:				return .s32
-				case .cap(let type):	return .cap(try type.lowered())
+				case .cap(let type):	return .cap(try type.lowered(in: &context))
 				case .registerDatum:	return .registerDatum
 			}
 		}

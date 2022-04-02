@@ -72,7 +72,7 @@ extension OB {
 				return .field(fieldName, of: try record.lowered(in: &context))
 				
 				case .vector(let valueType, count: let count):
-				return .vector(try valueType.lowered(), count: count)
+				return .vector(try valueType.lowered(in: &context), count: count)
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))

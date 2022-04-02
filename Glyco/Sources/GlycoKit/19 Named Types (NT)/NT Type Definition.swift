@@ -2,7 +2,7 @@
 
 extension NT {
 	
-	/// A value used while lowering.
+	/// A definition of a named type.
 	public struct TypeDefinition : Named, Codable, Equatable {
 		
 		/// Creates a definition with given name and value type.

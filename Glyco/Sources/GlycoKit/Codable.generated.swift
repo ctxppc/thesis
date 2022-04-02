@@ -255,7 +255,8 @@ extension NT.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case typeDefinitions = "types"
+		case types = "types"
+		case globals = "globals"
 	}
 }
 
@@ -286,7 +287,14 @@ extension OB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case typeDefinitions = "types"
+		case types = "types"
+	}
+}
+
+extension OB.Initialiser {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case result = "in"
 	}
 }
 
@@ -296,6 +304,14 @@ extension OB.Function {
 		case parameters = "takes"
 		case resultType = "returns"
 		case result = "in"
+	}
+}
+
+extension OB.ObjectType {
+	public enum CodingKeys : String, CodingKey {
+		case initialiser = "initialiser"
+		case methods = "methods"
+		case stateRecordType = "state"
 	}
 }
 
@@ -312,13 +328,6 @@ extension OB.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case value = "_1"
-	}
-}
-
-extension OB.TypeDefinition {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case type = "_1"
 	}
 }
 

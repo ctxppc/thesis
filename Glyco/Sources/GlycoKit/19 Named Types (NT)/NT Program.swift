@@ -9,10 +9,11 @@ public enum NT : Language {
 	/// A program on an NT machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function], types typeDefinitions: [TypeDefinition]) {
+		public init(_ result: Result, functions: [Function], types: [TypeDefinition], globals: [GlobalDeclaration]) {
 			self.result = result
 			self.functions = functions
-			self.typeDefinitions = typeDefinitions
+			self.types = types
+			self.globals = globals
 		}
 		
 		/// The program's result.
@@ -21,8 +22,11 @@ public enum NT : Language {
 		/// The program's functions.
 		public var functions: [Function]
 		
-		/// The program's type definitions.
-		public var typeDefinitions: [TypeDefinition]
+		/// The program's types.
+		public var types: [TypeDefinition]
+		
+		/// The program's globals.
+		public var globals: [GlobalDeclaration]
 		
 		// See protocol.
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
@@ -34,12 +38,14 @@ public enum NT : Language {
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			
 			var valueTypesByName = [TypeName : ValueType]()
-			for definition in typeDefinitions {
+			for definition in types {
 				let previous = valueTypesByName.updateValue(definition.type, forKey: definition.name)
 				if let previous = previous {
 					throw LoweringError.duplicateTypeDefinitions(definition.name, previous, definition.type)
 				}
 			}
+			
+			// TODO: Lower globals
 			
 			var context = Context(valueTypesByName: valueTypesByName)
 			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context))

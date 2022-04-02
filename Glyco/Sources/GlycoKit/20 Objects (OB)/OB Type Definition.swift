@@ -2,24 +2,35 @@
 
 extension OB {
 	
-	/// A value used while lowering.
-	public struct TypeDefinition : Named, Codable, Equatable, SimplyLowerable {
+	/// A definition of a named type.
+	public enum TypeDefinition : Named, Codable, Equatable, SimplyLowerable {
 		
-		/// Creates a definition with given name and value type.
-		public init(_ name: TypeName, _ type: ValueType) {
-			self.name = name
-			self.type = type
-		}
+		/// A name bound to a structural value type.
+		case alias(TypeName, ValueType)
 		
-		/// The defined name.
-		public var name: TypeName
-		
-		/// The definition's type.
-		public var type: ValueType
+		/// A name bound to an object type with given initialiser, methods, and state value type.
+		case object(TypeName, ObjectType)
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.TypeDefinition {
-			.init(name, try type.lowered(in: &context))
+		var name: TypeName {
+			switch self {
+				case .alias(let name, _),
+					.object(let name, _):
+				return name
+			}
+		}
+		
+		// See protocol.
+		func lowered(in context: inout Context) throws -> Lower.TypeDefinition {
+			switch self {
+				
+				case .alias(let typeName, let valueType):
+				return .init(typeName, try valueType.lowered(in: &context))
+				
+				case .object(let typeName, let objectType):
+				return .init(typeName, .cap(.record(objectType.stateRecordType, sealed: true)))
+				
+			}
 		}
 		
 	}

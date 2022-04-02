@@ -30,7 +30,7 @@ extension OB {
 			let previousSelfName = context.selfName
 			context.selfName = nil
 			defer { context.selfName = previousSelfName }
-			return try .init(name, takes: parameters, returns: resultType.lowered(), in: result.lowered(in: &context))
+			return try .init(name, takes: parameters, returns: resultType.lowered(in: &context), in: result.lowered(in: &context))
 		}
 		
 	}

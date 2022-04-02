@@ -13,9 +13,9 @@ extension ALA {
 		public init() {}
 		
 		/// Creates a definitions list with given typed locations.
-		public init(_ locations: [TypedLocation]) throws {
-			for typedLocation in locations {
-				try declare(typedLocation.location, type: typedLocation.dataType)
+		public init(_ declarations: [Declaration]) throws {
+			for declaration in declarations {
+				try declare(declaration.location, type: declaration.dataType)
 			}
 		}
 		
@@ -162,7 +162,7 @@ extension ALA {
 			}
 		}
 		
-		/// Removes given location.
+		/// Removes the declaration of given location.
 		public mutating func remove(_ location: Location) {
 			typesByLocation.removeValue(forKey: location)
 		}
@@ -179,10 +179,10 @@ extension ALA {
 			case inconsistentTyping(Location, DataType, DataType)
 			
 			/// An error indicating that given typed locations have different value types when they should have the same value type.
-			case unequalTypes(TypedLocation, TypedLocation)
+			case unequalTypes(Declaration, Declaration)
 			
 			/// An error indicating that given typed location is not compatible with a capability-typed source.
-			case capabilitySourceNotCompatibleWithLocation(TypedLocation)
+			case capabilitySourceNotCompatibleWithLocation(Declaration)
 			
 			/// An error indicating that a capability-typed source cannot be represented by a value of given type.
 			case capabilitySourceNotRepresentableByType(Source, DataType)
@@ -225,7 +225,7 @@ extension ALA.Declarations : Collection {
 	public var startIndex: Index { typesByLocation.startIndex }
 	public var endIndex: Index { typesByLocation.endIndex }
 	
-	public subscript(index: Index) -> ALA.TypedLocation {
+	public subscript(index: Index) -> ALA.Declaration {
 		let (location, type) = typesByLocation[index]
 		return location ~ type
 	}
@@ -238,7 +238,7 @@ extension ALA.Declarations : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
-		try self.init(decoder.singleValueContainer().decode([ALA.TypedLocation].self))
+		try self.init(decoder.singleValueContainer().decode([ALA.Declaration].self))
 	}
 	
 	public func encode(to encoder: Encoder) throws {

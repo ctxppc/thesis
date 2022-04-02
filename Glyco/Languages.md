@@ -93,6 +93,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
@@ -119,6 +123,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.ObjectType</code></dt>
+	<dd><code>(<strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -148,7 +156,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Method</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+	<dd><code>(Name, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Definition</code></dt>
@@ -156,7 +164,8 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.TypeDefinition</code></dt>
-	<dd><code>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>object</strong>(TypeName, ObjectType)</code></dd>
 </dl>
 
 <h2 id="NT">Grammar for NT (Named Types)</h2>
@@ -171,7 +180,7 @@ A language that introduces named types in a structural type system.
 <code>Symbol</code>
 <dl>
 	<dt><code>NT.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition])</code></dd>
+	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition], <strong>globals:</strong> [GlobalDeclaration])</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Effect</code></dt>
@@ -179,6 +188,9 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
 	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.GlobalDeclaration</code></dt>
 </dl>
 <dl>
 	<dt><code>NT.CapabilityType</code></dt>
@@ -821,13 +833,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dt><code>ALA.CoalesceLocations</code></dt>
 </dl>
 <dl>
-	<dt><code>ALA.TypedLocation</code></dt>
-	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
-</dl>
-<dl>
 	<dt><code>ALA.Declarations</code></dt>
-	<dd><code>([TypedLocation])</code></dd>
+	<dd><code>([Declaration])</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.AbstractLocation</code></dt>
@@ -847,6 +854,11 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>register</strong>(Register, DataType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 	<dd><code><strong>capability</strong>(<strong>to:</strong> Label)</code></dd>
+</dl>
+<dl>
+	<dt><code>ALA.Declaration</code></dt>
+	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.Effect</code></dt>
