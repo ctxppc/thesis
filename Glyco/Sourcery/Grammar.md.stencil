@@ -42,6 +42,6 @@ N/A
 	{% endfor %}
 	
 	{% for name, lang in lang.type.typealiases where name == "Lower" %}
-	{% include "Grammar.stencil" %}
+	{% include "Grammar.md.stencil" %}
 	{% endfor %}
 {% endif %}
