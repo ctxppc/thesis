@@ -19,8 +19,8 @@ extension LS {
 		public var rawValue: String
 		
 		// See protocol.
-		func lowered(in context: inout Context) -> Lower.Location {
-			context.location(for: self)
+		func lowered(in context: inout Context) throws -> Lower.Location {
+			try context.location(for: self)
 		}
 		
 	}

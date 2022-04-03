@@ -129,7 +129,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
-A language that introduces lexical scopes of definitions
+A language that introduces lexical scopes of definitions, thereby removing name clashes.
 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 

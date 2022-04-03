@@ -48,7 +48,7 @@ extension LS {
 				return .record(type)
 				
 				case .field(let fieldName, of: let record):
-				return .field(fieldName, of: record.lowered(in: &context))
+				return .field(fieldName, of: try record.lowered(in: &context))
 				
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)
@@ -63,6 +63,8 @@ extension LS {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let body):
+				context.pushScope(for: definitions.lazy.map(\.name))
+				defer { context.popScope(for: definitions.lazy.map(\.name)) }
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):

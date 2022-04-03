@@ -16,7 +16,7 @@ extension LS {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Parameter {
-			.init(name.lowered(in: &context), type)
+			.init(try name.lowered(in: &context), type)
 		}
 		
 	}

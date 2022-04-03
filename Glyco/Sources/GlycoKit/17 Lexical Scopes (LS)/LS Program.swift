@@ -1,12 +1,13 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Lexical Scopes
-//sourcery: description = A language that introduces lexical scopes of definitions, thereby removing name clashes.
+//sourcery: description = "A language that introduces lexical scopes of definitions, thereby removing name clashes."
 public enum LS : Language {
 	
 	/// A program on a LS machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given result and functions.
 		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
