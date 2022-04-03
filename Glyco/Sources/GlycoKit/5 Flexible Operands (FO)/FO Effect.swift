@@ -4,7 +4,6 @@ import Foundation
 
 extension FO {
 	
-	//sourcery: heavyGrammar
 	/// An effect on an FO machine.
 	///
 	/// As a convention, the following verbiage is used in the context of data movement:

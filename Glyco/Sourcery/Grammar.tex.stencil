@@ -1,5 +1,5 @@
 {% if lang.type %}
-\section{Grammar for {{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%}}
+\paragraph{ {{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%} } {{ lang.type.annotations["description"]|replace:"&","\&" }}
 \begin{grammar}
 	\footnotesize
 	{% for language in types.enums|public|implements: "Language" %}

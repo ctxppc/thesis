@@ -5,7 +5,7 @@
 
 \chapter{Language Reference}
 \label{ch:grammar}
-\section{Grammar for EX (Expressions)}
+\paragraph{ EX (Expressions) } A language that introduces expression semantics for values, thereby abstracting over computation effects.
 \begin{grammar}
 	\footnotesize
 				<EX.Program> ::=
@@ -51,7 +51,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for LS (Lexical Scopes)}
+\paragraph{ LS (Lexical Scopes) } A language that introduces lexical scopes of definitions
 \begin{grammar}
 	\footnotesize
 				<LS.Program> ::=
@@ -106,7 +106,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for DF (Definitions)}
+\paragraph{ DF (Definitions) } A language that introduces definitions with function-wide namespacing.
 \begin{grammar}
 	\footnotesize
 				<DF.Program> ::=
@@ -151,7 +151,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for CV (Computed Values)}
+\paragraph{ CV (Computed Values) } A language that allows a computation to be attached to a value.
 \begin{grammar}
 	\footnotesize
 				<CV.Program> ::=
@@ -187,7 +187,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for CA (Canonical Assignments)}
+\paragraph{ CA (Canonical Assignments) } A language that groups all effects that write to a location under one canonical assignment effect.
 \begin{grammar}
 	\footnotesize
 				<CA.Program> ::=
@@ -221,7 +221,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for CC (Calling Convention)}
+\paragraph{ CC (Calling Convention) } A language that introduces parameters \& result values in procedures via the low-level Glyco calling convention.
 \begin{grammar}
 	\footnotesize
 				<CC.Program> ::=
@@ -260,7 +260,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for SV (Structured Values)}
+\paragraph{ SV (Structured Values) } A language that introduces structured values (vectors and records).
 \begin{grammar}
 	\footnotesize
 				<SV.Program> ::=
@@ -313,7 +313,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for ID (Inferred Declarations)}
+\paragraph{ ID (Inferred Declarations) } A language that infers declarations from definitions.
 \begin{grammar}
 	\footnotesize
 				<ID.Program> ::=
@@ -345,7 +345,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for AL (Abstract Locations)}
+\paragraph{ AL (Abstract Locations) } A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer.
 \begin{grammar}
 	\footnotesize
 				<AL.Program> ::=
@@ -377,7 +377,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for ALA (Abstract Locations, Analysed)}
+\paragraph{ ALA (Abstract Locations, Analysed) } A language that introduces abstract locations, annotated with liveness and conflict information.
 \begin{grammar}
 	\footnotesize
 				<ALA.Program> ::=
@@ -440,7 +440,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for CD (Conditionals)}
+\paragraph{ CD (Conditionals) } A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps).
 \begin{grammar}
 	\footnotesize
 				<CD.Program> ::=
@@ -472,7 +472,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for PR (Predicates)}
+\paragraph{ PR (Predicates) } A language that introduces predicates in branches.
 \begin{grammar}
 	\footnotesize
 				<PR.Program> ::=
@@ -493,7 +493,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for BB (Basic Blocks)}
+\paragraph{ BB (Basic Blocks) } A language that groups effects into blocks of effects where blocks can only be entered at a single entry point and exited at a single exit point.
 \begin{grammar}
 	\footnotesize
 				<BB.Program> ::=
@@ -521,7 +521,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for FO (Flexible Operands)}
+\paragraph{ FO (Flexible Operands) } A language that introduces flexible operands in instructions, i.e., instructions that can take frame locations in all operand positions.
 \begin{grammar}
 	\footnotesize
 				<FO.Program> ::=
@@ -535,19 +535,19 @@
 				\par
 				<FO.Effect> ::=
 						"set""("<DataType>, <Location>, "to:" <Source>")"
-						\alt "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
-						\alt "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "onFrame:" <Bool>")"
-						\alt "destroyBuffer""(""capability:" <Source>")"
-						\alt "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
-						\alt "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
-						\alt "pushFrame""("<Frame>")"
-						\alt "popFrame"
-						\alt "clearAll""(""except:" <[Register]>")"
-						\alt "branch""(""to:" <Label>, <Source>, <BranchRelation>, <Source>")"
-						\alt "jump""(""to:" <Label>")"
-						\alt "call""("<Label>")"
-						\alt "return""(""to:" <Source>")"
-						\alt "labelled""("<Label>, <Effect>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "onFrame:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Source>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "pushFrame""("<Frame>")"
+						| "popFrame"
+						| "clearAll""(""except:" <[Register]>")"
+						| "branch""(""to:" <Label>, <Source>, <BranchRelation>, <Source>")"
+						| "jump""(""to:" <Label>")"
+						| "call""("<Label>")"
+						| "return""(""to:" <Source>")"
+						| "labelled""("<Label>, <Effect>")"
 				\par
 				<FO.Location> ::=
 						"register""("<Register>")"
@@ -579,7 +579,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for MM (Managed Memory)}
+\paragraph{ MM (Managed Memory) } A language that introduces a runtime, call stack, heap, and operations on them.
 \begin{grammar}
 	\footnotesize
 				<MM.Program> ::=
@@ -587,23 +587,23 @@
 				\par
 				<MM.Effect> ::=
 						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
-						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
-						\alt "load""("<DataType>, "into:" <Register>, "from:" <Frame.Location>")"
-						\alt "store""("<DataType>, "into:" <Frame.Location>, "from:" <Register>")"
-						\alt "createBuffer""(""bytes:" <Source>, "capability:" <Register>, "onFrame:" <Bool>")"
-						\alt "destroyBuffer""(""capability:" <Register>")"
-						\alt "loadElement""("<DataType>, "into:" <Register>, "buffer:" <Register>, "offset:" <Source>")"
-						\alt "storeElement""("<DataType>, "buffer:" <Register>, "offset:" <Source>, "from:" <Register>")"
-						\alt "deriveCapability""(""in:" <Register>, "to:" <Label>")"
-						\alt "pushFrame""("<Frame>")"
-						\alt "popFrame"
-						\alt "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>")"
-						\alt "clearAll""(""except:" <[Register]>")"
-						\alt "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
-						\alt "jump""(""to:" <Target>")"
-						\alt "call""("<Label>")"
-						\alt "return""(""to:" <Target>")"
-						\alt "labelled""("<Label>, <Effect>")"
+						| "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
+						| "load""("<DataType>, "into:" <Register>, "from:" <Frame.Location>")"
+						| "store""("<DataType>, "into:" <Frame.Location>, "from:" <Register>")"
+						| "createBuffer""(""bytes:" <Source>, "capability:" <Register>, "onFrame:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Register>")"
+						| "loadElement""("<DataType>, "into:" <Register>, "buffer:" <Register>, "offset:" <Source>")"
+						| "storeElement""("<DataType>, "buffer:" <Register>, "offset:" <Source>, "from:" <Register>")"
+						| "deriveCapability""(""in:" <Register>, "to:" <Label>")"
+						| "pushFrame""("<Frame>")"
+						| "popFrame"
+						| "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>")"
+						| "clearAll""(""except:" <[Register]>")"
+						| "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
+						| "jump""(""to:" <Target>")"
+						| "call""("<Label>")"
+						| "return""(""to:" <Target>")"
+						| "labelled""("<Label>, <Effect>")"
 				\par
 				<MM.Register> ::=
 						"zero"
@@ -644,7 +644,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for RT (Runtime)}
+\paragraph{ RT (Runtime) } A language that introduces a runtime system and runtime routines.
 \begin{grammar}
 	\footnotesize
 				<RT.Program> ::=
@@ -683,7 +683,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for CE (Canonical Effects)}
+\paragraph{ CE (Canonical Effects) } A language grouping related instructions under a single effect.
 \begin{grammar}
 	\footnotesize
 				<CE.Program> ::=
@@ -747,7 +747,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for RV (CHERI-RISC-V)}
+\paragraph{ RV (CHERI-RISC-V) } A language that maps directly to CHERI-RISC-V assembly statements, i.e., labels, instructions, and directives.
 \begin{grammar}
 	\footnotesize
 				<RV.Program> ::=
@@ -848,7 +848,7 @@
 				\par
 \end{grammar}
 \par
-\section{Grammar for S (CHERI-RISC-V Assembly)}
+\paragraph{ S (CHERI-RISC-V Assembly) } The ground language as provided to Clang for assembly and linking.
 \begin{grammar}
 	\footnotesize
 				<S.Program> ::=
