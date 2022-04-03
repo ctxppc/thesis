@@ -10,7 +10,7 @@ extension OB {
 		indirect case `let`([Definition], in: Effect)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(RecordType.Field.Name, of: Value, to: Value)
+		case setField(Field.Name, of: Value, to: Value)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(of: Value, at: Value, to: Value)

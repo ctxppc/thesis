@@ -76,6 +76,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 **Inherited from NT:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
 <code>RecordType</code>, 
@@ -104,7 +105,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dt><code>OB.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
@@ -113,7 +114,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -145,9 +146,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
-	<dt><code>OB.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
@@ -174,6 +172,7 @@ A language that introduces named types in a structural type system.
 **Inherited from EX:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
 <code>RecordType</code>, 
@@ -186,7 +185,7 @@ A language that introduces named types in a structural type system.
 	<dt><code>NT.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
@@ -216,7 +215,7 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -238,9 +237,6 @@ A language that introduces named types in a structural type system.
 <dl>
 	<dt><code>NT.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
-</dl>
-<dl>
-	<dt><code>NT.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>NT.ValueType</code></dt>
@@ -265,6 +261,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
 <code>RecordType</code>, 
@@ -279,7 +276,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -302,9 +299,6 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-	<dt><code>EX.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>EX.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
@@ -312,7 +306,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dt><code>EX.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
@@ -325,12 +319,13 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 
 <h2 id="LS">Grammar for LS (Lexical Scopes)</h2>
-A language that introduces lexical scopes of definitions, thereby removing name collisions.
+A language that introduces lexical scopes of definitions, thereby removing name clashes.
 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>RecordType</code>, 
 <code>ValueType</code>
@@ -358,7 +353,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Symbol)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Symbol)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -385,7 +380,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dt><code>LS.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Symbol, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Symbol, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -396,9 +391,6 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
-<dl>
-	<dt><code>LS.Context</code></dt>
-</dl>
 
 <h2 id="DF">Grammar for DF (Definitions)</h2>
 A language that introduces definitions with function-wide namespacing.
@@ -407,6 +399,7 @@ A language that introduces definitions with function-wide namespacing.
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
@@ -421,7 +414,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -448,7 +441,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -462,9 +455,6 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
-<dl>
-	<dt><code>DF.Context</code></dt>
-</dl>
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
 A language that allows a computation to be attached to a value.
@@ -474,6 +464,7 @@ A language that allows a computation to be attached to a value.
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
 <code>Context</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
@@ -495,7 +486,7 @@ A language that allows a computation to be attached to a value.
 	<dt><code>CV.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
@@ -509,7 +500,7 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -527,6 +518,7 @@ A language that groups all effects that write to a location under one canonical 
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
 <code>Context</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>Parameter</code>, 
@@ -545,7 +537,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dt><code>CA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect])</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
@@ -563,7 +555,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>source</strong>(Source)</code></dd>
 	<dd><code><strong>binary</strong>(Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>field</strong>(RecordType.Field.Name, <strong>of:</strong> Location)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -577,6 +569,7 @@ A language that introduces parameters & result values in procedures via the low-
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>CapabilityType</code>, 
+<code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
 <code>RecordType</code>, 
@@ -584,9 +577,6 @@ A language that introduces parameters & result values in procedures via the low-
 <dl>
 	<dt><code>CC.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-	<dt><code>CC.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>CC.Parameter</code></dt>
@@ -610,8 +600,8 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>createRecord</strong>(RecordType, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
-	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
@@ -663,8 +653,8 @@ A language that introduces structured values, i.e., vectors and records.
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>compute</strong>(Location, Source, BinaryOperator, Source)</code></dd>
 	<dd><code><strong>createRecord</strong>(RecordType, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
-	<dd><code><strong>getField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
-	<dd><code><strong>setField</strong>(RecordType.Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>getField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Location)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
@@ -690,7 +680,8 @@ A language that introduces structured values, i.e., vectors and records.
 	<dd><code>([Field])</code></dd>
 </dl>
 <dl>
-	<dt><code>SV.Context</code></dt>
+	<dt><code>SV.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>SV.Predicate</code></dt>
@@ -721,9 +712,6 @@ A language that infers declarations from definitions.
 <dl>
 	<dt><code>ID.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-	<dt><code>ID.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>ID.Procedure</code></dt>
@@ -827,12 +815,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(Location, Location)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.Identity</code></dt>
-</dl>
-<dl>
-	<dt><code>ALA.CoalesceLocations</code></dt>
-</dl>
-<dl>
 	<dt><code>ALA.Declarations</code></dt>
 	<dd><code>([Declaration])</code></dd>
 </dl>
@@ -885,9 +867,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>ALA.Procedure</code></dt>
 	<dd><code>(Label, <strong>locals:</strong> Declarations, <strong>in:</strong> Effect)</code></dd>
 </dl>
@@ -911,9 +890,6 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dl>
 	<dt><code>CD.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-	<dt><code>CD.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>CD.Predicate</code></dt>
@@ -1160,9 +1136,6 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
 <dl>
-	<dt><code>MM.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>MM.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
@@ -1350,9 +1323,6 @@ N/A
 	<dd><code>String</code></dd>
 </dl>
 <dl>
-	<dt><code>RV.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>RV.Instruction</code></dt>
 	<dd><code><strong>copyWord</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>copyCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
@@ -1411,8 +1381,4 @@ The ground language as provided to Clang for assembly and linking.
 <dl>
 	<dt><code>S.Program</code></dt>
 	<dd><code>(<strong>assembly:</strong> String)</code></dd>
-</dl>
-<dl>
-	<dt><code>S.CompilationError</code></dt>
-	<dd><code><strong>clangError</strong>(<strong>code:</strong> Int32)</code></dd>
 </dl>

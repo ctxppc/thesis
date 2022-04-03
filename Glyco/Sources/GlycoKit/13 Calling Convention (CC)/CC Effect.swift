@@ -23,10 +23,10 @@ extension CC {
 		case createRecord(RecordType, capability: Location, scoped: Bool)
 		
 		/// An effect that retrieves the field with given name in the record in `of` and puts it in `to`.
-		case getField(RecordType.Field.Name, of: Location, to: Location)
+		case getField(Field.Name, of: Location, to: Location)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(RecordType.Field.Name, of: Location, to: Source)
+		case setField(Field.Name, of: Location, to: Source)
 		
 		/// An effect that creates an (uninitialised) vector of `count` elements of given value type and puts a capability for that vector in given location.
 		///

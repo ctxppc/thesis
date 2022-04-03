@@ -3,7 +3,7 @@
 
 The pipeline, from high-level to low-level is:
 {% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}
-{% include "Pipeline.stencil" lang %}
+{% include "Pipeline.md.stencil" lang %}
 {% endfor %} ELF.
 
 This document is generated automatically by [Sourcery](https://github.com/krzysztofzablocki/Sourcery) using GlycoKit's source files as input. To update it, go to the project root (`/Glyco` in the repository) and invoke `sourcery`. Pass the `--watch` flag to enable continuous updates.
@@ -50,5 +50,5 @@ A program written in some language `XY` should be stored in a file with extensio
 </dl>
 
 {% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}
-{% include "Grammar.stencil" lang %}
+{% include "Grammar.md.stencil" lang %}
 {% endfor %}

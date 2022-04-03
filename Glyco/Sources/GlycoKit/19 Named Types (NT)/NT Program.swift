@@ -74,6 +74,7 @@ public enum NT : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
 	public typealias Parameter = Lower.Parameter
 	public typealias RecordType = Lower.RecordType

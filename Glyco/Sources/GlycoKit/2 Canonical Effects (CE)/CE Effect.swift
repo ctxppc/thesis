@@ -4,6 +4,7 @@ import Foundation
 
 extension CE {
 	
+	//sourcery: heavyGrammar
 	/// A CE effect.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		

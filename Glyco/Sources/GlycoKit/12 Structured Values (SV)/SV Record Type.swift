@@ -35,8 +35,7 @@ extension SV {
 		
 		/// Returns the field named `name`, or `nil` if `self` doesn't such a field.
 		public func field(named name: Field.Name) -> Field? {
-			typesByFieldName[name]
-				.map { .init(name: name, valueType: $0) }
+			typesByFieldName[name].map { .init(name, $0) }
 		}
 		
 		/// Returns the byte offset of given field.
@@ -50,20 +49,6 @@ extension SV {
 				.reduce(0, +)
 		}
 		
-		public struct Field : Named, Equatable, Codable {
-			
-			/// The field's name.
-			public var name: Name
-			public struct Name : GlycoKit.Name {
-				public init(rawValue: String) { self.rawValue = rawValue }
-				public var rawValue: String
-			}
-			
-			/// The value type of the field.
-			public var valueType: ValueType
-			
-		}
-		
 		/// The number of bytes required to represent a record of type `self`.
 		var byteSize: Int {
 			typesByFieldName.elements.map(\.1.byteSize).reduce(0, +)
@@ -74,9 +59,30 @@ extension SV {
 			sequence(state: (fields: typesByFieldName.elements[...], offset: 0)) { state -> (Field, offset: Int)? in
 				guard let (name, valueType) = state.fields.popFirst() else { return nil }
 				defer { state.offset += valueType.byteSize }	// FIXME: Capabilities must be capability-aligned
-				return (.init(name: name, valueType: valueType), state.offset)
+				return (.init(name, valueType), state.offset)
 			}
 		}
+		
+	}
+	
+	/// A field of a record.
+	public struct Field : Named, Equatable, Codable {
+		
+		/// Creates a field with given name and value type.
+		public init(_ name: Name, _ valueType: ValueType) {
+			self.name = name
+			self.valueType = valueType
+		}
+		
+		/// The field's name.
+		public var name: Name
+		public struct Name : GlycoKit.Name {
+			public init(rawValue: String) { self.rawValue = rawValue }
+			public var rawValue: String
+		}
+		
+		/// The value type of the field.
+		public var valueType: ValueType
 		
 	}
 	
@@ -86,7 +92,7 @@ extension SV.RecordType : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
-		self.init(try decoder.singleValueContainer().decode([Field].self))
+		self.init(try decoder.singleValueContainer().decode([SV.Field].self))
 	}
 	
 	public func encode(to encoder: Encoder) throws {
@@ -102,9 +108,9 @@ extension SV.RecordType : RandomAccessCollection {
 	
 	public var endIndex: Int { typesByFieldName.elements.endIndex }
 	
-	public subscript (index: Int) -> Field {
+	public subscript (index: Int) -> SV.Field {
 		let (name, valueType) = typesByFieldName.elements[index]
-		return .init(name: name, valueType: valueType)
+		return .init(name, valueType)
 	}
 	
 }

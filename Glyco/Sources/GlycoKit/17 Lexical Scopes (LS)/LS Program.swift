@@ -1,12 +1,13 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Lexical Scopes
-//sourcery: description = "A language that introduces lexical scopes of definitions, thereby removing name collisions."
+//sourcery: description = "A language that introduces lexical scopes of definitions, thereby removing name clashes."
 public enum LS : Language {
 	
 	/// A program on a LS machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program with given result and functions.
 		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
@@ -38,6 +39,7 @@ public enum LS : Language {
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias CapabilityType = Lower.CapabilityType
+	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
 	public typealias RecordType = Lower.RecordType
 	public typealias ValueType = Lower.ValueType

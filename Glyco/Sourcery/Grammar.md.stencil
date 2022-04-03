@@ -14,7 +14,7 @@ N/A
 	
 	{% for language in types.enums|public|implements: "Language" %}
 		{% if language.name == lang.type.name %}
-			{% for codableType in language.containedTypes %}
+			{% for codableType in language.containedTypes|public %}
 				{% if true %}
 					{% if codableType|implements: "RawCodable" %}
 <dl>
@@ -42,6 +42,6 @@ N/A
 	{% endfor %}
 	
 	{% for name, lang in lang.type.typealiases where name == "Lower" %}
-	{% include "Grammar.stencil" %}
+	{% include "Grammar.md.stencil" %}
 	{% endfor %}
 {% endif %}

@@ -4,6 +4,7 @@ import Foundation
 
 extension RT {
 	
+	//sourcery: heavyGrammar
 	/// An RT effect.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		

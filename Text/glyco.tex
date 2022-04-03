@@ -3,10 +3,11 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Glyco: A Nanopass Compiler for CHERI-RISC-V}
-
 Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We then describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. Later chapters discuss extensions and changes to this first version of the compiler.
+We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We then describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. We do so using a few example programs, working our way from the high-end language to the machine language. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+
+Later chapters discuss extensions and changes to this first version of the compiler.
 
 \section{Background: Nanopass Compilers}
 Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\glspl{nanopass}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \glspl{nanopass} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
@@ -15,219 +16,48 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-\section{Basic Abstractions over Assembly}
-The first version of Glyco defines 17 \ils{}. Each \il{} has a name and corresponding abbreviation, usually named after the abstraction it provides over the \lowerlang{}, and are defined by a context-free grammar. Many of these \ils{} are adapted from the educational compiler by \cite{compcourse}.
+Glyco defines 20 \gs{il}. Each language is named after the new abstraction or feature it brings compared to the \g{lowerlang}.
 
-The first 4 \ils{} (S through FO) provide some basic abstractions over the CHERI-RISC-V assembly language that are useful in higher abstractions. Just like programs written in assembly, programs in the 4 languages are merely sequences of (possibly labelled) instructions or effects.
+\section{An Expression Language}
+The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (if-then-else), definitions (let-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-\paragraph{CHERI-RISC-V Assembly (S)} The ground language is a wrapper around the assembly representation of the program, as can been seen in \cref{bnf:s}. This language is compiled by adding some runtime code to this assembly before passing it to Clang.
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		<Program> ::= (assembly: <String>)
-	\end{grammar}
-	\caption{The grammar for S.}
-	\label{bnf:s}
-\end{figure}
+The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
+\lstinputlisting{Programs/fib.ex}
 
-\paragraph{CHERI-RISC-V (RV)} The next \il{} provides a more structured, i.e., non-textual, representation of the assembly language and is adapted from \texttt{paren-x86} in \cite{compcourse} to the CHERI-RISC-V ISA. Every instruction in this language corresponds with an instruction or pseudo-instruction in the assembly language, except for the special \emph{labelled} instruction which decorates the wrapped instruction with a label. An abridged grammar can be seen in \Cref{bnf:rv}.
+This program defines a function \texttt{fib} with three signed 32-bit integer parameters \texttt{prev}, \texttt{curr}, and \texttt{iter} and which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \texttt{fib} where \texttt{prev} is 0, \texttt{curr} is 1, and \texttt{iter} is 30.
 
-One important deviation from \cite{compcourse} across the whole compiler pipeline is the support for multiple data types and the presence of capability-aware instructions in Glyco, due to CHERI-RISC-V having a different instruction set operating on capabilities than on non-capability data. For instance, the \texttt{offsetCapability} instruction cannot be replicated using addition (e.g., \texttt{\&array[5] + 2}) due to CHERI's capability provenance security property, whereas pointer arithmetic is exactly how pointers are offset in an architecture where pointers and integers (of the right bitwidth) are represented using the same machine data type.
+EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it is instead quite explicit and contains little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
 
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Instructions>)
-		
-		<Instructions> ::= <Instruction> | <Instruction> <Instructions>
-		
-		<Instruction> ::= copyWord(destination: <Register>, source: <Register>)
-			\alt copyCapability(destination: <Register>, source: <Register>)
-			\alt computeWithRegister(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, rs2: <Register>)
-			\alt computeWithImmediate(operation: <BinaryOperator>, rd: <Register>, rs1: <Register>, imm: <Int>)
-			\alt loadSignedWord(destination: <Register>, address: <Register>)
-			\alt storeSignedWord(source: <Register>, address: <Register>)
-			\alt offsetCapability(destination: <Register>, source: <Register>, offset: <Register>)
-			\alt branch(rs1: <Register>, relation: <BranchRelation>, rs2: <Register>, target: <Label>)
-			\alt call(target: <Label>)
-			\alt jump(target: <Label>)
-			\alt labelled(<Label>, <Instruction>)
-			\alt $\cdots$
-			
-		<Register> ::= zero | ra | sp | fp | t0 | t1 | t2 | s1 | $\cdots$
-		
-	\end{grammar}
-	\caption{Abridged grammar for RV.}
-	\label{bnf:rv}
-\end{figure}
+EX is \lowered{} to \textbf{LS} (Lexical Scopes). LS does not support subexpressions so the \g{nanopass} binds all subexpressions to names and uses those names in place of the subexpressions. Our Fibonacci example now becomes:
+\lstinputlisting{Programs/fib.ls}
 
-\paragraph{Managed Memory (MM)} This language introduces abstractions over memory operations, hence its name, as well as effects that operate on it, and restricts memory operations to either the call frame or allocated buffers. Its main purpose is to hide the stack and frame capability registers early on, i.e., from most abstractions in the compiler. An abridged grammar is shown in \cref{bnf:mm}.
+LS is itself \lowered{} to \textbf{DF} (Definitions) which does not support shadowing. For instance, the following LS program defines \texttt{answer} twice but only uses the outer definition. Without shadowing, the program would evaluate to 28. The right answer is 42.
+\lstinputlisting{Programs/shadowing.ls}
 
-MM is an adaptation of \texttt{paren-x86-mops} in \cite{compcourse} with several deviations. Since the stack and frame capability registers are not available in higher \ils{}, the load and store effects for data on the call frame are different from those for data in an allocated buffer. Additionally, MM provides effects for pushing and popping a buffer on the call stack. Another deviation is the computation effect, which can write its result to a different register than the one used for one of its operands and that it cannot read directly from memory, both due to the RISC-V ISA. Finally, MM introduces statically allocated buffers, a feature not present in the \cite{compcourse} compiler.
+The \g{nanopass} to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
+\lstinputlisting{Programs/shadowing.df}
 
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Effects>)
-		
-		<Effects> ::= <Effect> | <Effect> <Effects>
-		
-		<Effect> ::= copy(<DataType>, into: <Register>, from: <Register>)
-			\alt compute(<Register>, <BinaryExpression>)
-			\alt load(<DataType>, into: <Register>, from: <Frame.Location>)
-			\alt store(<DataType>, into: <Frame.Location>, from: <Register>)
-			\alt createBuffer(bytes: <Int>, capability: <Register>, onFrame: <Bool>)
-			\alt loadElement(<DataType>, into: <Register>, buffer: <Register>, offset: <Register>)
-			\alt storeElement(<DataType>, buffer: <Register>, offset: <Register>, from: <Register>)
-			\alt pushFrame(<Frame>)
-			\alt popFrame
-			\alt $\cdots$
-		
-		<DataType> ::= u8 | s32 | cap
-		
-		<BinaryExpression> ::= registerRegister(<Register>, <BinaryOperator>, <Register>)
-			\alt registerImmediate(<Register>, <BinaryOperator>, <Int>)
-		
-		<Frame> ::= (allocatedByteSize: <Int>)
-		
-		<Frame.Location> ::= (offset: <Int>)
-		
-		<Bool> ::= true | false
-		
-	\end{grammar}
-	\caption{Abridged grammar for MM.}
-	\label{bnf:mm}
-\end{figure}
+Definitions in value position in DF are implemented using \enquote{computed values} in \textbf{CV} (Computed Values), which are values on which a computation can be attached. The previous DF program is \lowered{} to the following CV program without definitions, i.e., without let-bindings, and with \texttt{do} values instead:
+\lstinputlisting{Programs/shadowing.cv}
 
-\paragraph{Flexible Operands (FO)} The next abstraction removes the load and store effects on the call frame and instead allows the remaining effects to refer directly to a location on the call frame besides referring to a register. This is an adaptation from \texttt{para-asm-lang} in \cite{compcourse} with the same deviations as in MM. An abridged grammar is presented in \Cref{bnf:fo}.
+Computed (\texttt{do}) values are themselves implemented by flattening them and binding the result to a name. The \g{nanopass} produces a \textbf{CA} (Canonical Assignments) program. The previous CV program becomes the following CA program, in which it's clear that the definition with value 28 is not used anywhere in the program:
+\lstinputlisting{Programs/shadowing.ca}
 
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Effects>)
-		
-		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
-			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
-			\alt allocateBuffer(bytes: <Int>, into: <Location>)
-			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
-			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
-			\alt branch(to: <Label>, <Source>, <BranchRelation>, <Source>)
-			\alt $\cdots$
-		
-		<Location> ::= register(<Register>) | frameCell(<Frame.Location>)
-		
-		<Source> ::= location(<Location>) | immediate(<Int>)
-		
-	\end{grammar}
-	\caption{Abridged grammar for FO.}
-	\label{bnf:fo}
-\end{figure}
-
-\section{Structured Jumps \& Branches}
-The next 3 \ils{} (BB through CD) constrain jumps \& branches so that they're easier to reason about in optimisations and higher abstracts.
-
-\paragraph{Basic Blocks (BB)} Basic blocks are sequences of effects which always execute together, or more specifically, can only be entered at the start of the sequence and only exited at the end of the sequence. BB defines a program to be a set of basic blocks, where each block has a label, contains a sequence of effects that aren't jumps or branches, and ends with a jump or branch. The initial block is named using a dedicated program entry label. The \il{} adapts \texttt{block-asm-lang} from \cite{compcourse} with similar deviations from FO, including a special \texttt{call} continuation. An abridged grammar is shown in \Cref{bnf:bb}.
-
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Blocks>)
-		
-		<Blocks> ::= <Block> <Blocks> | <Block>
-		
-		<Block> ::= (name: <Label>, do: <Effects>, then: <Continuation>)
-		
-		<Continuation> ::= continue(to: <Label>)
-			\alt branch(<Source>, <BranchRelation>, <Source>, then: <Label>, else: <Label>)
-			\alt call(<Label>, returnPoint: <Label>)
-			\alt return
-		
-		<Effect> ::= set(<DataType>, <Location>, to: <Source>)
-			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
-			\alt allocateBuffer(bytes: <Int>, into: <Location>)
-			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
-			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
-			\alt $\cdots$
-		
-	\end{grammar}
-	\caption{Abridged grammar for BB.}
-	\label{bnf:bb}
-\end{figure}
-
-\paragraph{Predicates (PR)} The next language removes the fixed relation specification from \texttt{branch} continuations and replaces it with a basic predicate syntax. It adapts \texttt{block-pred-lang} from \cite{compcourse} with similar deviations from BB. An abridged grammar is presented in \Cref{bnf:pr}.
-
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Blocks>)
-		
-		<Block> ::= (name: <Label>, do: <Effects>, then: <Continuation>)
-		
-		<Continuation> ::= continue(to: <Label>)
-			\alt branch(if: <Predicate>, then: <Label>, else: <Label>)
-			\alt call(<Label>, returnPoint: <Label>)
-			\alt return
-			
-		<Predicate> ::= constant(<Bool>)
-			\alt not(<Predicate>)
-			\alt relation(<Source>, <BranchRelation>, <Source>)
-			
-		<Bool> ::= false | true
-		
-	\end{grammar}
-	\caption{Abridged grammar for PR.}
-	\label{bnf:pr}
-\end{figure}
-
-\paragraph{Conditionals (CD)} With primitive predicates now available in PR, the next abstraction extends their power by allowing \texttt{if(_:then:else:)} conditionals in predicates and effects alike, thereby moulding effects into tree structures. CD includes support for procedures, which are modelled as an (effect) tree for each procedure, as well as support for (recursively) invoking them, which is modelled with the \texttt{call} and \texttt{return} effects. Control flows in pre-order, skipping nodes from false branches in conditionals, with control temporarily flowing to another (effect) tree when encountering a \texttt{call} effect and back to the previous tree when encountering a \texttt{return} effect.
-
-With these more deterministic control flows, CD can abstract basic blocks away. A program in CD consists of a main effect and zero or more procedures. Each procedure has a unique name and a main effect. An abridged grammar is presented in \Cref{bnf:cd}.
-
-CD is a partial adaptation of \texttt{nested-asm-lang} from \cite{compcourse}. CD does not define a \texttt{return-point} effect and instead relies on the \texttt{call} and \texttt{return} effects to push and pop a return address on the call stack. The underlying language defines a \texttt{call} effect which cannot be implemented using a combination of \texttt{jump} and other effects.
-
-\begin{figure}[ht]
-	\small
-	\begin{grammar}
-		
-		<Program> ::= (<Effect>, procedures: <Procedures>)
-		
-		<Procedures> ::= <Procedure> <Procedures> | <Procedure>
-		
-		<Procedure> ::= (<Label>, in: <Effect>)
-		
-		<Predicate> ::= constant(<Bool>)
-			\alt relation(<Source>, <BranchRelation>, <Source>)
-			\alt if(<Predicate>, then: <Predicate>, else: <Predicate>)
-			\alt do(<Effects>, then: <Predicate>)
-		
-		<Effect> ::= do(<Effects>)
-			\alt set(<DataType>, <Location>, to: <Source>)
-			\alt compute(<Source>, <BinaryOperator>, <Source>, to: <Location>)
-			\alt allocateBuffer(bytes: <Int>, into: <Location>)
-			\alt getElement(<DataType>, of: <Location>, offset: <Source>, to: <Location>)
-			\alt setElement(<DataType>, of: <Location>, offset: <Source>, to: <Source>)
-			\alt call(<Label>)
-			\alt $\cdots$
-		
-	\end{grammar}
-	\caption{Abridged grammar for CD.}
-	\label{bnf:cd}
-\end{figure}
-
-\section{Abstract Locations}
-The next 2 \ils{}, AL and ALA, introduce an abstraction over physical locations, whether on the call frame or in registers. The two \ils{} are tightly coupled.
-
-% TODO
+A \enquote{value}, in programming language parlance, is a placeholder for a datum at runtime. In Glyco, a value is an abstraction that is introduced in CA and expanded in the aforementioned higher \gs{il}. Values are implemented using one of the effects that are available in its \g{lowerlang}, \textbf{CC} (Calling Convention). For instance, the CA program
+\lstinputlisting{Programs/values.ca}
+is \lowered{} as the following CC program:
+\lstinputlisting{Programs/values.cc}
 
 \section{A Conventional Calling Convention}
 % TODO
 
-\section{An Expression Language}
+\section{Abstract Locations}
+% TODO
+
+\section{Structured Jumps \& Branches}
+% TODO
+
+\section{Basic Abstractions over Assembly}
 % TODO
 
 \biblio{}

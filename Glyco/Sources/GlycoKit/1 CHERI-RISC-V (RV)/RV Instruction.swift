@@ -2,6 +2,7 @@
 
 extension RV {
 	
+	//sourcery: heavyGrammar
 	/// A CHERI-RISC-V instruction.
 	///
 	/// Each instruction maps to exactly one machine instruction or pseudo-instruction.

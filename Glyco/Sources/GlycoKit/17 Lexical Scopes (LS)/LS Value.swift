@@ -14,7 +14,7 @@ extension LS {
 		case record(RecordType)
 		
 		/// A value that evaluates to the field with given name in the record `of`.
-		case field(RecordType.Field.Name, of: Symbol)
+		case field(Field.Name, of: Symbol)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
@@ -54,7 +54,7 @@ extension LS {
 				return .record(type)
 				
 				case .field(let fieldName, of: let record):
-				return .field(fieldName, of: record.lowered(in: &context))
+				return .field(fieldName, of: try record.lowered(in: &context))
 				
 				case .vector(let dataType, count: let count):
 				return .vector(dataType, count: count)
@@ -66,7 +66,7 @@ extension LS {
 				return .seal
 				
 				case .sealed(let cap, with: let seal):
-				return .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
+				return try .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, try arguments.lowered(in: &context))
@@ -75,6 +75,8 @@ extension LS {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let body):
+				context.pushScope(for: definitions.lazy.map(\.name))
+				defer { context.popScope(for: definitions.lazy.map(\.name)) }
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):

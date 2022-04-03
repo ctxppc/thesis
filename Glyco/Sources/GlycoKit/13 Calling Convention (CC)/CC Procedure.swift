@@ -70,7 +70,7 @@ extension CC {
 						)
 					}
 				} else {
-					parameterRecordType.prependOrReplace(.init(name: "cc.__savedfp__", valueType: .cap(.vector(of: .u8, sealed: false))))
+					parameterRecordType.prependOrReplace(.init("cc.__savedfp__", .cap(.vector(of: .u8, sealed: false))))
 					for (field, offset) in parameterRecordType.fieldByteOffsetPairs().dropFirst() {
 						Lower.Effect.set(.abstract(.init(rawValue: field.name.rawValue)), to: .frame(.init(offset: offset)))
 					}
@@ -111,7 +111,7 @@ extension CC {
 			// Assign remaining parameters to the arguments record.
 			// If a contiguous call stack is in use, ensure stack order by reversing the fields.
 			let parameterRecordFields = parameters
-				.map { RecordType.Field(name: .init(rawValue: $0.location.rawValue), valueType: $0.type) }
+				.map { Field(.init(rawValue: $0.location.rawValue), $0.type) }
 			if configuration.callingConvention.usesContiguousCallStack {
 				assignments.parameterRecordType = .init(parameterRecordFields.reversed())
 			} else {

@@ -12,7 +12,7 @@ extension LS {
 		indirect case `let`([Definition], in: Effect)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(RecordType.Field.Name, of: Symbol, to: Source)
+		case setField(Field.Name, of: Symbol, to: Source)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(of: Symbol, at: Source, to: Source)
@@ -26,7 +26,9 @@ extension LS {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .let(let definitions, in: let effect):
+				context.pushScope(for: definitions.lazy.map(\.name))
 				try Lowered.let(definitions.lowered(in: &context), in: effect.lowered(in: &context))
+				context.popScope(for: definitions.lazy.map(\.name))
 				
 				case .setField(let fieldName, of: let record, to: let element):
 				try Lowered.setField(fieldName, of: record.lowered(in: &context), to: element.lowered(in: &context))

@@ -1,6 +1,7 @@
 // Generated using Sourcery 1.7.0 — https://github.com/krzysztofzablocki/Sourcery
 // DO NOT EDIT
 
+
 extension AL.Program {
 	public enum CodingKeys : String, CodingKey {
 		case locals = "locals"
@@ -373,6 +374,13 @@ extension SV.Program {
 extension SV.RecordType {
 	public enum CodingKeys : String, CodingKey {
 		case fields = "_0"
+	}
+}
+
+extension SV.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
 	}
 }
 
