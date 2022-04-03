@@ -3,10 +3,9 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Glyco: A Nanopass Compiler for CHERI-RISC-V}
-
 Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. We do so using a few example programs, working our way from the high-end language to the machine language. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We then describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. We do so using a few example programs, working our way from the high-end language to the machine language. A full language reference of the final compiler can be found in \cref{ch:grammar}.
 
 Later chapters discuss extensions and changes to this first version of the compiler.
 
@@ -17,19 +16,26 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-\section{Basic Abstractions over Assembly}
-% TODO
+\section{An Expression Language}
+The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (if-then-else), definitions (let-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-\section{Structured Jumps \& Branches}
+The following EX program computes the 30th Fibonacci number with the sequence beginning with 0 and 1.
+\lstinputlisting{Programs/fib.ex}
+
+This program defines a function \texttt{fib} with three signed 32-bit integer parameters \texttt{prev}, \texttt{curr}, and \texttt{iter} and which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \texttt{fib} where \texttt{prev} is 0, \texttt{curr} is 1, and \texttt{iter} is 30.
+
+EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language, which means that it is very explicit and has very little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
+
+\section{A Conventional Calling Convention}
 % TODO
 
 \section{Abstract Locations}
 % TODO
 
-\section{A Conventional Calling Convention}
+\section{Structured Jumps \& Branches}
 % TODO
 
-\section{An Expression Language}
+\section{Basic Abstractions over Assembly}
 % TODO
 
 \biblio{}
