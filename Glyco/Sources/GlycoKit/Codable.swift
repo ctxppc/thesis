@@ -296,6 +296,13 @@ extension SV.RecordType {
 	}
 }
 
+extension SV.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
+	}
+}
+
 extension SV.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"

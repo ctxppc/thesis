@@ -12,7 +12,7 @@ extension DF {
 		indirect case `let`([Definition], in: Effect)
 		
 		/// An effect that evaluates `to` and puts it in the field with given name in the record in `of`.
-		case setField(RecordType.Field.Name, of: Location, to: Source)
+		case setField(Field.Name, of: Location, to: Source)
 		
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(of: Location, at: Source, to: Source)

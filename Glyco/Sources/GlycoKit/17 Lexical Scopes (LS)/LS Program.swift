@@ -38,6 +38,7 @@ public enum LS : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
 	public typealias RecordType = Lower.RecordType
 	public typealias ValueType = Lower.ValueType

@@ -14,7 +14,7 @@ extension LS {
 		case record(RecordType)
 		
 		/// A value that evaluates to the field with given name in the record `of`.
-		case field(RecordType.Field.Name, of: Symbol)
+		case field(Field.Name, of: Symbol)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
