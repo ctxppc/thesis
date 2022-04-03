@@ -15,7 +15,7 @@
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
 						| "record""("<RecordType>")"
-						| "field""("<RecordType.Field.Name>, "of:" <Value>")"
+						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -39,7 +39,7 @@
 				<EX.Effect> ::=
 						"do""("<[Effect]>")"
 						| "let""("<[Definition]>, "in:" <Effect>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
 						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
 				\par
 				<EX.Result> ::=
@@ -73,7 +73,7 @@
 						"source""("<Source>")"
 						| "binary""("<Source>, <BinaryOperator>, <Source>")"
 						| "record""("<RecordType>")"
-						| "field""("<RecordType.Field.Name>, "of:" <Symbol>")"
+						| "field""("<Field.Name>, "of:" <Symbol>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Symbol>, "at:" <Source>")"
 						| "evaluate""("<Label>, <[Source]>")"
@@ -94,7 +94,7 @@
 				<LS.Effect> ::=
 						"do""("<[Effect]>")"
 						| "let""("<[Definition]>, "in:" <Effect>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Symbol>, "to:" <Source>")"
+						| "setField""("<Field.Name>, "of:" <Symbol>, "to:" <Source>")"
 						| "setElement""(""of:" <Symbol>, "at:" <Source>, "to:" <Source>")"
 				\par
 				<LS.Result> ::=
@@ -115,7 +115,7 @@
 				<DF.Effect> ::=
 						"do""("<[Effect]>")"
 						| "let""("<[Definition]>, "in:" <Effect>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
 				\par
 				<DF.Result> ::=
@@ -138,7 +138,7 @@
 						"source""("<Source>")"
 						| "binary""("<Source>, <BinaryOperator>, <Source>")"
 						| "record""("<RecordType>")"
-						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
 						| "evaluate""("<Label>, <[Source]>")"
@@ -166,7 +166,7 @@
 				<CV.Effect> ::=
 						"do""("<[Effect]>")"
 						| "set""("<Location>, "to:" <Value>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "return""("<Source>")"
@@ -178,7 +178,7 @@
 						"source""("<Source>")"
 						| "binary""("<Source>, <BinaryOperator>, <Source>")"
 						| "record""("<RecordType>")"
-						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
 						| "evaluate""("<Label>, <[Source]>")"
@@ -199,7 +199,7 @@
 				<CA.Effect> ::=
 						"do""("<[Effect]>")"
 						| "set""("<Location>, "to:" <Value>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
 						| "call""("<Label>, <[Source]>, "result:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
@@ -215,7 +215,7 @@
 						"source""("<Source>")"
 						| "binary""("<Source>, <BinaryOperator>, <Source>")"
 						| "record""("<RecordType>")"
-						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
 				\par
@@ -245,8 +245,8 @@
 						| "set""("<Location>, "to:" <Source>")"
 						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
 						| "createRecord""("<RecordType>, "capability:" <Location>, "scoped:" <Bool>")"
-						| "getField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Location>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "getField""("<Field.Name>, "of:" <Location>, "to:" <Location>")"
+						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "createVector""("<ValueType>, "count:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
 						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
 						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
@@ -286,8 +286,8 @@
 						| "set""("<Location>, "to:" <Source>")"
 						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
 						| "createRecord""("<RecordType>, "capability:" <Location>, "scoped:" <Bool>")"
-						| "getField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Location>")"
-						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "getField""("<Field.Name>, "of:" <Location>, "to:" <Location>")"
+						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "createVector""("<ValueType>, "count:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
 						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
 						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
@@ -301,6 +301,9 @@
 				\par
 				<SV.RecordType> ::=
 							"("<[Field]>")"
+				\par
+				<SV.Field> ::=
+							"("<Name>, <ValueType>")"
 				\par
 				<SV.Predicate> ::=
 						"constant""("<Bool>")"

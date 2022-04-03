@@ -16,15 +16,37 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
+Glyco defines 20 \gs{il}. Each language is named after the new abstraction or feature it brings compared to the \g{lowerlang}.
+
 \section{An Expression Language}
 The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (if-then-else), definitions (let-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-The following EX program computes the 30th Fibonacci number with the sequence beginning with 0 and 1.
+The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
 \lstinputlisting{Programs/fib.ex}
 
 This program defines a function \texttt{fib} with three signed 32-bit integer parameters \texttt{prev}, \texttt{curr}, and \texttt{iter} and which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \texttt{fib} where \texttt{prev} is 0, \texttt{curr} is 1, and \texttt{iter} is 30.
 
-EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language, which means that it is very explicit and has very little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
+EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it is instead quite explicit and contains little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
+
+EX is \lowered{} to \textbf{LS} (Lexical Scopes). LS does not support subexpressions so the \g{nanopass} binds all subexpressions to names and uses those names in place of the subexpressions. Our Fibonacci example now becomes:
+\lstinputlisting{Programs/fib.ls}
+
+LS is itself \lowered{} to \textbf{DF} (Definitions) which does not support shadowing. For instance, the following LS program defines \texttt{answer} twice but only uses the outer definition. Without shadowing, the program would evaluate to 28. The right answer is 42.
+\lstinputlisting{Programs/shadowing.ls}
+
+The \g{nanopass} to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
+\lstinputlisting{Programs/shadowing.df}
+
+Definitions in value position in DF are implemented using \enquote{computed values} in \textbf{CV} (Computed Values), which are values on which a computation can be attached. The previous DF program is \lowered{} to the following CV program without definitions, i.e., without let-bindings, and with \texttt{do} values instead:
+\lstinputlisting{Programs/shadowing.cv}
+
+Computed (\texttt{do}) values are themselves implemented by flattening them and binding the result to a name. The \g{nanopass} produces a \textbf{CA} (Canonical Assignments) program. The previous CV program becomes the following CA program, in which it's clear that the definition with value 28 is not used anywhere in the program:
+\lstinputlisting{Programs/shadowing.ca}
+
+A \enquote{value}, in programming language parlance, is a placeholder for a datum at runtime. In Glyco, a value is an abstraction that is introduced in CA and expanded in the aforementioned higher \gs{il}. Values are implemented using one of the effects that are available in its \g{lowerlang}, \textbf{CC} (Calling Convention). For instance, the CA program
+\lstinputlisting{Programs/values.ca}
+is \lowered{} as the following CC program:
+\lstinputlisting{Programs/values.cc}
 
 \section{A Conventional Calling Convention}
 % TODO
