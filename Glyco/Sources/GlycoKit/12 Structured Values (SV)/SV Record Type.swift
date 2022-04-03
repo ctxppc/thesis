@@ -52,6 +52,12 @@ extension SV {
 		
 		public struct Field : Named, Equatable, Codable {
 			
+			// See protocol.
+			public init(name: SV.RecordType.Field.Name, valueType: SV.ValueType) {
+				self.name = name
+				self.valueType = valueType
+			}
+			
 			/// The field's name.
 			public var name: Name
 			public struct Name : GlycoKit.Name {

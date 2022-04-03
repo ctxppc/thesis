@@ -110,6 +110,9 @@ extension Sisp {
 			case .trailingParenthesis:
 			return nil
 			
+			case nil:
+			throw ParsingError.expectedTrailingParenthesis
+			
 			default:
 			label = .numbered(childIndex)
 			
