@@ -5,7 +5,857 @@
 
 \chapter{Language Reference}
 \label{ch:grammar}
-% TODO
+\section{Grammar for EX (Expressions)}
+\begin{grammar}
+	\footnotesize
+				<EX.Program> ::=
+							"("<Result>, "functions:" <[Function]>")"
+				\par
+				<EX.Value> ::=
+						"constant""("<Int>")"
+						| "named""("<Symbol>")"
+						| "record""("<RecordType>")"
+						| "field""("<RecordType.Field.Name>, "of:" <Value>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "binary""("<Value>, <BinaryOperator>, <Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<EX.Definition> ::=
+							"("<Symbol>, <Value>")"
+				\par
+				<EX.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Value>, <BranchRelation>, <Value>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<EX.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<EX.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<EX.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for LS (Lexical Scopes)}
+\begin{grammar}
+	\footnotesize
+				<LS.Program> ::=
+							"("<Result>, "functions:" <[Function]>")"
+				\par
+				<LS.Symbol> ::=
+						<String>
+				\par
+				<LS.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<LS.Parameter> ::=
+							"("<Symbol>, <ValueType>")"
+				\par
+				<LS.Value> ::=
+						"source""("<Source>")"
+						| "binary""("<Source>, <BinaryOperator>, <Source>")"
+						| "record""("<RecordType>")"
+						| "field""("<RecordType.Field.Name>, "of:" <Symbol>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Symbol>, "at:" <Source>")"
+						| "evaluate""("<Label>, <[Source]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<LS.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<LS.Source> ::=
+						"constant""("<Int>")"
+						| "named""("<Symbol>")"
+				\par
+				<LS.Definition> ::=
+							"("<Symbol>, <Value>")"
+				\par
+				<LS.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Symbol>, "to:" <Source>")"
+						| "setElement""(""of:" <Symbol>, "at:" <Source>, "to:" <Source>")"
+				\par
+				<LS.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Label>, <[Source]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for DF (Definitions)}
+\begin{grammar}
+	\footnotesize
+				<DF.Program> ::=
+							"("<Result>, "functions:" <[Function]>")"
+				\par
+				<DF.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
+				\par
+				<DF.Result> ::=
+						"value""("<Value>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "evaluate""("<Label>, <[Source]>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<DF.Definition> ::=
+							"("<Location>, <Value>")"
+				\par
+				<DF.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<DF.Value> ::=
+						"source""("<Source>")"
+						| "binary""("<Source>, <BinaryOperator>, <Source>")"
+						| "record""("<RecordType>")"
+						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Location>, "at:" <Source>")"
+						| "evaluate""("<Label>, <[Source]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<DF.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for CV (Computed Values)}
+\begin{grammar}
+	\footnotesize
+				<CV.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<CV.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<CV.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Value>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "return""("<Source>")"
+				\par
+				<CV.Procedure> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Effect>")"
+				\par
+				<CV.Value> ::=
+						"source""("<Source>")"
+						| "binary""("<Source>, <BinaryOperator>, <Source>")"
+						| "record""("<RecordType>")"
+						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Location>, "at:" <Source>")"
+						| "evaluate""("<Label>, <[Source]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for CA (Canonical Assignments)}
+\begin{grammar}
+	\footnotesize
+				<CA.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<CA.Procedure> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Effect>")"
+				\par
+				<CA.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Value>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
+						| "call""("<Label>, <[Source]>, "result:" <Location>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "return""("<Source>")"
+				\par
+				<CA.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<CA.Value> ::=
+						"source""("<Source>")"
+						| "binary""("<Source>, <BinaryOperator>, <Source>")"
+						| "record""("<RecordType>")"
+						| "field""("<RecordType.Field.Name>, "of:" <Location>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Location>, "at:" <Source>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for CC (Calling Convention)}
+\begin{grammar}
+	\footnotesize
+				<CC.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<CC.Parameter> ::=
+							"("<Location>, <ValueType>")"
+				\par
+				<CC.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<CC.Source> ::=
+						"constant""("<Int>")"
+						| "location""("<Location>")"
+				\par
+				<CC.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createRecord""("<RecordType>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "getField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Location>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "createVector""("<ValueType>, "count:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
+						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
+						| "destroyScopedValue""(""capability:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "call""("<Label>, <[Source]>, "result:" <Location>")"
+						| "return""("<Source>")"
+				\par
+				<CC.Procedure> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Effect>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for SV (Structured Values)}
+\begin{grammar}
+	\footnotesize
+				<SV.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<SV.ValueType> ::=
+						"u8"
+						| "s32"
+						| "vectorCap""("<ValueType>")"
+						| "recordCap""("<RecordType>")"
+						| "codeCap"
+						| "registerDatum"
+				\par
+				<SV.Source> ::=
+						"constant""("<Int>")"
+						| "abstract""("<AbstractLocation>")"
+						| "register""("<Register>, <ValueType>")"
+						| "frame""("<Frame.Location>")"
+						| "capability""(""to:" <Label>")"
+				\par
+				<SV.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createRecord""("<RecordType>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "getField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Location>")"
+						| "setField""("<RecordType.Field.Name>, "of:" <Location>, "to:" <Source>")"
+						| "createVector""("<ValueType>, "count:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
+						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
+						| "destroyScopedValue""(""capability:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "pushScope"
+						| "popScope"
+						| "clearAll""(""except:" <[Register]>")"
+						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "return""(""to:" <Source>")"
+				\par
+				<SV.RecordType> ::=
+							"("<[Field]>")"
+				\par
+				<SV.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<SV.Procedure> ::=
+							"("<Label>, "in:" <Effect>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for ID (Inferred Declarations)}
+\begin{grammar}
+	\footnotesize
+				<ID.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<ID.Procedure> ::=
+							"("<Label>, "in:" <Effect>")"
+				\par
+				<ID.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Source>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "pushScope"
+						| "popScope"
+						| "clearAll""(""except:" <[Register]>")"
+						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "return""(""to:" <Source>")"
+				\par
+				<ID.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for AL (Abstract Locations)}
+\begin{grammar}
+	\footnotesize
+				<AL.Program> ::=
+							"(""locals:" <Declarations>, "in:" <Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<AL.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<AL.Procedure> ::=
+							"("<Label>, "locals:" <Declarations>, "in:" <Effect>")"
+				\par
+				<AL.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Source>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "pushScope"
+						| "popScope"
+						| "clearAll""(""except:" <[Register]>")"
+						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "return""(""to:" <Source>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for ALA (Abstract Locations, Analysed)}
+\begin{grammar}
+	\footnotesize
+				<ALA.Program> ::=
+							"(""locals:" <Declarations>, "in:" <Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<ALA.ConflictGraph> ::=
+							"("<[Conflict]>")"
+				\par
+				<ALA.Conflict> ::=
+							"("<Location>, <Location>")"
+				\par
+				<ALA.TypedLocation> ::=
+						"abstract""("<AbstractLocation>, <DataType>")"
+						| "frame""("<Frame.Location>, <DataType>")"
+				\par
+				<ALA.Declarations> ::=
+							"("<[TypedLocation]>")"
+				\par
+				<ALA.AbstractLocation> ::=
+						<String>
+				\par
+				<ALA.Predicate> ::=
+						"constant""("<Bool>, "analysisAtEntry:" <Analysis>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>, "analysisAtEntry:" <Analysis>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>, "analysisAtEntry:" <Analysis>")"
+						| "do""("<[Effect]>, "then:" <Predicate>, "analysisAtEntry:" <Analysis>")"
+				\par
+				<ALA.Source> ::=
+						"constant""("<Int>")"
+						| "abstract""("<AbstractLocation>")"
+						| "register""("<Register>, <DataType>")"
+						| "frame""("<Frame.Location>")"
+						| "capability""(""to:" <Label>")"
+				\par
+				<ALA.Effect> ::=
+						"do""("<[Effect]>, "analysisAtEntry:" <Analysis>")"
+						| "set""("<Location>, "to:" <Source>, "analysisAtEntry:" <Analysis>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>, "analysisAtEntry:" <Analysis>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "scoped:" <Bool>, "analysisAtEntry:" <Analysis>")"
+						| "destroyBuffer""(""capability:" <Source>, "analysisAtEntry:" <Analysis>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>, "analysisAtEntry:" <Analysis>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>, "analysisAtEntry:" <Analysis>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>, "analysisAtEntry:" <Analysis>")"
+						| "pushScope""(""analysisAtEntry:" <Analysis>")"
+						| "popScope""(""analysisAtEntry:" <Analysis>")"
+						| "clearAll""(""except:" <[Register]>, "analysisAtEntry:" <Analysis>")"
+						| "call""("<Label>, "parameters:" <[Register]>, "analysisAtEntry:" <Analysis>")"
+						| "return""(""to:" <Source>, "analysisAtEntry:" <Analysis>")"
+				\par
+				<ALA.Location> ::=
+						"abstract""("<AbstractLocation>")"
+						| "register""("<Register>")"
+						| "frame""("<Frame.Location>")"
+				\par
+				<ALA.Procedure> ::=
+							"("<Label>, "locals:" <Declarations>, "in:" <Effect>")"
+				\par
+				<ALA.Analysis> ::=
+							"(""conflicts:" <ConflictGraph>, "possiblyLiveLocations:" <Set<Location>>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for CD (Conditionals)}
+\begin{grammar}
+	\footnotesize
+				<CD.Program> ::=
+							"("<Effect>, "procedures:" <[Procedure]>")"
+				\par
+				<CD.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "do""("<[Effect]>, "then:" <Predicate>")"
+				\par
+				<CD.Effect> ::=
+						"do""("<[Effect]>")"
+						| "set""("<DataType>, <Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "onFrame:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Source>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
+						| "pushFrame""("<Frame>")"
+						| "popFrame"
+						| "clearAll""(""except:" <[Register]>")"
+						| "call""("<Label>")"
+						| "return""(""to:" <Source>")"
+				\par
+				<CD.Procedure> ::=
+							"("<Label>, "in:" <Effect>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for PR (Predicates)}
+\begin{grammar}
+	\footnotesize
+				<PR.Program> ::=
+							"("<[Block]>")"
+				\par
+				<PR.Block> ::=
+							"(""name:" <Label>, "do:" <[Effect]>, "then:" <Continuation>")"
+				\par
+				<PR.Continuation> ::=
+						"continue""(""to:" <Label>")"
+						| "branch""(""if:" <Predicate>, "then:" <Label>, "else:" <Label>")"
+						| "call""("<Label>, "returnPoint:" <Label>")"
+						| "return""(""to:" <Source>")"
+				\par
+				<PR.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Source>, <BranchRelation>, <Source>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for BB (Basic Blocks)}
+\begin{grammar}
+	\footnotesize
+				<BB.Program> ::=
+							"("<[BB.Block]>")"
+				\par
+				<BB.Effect> ::=
+						"set""("<DataType>, <Location>, "to:" <Source>")"
+						| "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						| "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "onFrame:" <Bool>")"
+						| "destroyBuffer""(""capability:" <Source>")"
+						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "pushFrame""("<Frame>")"
+						| "popFrame"
+						| "clearAll""(""except:" <[Register]>")"
+				\par
+				<BB.Continuation> ::=
+						"continue""(""to:" <Label>")"
+						| "branch""("<Source>, <BranchRelation>, <Source>, "then:" <Label>, "else:" <Label>")"
+						| "call""("<Label>, "returnPoint:" <Label>")"
+						| "return""(""to:" <Source>")"
+				\par
+				<BB.Block> ::=
+							"(""name:" <Label>, "do:" <[Effect]>, "then:" <Continuation>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for FO (Flexible Operands)}
+\begin{grammar}
+	\footnotesize
+				<FO.Program> ::=
+							"("<[Effect]>")"
+				\par
+				<FO.Source> ::=
+						"constant""("<Int>")"
+						| "register""("<Register>")"
+						| "frame""("<Frame.Location>")"
+						| "capability""(""to:" <Label>")"
+				\par
+				<FO.Effect> ::=
+						"set""("<DataType>, <Location>, "to:" <Source>")"
+						\alt "compute""("<Location>, <Source>, <BinaryOperator>, <Source>")"
+						\alt "createBuffer""(""bytes:" <Int>, "capability:" <Location>, "onFrame:" <Bool>")"
+						\alt "destroyBuffer""(""capability:" <Source>")"
+						\alt "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
+						\alt "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						\alt "pushFrame""("<Frame>")"
+						\alt "popFrame"
+						\alt "clearAll""(""except:" <[Register]>")"
+						\alt "branch""(""to:" <Label>, <Source>, <BranchRelation>, <Source>")"
+						\alt "jump""(""to:" <Label>")"
+						\alt "call""("<Label>")"
+						\alt "return""(""to:" <Source>")"
+						\alt "labelled""("<Label>, <Effect>")"
+				\par
+				<FO.Location> ::=
+						"register""("<Register>")"
+						| "frame""("<Frame.Location>")"
+				\par
+				<FO.Register> ::=
+						"zero"
+						| "ra"
+						| "s1"
+						| "a0"
+						| "a1"
+						| "a2"
+						| "a3"
+						| "a4"
+						| "a5"
+						| "a6"
+						| "a7"
+						| "s2"
+						| "s3"
+						| "s4"
+						| "s5"
+						| "s6"
+						| "s7"
+						| "s8"
+						| "s9"
+						| "s10"
+						| "s11"
+						| "invocationData"
+				\par
+\end{grammar}
+\par
+\section{Grammar for MM (Managed Memory)}
+\begin{grammar}
+	\footnotesize
+				<MM.Program> ::=
+							"("<[Effect]>")"
+				\par
+				<MM.Effect> ::=
+						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
+						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
+						\alt "load""("<DataType>, "into:" <Register>, "from:" <Frame.Location>")"
+						\alt "store""("<DataType>, "into:" <Frame.Location>, "from:" <Register>")"
+						\alt "createBuffer""(""bytes:" <Source>, "capability:" <Register>, "onFrame:" <Bool>")"
+						\alt "destroyBuffer""(""capability:" <Register>")"
+						\alt "loadElement""("<DataType>, "into:" <Register>, "buffer:" <Register>, "offset:" <Source>")"
+						\alt "storeElement""("<DataType>, "buffer:" <Register>, "offset:" <Source>, "from:" <Register>")"
+						\alt "deriveCapability""(""in:" <Register>, "to:" <Label>")"
+						\alt "pushFrame""("<Frame>")"
+						\alt "popFrame"
+						\alt "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>")"
+						\alt "clearAll""(""except:" <[Register]>")"
+						\alt "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
+						\alt "jump""(""to:" <Target>")"
+						\alt "call""("<Label>")"
+						\alt "return""(""to:" <Target>")"
+						\alt "labelled""("<Label>, <Effect>")"
+				\par
+				<MM.Register> ::=
+						"zero"
+						| "ra"
+						| "s1"
+						| "a0"
+						| "a1"
+						| "a2"
+						| "a3"
+						| "a4"
+						| "a5"
+						| "a6"
+						| "a7"
+						| "s2"
+						| "s3"
+						| "s4"
+						| "s5"
+						| "s6"
+						| "s7"
+						| "s8"
+						| "s9"
+						| "s10"
+						| "s11"
+						| "t4"
+						| "t5"
+						| "invocationData"
+				\par
+				<MM.Target> ::=
+						"label""("<Label>")"
+						| "register""("<Register>")"
+				\par
+				<MM.Source> ::=
+						"constant""("<Int>")"
+						| "register""("<Register>")"
+				\par
+				<MM.Frame> ::=
+							"(""allocatedByteSize:" <Int>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for RT (Runtime)}
+\begin{grammar}
+	\footnotesize
+				<RT.Program> ::=
+							"("<[Statement]>")"
+				\par
+				<RT.Effect> ::=
+						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
+						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
+						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>")"
+						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>")"
+						\alt "storeCapability""(""address:" <Register>, "source:" <Register>, "offset:" <Int>")"
+						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"
+						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
+						\alt "offsetCapability""(""destination:" <Register>, "source:" <Register>, "offset:" <Source>")"
+						\alt "getCapabilityLength""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityBounds""(""destination:" <Register>, "base:" <Register>, "length:" <Source>")"
+						\alt "getCapabilityAddress""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityAddress""(""destination:" <Register>, "source:" <Register>, "address:" <Register>")"
+						\alt "getCapabilityDistance""(""destination:" <Register>, "cs1:" <Register>, "cs2:" <Register>")"
+						\alt "seal""(""destination:" <Register>, "source:" <Register>, "seal:" <Register>")"
+						\alt "sealEntry""(""destination:" <Register>, "source:" <Register>")"
+						\alt "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>, "using:" <Register>")"
+						\alt "clear""("<[Register]>")"
+						\alt "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
+						\alt "jump""(""to:" <Target>, "link:" <Register>")"
+						\alt "invoke""(""target:" <Register>, "data:" <Register>")"
+						\alt "callRuntimeRoutine""(""capability:" <Label>, "link:" <Register>")"
+				\par
+				<RT.Statement> ::=
+						"effect""("<Effect>")"
+						| "padding""(""alignment:" <DataType>")"
+						| "data""(""type:" <DataType>, "value:" <Int>, "count:" <Int>")"
+						| "bssSection"
+						| "labelled""("<Label>, <Statement>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for CE (Canonical Effects)}
+\begin{grammar}
+	\footnotesize
+				<CE.Program> ::=
+							"("<[Statement]>")"
+				\par
+				<CE.Statement> ::=
+						"effect""("<Effect>")"
+						| "padding""(""alignment:" <DataType>")"
+						| "data""(""type:" <DataType>, "value:" <Int>, "count:" <Int>")"
+						| "bssSection"
+						| "labelled""("<Label>, <Statement>")"
+				\par
+				<CE.Permission> ::=
+						"global"
+						| "execute"
+						| "load"
+						| "store"
+						| "loadCapability"
+						| "storeCapability"
+						| "storeLocalCapability"
+						| "seal"
+						| "invoke"
+						| "unseal"
+						| "setCID"
+				\par
+				<CE.DataType> ::=
+						"u8"
+						| "s32"
+						| "cap"
+				\par
+				<CE.Source> ::=
+						"constant""("<Int>")"
+						| "register""("<Register>")"
+				\par
+				<CE.Target> ::=
+						"label""("<Label>")"
+						| "register""("<Register>")"
+				\par
+				<CE.Effect> ::=
+						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
+						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
+						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>")"
+						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>")"
+						\alt "storeCapability""(""address:" <Register>, "source:" <Register>, "offset:" <Int>")"
+						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"
+						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
+						\alt "offsetCapability""(""destination:" <Register>, "source:" <Register>, "offset:" <Source>")"
+						\alt "getCapabilityLength""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityBounds""(""destination:" <Register>, "base:" <Register>, "length:" <Source>")"
+						\alt "getCapabilityAddress""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityAddress""(""destination:" <Register>, "source:" <Register>, "address:" <Register>")"
+						\alt "getCapabilityDistance""(""destination:" <Register>, "cs1:" <Register>, "cs2:" <Register>")"
+						\alt "seal""(""destination:" <Register>, "source:" <Register>, "seal:" <Register>")"
+						\alt "sealEntry""(""destination:" <Register>, "source:" <Register>")"
+						\alt "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>, "using:" <Register>")"
+						\alt "clear""("<[Register]>")"
+						\alt "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
+						\alt "jump""(""to:" <Target>, "link:" <Register>")"
+						\alt "invoke""(""target:" <Register>, "data:" <Register>")"
+				\par
+\end{grammar}
+\par
+\section{Grammar for RV (CHERI-RISC-V)}
+\begin{grammar}
+	\footnotesize
+				<RV.Program> ::=
+							"("<[Statement]>")"
+				\par
+				<RV.Register> ::=
+						"zero"
+						| "ra"
+						| "sp"
+						| "gp"
+						| "tp"
+						| "t0"
+						| "t1"
+						| "t2"
+						| "fp"
+						| "s1"
+						| "a0"
+						| "a1"
+						| "a2"
+						| "a3"
+						| "a4"
+						| "a5"
+						| "a6"
+						| "a7"
+						| "s2"
+						| "s3"
+						| "s4"
+						| "s5"
+						| "s6"
+						| "s7"
+						| "s8"
+						| "s9"
+						| "s10"
+						| "s11"
+						| "t3"
+						| "t4"
+						| "t5"
+						| "t6"
+				\par
+				<RV.Statement> ::=
+						"instruction""("<Instruction>")"
+						| "padding""(""byteAlignment:" <Int>")"
+						| "data""(""value:" <Int>, "datumByteSize:" <Int>, "count:" <Int>")"
+						| "bssSection"
+						| "labelled""("<Label>, <Statement>")"
+				\par
+				<RV.Label> ::=
+						<String>
+				\par
+				<RV.Instruction> ::=
+						"copyWord""(""destination:" <Register>, "source:" <Register>")"
+						\alt "copyCapability""(""destination:" <Register>, "source:" <Register>")"
+						\alt "computeWithRegister""(""operation:" <BinaryOperator>, "rd:" <Register>, "rs1:" <Register>, "rs2:" <Register>")"
+						\alt "computeWithImmediate""(""operation:" <BinaryOperator>, "rd:" <Register>, "rs1:" <Register>, "imm:" <Int>")"
+						\alt "loadByte""(""destination:" <Register>, "address:" <Register>")"
+						\alt "loadSignedWord""(""destination:" <Register>, "address:" <Register>")"
+						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "storeByte""(""source:" <Register>, "address:" <Register>")"
+						\alt "storeSignedWord""(""source:" <Register>, "address:" <Register>")"
+						\alt "storeCapability""(""source:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
+						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"
+						\alt "offsetCapability""(""destination:" <Register>, "source:" <Register>, "offset:" <Register>")"
+						\alt "offsetCapabilityWithImmediate""(""destination:" <Register>, "source:" <Register>, "offset:" <Int>")"
+						\alt "getCapabilityLength""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityBounds""(""destination:" <Register>, "base:" <Register>, "length:" <Register>")"
+						\alt "setCapabilityBoundsWithImmediate""(""destination:" <Register>, "base:" <Register>, "length:" <Int>")"
+						\alt "getCapabilityAddress""(""destination:" <Register>, "source:" <Register>")"
+						\alt "setCapabilityAddress""(""destination:" <Register>, "source:" <Register>, "address:" <Register>")"
+						\alt "getCapabilityDistance""(""destination:" <Register>, "cs1:" <Register>, "cs2:" <Register>")"
+						\alt "seal""(""destination:" <Register>, "source:" <Register>, "seal:" <Register>")"
+						\alt "sealEntry""(""destination:" <Register>, "source:" <Register>")"
+						\alt "permit""(""destination:" <Register>, "source:" <Register>, "mask:" <Register>")"
+						\alt "clear""(""quarter:" <Int>, "mask:" <UInt8>")"
+						\alt "branch""(""rs1:" <Register>, "relation:" <BranchRelation>, "rs2:" <Register>, "target:" <Label>")"
+						\alt "jump""(""target:" <Label>, "link:" <Register>")"
+						\alt "jumpWithRegister""(""target:" <Register>, "link:" <Register>")"
+						\alt "invoke""(""target:" <Register>, "data:" <Register>")"
+				\par
+				<RV.BranchRelation> ::=
+						"eq"
+						| "ne"
+						| "lt"
+						| "le"
+						| "gt"
+						| "ge"
+				\par
+				<RV.BinaryOperator> ::=
+						"add"
+						| "sub"
+						| "mul"
+						| "and"
+						| "or"
+						| "xor"
+						| "sll"
+						| "srl"
+						| "sra"
+				\par
+\end{grammar}
+\par
+\section{Grammar for S (CHERI-RISC-V Assembly)}
+\begin{grammar}
+	\footnotesize
+				<S.Program> ::=
+							"(""assembly:" <String>")"
+				\par
+\end{grammar}
+\par
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

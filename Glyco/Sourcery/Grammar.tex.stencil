@@ -1,0 +1,32 @@
+{% if lang.type %}
+\section{Grammar for {{lang.type.name}}{% if lang.type.annotations["longname"] %} ({{lang.type.annotations["longname"]}}){%endif%}}
+\begin{grammar}
+	\footnotesize
+	{% for language in types.enums|public|implements: "Language" %}
+		{% if language.name == lang.type.name %}
+			{% for codableType in language.containedTypes|public %}
+				<{{codableType.name}}> ::=
+				{% if codableType|implements: "RawCodable" %}
+					{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
+						<{{initialiser.parameters[0].typeName}}>
+					{% endfor %}
+				{% else %}
+					{% for initialiser in codableType.initializers|public %}
+						{% if initialiser|!annotated: "isInternalForm" %}
+							"("{% for par in initialiser.parameters %}{% if par.argumentLabel %}"{{par.argumentLabel}}:" {% endif %}<{{par.typeName}}>{% if not forloop.last %}, {% endif %}{% endfor %}")"
+						{% endif %}
+					{% endfor %}
+					{% for case in codableType.cases %}
+						{% if not forloop.first %}{% if codableType|annotated: "heavyGrammar" %}\alt{% else %}|{% endif %} {% endif %}"{{case.name|replace:"`",""}}"{% if case.associatedValues %}"("{% for par in case.associatedValues %}{% if par.localName %}"{{par.localName}}:" {% endif %}<{{par.typeName}}>{% if not forloop.last %}, {% endif %}{% endfor %}")"{% endif %}
+					{% endfor %}
+				{% endif %}
+				\par
+			{% endfor %}
+		{% endif %}
+	{% endfor %}
+\end{grammar}
+\par
+{% for name, lang in lang.type.typealiases where name == "Lower" %}
+{% include "Grammar.tex.stencil" %}
+{% endfor %}
+{% endif %}

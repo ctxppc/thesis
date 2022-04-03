@@ -4,7 +4,9 @@
 
 \chapter{Language Reference}
 \label{ch:grammar}
-% TODO
+{% for lang in types.typealiases where lang.name == "HighestSupportedLanguage" %}
+{% include "Grammar.tex.stencil" lang %}
+{% endfor %}
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

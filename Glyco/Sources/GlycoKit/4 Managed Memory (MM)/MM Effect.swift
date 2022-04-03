@@ -2,6 +2,7 @@
 
 extension MM {
 	
+	//sourcery: heavyGrammar
 	/// An MM effect.
 	public enum Effect : Codable, Equatable, MultiplyLowerable {
 		

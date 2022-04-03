@@ -109,9 +109,6 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
-	<dt><code>EX.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>EX.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
@@ -200,9 +197,6 @@ A language that introduces lexical scopes of definitions
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
-<dl>
-	<dt><code>LS.Context</code></dt>
-</dl>
 
 <h2 id="DF">Grammar for DF (Definitions)</h2>
 A language that introduces definitions with function-wide namespacing.
@@ -262,9 +256,6 @@ A language that introduces definitions with function-wide namespacing.
 <dl>
 	<dt><code>DF.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
-</dl>
-<dl>
-	<dt><code>DF.Context</code></dt>
 </dl>
 
 <h2 id="CV">Grammar for CV (Computed Values)</h2>
@@ -380,9 +371,6 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
 </dl>
 <dl>
-	<dt><code>CC.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>CC.Parameter</code></dt>
 	<dd><code>(Location, ValueType)</code></dd>
 </dl>
@@ -475,9 +463,6 @@ A language that introduces structured values (vectors and records).
 	<dd><code>([Field])</code></dd>
 </dl>
 <dl>
-	<dt><code>SV.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>SV.Predicate</code></dt>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
@@ -506,9 +491,6 @@ A language that infers declarations from definitions.
 <dl>
 	<dt><code>ID.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-	<dt><code>ID.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>ID.Procedure</code></dt>
@@ -608,12 +590,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(Location, Location)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.Identity</code></dt>
-</dl>
-<dl>
-	<dt><code>ALA.CoalesceLocations</code></dt>
-</dl>
-<dl>
 	<dt><code>ALA.TypedLocation</code></dt>
 	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
@@ -664,9 +640,6 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>ALA.Procedure</code></dt>
 	<dd><code>(Label, <strong>locals:</strong> Declarations, <strong>in:</strong> Effect)</code></dd>
 </dl>
@@ -690,9 +663,6 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 <dl>
 	<dt><code>CD.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
-</dl>
-<dl>
-	<dt><code>CD.Context</code></dt>
 </dl>
 <dl>
 	<dt><code>CD.Predicate</code></dt>
@@ -931,9 +901,6 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
 <dl>
-	<dt><code>MM.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>MM.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
@@ -1125,9 +1092,6 @@ N/A
 	<dd><code>String</code></dd>
 </dl>
 <dl>
-	<dt><code>RV.Context</code></dt>
-</dl>
-<dl>
 	<dt><code>RV.Instruction</code></dt>
 	<dd><code><strong>copyWord</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>copyCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
@@ -1186,8 +1150,4 @@ The ground language as provided to Clang for assembly and linking.
 <dl>
 	<dt><code>S.Program</code></dt>
 	<dd><code>(<strong>assembly:</strong> String)</code></dd>
-</dl>
-<dl>
-	<dt><code>S.CompilationError</code></dt>
-	<dd><code><strong>clangError</strong>(<strong>code:</strong> Int32)</code></dd>
 </dl>
