@@ -28,6 +28,7 @@ extension LS {
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Function {
 			var context = LS.Context()
+			context.pushScope(for: parameters.lazy.map(\.name))
 			return try .init(name, takes: parameters.lowered(in: &context), returns: resultType, in: result.lowered(in: &context))
 		}
 		
