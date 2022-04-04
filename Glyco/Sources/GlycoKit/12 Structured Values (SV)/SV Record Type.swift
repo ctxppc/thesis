@@ -92,12 +92,13 @@ extension SV.RecordType : Codable {
 	
 	//sourcery: isInternalForm
 	public init(from decoder: Decoder) throws {
-		self.init(try decoder.singleValueContainer().decode([SV.Field].self))
+		let container = try decoder.container(keyedBy: CodingKeys.self)
+		self.init(try container.decode(key: .fields))
 	}
 	
 	public func encode(to encoder: Encoder) throws {
-		var container = encoder.singleValueContainer()
-		try container.encode(Array(self))
+		var container = encoder.container(keyedBy: CodingKeys.self)
+		try container.encode(Array(self), forKey: .fields)
 	}
 	
 }
