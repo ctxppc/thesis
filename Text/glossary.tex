@@ -92,4 +92,14 @@
 	description={a procedure provided by the runtime with a possibly different \gls{cc} and more privileges afforded to it than a normal procedure}
 }
 
+\newglossaryentry{cersaved}{
+	name=caller-saved register,
+	description={a register that a procedure can use freely but needs to save if they wish to preserve their contents across a procedure call; contrast with \g{cersaved}}
+}
+
+\newglossaryentry{ceesaved}{
+	name=callee-saved register,
+	description={a register that a procedure can only use after saving its previous contents and restoring them when the procedure is done using the register; contrast with \g{cersaved}}
+}
+
 \makeglossaries
