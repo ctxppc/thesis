@@ -102,4 +102,14 @@
 	description={a register that a procedure can only use after saving its previous contents and restoring them when the procedure is done using the register; contrast with \g{cersaved}}
 }
 
+\newglossaryentry{stackcap}{
+	name=stack capability,
+	description={a capability in the \texttt{csp} register that points to the last pushed datum on the call stack, i.e., the top of the stack}
+}
+
+\newglossaryentry{framecap}{
+	name=frame capability,
+	description={a capability in the \texttt{cfp} register that points to the base of the current call frame}
+}
+
 \makeglossaries

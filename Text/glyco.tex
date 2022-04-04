@@ -53,11 +53,30 @@ A \g{cc} is a set of rules imposed by the operating system, instruction set arch
 \begin{itemize}[noitemsep]
 	\item where parameters and result values are placed (in dedicated registers, in a particular order on the call stack, or a combination of both);
 	\item how large values are passed to the callee or caller (over multiple registers, on the call stack, or in heap memory);
-	\item the state of the call stack and some registers when a procedure starts executing or when it returns to the caller;
-	\item which registers a procedure can use freely but cannot know if their contents will be preserved across a procedure call (\g{cersaved});
-	\item which registers a procedure can only use after saving their previous contents and restoring them after use (\g{ceesaved});
-	% TODO
+	\item the state of the call stack and some registers (like the register keeping the frame pointer) when a procedure starts executing or when it returns to the caller;
+	\item which registers a procedure can use freely but for which it cannot assume that their contents will be preserved across a procedure call (\gs{cersaved}); and
+	\item which registers a procedure can only use after saving their previous contents and if they're restored after use (\gs{ceesaved}).
 \end{itemize}
+
+The \g{cc} used in base version of Glyco is called \textbf{\g{ghscc}} and mimics a traditional \g{cc} that would be used for programs written in C, with some parts specified by \cite[chapter~25]{riscv}.
+
+\paragraph{Call Stack} The call stack is a region of memory on which information about procedure calls is stored, such as local state and return addresses. The stack grows downward, i.e., from high to low addresses. The \texttt{csp} register contains a capability, the \textbf{\g{stackcap}}, that points to the location of the last pushed datum, i.e., the top of the stack. The \g{stackcap}'s address decreases whenever data are pushed to the call stack and increases whenever data are popped from the stack.
+
+\paragraph{Call Frames} A call frame (also known as a \emph{stack frame}) is a region of memory on the call stack that belongs to a procedure call and on which the procedure can store its local state. The \texttt{cfp} register contains a capability, the \textbf{\g{framecap}}, that points to the base of the call frame. The procedure places local state and expects parameters in locations that are fixed distances removed from this base.
+
+Before accessing its call frame, a procedure pushes a call frame of the desired size in three steps. The procedure first pushes the (caller's) \g{framecap} to the call stack, then updates the \g{framecap} to point to this capability, and finally allocates room for its local state by moving the \g{stackcap} so that it points to the call frame's last datum.
+
+A procedure pops its call frame when it is done using it, e.g., when returning to its caller. It does so by popping all data stored in the call frame and restoring the previous \g{framecap}.
+
+% TODO
+
+\begin{figure}
+	\begin{center}
+		\includegraphics{Images/GCCC Stack.pdf}
+	\end{center}
+	\caption{A call stack containing two call frames in a variation of GCCC where no registers are available for storing parameters and local variables. The first call frame belongs to the initial procedure \texttt{main} which is called by the runtime, a dynamic linker, or the operating system and takes no parameters. Its call frame contains a \emph{previous frame pointer} capability that points to an unspecified location (possibly \texttt{null}) as well as two local variables \texttt{discount} and \texttt{price}. \texttt{main} invokes the 2-parameter \texttt{computeUnitPrice} procedure, binding the value \texttt{0.2} to the \texttt{discount} parameter and \texttt{cherry} to the \texttt{product} parameter. The latter procedure's call frame contains a \emph{previous frame pointer} capability that points to the location of the \emph{previous frame pointer} capability in the previous call frame, as well as a local variable \texttt{demand}. This call frame is at the top of the stack and so the \texttt{cfp} register's capability points to the \emph{previous frame pointer} capability in \texttt{computeUnitPrice}'s call frame. The \texttt{csp} register's capability always points to the last datum pushed on the stack, which is \texttt{demand} in this example. Note that the stack grows downward.}
+	\label{fig:gcccstack}
+\end{figure}
 
 % TODO
 
