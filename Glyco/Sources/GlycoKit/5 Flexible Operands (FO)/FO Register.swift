@@ -45,7 +45,7 @@ extension FO {
 		/// An argument register.
 		case a2, a3, a4, a5, a6, a7
 		
-		/// A saved register.
+		/// A callee-saved register.
 		case s2, s3, s4, s5, s6, s7, s8, s9, s10, s11
 		
 		/// A register for passing data through an invocation, i.e., `t6`/`ct6`.
