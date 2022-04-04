@@ -3,6 +3,8 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
+[`OB`](#OB) →
+[`NT`](#NT) →
 [`EX`](#EX) →
 [`LS`](#LS) →
 [`DF`](#DF) →
@@ -68,12 +70,197 @@ A program written in some language `XY` should be stored in a file with extensio
 </dl>
 
 
+<h2 id="OB">Grammar for OB (Objects)</h2>
+A language that introduces objects, i.e., encapsulated values with methods.
+
+**Inherited from NT:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Field</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>RecordType</code>, 
+<code>Symbol</code>, 
+<code>TypeName</code>
+<dl>
+	<dt><code>OB.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition])</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Function</code></dt>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Value</code></dt>
+	<dd><code><strong>self</strong></code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.ObjectType</code></dt>
+	<dd><code>(<strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.ValueType</code></dt>
+	<dd><code><strong>named</strong>(TypeName)</code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
+	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>OB.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>object</strong>(TypeName)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Method</code></dt>
+	<dd><code>(Name, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.TypeDefinition</code></dt>
+	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>object</strong>(TypeName, ObjectType)</code></dd>
+</dl>
+
+<h2 id="NT">Grammar for NT (Named Types)</h2>
+A language that introduces named types in a structural type system.
+
+**Inherited from EX:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Field</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>RecordType</code>, 
+<code>Symbol</code>
+<dl>
+	<dt><code>NT.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition], <strong>globals:</strong> [GlobalDeclaration])</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.GlobalDeclaration</code></dt>
+</dl>
+<dl>
+	<dt><code>NT.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.TypeDefinition</code></dt>
+	<dd><code>(TypeName, ValueType)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Value</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.TypeName</code></dt>
+	<dd><code>String</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Function</code></dt>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.ValueType</code></dt>
+	<dd><code><strong>named</strong>(TypeName)</code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
+	<dd><code><strong>registerDatum</strong></code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+
 <h2 id="EX">Grammar for EX (Expressions)</h2>
 A language that introduces expression semantics for values, thereby abstracting over computation effects.
 
 **Inherited from LS:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
 <code>Parameter</code>, 
@@ -92,6 +279,8 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
@@ -135,6 +324,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
 <code>RecordType</code>, 
@@ -166,6 +356,8 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Symbol)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Symbol, <strong>with:</strong> Symbol)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -206,6 +398,7 @@ A language that introduces definitions with function-wide namespacing.
 **Inherited from CV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
@@ -251,6 +444,8 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Location, <strong>with:</strong> Location)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
@@ -267,6 +462,7 @@ A language that allows a computation to be attached to a value.
 **Inherited from CA:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Context</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
@@ -307,6 +503,8 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Location, <strong>with:</strong> Location)</code></dd>
 	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -318,6 +516,7 @@ A language that groups all effects that write to a location under one canonical 
 **Inherited from CC:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Context</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
@@ -359,6 +558,8 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Location)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Location, <strong>with:</strong> Location)</code></dd>
 </dl>
 
 <h2 id="CC">Grammar for CC (Calling Convention)</h2>
@@ -367,6 +568,7 @@ A language that introduces parameters & result values in procedures via the low-
 **Inherited from SV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
 <code>Location</code>, 
@@ -378,7 +580,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Parameter</code></dt>
-	<dd><code>(Location, ValueType)</code></dd>
+	<dd><code>(Location, ValueType, <strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Predicate</code></dt>
@@ -403,6 +605,8 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>createVector</strong>(ValueType, <strong>count:</strong> Int, <strong>capability:</strong> Location, <strong>scoped:</strong> Bool)</code></dd>
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
@@ -414,7 +618,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 
 <h2 id="SV">Grammar for SV (Structured Values)</h2>
-A language that introduces structured values (vectors and records).
+A language that introduces structured values, i.e., vectors and records.
 
 **Inherited from ID:**
 <code>AbstractLocation</code>, 
@@ -432,9 +636,7 @@ A language that introduces structured values (vectors and records).
 	<dt><code>SV.ValueType</code></dt>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
-	<dd><code><strong>vectorCap</strong>(ValueType)</code></dd>
-	<dd><code><strong>recordCap</strong>(RecordType)</code></dd>
-	<dd><code><strong>codeCap</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
@@ -457,12 +659,21 @@ A language that introduces structured values (vectors and records).
 	<dd><code><strong>getElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>index:</strong> Source, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
+</dl>
+<dl>
+	<dt><code>SV.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>SV.RecordType</code></dt>
@@ -515,6 +726,8 @@ A language that infers declarations from definitions.
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -569,6 +782,8 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
@@ -600,13 +815,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code>(Location, Location)</code></dd>
 </dl>
 <dl>
-	<dt><code>ALA.TypedLocation</code></dt>
-	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
-	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
-</dl>
-<dl>
 	<dt><code>ALA.Declarations</code></dt>
-	<dd><code>([TypedLocation])</code></dd>
+	<dd><code>([Declaration])</code></dd>
 </dl>
 <dl>
 	<dt><code>ALA.AbstractLocation</code></dt>
@@ -628,6 +838,11 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>capability</strong>(<strong>to:</strong> Label)</code></dd>
 </dl>
 <dl>
+	<dt><code>ALA.Declaration</code></dt>
+	<dd><code><strong>abstract</strong>(AbstractLocation, DataType)</code></dd>
+	<dd><code><strong>frame</strong>(Frame.Location, DataType)</code></dd>
+</dl>
+<dl>
 	<dt><code>ALA.Effect</code></dt>
 	<dd><code><strong>do</strong>([Effect], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -636,6 +851,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
@@ -690,6 +907,8 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
@@ -761,6 +980,8 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
@@ -804,6 +1025,8 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>destroyBuffer</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>getElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Location)</code></dd>
 	<dd><code><strong>setElement</strong>(DataType, <strong>of:</strong> Location, <strong>offset:</strong> Source, <strong>to:</strong> Source)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Location)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
@@ -868,6 +1091,8 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>loadElement</strong>(DataType, <strong>into:</strong> Register, <strong>buffer:</strong> Register, <strong>offset:</strong> Source)</code></dd>
 	<dd><code><strong>storeElement</strong>(DataType, <strong>buffer:</strong> Register, <strong>offset:</strong> Source, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>deriveCapability</strong>(<strong>in:</strong> Register, <strong>to:</strong> Label)</code></dd>
+	<dd><code><strong>createSeal</strong>(<strong>in:</strong> Register)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>into:</strong> Register, <strong>source:</strong> Register, <strong>seal:</strong> Register)</code></dd>
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>permit</strong>([Permission], <strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
@@ -940,10 +1165,8 @@ A language that introduces a runtime system and runtime routines.
 	<dt><code>RT.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>storeCapability</strong>(<strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
@@ -1024,10 +1247,8 @@ A language grouping related instructions under a single effect.
 	<dt><code>CE.Effect</code></dt>
 	<dd><code><strong>copy</strong>(DataType, <strong>into:</strong> Register, <strong>from:</strong> Register)</code></dd>
 	<dd><code><strong>compute</strong>(<strong>destination:</strong> Register, Register, BinaryOperator, Source)</code></dd>
-	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register)</code></dd>
-	<dd><code><strong>storeCapability</strong>(<strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>load</strong>(DataType, <strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>store</strong>(DataType, <strong>address:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>offsetCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register, <strong>offset:</strong> Source)</code></dd>
@@ -1107,11 +1328,11 @@ N/A
 	<dd><code><strong>copyCapability</strong>(<strong>destination:</strong> Register, <strong>source:</strong> Register)</code></dd>
 	<dd><code><strong>computeWithRegister</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>rs2:</strong> Register)</code></dd>
 	<dd><code><strong>computeWithImmediate</strong>(<strong>operation:</strong> BinaryOperator, <strong>rd:</strong> Register, <strong>rs1:</strong> Register, <strong>imm:</strong> Int)</code></dd>
-	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>loadByte</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>loadSignedWord</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>loadCapability</strong>(<strong>destination:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
-	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
-	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register)</code></dd>
+	<dd><code><strong>storeByte</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
+	<dd><code><strong>storeSignedWord</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>storeCapability</strong>(<strong>source:</strong> Register, <strong>address:</strong> Register, <strong>offset:</strong> Int)</code></dd>
 	<dd><code><strong>deriveCapabilityFromLabel</strong>(<strong>destination:</strong> Register, <strong>label:</strong> Label)</code></dd>
 	<dd><code><strong>deriveCapabilityFromPCC</strong>(<strong>destination:</strong> Register, <strong>upperBits:</strong> UInt)</code></dd>

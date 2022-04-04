@@ -41,6 +41,12 @@ extension MM {
 		/// An effect that derives a capability to given label and puts it in given register.
 		case deriveCapability(in: Register, to: Label)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given register.
+		case createSeal(in: Register)
+		
+		/// An effect that seals the capability in `source` using the address of the capability in `seal` as the object type and puts it in `into`.
+		case seal(into: Register, source: Register, seal: Register)
+		
 		/// An effect that pushes given frame to the call stack.
 		///
 		/// This effect's semantics depend on the currently active calling convention:
@@ -111,19 +117,21 @@ extension MM {
 				case .compute(let destination, let lhs, let operation, let rhs):
 				try Lower.Effect.compute(destination: destination.lowered(), lhs.lowered(), operation, rhs.lowered())
 				
-				case .load(.cap, into: let destination, from: let source) where immediateOffsetRange.contains(source.offset):
-				Lower.Effect.loadCapability(destination: try destination.lowered(), address: .fp, offset: source.offset)
+				case .load(let dataType, into: let destination, from: let frameSource):
+				if immediateOffsetRange.contains(frameSource.offset) {
+					Lower.Effect.load(dataType, destination: try destination.lowered(), address: .fp, offset: frameSource.offset)
+				} else {
+					Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(frameSource.offset))
+					Lower.Effect.load(dataType, destination: try destination.lowered(), address: tempRegisterA, offset: 0)
+				}
 				
-				case .load(let dataType, into: let destination, from: let source):
-				Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(source.offset))
-				Lower.Effect.load(dataType, destination: try destination.lowered(), address: tempRegisterA)
-				
-				case .store(.cap, into: let destination, from: let source) where immediateOffsetRange.contains(destination.offset):
-				Lower.Effect.storeCapability(address: .fp, source: try source.lowered(), offset: destination.offset)
-				
-				case .store(let dataType, into: let destination, from: let source):
-				Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(destination.offset))
-				Lower.Effect.store(dataType, address: tempRegisterA, source: try source.lowered())
+				case .store(let dataType, into: let frameDestination, from: let source):
+				if immediateOffsetRange.contains(frameDestination.offset) {
+					Lower.Effect.store(dataType, address: .fp, source: try source.lowered(), offset: frameDestination.offset)
+				} else {
+					Lower.Effect.offsetCapability(destination: tempRegisterA, source: .fp, offset: .constant(frameDestination.offset))
+					Lower.Effect.store(dataType, address: tempRegisterA, source: try source.lowered(), offset: 0)
+				}
 				
 				case .createBuffer(bytes: let bytes, capability: let destinationBuffer, onFrame: false):
 				let lengthReg = tempRegisterA	// cf. alloc routine
@@ -205,22 +213,34 @@ extension MM {
 					Lower.Effect.offsetCapability(destination: .sp, source: .sp, offset: .register(tempRegisterA))
 				}
 				
-				case .loadElement(.cap, into: let destination, buffer: let buffer, offset: .constant(let offset)) where immediateOffsetRange.contains(offset):
-				try Lower.Effect.loadCapability(destination: destination.lowered(), address: buffer.lowered(), offset: offset)
+				case .loadElement(let dataType, into: let destination, buffer: let buffer, offset: .constant(let offset)) where immediateOffsetRange.contains(offset):
+				try Lower.Effect.load(dataType, destination: destination.lowered(), address: buffer.lowered(), offset: offset)
 				
 				case .loadElement(let dataType, into: let destination, buffer: let buffer, offset: let offset):
 				try Lower.Effect.offsetCapability(destination: destination.lowered(), source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Effect.load(dataType, destination: destination.lowered(), address: destination.lowered())
+				try Lower.Effect.load(dataType, destination: destination.lowered(), address: destination.lowered(), offset: 0)
 				
-				case .storeElement(.cap, buffer: let buffer, offset: .constant(let offset), from: let source) where immediateOffsetRange.contains(offset):
-				try Lower.Effect.storeCapability(address: buffer.lowered(), source: source.lowered(), offset: offset)
+				case .storeElement(let dataType, buffer: let buffer, offset: .constant(let offset), from: let source) where immediateOffsetRange.contains(offset):
+				try Lower.Effect.store(dataType, address: buffer.lowered(), source: source.lowered(), offset: offset)
 				
 				case .storeElement(let dataType, buffer: let buffer, offset: let offset, from: let source):
 				try Lower.Effect.offsetCapability(destination: tempRegisterA, source: buffer.lowered(), offset: offset.lowered())
-				try Lower.Effect.store(dataType, address: tempRegisterA, source: source.lowered())
+				try Lower.Effect.store(dataType, address: tempRegisterA, source: source.lowered(), offset: 0)
 				
 				case .deriveCapability(in: let destination, to: let label):
 				Lower.Effect.deriveCapabilityFromLabel(destination: try destination.lowered(), label: label)
+				
+				case .createSeal(in: let destination):
+				let destination = try destination.lowered()
+				let linkReg = tempRegisterA					// cf. create seal routine
+				let sealReg = Lower.Register.invocationData	// cf. create seal routine
+				Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: linkReg)
+				if sealReg != destination {
+					Lower.Effect.copy(.cap, into: destination, from: sealReg)
+				}
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				try Lower.Effect.seal(destination: destination.lowered(), source: source.lowered(), seal: seal.lowered())
 				
 				case .pushFrame(let frame):
 				switch context.configuration.callingConvention {
@@ -229,7 +249,7 @@ extension MM {
 					do {
 						
 						// Save previous fp — defer updating sp since fp is already included in the allocated byte size.
-						Lower.Effect.storeCapability(address: .sp, source: .fp, offset: -DataType.cap.byteSize)
+						Lower.Effect.store(.cap, address: .sp, source: .fp, offset: -DataType.cap.byteSize)
 						
 						// Set up fp for new frame — using deferred sp.
 						Lower.Effect.offsetCapability(destination: .fp, source: .sp, offset: .constant(-DataType.cap.byteSize))
@@ -254,7 +274,7 @@ extension MM {
 						// 		Lower.Effect.clear([linkReg])
 						
 						// Save previous fp in offset 0 of newly allocated frame.
-						Lower.Effect.store(.cap, address: bufferReg, source: .fp)
+						Lower.Effect.store(.cap, address: bufferReg, source: .fp, offset: 0)
 						
 						// Update cfp.
 						Lower.Effect.copy(.cap, into: .fp, from: bufferReg)
@@ -273,12 +293,12 @@ extension MM {
 						Lower.Effect.offsetCapability(destination: .sp, source: .fp, offset: .constant(+DataType.cap.byteSize))
 						
 						// Restore saved fp — follow the linked list.
-						Lower.Effect.load(.cap, destination: .fp, address: .fp)
+						Lower.Effect.load(.cap, destination: .fp, address: .fp, offset: 0)
 						
 					}
 					
 					case .heap:
-					Lower.Effect.load(.cap, destination: .fp, address: .fp)
+					Lower.Effect.load(.cap, destination: .fp, address: .fp, offset: 0)
 					
 				}
 				

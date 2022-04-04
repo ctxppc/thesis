@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Structured Values
-//sourcery: description = "A language that introduces structured values (vectors and records)."
+//sourcery: description = "A language that introduces structured values, i.e., vectors and records."
 public enum SV : Language {
 	
 	/// A program on an SV machine.

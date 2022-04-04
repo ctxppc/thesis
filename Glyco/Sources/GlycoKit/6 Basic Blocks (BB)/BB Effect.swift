@@ -27,6 +27,12 @@ extension BB {
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// Pushes given frame to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -61,6 +67,12 @@ extension BB {
 				
 				case .setElement(let type, of: let vector, offset: let offset, to: let element):
 				return .setElement(type, of: vector, offset: offset, to: element)
+				
+				case .createSeal(in: let destination):
+				return .createSeal(in: destination)
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				return .seal(into: destination, source: source, seal: seal)
 				
 				case .pushFrame(let frame):
 				return .pushFrame(frame)

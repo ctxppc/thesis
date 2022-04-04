@@ -5,7 +5,7 @@ extension LS {
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
 		
-		/// Creates a function with given name, parameters, result type, and effect.
+		/// Creates a function with given name, parameters, result type, and result.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
 			self.name = name
 			self.parameters = parameters
@@ -28,6 +28,7 @@ extension LS {
 		// See protocol.
 		func lowered(in context: inout ()) throws -> Lower.Function {
 			var context = LS.Context()
+			context.pushScope(for: parameters.lazy.map(\.name))
 			return try .init(name, takes: parameters.lowered(in: &context), returns: resultType, in: result.lowered(in: &context))
 		}
 		

@@ -32,6 +32,12 @@ extension CD {
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -72,6 +78,7 @@ extension CD {
 				case .set, .compute,
 					.createBuffer, .destroyBuffer,
 					.getElement, .setElement,
+					.createSeal, .seal,
 					.if,
 					.pushFrame, .popFrame,
 					.clearAll,
@@ -110,7 +117,13 @@ extension CD {
 						.reversed()	// optimisation: it's most likely at the end
 						.contains(where: \.returns)
 				
-				case .set, .compute, .createBuffer, .destroyBuffer, .getElement, .setElement, .pushFrame, .popFrame, .clearAll, .call:
+				case .set, .compute,
+					.createBuffer, .destroyBuffer,
+					.getElement, .setElement,
+					.createSeal, .seal,
+					.pushFrame, .popFrame,
+					.clearAll,
+					.call:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -254,6 +267,12 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			
 			case .setElement(let type, of: let vector, offset: let offset, to: let element):
 			return try simpleLowering(.setElement(type, of: vector, offset: offset, to: element))
+			
+			case .createSeal(in: let destination):
+			return try simpleLowering(.createSeal(in: destination))
+			
+			case .seal(into: let destination, source: let source, seal: let seal):
+			return try simpleLowering(.seal(into: destination, source: source, seal: seal))
 			
 			case .if(let predicate, then: let affirmative, else: let negative):
 			let affirmativeLabel = context.bag.uniqueName(from: "then")

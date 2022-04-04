@@ -30,6 +30,12 @@ extension ID {
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -91,6 +97,16 @@ extension ID {
 				case .setElement(let elementType, of: let buffer, offset: let offset, to: let element):
 				try context.declarations.require(element, type: elementType)
 				Lowered.setElement(elementType, of: buffer, offset: offset, to: element)
+				
+				case .createSeal(in: let seal):
+				try context.declarations.declare(seal, type: .cap)
+				Lowered.createSeal(in: seal)
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				try context.declarations.require(source, type: .cap)
+				try context.declarations.require(seal, type: .cap)
+				try context.declarations.declare(destination, type: .cap)
+				Lowered.seal(into: destination, source: source, seal: seal)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

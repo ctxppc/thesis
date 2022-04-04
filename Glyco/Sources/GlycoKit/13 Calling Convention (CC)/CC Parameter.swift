@@ -4,16 +4,22 @@ extension CC {
 	public struct Parameter : Codable, Equatable {
 		
 		/// Creates a parameter with given location and value type.
-		public init(_ location: Location, _ type: ValueType) {
+		public init(_ location: Location, _ type: ValueType, sealed: Bool = false) {
 			self.location = location
 			self.type = type
+			self.sealed = sealed
 		}
 		
 		/// The location where the argument is stored and accessible from within the procedure.
-		public let location: Location
+		public var location: Location
 		
 		/// The value type of the argument.
-		public let type: ValueType
+		public var type: ValueType
+		
+		/// A Boolean value indicating whether the argument to `self` is sealed and unsealed as part of the invocation.
+		///
+		/// At most one parameter can be marked as sealed.
+		public var sealed: Bool
 		
 		/// An assignment of parameters to physical locations.
 		struct Assignments {
@@ -39,7 +45,7 @@ extension CC {
 			
 			/// The register that `parameter` is assigned to.
 			///
-			/// The caller stores the argument to and the callee loads the argument from this location.
+			/// The caller puts the argument in and the callee retrieves the argument from this location. For sealed parameters, the caller-side assignment is done as part of the sealed invocation effect instead.
 			var register: Lower.Register
 			
 		}

@@ -27,7 +27,7 @@ final class IntermediateProgramsTestCase : XCTestCase {
 		for (groupName, urls) in urlsByGroupName where !groupName.starts(with: ".") {
 			do {
 				print(">> Testing “\(groupName)”, ", terminator: "")
-				var programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.compactMap { url -> (String, String)? in
+				let programSispsByLanguageName = Dictionary(uniqueKeysWithValues: try urls.compactMap { url -> (String, String)? in
 					let language = url.pathExtension.uppercased()
 					guard !language.isEmpty, language != "OUT" else { return nil }
 					return (language, try .init(contentsOf: url))
@@ -51,34 +51,6 @@ final class IntermediateProgramsTestCase : XCTestCase {
 			throw errors
 		}
 		
-	}
-	
-	struct TestErrors : Error, CustomStringConvertible {
-		
-		let configuration: CompilationConfiguration
-		
-		var errors = [TestGroupError]()
-		
-		var isEmpty: Bool { errors.isEmpty }
-		
-		mutating func add(_ error: TestGroupError) {
-			errors.append(error)
-		}
-		
-		var description: String { """
-			
-			Errors for \(configuration):
-			\(errors.lazy.map(\.description).joined(separator: "\n"))
-			
-			"""
-		}
-		
-	}
-	
-	struct TestGroupError : Error, CustomStringConvertible {
-		let groupName: String
-		let error: Error
-		var description: String { "(*) Test for “\(groupName)” failed: \(error)" }
 	}
 	
 }
@@ -151,4 +123,33 @@ private struct IntermediateProgramsTestReductor : ProgramReductor {
 		}
 	}
 	
+}
+
+struct TestErrors : Error, CustomStringConvertible {
+	
+	let configuration: CompilationConfiguration
+	
+	var errors = [TestGroupError]()
+	
+	var isEmpty: Bool { errors.isEmpty }
+	
+	mutating func add(_ error: TestGroupError) {
+		errors.append(error)
+	}
+	
+	var description: String {
+		"""
+
+		Errors for \(configuration):
+		\(errors.lazy.map(\.description).joined(separator: "\n"))
+
+		"""
+	}
+	
+}
+
+struct TestGroupError : Error, CustomStringConvertible {
+	let groupName: String
+	let error: Error
+	var description: String { "(*) Test for “\(groupName)” failed: \(error)" }
 }

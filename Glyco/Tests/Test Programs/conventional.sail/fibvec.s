@@ -42,6 +42,14 @@ rv.runtime:		cllc ct0, mm.heap
 				csetaddr csp, csp, t0
 				addi t0, zero, 124
 				candperm csp, csp, t0
+				auipcc ct0, 0
+				addi t1, zero, 129
+				candperm ct0, ct0, t1
+				addi t1, t1, 1
+				slli t1, t1, 19
+				csetaddr ct0, ct0, t1
+				cllc ct1, mm.cseal_seal_cap
+				csc ct0, 0(ct1)
 				cllc ct0, mm.alloc
 				cllc ct1, mm.alloc_end
 				csub t1, ct1, ct0
@@ -50,6 +58,15 @@ rv.runtime:		cllc ct0, mm.heap
 				candperm ct0, ct0, t1
 				csealentry ct0, ct0
 				cllc ct1, mm.alloc_cap
+				csc ct0, 0(ct1)
+				cllc ct0, mm.cseal
+				cllc ct1, mm.cseal_end
+				csub t1, ct1, ct0
+				csetbounds ct0, ct0, t1
+				addi t1, zero, 63
+				candperm ct0, ct0, t1
+				csealentry ct0, ct0
+				cllc ct1, mm.cseal_cap
 				csc ct0, 0(ct1)
 				cllc ct6, rv.main
 				cllc ct0, mm.user_end
@@ -77,6 +94,17 @@ mm.alloc:		addi t2, zero, 15
 				.balign 16
 mm.heap_cap:	.octa 0
 mm.alloc_end:	.balign 4
+				.balign 4
+mm.cseal:		cllc ct1, mm.cseal_seal_cap
+				clc ct6, 0(ct1)
+				cincoffsetimm ct6, ct6, 1
+				csc ct6, 0(ct1)
+				csetboundsimm ct6, ct6, 1
+				.4byte 4276158555 # cclear 0, 64
+				cjalr cnull, ct0
+				.balign 16
+mm.cseal_seal_cap:	.octa 0
+mm.cseal_end:	.balign 4
 				.balign 4
 rv.main:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
@@ -129,18 +157,18 @@ cd.else:		mv ra, a3
 				mv ra, a0
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
-				lw.cap a0, 0(ca0)
+				clw a0, 0(ca0)
 				cmove cs1, ca4
 				mv ra, a1
 				slli ra, ra, 2
 				cincoffset cra, cs1, ra
-				lw.cap ra, 0(cra)
+				clw ra, 0(cra)
 				add s1, a0, ra
 				cmove ca0, ca4
 				mv ra, a3
 				slli ra, ra, 2
 				cincoffset ct0, ca0, ra
-				sw.cap s1, 0(ct0)
+				csw s1, 0(ct0)
 				mv a0, a2
 				mv a1, a5
 				cmove ca2, ca4
@@ -154,7 +182,7 @@ cd.then$32:		cmove cs1, ca4
 				mv ra, a5
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
-				lw.cap a0, 0(ca0)
+				clw a0, 0(ca0)
 				clc cs1, -16(cfp)
 cd.then$42:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16
@@ -162,7 +190,7 @@ cd.then$42:		clc cra, -32(cfp)
 				cjalr cnull, cra
 				.balign 16
 mm.alloc_cap:	.octa 0
-mm.scall_cap:	.octa 0
+mm.cseal_cap:	.octa 0
 mm.user_end:	.balign 4
 				.bss
 				.balign 16

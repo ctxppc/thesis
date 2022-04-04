@@ -27,22 +27,30 @@ extension RV {
 		/// `operation` cannot be `.mul`.
 		case computeWithImmediate(operation: BinaryOperator, rd: Register, rs1: Register, imm: Int)
 		
-		/// An instruction that loads the word byte memory at the address in `address` and puts it in `destination`.
-		case loadByte(destination: Register, address: Register)
+		/// An instruction that loads the word byte memory at the address in `address` and puts it in `destination`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case loadByte(destination: Register, address: Register, offset: Int)
 		
-		/// An instruction that loads the word from memory at the address in `address` and puts it in `destination`.
-		case loadSignedWord(destination: Register, address: Register)
+		/// An instruction that loads the word from memory at the address in `address` and puts it in `destination`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case loadSignedWord(destination: Register, address: Register, offset: Int)
 		
 		/// An instruction that loads the capability from memory at the address in `address` and puts it in `destination`, offset by `offset` bytes.
 		///
 		/// `offset` must be in the range [-2048; 2047].
 		case loadCapability(destination: Register, address: Register, offset: Int)
 		
-		/// An instruction that retrieves the byte from `source` and stores it in memory at the address in `address`.
-		case storeByte(source: Register, address: Register)
+		/// An instruction that retrieves the byte from `source` and stores it in memory at the address in `address`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case storeByte(source: Register, address: Register, offset: Int)
 		
-		/// An instruction that retrieves the word from `source` and stores it in memory at the address in `address`.
-		case storeSignedWord(source: Register, address: Register)
+		/// An instruction that retrieves the word from `source` and stores it in memory at the address in `address`, offset by `offset` bytes.
+		///
+		/// `offset` must be in the range [-2048; 2047].
+		case storeSignedWord(source: Register, address: Register, offset: Int)
 		
 		/// An instruction that retrieves the capability from `source` and stores it in memory at the address in `address`, offset by `offset` bytes.
 		///
@@ -148,20 +156,20 @@ extension RV {
 				case .computeWithImmediate(operation: let operation, rd: let rd, rs1: let rs1, imm: let imm):
 				return "\(operation.rawValue)i \(rd.x), \(rs1.x), \(imm)"
 				
-				case .loadByte(destination: let rd, address: let address):
-				return "lbu.cap \(rd.x), 0(\(address.c))"
+				case .loadByte(destination: let rd, address: let address, offset: let offset):
+				return "clbu \(rd.x), \(offset)(\(address.c))"
 				
-				case .loadSignedWord(destination: let rd, address: let address):
-				return "lw.cap \(rd.x), 0(\(address.c))"
+				case .loadSignedWord(destination: let rd, address: let address, offset: let offset):
+				return "clw \(rd.x), \(offset)(\(address.c))"
 				
 				case .loadCapability(destination: let cd, address: let address, offset: let offset):
 				return "clc \(cd.c), \(offset)(\(address.c))"
 				
-				case .storeByte(source: let rs, address: let address):
-				return "sbu.cap \(rs.x), 0(\(address.c))"
+				case .storeByte(source: let rs, address: let address, offset: let offset):
+				return "csbu \(rs.x), \(offset)(\(address.c))"
 				
-				case .storeSignedWord(source: let rs, address: let address):
-				return "sw.cap \(rs.x), 0(\(address.c))"
+				case .storeSignedWord(source: let rs, address: let address, offset: let offset):
+				return "csw \(rs.x), \(offset)(\(address.c))"
 				
 				case .storeCapability(source: let cs, address: let address, offset: let offset):
 				return "csc \(cs.c), \(offset)(\(address.c))"

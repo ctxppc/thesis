@@ -22,6 +22,12 @@ extension LS {
 		/// A value that evaluates to the element at zero-based position `at` in the vector named `of`.
 		case element(of: Symbol, at: Source)
 		
+		/// A value that evaluates to a unique capability that can be used for sealing.
+		case seal
+		
+		/// A value that evaluates to the first named capability after sealing it with the (second named) seal capability.
+		case sealed(Symbol, with: Symbol)
+		
 		/// A value that evaluates to a function evaluated with given arguments.
 		case evaluate(Label, [Source])
 		
@@ -55,6 +61,12 @@ extension LS {
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .seal:
+				return .seal
+				
+				case .sealed(let cap, with: let seal):
+				return try .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
 				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, try arguments.lowered(in: &context))

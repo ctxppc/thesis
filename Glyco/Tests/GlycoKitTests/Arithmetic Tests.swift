@@ -76,6 +76,14 @@ final class ArithmeticTests : XCTestCase {
 						csetaddr csp, csp, t0
 						addi t0, zero, 124
 						candperm csp, csp, t0
+						auipcc ct0, 0
+						addi t1, zero, 129
+						candperm ct0, ct0, t1
+						addi t1, t1, 1
+						slli t1, t1, 19
+						csetaddr ct0, ct0, t1
+						cllc ct1, mm.cseal_seal_cap
+						csc ct0, 0(ct1)
 						cllc ct0, mm.alloc
 						cllc ct1, mm.alloc_end
 						csub t1, ct1, ct0
@@ -84,6 +92,15 @@ final class ArithmeticTests : XCTestCase {
 						candperm ct0, ct0, t1
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc_cap
+						csc ct0, 0(ct1)
+						cllc ct0, mm.cseal
+						cllc ct1, mm.cseal_end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 63
+						candperm ct0, ct0, t1
+						csealentry ct0, ct0
+						cllc ct1, mm.cseal_cap
 						csc ct0, 0(ct1)
 						cllc ct6, rv.main
 						cllc ct0, mm.user_end
@@ -112,13 +129,24 @@ final class ArithmeticTests : XCTestCase {
 		mm.heap_cap:	.octa 0
 		mm.alloc_end:	.balign 4
 						.balign 4
+		mm.cseal:		cllc ct1, mm.cseal_seal_cap
+						clc ct6, 0(ct1)
+						cincoffsetimm ct6, ct6, 1
+						csc ct6, 0(ct1)
+						csetboundsimm ct6, ct6, 1
+						.4byte 4276158555 # cclear 0, 64
+						cjalr cnull, ct0
+						.balign 16
+		mm.cseal_seal_cap:	.octa 0
+		mm.cseal_end:	.balign 4
+						.balign 4
 		rv.main:		addi s1, zero, 1
 						addi s1, s1, 2
 						mv a0, s1
 						cjalr cnull, cra
 						.balign 16
 		mm.alloc_cap:	.octa 0
-		mm.scall_cap:	.octa 0
+		mm.cseal_cap:	.octa 0
 		mm.user_end:	.balign 4
 						.bss
 						.balign 16
@@ -216,6 +244,14 @@ final class ArithmeticTests : XCTestCase {
 						csetaddr csp, csp, t0
 						addi t0, zero, 124
 						candperm csp, csp, t0
+						auipcc ct0, 0
+						addi t1, zero, 129
+						candperm ct0, ct0, t1
+						addi t1, t1, 1
+						slli t1, t1, 19
+						csetaddr ct0, ct0, t1
+						cllc ct1, mm.cseal_seal_cap
+						csc ct0, 0(ct1)
 						cllc ct0, mm.alloc
 						cllc ct1, mm.alloc_end
 						csub t1, ct1, ct0
@@ -224,6 +260,15 @@ final class ArithmeticTests : XCTestCase {
 						candperm ct0, ct0, t1
 						csealentry ct0, ct0
 						cllc ct1, mm.alloc_cap
+						csc ct0, 0(ct1)
+						cllc ct0, mm.cseal
+						cllc ct1, mm.cseal_end
+						csub t1, ct1, ct0
+						csetbounds ct0, ct0, t1
+						addi t1, zero, 63
+						candperm ct0, ct0, t1
+						csealentry ct0, ct0
+						cllc ct1, mm.cseal_cap
 						csc ct0, 0(ct1)
 						cllc ct6, rv.main
 						cllc ct0, mm.user_end
@@ -252,6 +297,17 @@ final class ArithmeticTests : XCTestCase {
 		mm.heap_cap:	.octa 0
 		mm.alloc_end:	.balign 4
 						.balign 4
+		mm.cseal:		cllc ct1, mm.cseal_seal_cap
+						clc ct6, 0(ct1)
+						cincoffsetimm ct6, ct6, 1
+						csc ct6, 0(ct1)
+						csetboundsimm ct6, ct6, 1
+						.4byte 4276158555 # cclear 0, 64
+						cjalr cnull, ct0
+						.balign 16
+		mm.cseal_seal_cap:	.octa 0
+		mm.cseal_end:	.balign 4
+						.balign 4
 		rv.main:		addi t4, zero, 12
 						addi s1, t4, -11
 						addi t5, zero, 1
@@ -263,7 +319,7 @@ final class ArithmeticTests : XCTestCase {
 						cjal cnull, cd.endif
 						.balign 16
 		mm.alloc_cap:	.octa 0
-		mm.scall_cap:	.octa 0
+		mm.cseal_cap:	.octa 0
 		mm.user_end:	.balign 4
 						.bss
 						.balign 16

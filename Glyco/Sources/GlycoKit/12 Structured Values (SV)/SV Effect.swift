@@ -43,6 +43,12 @@ extension SV {
 		/// This effect must only be used with *scoped* values created in the *current* scope. For any two values *a* and *b* created in the current scope, *b* must be destroyed exactly once before destroyed *a*. Destruction is not required before popping the scope; in that case, destruction is automatic.
 		case destroyScopedValue(capability: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
@@ -79,21 +85,24 @@ extension SV {
 				case .do(let effects):
 				Lowered.do(try effects.lowered(in: &context))
 				
-				case .set(let destination, to: .register(let register, .vectorCap(let elementType))):
+				case .set(let destination, to: .register(let register, .cap(.vector(of: let elementType, sealed: let sealed)))):
 				context.elementTypesByVectorLocation[destination] = elementType
+				context.mark(destination, asSealed: sealed)
 				Lowered.set(destination, to: .register(register, .cap))
 				
-				case .set(let destination, to: .register(let register, .recordCap(let recordType))):
+				case .set(let destination, to: .register(let register, .cap(.record(let recordType, sealed: let sealed)))):
 				context.recordTypesByRecordLocation[destination] = recordType
+				context.mark(destination, asSealed: sealed)
 				Lowered.set(destination, to: .register(register, .cap))
 				
 				case .set(let destination, to: let source):
-				if let location = source.location {
-					if let elementType = context.elementTypesByVectorLocation[location] {
+				if let source = source.location {
+					if let elementType = context.elementTypesByVectorLocation[source] {
 						context.elementTypesByVectorLocation[destination] = elementType
-					} else if let recordType = context.recordTypesByRecordLocation[location] {
+					} else if let recordType = context.recordTypesByRecordLocation[source] {
 						context.recordTypesByRecordLocation[destination] = recordType
 					}
+					context.mark(destination, asSealed: context.isSealed(source))
 				}
 				Lowered.set(destination, to: try source.lowered(in: &context))
 				
@@ -102,11 +111,15 @@ extension SV {
 				
 				case .createRecord(let recordType, capability: let record, scoped: let scoped):
 				context.recordTypesByRecordLocation[record] = recordType
+				context.mark(record, asSealed: false)
 				Lowered.createBuffer(bytes: recordType.byteSize, capability: record, scoped: scoped)
 				
 				case .getField(let name, of: let record, to: let destination):
-				if let recordType = context.recordTypesByRecordLocation[record] {
+				if context.isSealed(record) {
+					throw LoweringError.sealedCapabilityType(record)
+				} else if let recordType = context.recordTypesByRecordLocation[record] {
 					if let field = recordType.field(named: name) {
+						context.mark(destination, asSealed: false)
 						Lowered.getElement(
 							field.valueType.lowered(),
 							of:		record,
@@ -121,7 +134,9 @@ extension SV {
 				}
 				
 				case .setField(let name, of: let record, to: let source):
-				if let recordType = context.recordTypesByRecordLocation[record] {
+				if context.isSealed(record) {
+					throw LoweringError.sealedCapabilityType(record)
+				} else if let recordType = context.recordTypesByRecordLocation[record] {
 					if let field = recordType.field(named: name) {
 						Lowered.setElement(
 							field.valueType.lowered(),
@@ -137,10 +152,14 @@ extension SV {
 				}
 				
 				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
+				context.elementTypesByVectorLocation[vector] = elementType
+				context.mark(vector, asSealed: false)
 				Lowered.createBuffer(bytes: elementType.byteSize * count, capability: vector, scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
-				if let elementType = context.elementTypesByVectorLocation[vector] {
+				if context.isSealed(vector) {
+					throw LoweringError.sealedCapabilityType(vector)
+				} else if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
 					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(elementType.byteSize.trailingZeroBitCount))
 					Lowered.getElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: destination)
@@ -149,7 +168,9 @@ extension SV {
 				}
 				
 				case .setElement(of: let vector, index: let index, to: let source):
-				if let elementType = context.elementTypesByVectorLocation[vector] {
+				if context.isSealed(vector) {
+					throw LoweringError.sealedCapabilityType(vector)
+				} else if let elementType = context.elementTypesByVectorLocation[vector] {
 					let offset = context.locations.uniqueName(from: "offset")
 					Lowered.compute(.abstract(offset), try index.lowered(in: &context), .sll, .constant(elementType.byteSize.trailingZeroBitCount))
 					Lowered.setElement(elementType.lowered(), of: vector, offset: .abstract(offset), to: try source.lowered(in: &context))
@@ -159,6 +180,19 @@ extension SV {
 				
 				case .destroyScopedValue(capability: let capability):
 				Lowered.destroyBuffer(capability: try capability.lowered(in: &context))
+				
+				case .createSeal(in: let seal):
+				Lowered.createSeal(in: seal)
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				if context.isSealed(source) {
+					throw LoweringError.sealedCapabilityType(source)
+				} else if context.isSealed(seal) {
+					throw LoweringError.sealedCapabilityType(seal)
+				} else {
+					context.mark(destination, asSealed: true)
+					Lowered.seal(into: destination, source: source, seal: seal)
+				}
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -198,6 +232,9 @@ extension SV {
 			/// An error indicating that no vector type is known for given location.
 			case noVectorType(Location)
 			
+			/// An error indicating that an operation is performed on a sealed capability type.
+			case sealedCapabilityType(Location)
+			
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
@@ -210,6 +247,9 @@ extension SV {
 					
 					case .noVectorType(let vector):
 					return "“\(vector)” is not a vector"
+					
+					case .sealedCapabilityType(let location):
+					return "“\(location)” is a sealed capability and cannot be used directly"
 					
 				}
 			}

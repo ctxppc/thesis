@@ -7,6 +7,150 @@
 \label{ch:grammar}
 This chapter presents all \gs{il} in the final version of Glyco, from high-level to low-level languages. The Swift source files for these \gs{il} can be found under \url{https://tsarouhas.eu/glyco/ils}.
 
+\paragraph{ OB (Objects) } A language that introduces objects, i.e., encapsulated values with methods.
+\begin{grammar}
+	\footnotesize
+				<OB.Program> ::=
+							"("<Result>, "functions:" <[Function]>, "types:" <[TypeDefinition]>")"
+				\par
+				<OB.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Value>, <BranchRelation>, <Value>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<OB.Initialiser> ::=
+							"(""takes:" <[Parameter]>, "in:" <Result>")"
+				\par
+				<OB.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<OB.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<OB.Value> ::=
+						"self"
+						| "constant""("<Int>")"
+						| "named""("<Symbol>")"
+						| "record""("<RecordType>")"
+						| "field""("<Field.Name>, "of:" <Value>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "seal"
+						| "sealed""("<Value>, "with:" <Value>")"
+						| "binary""("<Value>, <BinaryOperator>, <Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<OB.ObjectType> ::=
+							"(""initialiser:" <Initialiser>, "methods:" <[Method]>, "state:" <RecordType>")"
+				\par
+				<OB.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<OB.ValueType> ::=
+						"named""("<TypeName>")"
+						| "u8"
+						| "s32"
+						| "cap""("<CapabilityType>")"
+						| "registerDatum"
+				\par
+				<OB.CapabilityType> ::=
+						"vector""(""of:" <ValueType>")"
+						| "record""("<RecordType>")"
+						| "code"
+						| "object""("<TypeName>")"
+				\par
+				<OB.Method> ::=
+							"("<Name>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<OB.Definition> ::=
+							"("<Symbol>, <Value>")"
+				\par
+				<OB.TypeDefinition> ::=
+						"alias""("<TypeName>, <ValueType>")"
+						| "object""("<TypeName>, <ObjectType>")"
+				\par
+\end{grammar}
+\par
+\paragraph{ NT (Named Types) } A language that introduces named types in a structural type system.
+\begin{grammar}
+	\footnotesize
+				<NT.Program> ::=
+							"("<Result>, "functions:" <[Function]>, "types:" <[TypeDefinition]>, "globals:" <[GlobalDeclaration]>")"
+				\par
+				<NT.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<NT.GlobalDeclaration> ::=
+				\par
+				<NT.CapabilityType> ::=
+						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
+						| "record""("<RecordType>, "sealed:" <Bool>")"
+						| "code"
+						| "seal""(""sealed:" <Bool>")"
+				\par
+				<NT.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<NT.TypeDefinition> ::=
+							"("<TypeName>, <ValueType>")"
+				\par
+				<NT.Value> ::=
+						"constant""("<Int>")"
+						| "named""("<Symbol>")"
+						| "record""("<RecordType>")"
+						| "field""("<Field.Name>, "of:" <Value>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "seal"
+						| "sealed""("<Value>, "with:" <Value>")"
+						| "binary""("<Value>, <BinaryOperator>, <Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<NT.Definition> ::=
+							"("<Symbol>, <Value>")"
+				\par
+				<NT.TypeName> ::=
+						<String>
+				\par
+				<NT.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<NT.ValueType> ::=
+						"named""("<TypeName>")"
+						| "u8"
+						| "s32"
+						| "cap""("<CapabilityType>")"
+						| "registerDatum"
+				\par
+				<NT.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Value>, <BranchRelation>, <Value>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+\end{grammar}
+\par
 \paragraph{ EX (Expressions) } A language that introduces expression semantics for values, thereby abstracting over computation effects.
 \begin{grammar}
 	\footnotesize
@@ -20,6 +164,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "seal"
+						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Label>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
@@ -78,6 +224,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Symbol>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Symbol>, "at:" <Source>")"
+						| "seal"
+						| "sealed""("<Symbol>, "with:" <Symbol>")"
 						| "evaluate""("<Label>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
@@ -143,6 +291,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
+						| "seal"
+						| "sealed""("<Location>, "with:" <Location>")"
 						| "evaluate""("<Label>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
@@ -183,6 +333,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
+						| "seal"
+						| "sealed""("<Location>, "with:" <Location>")"
 						| "evaluate""("<Label>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -220,6 +372,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Location>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Location>, "at:" <Source>")"
+						| "seal"
+						| "sealed""("<Location>, "with:" <Location>")"
 				\par
 \end{grammar}
 \par
@@ -230,7 +384,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Effect>, "procedures:" <[Procedure]>")"
 				\par
 				<CC.Parameter> ::=
-							"("<Location>, <ValueType>")"
+							"("<Location>, <ValueType>, "sealed:" <Bool>")"
 				\par
 				<CC.Predicate> ::=
 						"constant""("<Bool>")"
@@ -252,6 +406,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "createVector""("<ValueType>, "count:" <Int>, "capability:" <Location>, "scoped:" <Bool>")"
 						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
 						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "destroyScopedValue""(""capability:" <Source>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "call""("<Label>, <[Source]>, "result:" <Location>")"
@@ -262,7 +418,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 \end{grammar}
 \par
-\paragraph{ SV (Structured Values) } A language that introduces structured values (vectors and records).
+\paragraph{ SV (Structured Values) } A language that introduces structured values, i.e., vectors and records.
 \begin{grammar}
 	\footnotesize
 				<SV.Program> ::=
@@ -271,9 +427,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<SV.ValueType> ::=
 						"u8"
 						| "s32"
-						| "vectorCap""("<ValueType>")"
-						| "recordCap""("<RecordType>")"
-						| "codeCap"
+						| "cap""("<CapabilityType>")"
 						| "registerDatum"
 				\par
 				<SV.Source> ::=
@@ -294,12 +448,20 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "getElement""(""of:" <Location>, "index:" <Source>, "to:" <Location>")"
 						| "setElement""(""of:" <Location>, "index:" <Source>, "to:" <Source>")"
 						| "destroyScopedValue""(""capability:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "pushScope"
 						| "popScope"
 						| "clearAll""(""except:" <[Register]>")"
 						| "call""("<Label>, "parameters:" <[Register]>")"
 						| "return""(""to:" <Source>")"
+				\par
+				<SV.CapabilityType> ::=
+						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
+						| "record""("<RecordType>, "sealed:" <Bool>")"
+						| "code"
+						| "seal""(""sealed:" <Bool>")"
 				\par
 				<SV.RecordType> ::=
 							"("<[Field]>")"
@@ -335,6 +497,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "pushScope"
 						| "popScope"
@@ -373,6 +537,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "pushScope"
 						| "popScope"
@@ -394,12 +560,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<ALA.Conflict> ::=
 							"("<Location>, <Location>")"
 				\par
-				<ALA.TypedLocation> ::=
-						"abstract""("<AbstractLocation>, <DataType>")"
-						| "frame""("<Frame.Location>, <DataType>")"
-				\par
 				<ALA.Declarations> ::=
-							"("<[TypedLocation]>")"
+							"("<[Declaration]>")"
 				\par
 				<ALA.AbstractLocation> ::=
 						<String>
@@ -417,6 +579,10 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "frame""("<Frame.Location>")"
 						| "capability""(""to:" <Label>")"
 				\par
+				<ALA.Declaration> ::=
+						"abstract""("<AbstractLocation>, <DataType>")"
+						| "frame""("<Frame.Location>, <DataType>")"
+				\par
 				<ALA.Effect> ::=
 						"do""("<[Effect]>, "analysisAtEntry:" <Analysis>")"
 						| "set""("<Location>, "to:" <Source>, "analysisAtEntry:" <Analysis>")"
@@ -425,6 +591,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>, "analysisAtEntry:" <Analysis>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>, "analysisAtEntry:" <Analysis>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>, "analysisAtEntry:" <Analysis>")"
+						| "createSeal""(""in:" <Location>, "analysisAtEntry:" <Analysis>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>, "analysisAtEntry:" <Analysis>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>, "analysisAtEntry:" <Analysis>")"
 						| "pushScope""(""analysisAtEntry:" <Analysis>")"
 						| "popScope""(""analysisAtEntry:" <Analysis>")"
@@ -465,6 +633,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "pushFrame""("<Frame>")"
 						| "popFrame"
@@ -511,6 +681,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "pushFrame""("<Frame>")"
 						| "popFrame"
 						| "clearAll""(""except:" <[Register]>")"
@@ -545,6 +717,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "destroyBuffer""(""capability:" <Source>")"
 						| "getElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Location>")"
 						| "setElement""("<DataType>, "of:" <Location>, "offset:" <Source>, "to:" <Source>")"
+						| "createSeal""(""in:" <Location>")"
+						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "pushFrame""("<Frame>")"
 						| "popFrame"
 						| "clearAll""(""except:" <[Register]>")"
@@ -600,6 +774,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "loadElement""("<DataType>, "into:" <Register>, "buffer:" <Register>, "offset:" <Source>")"
 						| "storeElement""("<DataType>, "buffer:" <Register>, "offset:" <Source>, "from:" <Register>")"
 						| "deriveCapability""(""in:" <Register>, "to:" <Label>")"
+						| "createSeal""(""in:" <Register>")"
+						| "seal""(""into:" <Register>, "source:" <Register>, "seal:" <Register>")"
 						| "pushFrame""("<Frame>")"
 						| "popFrame"
 						| "permit""("<[Permission]>, "destination:" <Register>, "source:" <Register>")"
@@ -658,10 +834,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<RT.Effect> ::=
 						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
 						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
-						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>")"
-						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
-						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>")"
-						\alt "storeCapability""(""address:" <Register>, "source:" <Register>, "offset:" <Int>")"
+						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>, "offset:" <Int>")"
 						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"
 						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
 						\alt "offsetCapability""(""destination:" <Register>, "source:" <Register>, "offset:" <Source>")"
@@ -730,10 +904,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<CE.Effect> ::=
 						"copy""("<DataType>, "into:" <Register>, "from:" <Register>")"
 						\alt "compute""(""destination:" <Register>, <Register>, <BinaryOperator>, <Source>")"
-						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>")"
-						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
-						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>")"
-						\alt "storeCapability""(""address:" <Register>, "source:" <Register>, "offset:" <Int>")"
+						\alt "load""("<DataType>, "destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "store""("<DataType>, "address:" <Register>, "source:" <Register>, "offset:" <Int>")"
 						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"
 						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
 						\alt "offsetCapability""(""destination:" <Register>, "source:" <Register>, "offset:" <Source>")"
@@ -807,11 +979,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						\alt "copyCapability""(""destination:" <Register>, "source:" <Register>")"
 						\alt "computeWithRegister""(""operation:" <BinaryOperator>, "rd:" <Register>, "rs1:" <Register>, "rs2:" <Register>")"
 						\alt "computeWithImmediate""(""operation:" <BinaryOperator>, "rd:" <Register>, "rs1:" <Register>, "imm:" <Int>")"
-						\alt "loadByte""(""destination:" <Register>, "address:" <Register>")"
-						\alt "loadSignedWord""(""destination:" <Register>, "address:" <Register>")"
+						\alt "loadByte""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "loadSignedWord""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
 						\alt "loadCapability""(""destination:" <Register>, "address:" <Register>, "offset:" <Int>")"
-						\alt "storeByte""(""source:" <Register>, "address:" <Register>")"
-						\alt "storeSignedWord""(""source:" <Register>, "address:" <Register>")"
+						\alt "storeByte""(""source:" <Register>, "address:" <Register>, "offset:" <Int>")"
+						\alt "storeSignedWord""(""source:" <Register>, "address:" <Register>, "offset:" <Int>")"
 						\alt "storeCapability""(""source:" <Register>, "address:" <Register>, "offset:" <Int>")"
 						\alt "deriveCapabilityFromLabel""(""destination:" <Register>, "label:" <Label>")"
 						\alt "deriveCapabilityFromPCC""(""destination:" <Register>, "upperBits:" <UInt>")"

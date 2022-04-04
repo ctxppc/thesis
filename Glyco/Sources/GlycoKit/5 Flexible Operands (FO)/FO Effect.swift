@@ -36,6 +36,12 @@ extension FO {
 		/// An effect that evaluates `to` and puts it in the buffer in `of` at offset `offset`.
 		case setElement(DataType, of: Location, offset: Source, to: Source)
 		
+		/// An effect that creates a capability that can be used for sealing with a unique object type and puts it in given location.
+		case createSeal(in: Location)
+		
+		/// An effect that seals the capability in `source` using the sealing capability in `seal` and puts it in `into`.
+		case seal(into: Location, source: Location, seal: Location)
+		
 		/// Pushes given frame to the call stack.
 		///
 		/// This effect must be executed exactly once before any effects accessing the call frame.
@@ -165,6 +171,20 @@ extension FO {
 				loadOffset
 				loadElement
 				Lower.Effect.storeElement(type, buffer: buffer, offset: offset, from: element)
+				
+				case .createSeal(in: let destination):
+				let (storeSeal, destination) = try store(.cap, to: destination, using: tempRegisterA)
+				Lower.Effect.createSeal(in: destination)
+				storeSeal
+				
+				case .seal(into: let destination, source: let source, seal: let seal):
+				let (loadSource, source) = try load(.cap, from: .init(source), using: tempRegisterA)
+				let (loadSeal, seal) = try load(.cap, from: .init(seal), using: tempRegisterB)
+				let (storeResult, destination) = try store(.cap, to: destination, using: tempRegisterA)
+				loadSource
+				loadSeal
+				Lower.Effect.seal(into: destination, source: source, seal: seal)
+				storeResult
 				
 				case .pushFrame(let frame):
 				Lower.Effect.pushFrame(frame)

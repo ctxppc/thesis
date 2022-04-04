@@ -95,6 +95,7 @@ extension CC.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case location = "_0"
 		case type = "_1"
+		case sealed = "sealed"
 	}
 }
 
@@ -248,6 +249,86 @@ extension MM.Program {
 extension MM.Frame {
 	public enum CodingKeys : String, CodingKey {
 		case allocatedByteSize = "allocatedByteSize"
+	}
+}
+
+extension NT.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+		case types = "types"
+		case globals = "globals"
+	}
+}
+
+extension NT.TypeDefinition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
+	}
+}
+
+extension NT.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension NT.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension OB.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+		case types = "types"
+	}
+}
+
+extension OB.Initialiser {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case result = "in"
+	}
+}
+
+extension OB.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension OB.ObjectType {
+	public enum CodingKeys : String, CodingKey {
+		case initialiser = "initialiser"
+		case methods = "methods"
+		case stateRecordType = "state"
+	}
+}
+
+extension OB.Method {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension OB.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 

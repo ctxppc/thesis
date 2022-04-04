@@ -9,7 +9,7 @@
 		)
 		
 		(recFib, 
-			takes: (index, s32()) (lastIndex, s32()) (nums, vectorCap(s32())),
+			takes: (index, s32()) (lastIndex, s32()) (nums, cap(vector(of: s32(), sealed: false))),
 			returns: s32(),
 			in: if(relation(named(index), gt, named(lastIndex))
 				then: value(element(of: named(nums), at: named(lastIndex))),

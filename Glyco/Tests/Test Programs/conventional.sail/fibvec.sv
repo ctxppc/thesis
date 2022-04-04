@@ -1,7 +1,7 @@
 (
 	do(
 		pushScope()
-		set(abstract(cc.retcap), to: register(ra, codeCap()))
+		set(abstract(cc.retcap), to: register(ra, cap(code())))
 		set(abstract(ls.arg0), to: constant(1))
 		set(abstract(ls.arg1), to: constant(1))
 		set(register(a0), to: abstract(ls.arg0))
@@ -11,7 +11,7 @@
 		set(register(a0), to: abstract(df.result))
 		set(register(ra), to: abstract(cc.retcap))
 		popScope()
-		return(to: register(ra, codeCap()))
+		return(to: register(ra, cap(code())))
 	),
 	procedures: (
 		fib,
@@ -28,7 +28,7 @@
 			set(abstract(cc.savedS9), to: register(s9, registerDatum()))
 			set(abstract(cc.savedS10), to: register(s10, registerDatum()))
 			set(abstract(cc.savedS11), to: register(s11, registerDatum()))
-			set(abstract(cc.retcap), to: register(ra, codeCap()))
+			set(abstract(cc.retcap), to: register(ra, cap(code())))
 			set(abstract(ls.first), to: register(a0, s32()))
 			set(abstract(ls.second), to: register(a1, s32()))
 			set(abstract(ls.arg0), to: constant(2))
@@ -53,7 +53,7 @@
 			set(register(s11), to: abstract(cc.savedS11))
 			set(register(ra), to: abstract(cc.retcap))
 			popScope()
-			return(to: register(ra, codeCap()))
+			return(to: register(ra, cap(code())))
 		)
 	)
 	(
@@ -71,10 +71,10 @@
 			set(abstract(cc.savedS9), to: register(s9, registerDatum()))
 			set(abstract(cc.savedS10), to: register(s10, registerDatum()))
 			set(abstract(cc.savedS11), to: register(s11, registerDatum()))
-			set(abstract(cc.retcap), to: register(ra, codeCap()))
+			set(abstract(cc.retcap), to: register(ra, cap(code())))
 			set(abstract(ls.index), to: register(a0, s32()))
 			set(abstract(ls.lastIndex), to: register(a1, s32()))
-			set(abstract(ls.nums), to: register(a2, vectorCap(s32())))
+			set(abstract(ls.nums), to: register(a2, cap(vector(of: s32(), sealed: false))))
 			if(
 				do(
 					set(abstract(ls.lhs), to: abstract(ls.index)) set(abstract(ls.rhs), to: abstract(ls.lastIndex)),
@@ -98,7 +98,7 @@
 					set(register(s11), to: abstract(cc.savedS11))
 					set(register(ra), to: abstract(cc.retcap))
 					popScope()
-					return(to: register(ra, codeCap()))
+					return(to: register(ra, cap(code())))
 				),
 				else: do(
 					set(abstract(ls.lhs$1), to: abstract(ls.index))
@@ -143,7 +143,7 @@
 					set(register(s11), to: abstract(cc.savedS11))
 					set(register(ra), to: abstract(cc.retcap))
 					popScope()
-					return(to: register(ra, codeCap()))
+					return(to: register(ra, cap(code())))
 				)
 			)
 		)

@@ -22,6 +22,12 @@ extension EX {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value that evaluates to a unique capability that can be used for sealing.
+		case seal
+		
+		/// A value that evaluates to the first capability after sealing it with the (second) seal capability.
+		indirect case sealed(Value, with: Value)
+		
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
@@ -56,8 +62,8 @@ extension EX {
 					.init(rec, record.lowered(in: &context)),
 				], in: .field(fieldName, of: rec))
 				
-				case .vector(let dataType, count: let count):
-				return .vector(dataType, count: count)
+				case .vector(let valueType, count: let count):
+				return .vector(valueType, count: count)
 				
 				case .element(of: let vector, at: let index):
 				let vec = context.bag.uniqueName(from: "vec")
@@ -66,6 +72,17 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
 				], in: .element(of: vec, at: .named(idx)))
+				
+				case .seal:
+				return .seal
+				
+				case .sealed(let cap, with: let seal):
+				let c = context.bag.uniqueName(from: "cap")
+				let s = context.bag.uniqueName(from: "seal")
+				return try .let([
+					.init(c, cap.lowered(in: &context)),
+					.init(s, seal.lowered(in: &context))
+				], in: .sealed(c, with: s))
 				
 				case .binary(let lhs, let op, let rhs):
 				let l = context.bag.uniqueName(from: "lhs")

@@ -11,7 +11,7 @@
 	)
 	(
 		recFib,
-		takes: (index, s32()) (lastIndex, s32()) (nums, vectorCap(s32())),
+		takes: (index, s32()) (lastIndex, s32()) (nums, cap(vector(of: s32(), sealed: false))),
 		returns: s32(),
 		in: if(
 			let(
