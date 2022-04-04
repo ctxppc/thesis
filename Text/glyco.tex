@@ -60,9 +60,9 @@ A \g{cc} is a set of rules imposed by the operating system, instruction set arch
 
 The \g{cc} used in base version of Glyco is called \textbf{\g{ghscc}} and mimics a traditional \g{cc} that would be used for programs written in C, with some parts specified by \cite[chapter~25]{riscv}.
 
-\paragraph{Call Stack} The call stack is a region of memory on which information about procedure calls is stored, such as local state and return addresses. The stack grows downward, i.e., from high to low addresses. The \texttt{csp} register contains the \textbf{\g{stackcap}}, a capability that points to the location of the last pushed datum, i.e., the top of the stack, and gives read-write authority over the stack memory. The \g{stackcap}'s address decreases whenever data are pushed to the call stack and increases whenever data are popped from the stack.
+\paragraph{Call stack} The call stack is a region of memory on which information about procedure calls is stored, such as local state and return addresses. The stack grows downward, i.e., from high to low addresses. The \texttt{csp} register contains the \textbf{\g{stackcap}}, a capability that points to the location of the last pushed datum, i.e., the top of the stack, and gives read-write authority over the stack memory. The \g{stackcap}'s address decreases whenever data are pushed to the call stack and increases whenever data are popped from the stack.
 
-\paragraph{Call Frames} A call frame (also known as a \emph{stack frame}) is a region of memory on the call stack that belongs to a procedure call and on which the procedure can store its local state. The \texttt{cfp} register contains the \textbf{\g{framecap}}, a capability derived from the \g{stackcap} that points to the base of the call frame. The procedure places local state and expects parameters in locations that are fixed distances removed from this base.
+\paragraph{Call frames} A call frame (also known as a \emph{stack frame}) is a region of memory on the call stack that belongs to a procedure call and on which the procedure can store its local state. The \texttt{cfp} register contains the \textbf{\g{framecap}}, a capability derived from the \g{stackcap} that points to the base of the call frame. The procedure places local state and expects parameters in locations that are fixed distances removed from this base.
 
 Before accessing its call frame, a procedure pushes a call frame of the desired size to the call stack in three steps. The procedure first pushes the (caller's) \g{framecap} to the call stack, then updates the \g{framecap} to point to this capability, and finally allocates room for its local state by moving the \g{stackcap} so that it points to the new call frame's last datum.
 
@@ -76,9 +76,11 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 
 \paragraph{Results} A procedure can return a single value via \texttt{a0}. Vectors and records are passed by reference as capabilities.
 
-\paragraph{Available Registers} The set of \gs{cersaved} and \gs{ceesaved} registers is customisable via command-line options. The default \gs{cersaved} are \texttt{s1}, \texttt{s2}, \texttt{s3}, \texttt{s4}, \texttt{s5}, \texttt{s6}, \texttt{s7}, \texttt{s8}, \texttt{s9}, \texttt{s10}, and \texttt{s11}; the default \gs{ceesaved} are the remaining 9 registers available in CC.
+\paragraph{Available registers} The set of \gs{cersaved} and \gs{ceesaved} registers is customisable via command-line options. The default \gs{cersaved} are \texttt{s1}, \texttt{s2}, \texttt{s3}, \texttt{s4}, \texttt{s5}, \texttt{s6}, \texttt{s7}, \texttt{s8}, \texttt{s9}, \texttt{s10}, and \texttt{s11}; the default \gs{ceesaved} are the remaining 9 registers available in CC.
 
-\paragraph{Local State} A procedure call's local state comprises saved register data (cf. supra), data for which no register is available, and stack-allocated buffers. These are reside at lower addresses than the call's \g{framecap}; the procedure can therefore access them using negative offsets of the \g{framecap}.
+\paragraph{Local state} A procedure call's local state comprises saved register data (cf. supra), data for which no register is available, and stack-allocated buffers. These are reside at lower addresses than the call's \g{framecap}; the procedure can therefore access them using negative offsets of the \g{framecap}.
+
+\paragraph{Return address} The caller provides a return address capability in the \texttt{cra} register.\footnote{\texttt{cra} is a \g{ceesaved}, so if the callee needs to call another procedure, it will need to save the contents of \texttt{cra} before overwriting the register, except in the special case of a tail-call.} The callee can return control to the callee by jumping to this return capability.
 
 \Cref{fig:gcccstack} shows a simple two-frame call stack example with zero registers available for arguments and local variables, to force Glyco to store them in call frames.
 
@@ -90,11 +92,27 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 	\label{fig:gcccstack}
 \end{figure}
 
-\paragraph{}
+\hspace{0pt} \\
+CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program
+\lstinputlisting{Programs/42.cc}
+is lowered to the following SV program:
+\lstinputlisting{Programs/42.sv}
 
-% TODO
+It's noteworthy how CC's \g{nanopass} implements \g{cersaved} preservation by binding the register's contents to temporary names before the call and restoring those contents after the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+
+\section{Structured Values}
+The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of \textbf{vectors} and \textbf{records}. Vectors in SV are homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} arrays and represented with capabilities that points to the vector's first element, similarly to arrays in the C programming language. A record is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and are similar to C \texttt{struct}s. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability.}
+
+Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
+\lstinputlisting{Programs/sequences.sv}
+is \lowered{} to the following ID program:
+\lstinputlisting{Programs/sequences.id}
+
+We should note that the results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
 \section{Abstract Locations}
+All programs until now have been able to bind values to names in one form or another, be it let-bindings with shadowing or globally scoped names. These names refer to physical locations where data can be stored, but since the programmer does not specify the names themselves are \emph{abstract} locations, locations that the compiler is to associate with a physical location.
+
 % TODO
 
 \section{Structured Jumps \& Branches}
