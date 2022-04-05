@@ -65,7 +65,7 @@ extension CA {
 				Lowered.setElement(of: vector, index: index, to: element)
 				
 				case .call(let name, let arguments, result: let result):
-				Lowered.call(name, arguments, result: result)
+				Lowered.call(.procedure(name), arguments, result: result)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

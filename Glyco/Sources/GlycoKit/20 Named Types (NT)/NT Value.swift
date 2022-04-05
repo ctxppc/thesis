@@ -22,6 +22,9 @@ extension NT {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value representing a globally defined function with given name.
+		case function(Label)
+		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
@@ -64,6 +67,9 @@ extension NT {
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .function(let name):
+				return .function(name)
 				
 				case .seal:
 				return .seal

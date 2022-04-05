@@ -24,6 +24,9 @@ extension Λ {
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
+		/// A value representing a globally defined function with given name.
+		case function(Label)
+		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
@@ -72,7 +75,10 @@ extension Λ {
 				context.anonymousFunctions.append(
 					.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 				)
-				return .procedure(name)
+				return .function(name)
+				
+				case .function(let name):
+				return .function(name)
 				
 				case .seal:
 				return .seal

@@ -2,11 +2,12 @@
 
 import Algorithms
 import DepthKit
+import Foundation
 
 extension CC {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, Named, SimplyLowerable {
+	public struct Procedure : Codable, Equatable, Named, SimplyLowerable, Validatable {
 		
 		/// Creates a procedure with given name, parameters, result type, and effect.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in effect: Effect) {
@@ -27,6 +28,12 @@ extension CC {
 		
 		/// The procedure's effect when invoked.
 		public var effect: Effect
+		
+		// See protocol.
+		public func validate(configuration: CompilationConfiguration) throws {
+			let sealedParameters = parameters.filter(\.sealed)
+			guard sealedParameters.count <= 1 else { throw ValidationError.multipleSealedParameters(sealedParameters) }
+		}
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
@@ -120,6 +127,21 @@ extension CC {
 			
 			// Done.
 			return assignments
+			
+		}
+		
+		enum ValidationError : LocalizedError {
+			
+			/// An error indicating that multiple parameters are sealed.
+			case multipleSealedParameters([Parameter])
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					case .multipleSealedParameters(let parameters):
+					return "Multiple parameters (\(parameters)) are marked as sealed; no more than one parameter can be marked as sealed"
+				}
+			}
 			
 		}
 		

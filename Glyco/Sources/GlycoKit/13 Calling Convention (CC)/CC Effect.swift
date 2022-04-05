@@ -53,8 +53,8 @@ extension CC {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
-		/// An effect that invokes the labelled procedure passing given arguments and puts the procedure's result in `result`.
-		case call(Label, [Source], result: Location)
+		/// An effect that invokes the procedure with given target code capability with given arguments and putting the procedure's result in `result`.
+		case call(Source, [Source], result: Location)
 		
 		/// An effect that returns given result to the caller.
 		///
@@ -105,7 +105,7 @@ extension CC {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .call(let name, let arguments, result: let result):
+				case .call(.procedure(let name), let arguments, result: let result):
 				if let procedure = context.procedures[name] {
 					
 					// TODO: Update for calls of procedures with a sealed parameter.
@@ -157,7 +157,7 @@ extension CC {
 					
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
-					Lowered.call(name, parameters: argumentRegisters)
+					Lowered.call(.capability(to: name), parameters: argumentRegisters)
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {
@@ -177,6 +177,9 @@ extension CC {
 				} else {
 					throw LoweringError.unrecognisedProcedure(name: name)
 				}
+				
+				case .call:
+				_ = TODO.unimplemented
 				
 				case .return(let result):
 				do {

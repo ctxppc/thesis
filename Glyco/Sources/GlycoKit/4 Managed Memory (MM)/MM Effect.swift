@@ -89,10 +89,10 @@ extension MM {
 		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
 		case jump(to: Target)
 		
-		/// An effect that links the return capability and calls the procedure with given name.
+		/// An effect that links the return capability and calls the procedure with given target code capability.
 		///
 		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
-		case call(Label)
+		case call(Target)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
@@ -316,16 +316,19 @@ extension MM {
 				case .jump(to: let target):
 				Lower.Effect.jump(to: try target.lowered(), link: .zero)
 				
-				case .call(let name):
+				case .call(let target):
 				switch context.configuration.callingConvention {
 					
 					case .conventional:
-					Lower.Effect.jump(to: .label(name), link: .ra)
+					Lower.Effect.jump(to: try target.lowered(), link: .ra)
 						
 					case .heap:
 					let ret = context.labels.uniqueName(from: "ret")
 					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)	// scall doesn't support sentries so we need to link cra manually
-					Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
+					switch target {
+						case .label(let name):	Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
+						case .register(let r):	Lower.Effect.copy(.cap, into: .invocationData, from: try r.lowered())
+					}
 					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: tempRegisterA)	// can't use cnull link register for routine calls
 					ret ~ .copy(.cap, into: .fp, from: .invocationData)	// restore cfp
 					

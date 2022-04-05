@@ -11,8 +11,8 @@ extension BB {
 		/// A continuation that jumps to the block labelled `then` if *x* *R* *y*, or to the block labelled `else` otherwise, where *x* is the value of the first source, *y* is the value of the second source, and *R* is the relation.
 		case branch(Source, BranchRelation, Source, then: Label, else: Label)
 		
-		/// A continuation that calls the procedure with given label then returns to the block labelled `returnPoint`.
-		case call(Label, returnPoint: Label)
+		/// A continuation that calls the procedure with given target code capability then returns to the block labelled `returnPoint`.
+		case call(Source, returnPoint: Label)
 		
 		/// A continuation that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
@@ -33,8 +33,9 @@ extension BB {
 				case .branch(let lhs, let relation, let rhs, then: let affirmative, else: let negative):
 				self = .branch(lhs, relation, rhs, then: substituting(affirmative), else: substituting(negative))
 				
-				case .call(let name, returnPoint: let returnPoint):
-				self = .call(name, returnPoint: substituting(returnPoint))
+				case .call(let target, returnPoint: let returnPoint):
+				self = .call(target, returnPoint: substituting(returnPoint))
+				// TODO: Implement target block name substitution (likely relevant for tail-calls)
 				
 				case .return:
 				break

@@ -19,11 +19,11 @@ extension CC {
 		/// The compilation configuration.
 		let configuration: CompilationConfiguration
 		
-		/// The locations bag.
-		var locations = Bag<Location>()
+		/// The abstract locations bag.
+		var locations = Bag<Lower.AbstractLocation>()
 		
 		/// Returns the location for given saved register.
-		mutating func saveLocation(for register: Lower.Register) -> Location {
+		mutating func saveLocation(for register: Lower.Register) -> Lower.AbstractLocation {
 			if let location = saveLocationByRegister[register] {
 				return location
 			} else {
@@ -34,7 +34,7 @@ extension CC {
 		}
 		
 		/// The locations by saved register.
-		private var saveLocationByRegister = [Lower.Register : Location]()
+		private var saveLocationByRegister = [Lower.Register : Lower.AbstractLocation]()
 		
 		/// The location of the return capability.
 		private(set) lazy var returnLocation = locations.uniqueName(from: "retcap")

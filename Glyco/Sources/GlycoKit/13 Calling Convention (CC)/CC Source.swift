@@ -11,7 +11,7 @@ extension CC {
 		/// The value bound at given location.
 		case location(Location)
 		
-		/// A capability pointing to given labelled procedure.
+		/// A capability pointing to given defined procedure.
 		case procedure(Label)
 		
 		// See protocol.

@@ -54,8 +54,8 @@ extension CD {
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		case clearAll(except: [Register])
 		
-		/// An effect that calls the procedure with given name.
-		case call(Label)
+		/// An effect that calls the procedure with given target code capability.
+		case call(Source)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)

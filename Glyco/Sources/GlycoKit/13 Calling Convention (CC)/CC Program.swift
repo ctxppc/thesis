@@ -22,7 +22,11 @@ public enum CC : Language {
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate(configuration: CompilationConfiguration) {}
+		public func validate(configuration: CompilationConfiguration) throws {
+			for procedure in procedures {
+				try procedure.validate(configuration: configuration)
+			}
+		}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

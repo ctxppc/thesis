@@ -56,10 +56,10 @@ extension ID {
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		case clearAll(except: [Register])
 		
-		/// An effect that calls the procedure with given name and uses given parameter registers.
+		/// An effect that calls the procedure with given target code capability and uses given parameter registers.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
-		case call(Label, parameters: [Register])
+		case call(Source, parameters: [Register])
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
@@ -120,8 +120,8 @@ extension ID {
 				case .clearAll(except: let sparedRegisters):
 				Lowered.clearAll(except: sparedRegisters)
 				
-				case .call(let name, parameters: let parameters):
-				Lowered.call(name, parameters: parameters)
+				case .call(let target, parameters: let parameters):
+				Lowered.call(target, parameters: parameters)
 				
 				case .return(to: let caller):
 				try context.declarations.require(caller, type: .cap)

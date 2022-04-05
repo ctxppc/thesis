@@ -45,7 +45,7 @@ extension ALA {
 		func callAsFunction(_ effect: ALA.Effect) throws -> ALA.Effect {
 			switch effect {
 				
-				case .do, .if, .pushScope, .popScope, .clearAll, .call, .return:
+				case .do, .if, .pushScope, .popScope, .clearAll:
 				return effect
 				
 				case .set(.abstract(removedLocation), to: let source, analysisAtEntry: let analysis)
@@ -84,6 +84,12 @@ extension ALA {
 				
 				case .seal(into: let destination, source: let source, seal: let seal, analysisAtEntry: let analysis):
 				return .seal(into: substitute(destination), source: substitute(source), seal: substitute(seal), analysisAtEntry: analysis)
+				
+				case .call(let target, parameters: let parameters, analysisAtEntry: let analysis):
+				return .call(try substitute(target), parameters: parameters, analysisAtEntry: analysis)
+				
+				case .return(to: let caller, analysisAtEntry: let analysis):
+				return .return(to: try substitute(caller), analysisAtEntry: analysis)
 				
 			}
 		}

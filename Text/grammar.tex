@@ -39,6 +39,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -118,6 +119,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -166,6 +168,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -214,7 +217,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
-						| "procedure""("<Label>")"
+						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -299,7 +302,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<LS.Source> ::=
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "procedure""("<Label>")"
+						| "function""("<Label>")"
 				\par
 				<LS.Definition> ::=
 							"("<Symbol>, <Value>")"
@@ -492,7 +495,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal""(""into:" <Location>, "source:" <Location>, "seal:" <Location>")"
 						| "destroyScopedValue""(""capability:" <Source>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
-						| "call""("<Label>, <[Source]>, "result:" <Location>")"
+						| "call""("<Source>, <[Source]>, "result:" <Location>")"
 						| "return""("<Source>")"
 				\par
 				<CC.ValueType> ::=
@@ -541,7 +544,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "pushScope"
 						| "popScope"
 						| "clearAll""(""except:" <[Register]>")"
-						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "call""("<Source>, "parameters:" <[Register]>")"
 						| "return""(""to:" <Source>")"
 				\par
 				<SV.CapabilityType> ::=
@@ -590,7 +593,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "pushScope"
 						| "popScope"
 						| "clearAll""(""except:" <[Register]>")"
-						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "call""("<Source>, "parameters:" <[Register]>")"
 						| "return""(""to:" <Source>")"
 				\par
 				<ID.Predicate> ::=
@@ -630,7 +633,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "pushScope"
 						| "popScope"
 						| "clearAll""(""except:" <[Register]>")"
-						| "call""("<Label>, "parameters:" <[Register]>")"
+						| "call""("<Source>, "parameters:" <[Register]>")"
 						| "return""(""to:" <Source>")"
 				\par
 \end{grammar}
@@ -684,7 +687,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "pushScope""(""analysisAtEntry:" <Analysis>")"
 						| "popScope""(""analysisAtEntry:" <Analysis>")"
 						| "clearAll""(""except:" <[Register]>, "analysisAtEntry:" <Analysis>")"
-						| "call""("<Label>, "parameters:" <[Register]>, "analysisAtEntry:" <Analysis>")"
+						| "call""("<Source>, "parameters:" <[Register]>, "analysisAtEntry:" <Analysis>")"
 						| "return""(""to:" <Source>, "analysisAtEntry:" <Analysis>")"
 				\par
 				<ALA.Location> ::=
@@ -726,7 +729,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "pushFrame""("<Frame>")"
 						| "popFrame"
 						| "clearAll""(""except:" <[Register]>")"
-						| "call""("<Label>")"
+						| "call""("<Source>")"
 						| "return""(""to:" <Source>")"
 				\par
 				<CD.Procedure> ::=
@@ -746,7 +749,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<PR.Continuation> ::=
 						"continue""(""to:" <Label>")"
 						| "branch""(""if:" <Predicate>, "then:" <Label>, "else:" <Label>")"
-						| "call""("<Label>, "returnPoint:" <Label>")"
+						| "call""("<Source>, "returnPoint:" <Label>")"
 						| "return""(""to:" <Source>")"
 				\par
 				<PR.Predicate> ::=
@@ -777,7 +780,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<BB.Continuation> ::=
 						"continue""(""to:" <Label>")"
 						| "branch""("<Source>, <BranchRelation>, <Source>, "then:" <Label>, "else:" <Label>")"
-						| "call""("<Label>, "returnPoint:" <Label>")"
+						| "call""("<Source>, "returnPoint:" <Label>")"
 						| "return""(""to:" <Source>")"
 				\par
 				<BB.Block> ::=
@@ -811,7 +814,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "clearAll""(""except:" <[Register]>")"
 						| "branch""(""to:" <Label>, <Source>, <BranchRelation>, <Source>")"
 						| "jump""(""to:" <Label>")"
-						| "call""("<Label>")"
+						| "call""("<Source>")"
 						| "return""(""to:" <Source>")"
 						| "labelled""("<Label>, <Effect>")"
 				\par
@@ -869,7 +872,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "clearAll""(""except:" <[Register]>")"
 						| "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
 						| "jump""(""to:" <Target>")"
-						| "call""("<Label>")"
+						| "call""("<Target>")"
 						| "return""(""to:" <Target>")"
 						| "labelled""("<Label>, <Effect>")"
 				\par

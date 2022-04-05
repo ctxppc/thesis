@@ -58,12 +58,12 @@ extension ALA {
 		/// An effect that clears all registers except the structural registers `csp`, `cgp`, `ctp`, and `cfp` as well as given registers.
 		case clearAll(except: [Register], analysisAtEntry: Analysis)
 		
-		/// An effect that calls the procedure with given name and uses given parameter registers.
+		/// An effect that calls the procedure with given target code capability and uses given parameter registers.
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		///
 		/// A call effect "defines" caller-saved registers.
-		case call(Label, parameters: [Register], analysisAtEntry: Analysis)
+		case call(Source, parameters: [Register], analysisAtEntry: Analysis)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
@@ -132,8 +132,8 @@ extension ALA {
 				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
 				Lowered.clearAll(except: sparedRegisters)
 				
-				case .call(let name, parameters: _, analysisAtEntry: _):
-				Lowered.call(name)
+				case .call(let target, parameters: _, analysisAtEntry: _):
+				Lowered.call(try target.lowered(in: &context))
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				Lowered.return(to: try caller.lowered(in: &context))
@@ -241,8 +241,8 @@ extension ALA {
 				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
 				return .clearAll(except: sparedRegisters, analysisAtEntry: analysis)
 				
-				case .call(let name, parameters: let parameters, analysisAtEntry: _):
-				return .call(name, parameters: parameters, analysisAtEntry: analysis)
+				case .call(let procedure, parameters: let parameters, analysisAtEntry: _):
+				return .call(procedure, parameters: parameters, analysisAtEntry: analysis)
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				return .return(to: caller, analysisAtEntry: analysis)
@@ -346,8 +346,8 @@ extension ALA {
 				case .popScope:
 				return configuration.calleeSavedRegisters.map { .register($0) }
 				
-				case .call(_, parameters: let parameters, analysisAtEntry: _):
-				return parameters.map { .register($0) }
+				case .call(let target, parameters: let parameters, analysisAtEntry: _):
+				return [target].compactMap(\.location) + parameters.map { .register($0) }
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				return [caller].compactMap(\.location) + [.register(.a0)]

@@ -11,8 +11,8 @@ extension PR {
 		/// A continuation that jumps to the block labelled `then` if given predicate holds, or to the block labelled `else` otherwise.
 		case branch(if: Predicate, then: Label, else: Label)
 		
-		/// A continuation that calls the procedure with given label then returns to the block labelled `returnPoint`.
-		case call(Label, returnPoint: Label)
+		/// A continuation that calls the procedure with given target capability then returns to the block labelled `returnPoint`.
+		case call(Source, returnPoint: Label)
 		
 		/// A continuation that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
@@ -33,8 +33,8 @@ extension PR {
 				case .branch(if: .relation(let lhs, let relation, let rhs), then: let affirmative, else: let negative):
 				return .branch(lhs, relation, rhs, then: affirmative, else: negative)
 				
-				case .call(let name, returnPoint: let returnPoint):
-				return .call(name, returnPoint: returnPoint)
+				case .call(let target, returnPoint: let returnPoint):
+				return .call(target, returnPoint: returnPoint)
 				
 				case .return(to: let caller):
 				return .return(to: caller)

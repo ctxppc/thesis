@@ -11,15 +11,15 @@ extension LS {
 		/// The value bound to given name.
 		case named(Symbol)
 		
-		/// A capability pointing to given labelled procedure.
-		case procedure(Label)
+		/// A capability pointing to given defined function.
+		case function(Label)
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Source {
 			switch self {
 				case .constant(let value):	return .constant(value)
 				case .named(let symbol):	return .location(try symbol.lowered(in: &context))
-				case .procedure(let name):	return .procedure(name)
+				case .function(let name):	return .procedure(name)
 			}
 		}
 		

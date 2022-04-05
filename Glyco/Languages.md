@@ -118,6 +118,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -217,6 +218,7 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -282,6 +284,7 @@ A language that introduces anonymous functions and function values.
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -346,7 +349,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
-	<dd><code><strong>procedure</strong>(Label)</code></dd>
+	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -448,7 +451,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dt><code>LS.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>procedure</strong>(Label)</code></dd>
+	<dd><code><strong>function</strong>(Label)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Definition</code></dt>
@@ -707,7 +710,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>seal</strong>(<strong>into:</strong> Location, <strong>source:</strong> Location, <strong>seal:</strong> Location)</code></dd>
 	<dd><code><strong>destroyScopedValue</strong>(<strong>capability:</strong> Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
+	<dd><code><strong>call</strong>(Source, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
 <dl>
@@ -769,7 +772,7 @@ A language that introduces structured values, i.e., vectors and records.
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -836,7 +839,7 @@ A language that infers declarations from definitions.
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -892,7 +895,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 	<dd><code><strong>pushScope</strong></code></dd>
 	<dd><code><strong>popScope</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register])</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>parameters:</strong> [Register])</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 
@@ -961,7 +964,7 @@ A language that introduces abstract locations, annotated with liveness and confl
 	<dd><code><strong>pushScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>popScope</strong>(<strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>parameters:</strong> [Register], <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source, <strong>analysisAtEntry:</strong> Analysis)</code></dd>
 </dl>
 <dl>
@@ -1017,7 +1020,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 	<dd><code><strong>pushFrame</strong>(Frame)</code></dd>
 	<dd><code><strong>popFrame</strong></code></dd>
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
-	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>call</strong>(Source)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -1051,7 +1054,7 @@ A language that introduces predicates in branches.
 	<dt><code>PR.Continuation</code></dt>
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(<strong>if:</strong> Predicate, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -1094,7 +1097,7 @@ A language that groups effects into blocks of effects where blocks can only be e
 	<dt><code>BB.Continuation</code></dt>
 	<dd><code><strong>continue</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>branch</strong>(Source, BranchRelation, Source, <strong>then:</strong> Label, <strong>else:</strong> Label)</code></dd>
-	<dd><code><strong>call</strong>(Label, <strong>returnPoint:</strong> Label)</code></dd>
+	<dd><code><strong>call</strong>(Source, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 </dl>
 <dl>
@@ -1136,7 +1139,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
-	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>call</strong>(Source)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -1203,7 +1206,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>clearAll</strong>(<strong>except:</strong> [Register])</code></dd>
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target)</code></dd>
-	<dd><code><strong>call</strong>(Label)</code></dd>
+	<dd><code><strong>call</strong>(Target)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Target)</code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>

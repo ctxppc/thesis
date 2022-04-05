@@ -74,8 +74,8 @@ public enum BB : Language {
 						try appendBlockOrJumpToBlock(named: negative)
 						try appendBlockOrJumpToBlock(named: affirmative)
 						
-						case .call(let name, returnPoint: let returnPoint):
-						loweredProgramEffects.append(.call(name))
+						case .call(let target, returnPoint: let returnPoint):
+						loweredProgramEffects.append(.call(target))
 						try appendBlockOrJumpToBlock(named: returnPoint)
 						
 						case .return(to: let caller):

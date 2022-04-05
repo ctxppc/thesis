@@ -61,8 +61,8 @@ extension FO {
 		/// An effect that jumps to given target.
 		case jump(to: Label)
 		
-		/// An effect that calls the procedure with given name.
-		case call(Label)
+		/// An effect that calls the procedure with given target code capability.
+		case call(Source)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
@@ -205,8 +205,18 @@ extension FO {
 				case .jump(to: let target):
 				Lower.Effect.jump(to: .label(target))
 				
-				case .call(let label):
-				Lower.Effect.call(label)
+				case .call(.constant(let value)):
+				throw LoweringError.callingConstant(value)
+				
+				case .call(.register(let target)):
+				Lower.Effect.call(.register(try target.lowered()))
+				
+				case .call(.frame(let location)):
+				Lower.Effect.load(.cap, into: tempRegisterA, from: location)
+				Lower.Effect.call(.register(tempRegisterA))
+				
+				case .call(.capability(to: let name)):
+				Lower.Effect.call(.label(name))
 				
 				case .return(to: .constant(let value)):
 				throw LoweringError.returningToConstant(value)
@@ -288,6 +298,9 @@ extension FO {
 		
 		enum LoweringError : LocalizedError {
 			
+			/// An error indicating that a call is being attempt using a constant.
+			case callingConstant(Int)
+			
 			/// An error indicating that a return is being attempt using a constant.
 			case returningToConstant(Int)
 			
@@ -300,6 +313,9 @@ extension FO {
 			// See protocol.
 			var errorDescription: String? {
 				switch self {
+					
+					case .callingConstant(let value):
+					return "Cannot call the constant value \(value)"
 					
 					case .returningToConstant(let value):
 					return "Cannot return to the constant value \(value)"
