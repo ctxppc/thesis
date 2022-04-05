@@ -91,6 +91,19 @@ extension CC.Program {
 	}
 }
 
+extension CC.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension CC.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
+	}
+}
+
 extension CC.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case location = "_0"
@@ -240,6 +253,19 @@ extension LS.Definition {
 	}
 }
 
+extension LS.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension LS.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
+	}
+}
+
 extension MM.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effects = "_0"
@@ -281,6 +307,13 @@ extension NT.Function {
 		case parameters = "takes"
 		case resultType = "returns"
 		case result = "in"
+	}
+}
+
+extension NT.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
 	}
 }
 
@@ -388,6 +421,29 @@ extension SV.Procedure {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case effect = "in"
+	}
+}
+
+extension Λ.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+		case functions = "functions"
+	}
+}
+
+extension Λ.Function {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension Λ.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 

@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension NT {
+extension Λ {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
@@ -27,7 +27,7 @@ extension NT {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Function {
-			try .init(name, takes: parameters, returns: resultType.lowered(in: &context), in: result.lowered(in: &context))
+			.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 		}
 		
 	}

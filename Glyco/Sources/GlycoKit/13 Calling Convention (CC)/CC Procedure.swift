@@ -55,7 +55,7 @@ extension CC {
 				// Sealed parameters are passed as part of the sealed invocation effect instead.
 				for asn in assignments.viaRegisters where !asn.parameter.sealed {
 					let parameter = asn.parameter
-					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type))
+					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type.lowered()))
 				}
 				
 				// Bind local names to arguments in arguments record.
@@ -111,7 +111,7 @@ extension CC {
 			// Assign remaining parameters to the arguments record.
 			// If a contiguous call stack is in use, ensure stack order by reversing the fields.
 			let parameterRecordFields = parameters
-				.map { Field(.init(rawValue: $0.location.rawValue), $0.type) }
+				.map { Lower.Field(.init(rawValue: $0.location.rawValue), $0.type.lowered()) }
 			if configuration.callingConvention.usesContiguousCallStack {
 				assignments.parameterRecordType = .init(parameterRecordFields.reversed())
 			} else {

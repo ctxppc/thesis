@@ -30,7 +30,7 @@ extension CC {
 			/// The record type for parameters passed via the call frame, with each field named after its corresponding parameter.
 			///
 			/// The fields in the record type are laid out in stack order, i.e., the first frame-resident argument is the last element (highest address) of the parameter record.
-			var parameterRecordType = RecordType([])
+			var parameterRecordType = Lower.RecordType([])
 			
 			/// The register to which a capability to the arguments record is assigned, or `nil` if no such capability is passed to the callee.
 			var argumentsRecordRegister: Lower.Register? = nil
@@ -51,13 +51,4 @@ extension CC {
 		}
 		
 	}
-}
-
-extension Sequence where Element == CC.Parameter {
-	
-	/// Returns the total size of the parameters in `self`, in bytes.
-	func totalByteSize() -> Int {
-		lazy.map(\.type.byteSize).reduce(0, +)
-	}
-	
 }

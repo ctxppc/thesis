@@ -9,6 +9,7 @@ public enum NT : Language {
 	/// A program on an NT machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
+		/// Creates a program.
 		public init(_ result: Result, functions: [Function], types: [TypeDefinition], globals: [GlobalDeclaration]) {
 			self.result = result
 			self.functions = functions
@@ -70,13 +71,12 @@ public enum NT : Language {
 	}
 	
 	// See protocol.
-	public typealias Lower = EX
+	public typealias Lower = Λ
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
-	public typealias Parameter = Lower.Parameter
 	public typealias RecordType = Lower.RecordType
 	public typealias Symbol = Lower.Symbol
 	

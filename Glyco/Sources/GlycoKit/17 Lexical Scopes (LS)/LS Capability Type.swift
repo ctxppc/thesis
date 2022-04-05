@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension NT {
+extension LS {
 	
 	/// A value denoting the type of a capability.
 	public enum CapabilityType : Equatable, Codable, SimplyLowerable {
@@ -16,10 +16,10 @@ extension NT {
 		/// A (possibly sealed) capability to a record of given type.
 		case record(RecordType, sealed: Bool)
 		
-		/// A (possibly sealed) capability to code.
+		/// A (possibly sealed) capability to a procedure with given parameters and result type.
 		///
-		/// A code capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
-		case code
+		/// A procedure capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
+		indirect case procedure(takes: [Parameter], returns: ValueType)
 		
 		/// A (possibly sealed) capability that can be used to seal other capabilities.
 		case seal(sealed: Bool)
@@ -27,10 +27,19 @@ extension NT {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.CapabilityType {
 			switch self {
-				case .vector(of: let elementType, sealed: let sealed):	return .vector(of: try elementType.lowered(in: &context), sealed: sealed)
-				case .record(let recordType, sealed: let sealed):		return .record(recordType, sealed: sealed)
-				case .code:												return .code
-				case .seal(sealed: let sealed):							return .seal(sealed: sealed)
+				
+				case .vector(of: let elementType, sealed: let sealed):
+				return .vector(of: try elementType.lowered(in: &context), sealed: sealed)
+				
+				case .record(let recordType, sealed: let sealed):
+				return .record(try recordType.lowered(in: &context), sealed: sealed)
+				
+				case .procedure(takes: let parameters, returns: let resultType):
+				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
+				
+				case .seal(sealed: let sealed):
+				return .seal(sealed: sealed)
+				
 			}
 		}
 		

@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension LS {
+extension NT {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
 	public struct Function : Codable, Equatable, SimplyLowerable {
@@ -26,15 +26,8 @@ extension LS {
 		public var result: Result
 		
 		// See protocol.
-		func lowered(in context: inout ()) throws -> Lower.Function {
-			var context = LS.Context()
-			context.pushScope(for: parameters.lazy.map(\.name))
-			return try .init(
-				name,
-				takes: parameters.lowered(in: &context),
-				returns: resultType.lowered(in: &context),
-				in: result.lowered(in: &context)
-			)
+		func lowered(in context: inout Context) throws -> Lower.Function {
+			try .init(name, takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: result.lowered(in: &context))
 		}
 		
 	}

@@ -5,6 +5,7 @@
 The pipeline, from high-level to low-level is:
 [`OB`](#OB) →
 [`NT`](#NT) →
+[`Λ`](#Λ) →
 [`EX`](#EX) →
 [`LS`](#LS) →
 [`DF`](#DF) →
@@ -143,13 +144,12 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
 	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
-	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
 </dl>
 <dl>
@@ -169,12 +169,11 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <h2 id="NT">Grammar for NT (Named Types)</h2>
 A language that introduces named types in a structural type system.
 
-**Inherited from EX:**
+**Inherited from Λ:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
 <code>Field</code>, 
 <code>Label</code>, 
-<code>Parameter</code>, 
 <code>RecordType</code>, 
 <code>Symbol</code>
 <dl>
@@ -195,7 +194,7 @@ A language that introduces named types in a structural type system.
 	<dt><code>NT.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
 	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
-	<dd><code><strong>code</strong></code></dd>
+	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
@@ -244,7 +243,6 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
 	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
-	<dd><code><strong>registerDatum</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Predicate</code></dt>
@@ -252,6 +250,75 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Parameter</code></dt>
+	<dd><code>(Symbol, ValueType)</code></dd>
+</dl>
+
+<h2 id="Λ">Grammar for Λ (Lambdas)</h2>
+A language that introduces anonymous functions and function values.
+
+**Inherited from EX:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>CapabilityType</code>, 
+<code>Field</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>RecordType</code>, 
+<code>Symbol</code>, 
+<code>ValueType</code>
+<dl>
+	<dt><code>Λ.Program</code></dt>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Value</code></dt>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
+	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Predicate</code></dt>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Function</code></dt>
+	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
 </dl>
 
 <h2 id="EX">Grammar for EX (Expressions)</h2>
@@ -279,6 +346,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>procedure</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -324,11 +392,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 **Inherited from DF:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>CapabilityType</code>, 
-<code>Field</code>, 
-<code>Label</code>, 
-<code>RecordType</code>, 
-<code>ValueType</code>
+<code>Label</code>
 <dl>
 	<dt><code>LS.Program</code></dt>
 	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
@@ -347,6 +411,12 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 <dl>
 	<dt><code>LS.Parameter</code></dt>
 	<dd><code>(Symbol, ValueType)</code></dd>
+</dl>
+<dl>
+	<dt><code>LS.ValueType</code></dt>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Value</code></dt>
@@ -368,9 +438,17 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
+	<dt><code>LS.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
+</dl>
+<dl>
 	<dt><code>LS.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>procedure</strong>(Label)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.Definition</code></dt>
@@ -390,6 +468,14 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>LS.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>LS.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 
 <h2 id="DF">Grammar for DF (Definitions)</h2>
@@ -568,15 +654,26 @@ A language that introduces parameters & result values in procedures via the low-
 **Inherited from SV:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>CapabilityType</code>, 
-<code>Field</code>, 
 <code>Label</code>, 
-<code>Location</code>, 
-<code>RecordType</code>, 
-<code>ValueType</code>
+<code>Location</code>
 <dl>
 	<dt><code>CC.Program</code></dt>
 	<dd><code>(Effect, <strong>procedures:</strong> [Procedure])</code></dd>
+</dl>
+<dl>
+	<dt><code>CC.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
+	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
+</dl>
+<dl>
+	<dt><code>CC.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>CC.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Parameter</code></dt>
@@ -593,6 +690,7 @@ A language that introduces parameters & result values in procedures via the low-
 	<dt><code>CC.Source</code></dt>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
+	<dd><code><strong>procedure</strong>(Label)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Effect</code></dt>
@@ -611,6 +709,12 @@ A language that introduces parameters & result values in procedures via the low-
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
+</dl>
+<dl>
+	<dt><code>CC.ValueType</code></dt>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 </dl>
 <dl>
 	<dt><code>CC.Procedure</code></dt>

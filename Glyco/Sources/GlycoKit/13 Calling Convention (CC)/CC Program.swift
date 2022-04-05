@@ -48,11 +48,7 @@ public enum CC : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias CapabilityType = Lower.CapabilityType
-	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
 	public typealias Location = Lower.AbstractLocation
-	public typealias RecordType = Lower.RecordType
-	public typealias ValueType = Lower.ValueType
 	
 }

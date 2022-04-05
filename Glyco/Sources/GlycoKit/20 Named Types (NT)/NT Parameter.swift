@@ -1,6 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension LS {
+extension NT {
 	public struct Parameter : Codable, Equatable, SimplyLowerable {
 		
 		public init(_ name: Symbol, _ type: ValueType) {
@@ -16,7 +16,7 @@ extension LS {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Parameter {
-			try .init(name.lowered(in: &context), type.lowered(in: &context))
+			.init(name, try type.lowered(in: &context))
 		}
 		
 	}

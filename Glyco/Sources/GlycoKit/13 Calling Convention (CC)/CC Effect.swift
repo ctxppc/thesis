@@ -76,7 +76,7 @@ extension CC {
 				try Lowered.compute(.abstract(destination), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .createRecord(let type, capability: let record, scoped: let scoped):
-				Lowered.createRecord(type, capability: .abstract(record), scoped: scoped)
+				Lowered.createRecord(type.lowered(in: &context), capability: .abstract(record), scoped: scoped)
 				
 				case .getField(let fieldName, of: let record, to: let destination):
 				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
@@ -85,7 +85,7 @@ extension CC {
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
 				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
-				Lowered.createVector(elementType, count: count, capability: .abstract(vector), scoped: scoped)
+				Lowered.createVector(elementType.lowered(), count: count, capability: .abstract(vector), scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
 				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
@@ -165,7 +165,7 @@ extension CC {
 					}
 					
 					// Write result.
-					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType))
+					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType.lowered()))
 					
 					// Restore caller-saved registers from abstract locations.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {

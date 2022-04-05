@@ -62,12 +62,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "u8"
 						| "s32"
 						| "cap""("<CapabilityType>")"
-						| "registerDatum"
 				\par
 				<OB.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
-						| "code"
+						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "object""("<TypeName>")"
 				\par
 				<OB.Method> ::=
@@ -99,7 +98,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<NT.CapabilityType> ::=
 						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
 						| "record""("<RecordType>, "sealed:" <Bool>")"
-						| "code"
+						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal""(""sealed:" <Bool>")"
 				\par
 				<NT.Result> ::=
@@ -141,13 +140,64 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "u8"
 						| "s32"
 						| "cap""("<CapabilityType>")"
-						| "registerDatum"
 				\par
 				<NT.Predicate> ::=
 						"constant""("<Bool>")"
 						| "relation""("<Value>, <BranchRelation>, <Value>")"
 						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
 						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<NT.Parameter> ::=
+							"("<Symbol>, <ValueType>")"
+				\par
+\end{grammar}
+\par
+\paragraph{ Λ (Lambdas) } A language that introduces anonymous functions and function values.
+\begin{grammar}
+	\footnotesize
+				<Λ.Program> ::=
+							"("<Result>, "functions:" <[Function]>")"
+				\par
+				<Λ.Value> ::=
+						"constant""("<Int>")"
+						| "named""("<Symbol>")"
+						| "record""("<RecordType>")"
+						| "field""("<Field.Name>, "of:" <Value>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+						| "seal"
+						| "sealed""("<Value>, "with:" <Value>")"
+						| "binary""("<Value>, <BinaryOperator>, <Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<Λ.Predicate> ::=
+						"constant""("<Bool>")"
+						| "relation""("<Value>, <BranchRelation>, <Value>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<Λ.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<Λ.Function> ::=
+							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<Λ.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Label>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<Λ.Definition> ::=
+							"("<Symbol>, <Value>")"
 				\par
 \end{grammar}
 \par
@@ -164,6 +214,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "procedure""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -217,6 +268,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<LS.Parameter> ::=
 							"("<Symbol>, <ValueType>")"
 				\par
+				<LS.ValueType> ::=
+						"u8"
+						| "s32"
+						| "cap""("<CapabilityType>")"
+				\par
 				<LS.Value> ::=
 						"source""("<Source>")"
 						| "binary""("<Source>, <BinaryOperator>, <Source>")"
@@ -234,9 +290,16 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<LS.Function> ::=
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
+				<LS.CapabilityType> ::=
+						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
+						| "record""("<RecordType>, "sealed:" <Bool>")"
+						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "seal""(""sealed:" <Bool>")"
+				\par
 				<LS.Source> ::=
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
+						| "procedure""("<Label>")"
 				\par
 				<LS.Definition> ::=
 							"("<Symbol>, <Value>")"
@@ -253,6 +316,12 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<LS.RecordType> ::=
+							"("<[Field]>")"
+				\par
+				<LS.Field> ::=
+							"("<Name>, <ValueType>")"
 				\par
 \end{grammar}
 \par
@@ -383,6 +452,18 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<CC.Program> ::=
 							"("<Effect>, "procedures:" <[Procedure]>")"
 				\par
+				<CC.CapabilityType> ::=
+						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
+						| "record""("<RecordType>, "sealed:" <Bool>")"
+						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "seal""(""sealed:" <Bool>")"
+				\par
+				<CC.RecordType> ::=
+							"("<[Field]>")"
+				\par
+				<CC.Field> ::=
+							"("<Name>, <ValueType>")"
+				\par
 				<CC.Parameter> ::=
 							"("<Location>, <ValueType>, "sealed:" <Bool>")"
 				\par
@@ -395,6 +476,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<CC.Source> ::=
 						"constant""("<Int>")"
 						| "location""("<Location>")"
+						| "procedure""("<Label>")"
 				\par
 				<CC.Effect> ::=
 						"do""("<[Effect]>")"
@@ -412,6 +494,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "call""("<Label>, <[Source]>, "result:" <Location>")"
 						| "return""("<Source>")"
+				\par
+				<CC.ValueType> ::=
+						"u8"
+						| "s32"
+						| "cap""("<CapabilityType>")"
 				\par
 				<CC.Procedure> ::=
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Effect>")"

@@ -17,7 +17,7 @@ extension SV {
 		/// A datum with unspecified interpretation that fits in a register.
 		case registerDatum
 		
-		/// The size of a datum of this type, in bytes.
+		/// The size of a value of this type, in bytes.
 		var byteSize: Int {
 			lowered().byteSize
 		}

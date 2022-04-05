@@ -1,35 +1,40 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-extension LS {
-	
+extension Λ {
 	public enum Value : Codable, Equatable, SimplyLowerable {
 		
-		/// A value that evaluates to the value of given source.
-		case source(Source)
+		/// A value that evaluates to given number.
+		case constant(Int)
 		
-		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
-		case binary(Source, BinaryOperator, Source)
+		/// A value that evaluates to the named value associated with given name in the environment.
+		case named(Symbol)
 		
 		/// A value that evaluates to a unique capability to an uninitialised record of given type.
 		case record(RecordType)
 		
 		/// A value that evaluates to the field with given name in the record `of`.
-		case field(Field.Name, of: Symbol)
+		indirect case field(Field.Name, of: Value)
 		
 		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
 		case vector(ValueType, count: Int)
 		
-		/// A value that evaluates to the element at zero-based position `at` in the vector named `of`.
-		case element(of: Symbol, at: Source)
+		/// A value that evaluates to the `at`th element of the list `of`.
+		indirect case element(of: Value, at: Value)
+		
+		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
+		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
-		/// A value that evaluates to the first named capability after sealing it with the (second named) seal capability.
-		case sealed(Symbol, with: Symbol)
+		/// A value that evaluates to the first capability after sealing it with the (second) seal capability.
+		indirect case sealed(Value, with: Value)
+		
+		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
+		indirect case binary(Value, BinaryOperator, Value)
 		
 		/// A value that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Source])
+		case evaluate(Label, [Value])
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
@@ -44,23 +49,30 @@ extension LS {
 		func lowered(in context: inout Context) throws -> Lower.Value {
 			switch self {
 				
-				case .source(let source):
-				return .source(try source.lowered(in: &context))
-				
-				case .binary(let lhs, let op, let rhs):
-				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
+				case .constant(let value):
+				return .constant(value)
+					
+				case .named(let symbol):
+				return .named(symbol)
 				
 				case .record(let type):
-				return .record(try type.lowered(in: &context))
+				return .record(type)
 				
 				case .field(let fieldName, of: let record):
-				return .field(fieldName, of: try record.lowered(in: &context))
+				return try .field(fieldName, of: record.lowered(in: &context))
 				
-				case .vector(let elementType, count: let count):
-				return .vector(try elementType.lowered(in: &context), count: count)
+				case .vector(let valueType, count: let count):
+				return .vector(valueType, count: count)
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .λ(takes: let parameters, returns: let resultType, in: let result):
+				let name = context.labels.uniqueName(from: "anon")
+				context.anonymousFunctions.append(
+					.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
+				)
+				return .procedure(name)
 				
 				case .seal:
 				return .seal
@@ -68,15 +80,20 @@ extension LS {
 				case .sealed(let cap, with: let seal):
 				return try .sealed(cap.lowered(in: &context), with: seal.lowered(in: &context))
 				
+				case .binary(let lhs, let op, let rhs):
+				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
+				
 				case .evaluate(let name, let arguments):
 				return .evaluate(name, try arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				return try .if(
+					predicate.lowered(in: &context),
+					then: affirmative.lowered(in: &context),
+					else: negative.lowered(in: &context)
+				)
 				
 				case .let(let definitions, in: let body):
-				context.pushScope(for: definitions.lazy.map(\.name))
-				defer { context.popScope(for: definitions.lazy.map(\.name)) }
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):
@@ -86,5 +103,4 @@ extension LS {
 		}
 		
 	}
-	
 }

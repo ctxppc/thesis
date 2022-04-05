@@ -20,9 +20,6 @@ extension NT {
 		/// A capability of given type.
 		case cap(CapabilityType)
 		
-		/// A datum with unspecified interpretation that fits in a register.
-		case registerDatum
-		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.ValueType {
 			try lowered(in: &context, attemptedResolutions: [])
@@ -44,9 +41,6 @@ extension NT {
 				
 				case .cap(let type):
 				return .cap(try type.lowered(in: &context))
-				
-				case .registerDatum:
-				return .registerDatum
 				
 			}
 		}

@@ -22,6 +22,9 @@ extension EX {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value representing the procedure with given name.
+		case procedure(Label)
+		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
@@ -72,6 +75,9 @@ extension EX {
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
 				], in: .element(of: vec, at: .named(idx)))
+				
+				case .procedure(let name):
+				TODO.unimplemented
 				
 				case .seal:
 				return .seal

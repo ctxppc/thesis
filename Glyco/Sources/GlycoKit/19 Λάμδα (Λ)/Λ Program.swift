@@ -1,13 +1,12 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-//sourcery: longname = Lexical Scopes
-//sourcery: description = "A language that introduces lexical scopes of definitions, thereby removing name clashes."
-public enum LS : Language {
+//sourcery: longname = Lambdas
+//sourcery: description = "A language that introduces anonymous functions and function values."
+public enum Λ : Language {
 	
-	/// A program on a LS machine.
+	/// A program on a Λ machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		/// Creates a program with given result and functions.
 		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
@@ -27,17 +26,26 @@ public enum LS : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context()
-			return try .init(result.lowered(in: &context), functions: functions.lowered())
+			var context = Λ.Context()
+			return try .init(
+				result.lowered(in: &context),
+				functions: functions.lowered(in: &context) + context.anonymousFunctions
+			)
 		}
 		
 	}
 	
 	// See protocol.
-	public typealias Lower = DF
+	public typealias Lower = EX
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
+	public typealias CapabilityType = Lower.CapabilityType
+	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
+	public typealias Parameter = Lower.Parameter
+	public typealias RecordType = Lower.RecordType
+	public typealias Symbol = Lower.Symbol
+	public typealias ValueType = Lower.ValueType
 	
 }
