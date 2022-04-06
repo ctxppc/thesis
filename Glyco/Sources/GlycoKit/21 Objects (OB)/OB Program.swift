@@ -7,10 +7,9 @@ public enum OB : Language {
 	/// A program on an OB machine.
 	public struct Program : Codable, GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function], types: [TypeDefinition]) {
+		public init(_ result: Result, functions: [Function]) {
 			self.result = result
 			self.functions = functions
-			self.types = types
 		}
 		
 		/// The program's result.
@@ -18,9 +17,6 @@ public enum OB : Language {
 		
 		/// The program's functions.
 		public var functions: [Function]
-		
-		/// The program's type definitions.
-		public var types: [TypeDefinition]
 		
 		// See protocol.
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
@@ -30,24 +26,8 @@ public enum OB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			
-			var context = Context(selfName: nil, types: types)
-			
-			var globals = [Lower.GlobalDeclaration]()
-			var functions = try self.functions.lowered(in: &context)
-			for type in types {
-				
-				guard case .object(let typeName, let objectType) = type else { continue }
-				context.objectTypeName = typeName
-				
-				functions.append(try objectType.initialiser.lowered(in: &context))
-				functions.append(contentsOf: try objectType.methods.lowered(in: &context))
-				
-			}
-			context.objectTypeName = nil
-			
-			return try .init(result.lowered(in: &context), functions: functions, types: types.lowered(in: &context), globals: globals)
-			
+			var context = Context(selfName: nil)
+			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context))
 		}
 		
 	}

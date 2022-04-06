@@ -30,7 +30,7 @@ extension NT {
 				
 				case .named(let name):
 				guard !attemptedResolutions.contains(name) else { throw LoweringError.infiniteType(name, cycle: attemptedResolutions) }
-				guard let type = context.valueTypesByName[name] else { throw LoweringError.undefinedType(name) }
+				guard let type = context.valueTypesByName[name]?.last else { throw LoweringError.undefinedType(name) }
 				return try type.lowered(in: &context, attemptedResolutions: attemptedResolutions.union([name]))
 				
 				case .u8:

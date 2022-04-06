@@ -12,7 +12,7 @@ extension OB {
 		var objectTypeName: TypeName?
 		
 		/// The type definitions in the current scope.
-		var types: [TypeDefinition]
+		var types = [TypeDefinition]()
 		
 		/// A bag of symbols.
 		var symbols = Bag<Symbol>()

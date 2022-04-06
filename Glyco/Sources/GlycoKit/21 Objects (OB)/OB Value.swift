@@ -49,6 +49,9 @@ extension OB {
 		/// A value that evaluates to given value after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Value)
 		
+		/// A value that evaluates to given value after defining a
+		indirect case letType([TypeDefinition], in: Value)
+		
 		/// A value that evaluates to given value after performing given effects.
 		indirect case `do`([Effect], then: Value)
 		
@@ -98,6 +101,9 @@ extension OB {
 				
 				case .let(let definitions, in: let body):
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				
+				case .letType(let definitions, in: let body):
+				return try .letType(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))

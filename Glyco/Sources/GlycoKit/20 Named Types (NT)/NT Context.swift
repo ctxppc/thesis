@@ -5,8 +5,8 @@ extension NT {
 	/// A value used while lowering.
 	struct Context {
 		
-		/// The value types by name.
-		let valueTypesByName: [TypeName : ValueType]
+		/// The stacks of value types by name.
+		var valueTypesByName = [TypeName : [ValueType]]()
 		
 	}
 	

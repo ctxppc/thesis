@@ -32,7 +32,7 @@ extension NT {
 				return .vector(of: try elementType.lowered(in: &context), sealed: sealed)
 				
 				case .record(let recordType, sealed: let sealed):
-				return .record(recordType, sealed: sealed)
+				return .record(try recordType.lowered(in: &context), sealed: sealed)
 				
 				case .procedure(takes: let parameters, returns: let resultType):
 				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))

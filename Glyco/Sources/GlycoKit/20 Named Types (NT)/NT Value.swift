@@ -22,6 +22,9 @@ extension NT {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
+		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
+		
 		/// A value representing a globally defined function with given name.
 		case function(Label)
 		
@@ -43,6 +46,9 @@ extension NT {
 		/// A value that evaluates to given value after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Value)
 		
+		/// A value that evaluates to given value after associating zero or more types with a name.
+		indirect case letType([TypeDefinition], in: Value)
+		
 		/// A value that evaluates to given value after performing given effects.
 		indirect case `do`([Effect], then: Value)
 		
@@ -57,7 +63,7 @@ extension NT {
 				return .named(symbol)
 				
 				case .record(let type):
-				return .record(type)
+				return .record(try type.lowered(in: &context))
 				
 				case .field(let fieldName, of: let record):
 				return .field(fieldName, of: try record.lowered(in: &context))
@@ -67,6 +73,13 @@ extension NT {
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .λ(takes: let parameters, returns: let resultType, in: let result):
+				return try .λ(
+					takes:		parameters.lowered(in: &context),
+					returns:	resultType.lowered(in: &context),
+					in:			result.lowered(in: &context)
+				)
 				
 				case .function(let name):
 				return .function(name)
@@ -84,10 +97,17 @@ extension NT {
 				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
-				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
+				return try .if(
+					predicate.lowered(in: &context),
+					then: affirmative.lowered(in: &context),
+					else: negative.lowered(in: &context)
+				)
 				
 				case .let(let definitions, in: let body):
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				
+				case .letType(let definitions, in: let body):
+				TODO.unimplemented
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))

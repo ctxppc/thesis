@@ -282,8 +282,6 @@ extension NT.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case types = "types"
-		case globals = "globals"
 	}
 }
 
@@ -298,6 +296,19 @@ extension NT.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case value = "_1"
+	}
+}
+
+extension NT.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension NT.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
 	}
 }
 
@@ -321,7 +332,6 @@ extension OB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
-		case types = "types"
 	}
 }
 

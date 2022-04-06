@@ -11,7 +11,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 \begin{grammar}
 	\footnotesize
 				<OB.Program> ::=
-							"("<Result>, "functions:" <[Function]>, "types:" <[TypeDefinition]>")"
+							"("<Result>, "functions:" <[Function]>")"
 				\par
 				<OB.Predicate> ::=
 						"constant""("<Bool>")"
@@ -46,6 +46,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
+						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<OB.ObjectType> ::=
@@ -86,7 +87,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 \begin{grammar}
 	\footnotesize
 				<NT.Program> ::=
-							"("<Result>, "functions:" <[Function]>, "types:" <[TypeDefinition]>, "globals:" <[GlobalDeclaration]>")"
+							"("<Result>, "functions:" <[Function]>")"
 				\par
 				<NT.Effect> ::=
 						"do""("<[Effect]>")"
@@ -119,6 +120,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
@@ -126,10 +128,17 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
+						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<NT.Definition> ::=
 							"("<Symbol>, <Value>")"
+				\par
+				<NT.RecordType> ::=
+							"("<[Field]>")"
+				\par
+				<NT.Field> ::=
+							"("<Name>, <ValueType>")"
 				\par
 				<NT.TypeName> ::=
 						<String>

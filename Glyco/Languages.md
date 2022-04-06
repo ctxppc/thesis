@@ -85,7 +85,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <code>TypeName</code>
 <dl>
 	<dt><code>OB.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition])</code></dd>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Predicate</code></dt>
@@ -125,6 +125,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
@@ -173,13 +174,11 @@ A language that introduces named types in a structural type system.
 **Inherited from Λ:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Field</code>, 
 <code>Label</code>, 
-<code>RecordType</code>, 
 <code>Symbol</code>
 <dl>
 	<dt><code>NT.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function], <strong>types:</strong> [TypeDefinition], <strong>globals:</strong> [GlobalDeclaration])</code></dd>
+	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Effect</code></dt>
@@ -218,6 +217,7 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
@@ -225,11 +225,20 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Definition</code></dt>
 	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>NT.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.TypeName</code></dt>
