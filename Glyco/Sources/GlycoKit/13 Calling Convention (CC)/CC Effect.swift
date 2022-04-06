@@ -70,6 +70,7 @@ extension CC {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let location, to: let source):
+				try context.declare(location, sameTypeAs: source)
 				Lowered.set(.abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let destination, let lhs, let op, let rhs):
@@ -105,8 +106,10 @@ extension CC {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .call(.procedure(let name), let arguments, result: let result):
-				if let procedure = context.procedures[name] {
+				case .call(let procedure, let arguments, result: let result):
+				do {
+					
+					let (parameters, resultType) = try context.signature(of: procedure)
 					
 					// TODO: Update for calls of procedures with a sealed parameter.
 					
@@ -118,7 +121,7 @@ extension CC {
 					}
 					
 					// Determine assignments.
-					let assignments = procedure.parameterAssignments(in: context.configuration)
+					let assignments = Parameter.Assignments(parameters: parameters, resultType: resultType, configuration: context.configuration)
 					
 					// Create (scoped) arguments record, if nonempty. (The record is heap-allocated when the call stack is discontiguous.)
 					let argumentsRecord = context.locations.uniqueName(from: "args")
@@ -128,7 +131,7 @@ extension CC {
 					
 					// Prepare arguments for lowering.
 					let arguments = try arguments.lowered(in: &context)
-					let parameterNames = procedure.parameters.map(\.location.rawValue)
+					let parameterNames = parameters.map(\.location.rawValue)
 					let argumentsByParameterName = Dictionary(uniqueKeysWithValues: zip(parameterNames, arguments))
 					
 					// Pass frame-resident arguments first.
@@ -157,7 +160,7 @@ extension CC {
 					
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
-					Lowered.call(.capability(to: name), parameters: argumentRegisters)
+					Lowered.call(try procedure.lowered(in: &context), parameters: argumentRegisters)
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {
@@ -165,7 +168,7 @@ extension CC {
 					}
 					
 					// Write result.
-					Lowered.set(.abstract(result), to: .register(.a0, procedure.resultType.lowered()))
+					Lowered.set(.abstract(result), to: .register(.a0, resultType.lowered()))
 					
 					// Restore caller-saved registers from abstract locations.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
@@ -174,12 +177,7 @@ extension CC {
 						}
 					}
 					
-				} else {
-					throw LoweringError.unrecognisedProcedure(name: name)
 				}
-				
-				case .call:
-				_ = TODO.unimplemented
 				
 				case .return(let result):
 				do {
@@ -213,21 +211,6 @@ extension CC {
 				}
 				
 			}
-		}
-		
-		enum LoweringError : LocalizedError {
-			
-			/// An error indicating that no procedure is known by the name `name`.
-			case unrecognisedProcedure(name: Label)
-			
-			// See protocol.
-			var errorDescription: String? {
-				switch self {
-					case .unrecognisedProcedure(name: let name):
-					return "No procedure is known by the name “\(name)”."
-				}
-			}
-			
 		}
 		
 		// See protocol.

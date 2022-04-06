@@ -24,6 +24,40 @@ extension CC {
 		/// An assignment of parameters to physical locations.
 		struct Assignments {
 			
+			/// Creates an assignment for a procedure with given parameters and result type in given configuration.
+			init(parameters: [Parameter], resultType: ValueType, configuration: CompilationConfiguration) {
+				
+				// Assign sealed parameter (if any) to invocation data register.
+				var parameters = parameters[...]
+				if let index = parameters.firstIndex(where: \.sealed) {
+					viaRegisters.append(.init(parameter: parameters.remove(at: index), register: .invocationData))
+				}
+				
+				// Prepare available arguments registers.
+				var registers = configuration.argumentRegisters[...]
+				
+				// If a discontiguous call stack is in use and an arguments record is required, reserve a register for the arguments record capability.
+				if !configuration.callingConvention.usesContiguousCallStack, parameters.count > registers.count {
+					argumentsRecordRegister = registers.popLast()
+				}
+				
+				// As long as there is an argument register available, assign the next parameter to it.
+				while let register = registers.popFirst(), let parameter = parameters.popFirst() {
+					viaRegisters.append(.init(parameter: parameter, register: register))
+				}
+				
+				// Assign remaining parameters to the arguments record.
+				// If a contiguous call stack is in use, ensure stack order by reversing the fields.
+				let parameterRecordFields = parameters
+					.map { Lower.Field(.init(rawValue: $0.location.rawValue), $0.type.lowered()) }
+				if configuration.callingConvention.usesContiguousCallStack {
+					parameterRecordType = .init(parameterRecordFields.reversed())
+				} else {
+					parameterRecordType = .init(parameterRecordFields)
+				}
+				
+			}
+			
 			/// Assignments of parameters passed via registers, in parameter order.
 			var viaRegisters: [RegisterAssignment] = []
 			
