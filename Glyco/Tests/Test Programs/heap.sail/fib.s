@@ -174,7 +174,7 @@ fib:			addi t0, zero, 32
 				csc cra, 16(cfp)
 				mv a3, a0
 				mv ra, a2
-				addi s1, zero, 0
+				addi s1, zero, 1
 cd.pred:		nop
 				ble ra, s1, cd.then
 cd.else:		mv a0, a1

@@ -12,7 +12,7 @@
 		returns: s32(),
 		in: if(
 			do(
-				set(ls.lhs, to: location(ls.iter)) set(ls.rhs, to: constant(0)),
+				set(ls.lhs, to: location(ls.iter)) set(ls.rhs, to: constant(1)),
 				then: relation(location(ls.lhs), le, location(ls.rhs))
 			),
 			then: do(set(df.result$1, to: location(ls.curr)) return(location(df.result$1))),

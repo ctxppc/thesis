@@ -47,7 +47,7 @@
 			set(abstract(ls.iter), to: register(a2, s32))
 			if(
 				do(
-					set(abstract(ls.lhs), to: abstract(ls.iter)) set(abstract(ls.rhs), to: constant(0)),
+					set(abstract(ls.lhs), to: abstract(ls.iter)) set(abstract(ls.rhs), to: constant(1)),
 					then: relation(abstract(ls.lhs), le, abstract(ls.rhs))
 				),
 				then: do(

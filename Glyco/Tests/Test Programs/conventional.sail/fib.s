@@ -125,7 +125,7 @@ fib:			csc cfp, -16(csp)
 cd.then$9:		csc cra, -32(cfp)
 				mv a3, a0
 				mv ra, a2
-				addi s1, zero, 0
+				addi s1, zero, 1
 cd.pred:		nop
 				ble ra, s1, cd.then$10
 cd.else:		mv a0, a1

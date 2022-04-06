@@ -8,7 +8,7 @@
 		takes: (prev, s32()) (curr, s32()) (iter, s32()),
 		returns: s32(),
 		in: if(
-			let((ex.lhs, source(named(iter))) (ex.rhs, source(constant(0))), in: relation(named(ex.lhs), le, named(ex.rhs))),
+			let((ex.lhs, source(named(iter))) (ex.rhs, source(constant(1))), in: relation(named(ex.lhs), le, named(ex.rhs))),
 			then: value(source(named(curr))),
 			else: let(
 				(arg0, source(named(curr)))

@@ -9,7 +9,7 @@
 		returns: s32(),
 		in: if(
 			let(
-				(ls.lhs, source(location(ls.iter))) (ls.rhs, source(constant(0))),
+				(ls.lhs, source(location(ls.iter))) (ls.rhs, source(constant(1))),
 				in: relation(location(ls.lhs), le, location(ls.rhs))
 			),
 			then: value(source(location(ls.curr))),

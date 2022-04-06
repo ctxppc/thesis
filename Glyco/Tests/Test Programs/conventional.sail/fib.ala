@@ -5862,7 +5862,7 @@
 					)
 					set(
 						abstract(ls.rhs),
-						to: constant(0),
+						to: constant(1),
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), abstract(ls.rhs))

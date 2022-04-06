@@ -29,7 +29,7 @@
 			set(s32, register(a3), to: register(a0))
 			if(
 				do(
-					set(s32, register(ra), to: register(a2)) set(s32, register(s1), to: constant(0)),
+					set(s32, register(ra), to: register(a2)) set(s32, register(s1), to: constant(1)),
 					then: relation(register(ra), le, register(s1))
 				),
 				then: do(
