@@ -70,26 +70,43 @@ extension CC {
 				Lowered.do(try effects.lowered(in: &context))
 				
 				case .set(let location, to: let source):
-				try context.declare(location, sameTypeAs: source)
+				try context.declare(location, context.type(of: source))
 				Lowered.set(.abstract(location), to: try source.lowered(in: &context))
 				
 				case .compute(let destination, let lhs, let op, let rhs):
+				try context.declare(destination, .s32)
 				try Lowered.compute(.abstract(destination), lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .createRecord(let type, capability: let record, scoped: let scoped):
+				try context.declare(record, .cap(.record(type, sealed: false)))
 				Lowered.createRecord(type.lowered(in: &context), capability: .abstract(record), scoped: scoped)
 				
 				case .getField(let fieldName, of: let record, to: let destination):
-				Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
+				if case .cap(.record(let type, sealed: _)) = try context.type(of: record) {
+					if let field = type.fields[fieldName] {
+						try context.declare(destination, field.valueType)
+						Lowered.getField(fieldName, of: .abstract(record), to: .abstract(destination))
+					} else {
+						throw LoweringError.undefinedFieldName(fieldName, type, record)
+					}
+				} else {
+					throw LoweringError.indexingNonrecord(record)
+				}
 				
 				case .setField(let fieldName, of: let record, to: let source):
 				Lowered.setField(fieldName, of: .abstract(record), to: try source.lowered(in: &context))
 				
 				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
+				try context.declare(vector, .cap(.vector(of: elementType, sealed: false)))
 				Lowered.createVector(elementType.lowered(), count: count, capability: .abstract(vector), scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
-				Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
+				if case .cap(.vector(of: let elementType, sealed: _)) = try context.type(of: vector) {
+					try context.declare(destination, elementType)
+					Lowered.getElement(of: .abstract(vector), index: try index.lowered(in: &context), to: .abstract(destination))
+				} else {
+					throw LoweringError.indexingNonvector(vector)
+				}
 				
 				case .setElement(of: let vector, index: let index, to: let source):
 				try Lowered.setElement(of: .abstract(vector), index: index.lowered(in: &context), to: source.lowered(in: &context))
@@ -98,18 +115,22 @@ extension CC {
 				Lowered.destroyScopedValue(capability: try capability.lowered(in: &context))
 				
 				case .createSeal(in: let seal):
+				try context.declare(seal, .cap(.seal(sealed: false)))
 				Lowered.createSeal(in: .abstract(seal))
 				
 				case .seal(into: let destination, source: let source, seal: let seal):
-				Lowered.seal(into: .abstract(destination), source: .abstract(source), seal: .abstract(seal))
+				if case .cap(let type) = try context.type(of: source) {
+					try context.declare(destination, .cap(type.sealed(true)))
+					Lowered.seal(into: .abstract(destination), source: .abstract(source), seal: .abstract(seal))
+				} else {
+					throw LoweringError.sealingNoncapability(source)
+				}
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .call(let procedure, let arguments, result: let result):
-				do {
-					
-					let (parameters, resultType) = try context.signature(of: procedure)
+				if case .cap(.procedure(let parameters, let resultType)) = try context.type(of: procedure) {
 					
 					// TODO: Update for calls of procedures with a sealed parameter.
 					
@@ -177,6 +198,8 @@ extension CC {
 						}
 					}
 					
+				} else {
+					throw LoweringError.callingNonprocedure(procedure)
 				}
 				
 				case .return(let result):
@@ -211,6 +234,47 @@ extension CC {
 				}
 				
 			}
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating that the value being indexed is not a record.
+			case indexingNonrecord(Location)
+			
+			/// An error indicating that given field name is not defined on given record type associated with given location
+			case undefinedFieldName(Field.Name, RecordType, Location)
+			
+			/// An error indicating that the value being indexed is not a vector.
+			case indexingNonvector(Location)
+			
+			/// An error indicating that the value being sealed is not a capability.
+			case sealingNoncapability(Location)
+			
+			/// An error indicating that the value being called is not a procedure.
+			case callingNonprocedure(Source)
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					
+					case .indexingNonrecord(let record):
+					return "\(record) is not a record"
+					
+					case .undefinedFieldName(let name, let type, let record):
+					return "“\(name)” is not a defined field in \(type) for the record \(record)"
+					
+					case .indexingNonvector(let vector):
+					return "\(vector) is not a vector"
+					
+					case .sealingNoncapability(let capability):
+					return "\(capability) cannot be sealed because it is not a capability"
+					
+					case .callingNonprocedure(let target):
+					return "\(target) is not a procedure"
+					
+				}
+			}
+			
 		}
 		
 		// See protocol.
