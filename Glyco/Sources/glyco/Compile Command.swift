@@ -15,13 +15,15 @@ struct CompileCommand : ParsableCommand {
 	static let configuration = CommandConfiguration(commandName: "glyco", abstract: "Compiles Gly source files to CHERI-RISC-V executables.", discussion: discussion)
 	
 	private static let discussion = """
-	Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the CHERITOOLCHAIN environment variable; if omitted, Glyco assumes it‘s in ~/cheri. The path to the system root can be provided through the CHERISYSROOT environment variable; if omitted, Glyco assumes it‘s in output/rootfs-riscv64-purecap within the toolchain.
+	Glyco requires a CHERI-RISC-V toolchain and a CheriBSD system root, as built by cheribuild. The path to the toolchain can be provided through the “CHERITOOLCHAIN” environment variable; if omitted, Glyco assumes it‘s in ~/cheri. The path to the system root can be provided through the “CHERISYSROOT” environment variable; if omitted, Glyco assumes it‘s in output/rootfs-riscv64-purecap within the toolchain.
 	
 	When one or more intermediate languages are specified with the -l option, Glyco lowers the source file to those languages. When no intermediate language is specified, Glyco lowers the source file to an ELF binary.
 	
 	By default, intermediate programs and binary executables are written to the same directory as the source file, with a filename derived from the source file. To change this, pass paths (relative to the current directory) using the -o option, one path per corresponding intermediate language or one path for the ELF binary. Glyco overwrites files.
 	
 	To disable writing to disk, pass the --stdout flag. Intermediate programs are written to standard out; binary executables are discarded after compilation.
+	
+	When targeting a Sail emulator target and the --stdout and -l options are not specified, the -s flag can be specified to simulate the program in the Sail emulator specified through the “SIMULATOR” environment variable. The full trace is written to a file derived from the source file and ending with .log.
 	"""
 	
 	@Argument(help: "A Gly or intermediate file, relative to the current directory. The file‘s extension must be .gly or the name of an intermediate language: .s, .rv, .fl, etc.")
@@ -50,6 +52,9 @@ struct CompileCommand : ParsableCommand {
 	
 	@Flag(name: .long, inversion: .prefixedNo, help: "Enable/disable intra-language validations.")
 	var validate: Bool = true
+	
+	@Flag(name: .shortAndLong, help: "Runs the program after compiling it. (Only supported for the \(CompilationConfiguration.Target.sail) target and cannot be combined with -l or --stdout.)")
+	var simulate: Bool = false
 	
 	@Flag(name: .customLong("caller-saved-copying"), inversion: .prefixedNo, help: "Enable/disable caller-saved register copying around procedure calls to limit their lifetime.")
 	var limitsCallerSavedRegisterLifetimes: Bool = false
@@ -114,6 +119,9 @@ struct CompileCommand : ParsableCommand {
 				let outputURL = derivedOutputURL(language: nil)
 				try elf.write(to: outputURL)
 				print("Exported ELF (\(elf.count) bytes) to \(outputURL.absoluteString).")
+				if simulate {
+					try simulateELF(at: outputURL)
+				}
 			}
 			
 		} else {
@@ -147,11 +155,67 @@ struct CompileCommand : ParsableCommand {
 	
 	private func compileAfterChange(sourceData: Data, configuration: CompilationConfiguration, sourceLanguage: String) {
 		do {
-			guard let source = String(bytes: sourceData, encoding: .utf8) else { throw DecodingError.illegalUTF8 }
+			guard let source = String(bytes: sourceData, encoding: .utf8) else { throw CompilationError.illegalUTF8 }
 			try compile(sourceString: source, configuration: configuration, sourceLanguage: sourceLanguage)
 		} catch {
 			print(error)
 		}
+	}
+	
+	private func simulateELF(at elfURL: URL) throws {
+		
+		guard let simulatorURL = ProcessInfo.processInfo.environment["SIMULATOR"].map(URL.init(fileURLWithPath:)) else { throw CompilationError.missingSimulator }
+		print("Simulating program using \(simulatorURL.path)…")
+		
+		let outputURL = derivedOutputURL(language: "log")
+		try Data().write(to: outputURL)
+		let outputHandle = try FileHandle(forWritingTo: outputURL)
+		
+		let sim = Process()
+		sim.executableURL = simulatorURL
+		sim.arguments = [elfURL.path]
+		sim.standardError = outputHandle
+		sim.standardOutput = outputHandle
+		try sim.run()
+		sim.waitUntilExit()
+		
+		let output = try String(contentsOf: outputURL)
+		var result: Int?
+		var parsingError: Error?
+		output.enumerateSubstrings(in: output.startIndex..., options: [.byLines, .reverse]) { substring, _, _, stop in
+			
+			let substring = substring !! "Expected substring"
+			guard substring.hasPrefix("x10 <-") else { return }
+			stop = true
+			
+			do {
+				
+				let components = substring.components(separatedBy: .init(charactersIn: " :"))
+				guard let offsetKeyIndex = components.firstIndex(of: "offset") else { throw CompilationError.noOffsetKey }
+				var offsetValueString = components[offsetKeyIndex + 1]
+				
+				guard offsetValueString.hasPrefix("0x") else { throw CompilationError.unprefixedOffsetValueString(offsetValueString) }
+				offsetValueString.removeFirst(2)
+				
+				guard let offsetValue = Int(offsetValueString, radix: 16) else { throw CompilationError.nonnumericOffsetValueString(offsetValueString) }
+				result = offsetValue
+				
+			} catch {
+				parsingError = error
+			}
+			
+		}
+		
+		if let parsingError = parsingError {
+			throw parsingError
+		}
+		
+		if let result = result {
+			print("Simulation ended with result \(result).")
+		} else {
+			print("Simulation ended with no result — make sure the program writes to register a0.")
+		}
+		
 	}
 	
 	private func derivedOutputURL(language: String?) -> URL {
@@ -166,8 +230,12 @@ struct CompileCommand : ParsableCommand {
 		return language.map { base.appendingPathExtension($0.lowercased()) } ?? base
 	}
 	
-	private enum DecodingError : Error {
+	private enum CompilationError : Error {
 		case illegalUTF8
+		case missingSimulator
+		case noOffsetKey
+		case unprefixedOffsetValueString(String)
+		case nonnumericOffsetValueString(String)
 	}
 	
 }

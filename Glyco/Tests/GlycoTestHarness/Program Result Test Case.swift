@@ -8,7 +8,7 @@ import XCTest
 final class ProgramResultTestCase : XCTestCase {
 	
 	func testPrograms() throws {
-		guard let simulatorPath = ProcessInfo.processInfo.environment["simulator"] else { throw XCTSkip("Missing “simulator” environment variable") }
+		guard let simulatorPath = ProcessInfo.processInfo.environment["SIMULATOR"] else { throw XCTSkip("Missing “SIMULATOR” environment variable") }
 		for target in CompilationConfiguration.Target.allCases {
 			for convention in CompilationConfiguration.CallingConvention.allCases {
 				try verifyPrograms(
@@ -93,6 +93,7 @@ private struct DecodeSourceAndSimulateProgramsAction : LanguageAction {
 		sim.executableURL = simulatorURL
 		sim.arguments = [elfURL.path]
 		sim.standardOutput = outputHandle
+		sim.standardError = outputHandle
 		try sim.run()
 		sim.waitUntilExit()
 		
