@@ -4,12 +4,13 @@ import Foundation
 
 extension CC {
 	
-	/// A value used while lowering a procedure.
+	/// A value used while lowering a program or procedure.
 	struct Context {
 		
 		/// Creates a context value.
-		init(procedures: [Procedure], configuration: CompilationConfiguration) {
+		init(procedures: [Procedure], loweredProcedure: Procedure?, configuration: CompilationConfiguration) {
 			self.procedures = procedures
+			self.loweredProcedure = loweredProcedure
 			self.configuration = configuration
 		}
 		
@@ -17,7 +18,7 @@ extension CC {
 		let procedures: [Procedure]
 		
 		/// The procedure being lowered, or `nil` if no procedure is being lowered.
-		var loweredProcedure: Procedure? = nil
+		let loweredProcedure: Procedure?
 		
 		/// The compilation configuration.
 		let configuration: CompilationConfiguration

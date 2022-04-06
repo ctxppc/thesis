@@ -4,7 +4,7 @@
 		pushScope()
 		set(abstract(cc.retcap), to: register(ra, cap))
 		clearAll(except: )
-		call(f, parameters: )
+		call(capability(to: f), parameters: )
 		set(abstract(res), to: register(a0, s32))
 		set(register(a0), to: abstract(res))
 		set(register(ra), to: abstract(cc.retcap))

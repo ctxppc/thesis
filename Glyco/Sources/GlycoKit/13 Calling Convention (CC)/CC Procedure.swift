@@ -38,9 +38,10 @@ extension CC {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Procedure {
 			
-			let previousProcedure = context.loweredProcedure
-			context.loweredProcedure = self
-			defer { context.loweredProcedure = previousProcedure }
+			var context = Context(procedures: context.procedures, loweredProcedure: self, configuration: context.configuration)
+			for parameter in parameters {
+				try context.declare(parameter.location, parameter.type)
+			}
 			
 			return .init(name, in: try .do {
 				

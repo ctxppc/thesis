@@ -3,7 +3,7 @@
 		set(ls.arg0, to: constant(0))
 		set(ls.arg1, to: constant(1))
 		set(ls.arg2, to: constant(30))
-		call(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2), result: df.result)
+		call(procedure(fib), location(ls.arg0) location(ls.arg1) location(ls.arg2), result: df.result)
 		return(location(df.result))
 	),
 	procedures: (
@@ -24,7 +24,7 @@
 				set(ls.lhs$2, to: location(ls.iter))
 				set(ls.rhs$2, to: constant(1))
 				compute(ls.arg2, location(ls.lhs$2), sub, location(ls.rhs$2))
-				call(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2), result: df.result$2)
+				call(procedure(fib), location(ls.arg0) location(ls.arg1) location(ls.arg2), result: df.result$2)
 				return(location(df.result$2))
 			)
 		)

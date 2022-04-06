@@ -260,7 +260,7 @@
 			)
 		)
 		call(
-			fib,
+			capability(to: fib),
 			parameters: a0 a1 a2,
 			analysisAtEntry: (
 				conflicts: (
@@ -9607,7 +9607,7 @@
 						)
 					)
 					call(
-						fib,
+						capability(to: fib),
 						parameters: a0 a1 a2,
 						analysisAtEntry: (
 							conflicts: (

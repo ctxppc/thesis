@@ -30,7 +30,7 @@ public enum CC : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(procedures: procedures, configuration: configuration)
+			var context = Context(procedures: procedures, loweredProcedure: nil, configuration: configuration)
 			return try .init(try .do {
 				
 				// Prepare new scope.
