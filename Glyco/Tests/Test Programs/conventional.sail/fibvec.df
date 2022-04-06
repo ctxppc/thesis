@@ -1,5 +1,5 @@
 (
-	let((ls.arg0, source(constant(1))) (ls.arg1, source(constant(1))), in: evaluate(fib, location(ls.arg0) location(ls.arg1))),
+	let((ls.arg0, source(constant(0))) (ls.arg1, source(constant(1))), in: evaluate(fib, location(ls.arg0) location(ls.arg1))),
 	functions: (
 		fib,
 		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
@@ -26,61 +26,57 @@
 					in: element(of: ls.vec, at: location(ls.idx))
 				)
 			),
-			else: let(
-				(
-					ls.indexOfFirst,
-					let(
-						(ls.lhs$1, source(location(ls.index))) (ls.rhs$1, source(constant(2))),
-						in: binary(location(ls.lhs$1), sub, location(ls.rhs$1))
-					)
-				)
-				(
-					ls.indexOfSecond,
-					let(
-						(ls.lhs$2, source(location(ls.index))) (ls.rhs$2, source(constant(1))),
-						in: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
-					)
-				)
-				(
-					ls.nextIndex,
-					let(
-						(ls.lhs$3, source(location(ls.index))) (ls.rhs$3, source(constant(1))),
-						in: binary(location(ls.lhs$3), add, location(ls.rhs$3))
-					)
-				)
-				(
-					ls.fibNum,
-					let(
-						(
-							ls.lhs$4,
-							let(
-								(ls.vec$1, source(location(ls.nums))) (ls.idx$1, source(location(ls.indexOfFirst))),
-								in: element(of: ls.vec$1, at: location(ls.idx$1))
+			else: do(
+				let(
+					(ls.vec$1, source(location(ls.nums)))
+					(ls.idx$1, source(location(ls.index)))
+					(
+						ls.elem,
+						let(
+							(
+								ls.lhs$1,
+								let(
+									(ls.vec$2, source(location(ls.nums)))
+									(
+										ls.idx$2,
+										let(
+											(ls.lhs$2, source(location(ls.index))) (ls.rhs$2, source(constant(2))),
+											in: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
+										)
+									),
+									in: element(of: ls.vec$2, at: location(ls.idx$2))
+								)
 							)
+							(
+								ls.rhs$1,
+								let(
+									(ls.vec$3, source(location(ls.nums)))
+									(
+										ls.idx$3,
+										let(
+											(ls.lhs$3, source(location(ls.index))) (ls.rhs$3, source(constant(1))),
+											in: binary(location(ls.lhs$3), sub, location(ls.rhs$3))
+										)
+									),
+									in: element(of: ls.vec$3, at: location(ls.idx$3))
+								)
+							),
+							in: binary(location(ls.lhs$1), add, location(ls.rhs$1))
 						)
-						(
-							ls.rhs$4,
-							let(
-								(ls.vec$2, source(location(ls.nums))) (ls.idx$2, source(location(ls.indexOfSecond))),
-								in: element(of: ls.vec$2, at: location(ls.idx$2))
-							)
-						),
-						in: binary(location(ls.lhs$4), add, location(ls.rhs$4))
-					)
-				),
-				in: do(
-					let(
-						(ls.vec$3, source(location(ls.nums)))
-						(ls.idx$3, source(location(ls.index)))
-						(ls.elem, source(location(ls.fibNum))),
-						in: setElement(of: ls.vec$3, at: location(ls.idx$3), to: location(ls.elem))
 					),
-					then: let(
-						(ls.arg0, source(location(ls.nextIndex)))
-						(ls.arg1, source(location(ls.lastIndex)))
-						(ls.arg2, source(location(ls.nums))),
-						in: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+					in: setElement(of: ls.vec$1, at: location(ls.idx$1), to: location(ls.elem))
+				),
+				then: let(
+					(
+						ls.arg0,
+						let(
+							(ls.lhs$4, source(location(ls.index))) (ls.rhs$4, source(constant(1))),
+							in: binary(location(ls.lhs$4), add, location(ls.rhs$4))
+						)
 					)
+					(ls.arg1, source(location(ls.lastIndex)))
+					(ls.arg2, source(location(ls.nums))),
+					in: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
 				)
 			)
 		)

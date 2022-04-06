@@ -1,5 +1,5 @@
 (
-	evaluate(fib, constant(1) constant(1)),
+	evaluate(fib, constant(0) constant(1)),
 	functions:
 		
 		(fib,
@@ -11,20 +11,20 @@
 		(recFib, 
 			takes: (index, s32()) (lastIndex, s32()) (nums, cap(vector(of: s32(), sealed: false))),
 			returns: s32(),
-			in: if(relation(named(index), gt, named(lastIndex))
+			in: if(
+				relation(named(index), gt, named(lastIndex)),
 				then: value(element(of: named(nums), at: named(lastIndex))),
-				else: let(
-					(indexOfFirst, binary(named(index), sub, constant(2)))
-					(indexOfSecond, binary(named(index), sub, constant(1)))
-					(nextIndex, binary(named(index), add, constant(1)))
-					(fibNum, binary(
-						element(of: named(nums), at: named(indexOfFirst)),
+				else: do(
+					setElement(of: named(nums), at: named(index), to: binary(
+						element(of: named(nums), at: binary(named(index), sub, constant(2))),
 						add,
-						element(of: named(nums), at: named(indexOfSecond)),
+						element(of: named(nums), at: binary(named(index), sub, constant(1))),
 					)),
-					in: do(
-						setElement(of: named(nums), at: named(index), to: named(fibNum)),
-						then: evaluate(recFib, named(nextIndex) named(lastIndex) named(nums))
+					then: evaluate(
+						recFib, 
+						binary(named(index), add, constant(1)) 
+						named(lastIndex) 
+						named(nums)
 					)
 				)
 			)
