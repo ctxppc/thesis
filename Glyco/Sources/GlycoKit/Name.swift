@@ -26,7 +26,7 @@ struct Bag<NameType : Name, Language : GlycoKit.Language> {
 			.splittingLast()
 			.map { String($0.tail) } ?? suffixlessPrefix
 		
-		let prefix = "\(Language.name.lowercased()).\(langlessPrefix)"
+		let prefix = "\(Language.name.lowercased().applyingTransform(.toLatin, reverse: false) ?? "").\(langlessPrefix)"
 		
 		if let uses = usesByPrefix[prefix] {
 			defer { usesByPrefix[prefix] = uses + 1 }
