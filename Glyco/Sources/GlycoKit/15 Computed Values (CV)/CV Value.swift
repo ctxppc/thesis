@@ -28,8 +28,8 @@ extension CV {
 		/// A value that evaluates to the capability in the first given location after sealing it with the seal capability in `with`.
 		case sealed(Location, with: Location)
 		
-		/// A value that performs the procedure with given name and evaluates to that procedure's result.
-		case evaluate(Label, [Source])
+		/// A value that performs the procedure with given target code capability with given arguments and evaluates to that procedure's result.
+		case evaluate(Source, [Source])
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)

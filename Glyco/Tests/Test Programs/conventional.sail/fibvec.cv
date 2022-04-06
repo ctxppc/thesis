@@ -1,8 +1,8 @@
 (
 	do(
-		set(ls.arg0, to: source(constant(0)))
-		set(ls.arg1, to: source(constant(1)))
-		set(df.result, to: evaluate(fib, location(ls.arg0) location(ls.arg1)))
+		set(ls.arg, to: source(constant(0)))
+		set(ls.arg$1, to: source(constant(1)))
+		set(df.result, to: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1)))
 		return(location(df.result))
 	),
 	procedures: (
@@ -10,10 +10,10 @@
 		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
 		returns: s32(),
 		in: do(
-			set(ls.arg0, to: source(constant(2)))
-			set(ls.arg1, to: source(constant(29)))
-			set(ls.arg2, to: vector(s32(), count: 30))
-			set(df.result$1, to: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2)))
+			set(ls.arg, to: source(constant(2)))
+			set(ls.arg$1, to: source(constant(29)))
+			set(ls.arg$2, to: vector(s32(), count: 30))
+			set(df.result$1, to: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
 			return(location(df.result$1))
 		)
 	)
@@ -77,15 +77,15 @@
 				)
 				setElement(of: ls.vec$1, at: location(ls.idx$1), to: location(ls.elem))
 				set(
-					ls.arg0,
+					ls.arg,
 					to: do(
 						set(ls.lhs$4, to: source(location(ls.index))) set(ls.rhs$4, to: source(constant(1))),
 						then: binary(location(ls.lhs$4), add, location(ls.rhs$4))
 					)
 				)
-				set(ls.arg1, to: source(location(ls.lastIndex)))
-				set(ls.arg2, to: source(location(ls.nums)))
-				set(df.result$3, to: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2)))
+				set(ls.arg$1, to: source(location(ls.lastIndex)))
+				set(ls.arg$2, to: source(location(ls.nums)))
+				set(df.result$3, to: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
 				return(location(df.result$3))
 			)
 		)

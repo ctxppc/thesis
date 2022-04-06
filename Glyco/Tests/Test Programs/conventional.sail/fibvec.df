@@ -1,12 +1,15 @@
 (
-	let((ls.arg0, source(constant(0))) (ls.arg1, source(constant(1))), in: evaluate(fib, location(ls.arg0) location(ls.arg1))),
+	let(
+		(ls.arg, source(constant(0))) (ls.arg$1, source(constant(1))),
+		in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1))
+	),
 	functions: (
 		fib,
 		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
 		returns: s32(),
 		in: let(
-			(ls.arg0, source(constant(2))) (ls.arg1, source(constant(29))) (ls.arg2, vector(s32(), count: 30)),
-			in: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+			(ls.arg, source(constant(2))) (ls.arg$1, source(constant(29))) (ls.arg$2, vector(s32(), count: 30)),
+			in: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
 		)
 	)
 	(
@@ -68,15 +71,15 @@
 				),
 				then: let(
 					(
-						ls.arg0,
+						ls.arg,
 						let(
 							(ls.lhs$4, source(location(ls.index))) (ls.rhs$4, source(constant(1))),
 							in: binary(location(ls.lhs$4), add, location(ls.rhs$4))
 						)
 					)
-					(ls.arg1, source(location(ls.lastIndex)))
-					(ls.arg2, source(location(ls.nums))),
-					in: evaluate(recFib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+					(ls.arg$1, source(location(ls.lastIndex)))
+					(ls.arg$2, source(location(ls.nums))),
+					in: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
 				)
 			)
 		)

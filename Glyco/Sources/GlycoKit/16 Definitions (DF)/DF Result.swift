@@ -10,8 +10,8 @@ extension DF {
 		/// A result that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Result, else: Result)
 		
-		/// A result that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Source])
+		/// A result that evaluates to given function evaluated with given arguments.
+		case evaluate(Source, [Source])
 		
 		/// A result provided by given result after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Result)
@@ -32,9 +32,9 @@ extension DF {
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
-				case .evaluate(let name, let arguments):
+				case .evaluate(let function, let arguments):
 				let result = context.bag.uniqueName(from: "result")
-				Lowered.set(result, to: .evaluate(name, arguments))
+				Lowered.set(result, to: .evaluate(function, arguments))
 				Lowered.return(.location(result))
 				
 				case .let(let definitions, in: let result):

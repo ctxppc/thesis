@@ -28,8 +28,8 @@ extension DF {
 		/// A value that evaluates to the capability in the first given location after sealing it with the seal capability in `with`.
 		case sealed(Location, with: Location)
 		
-		/// A value that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Source])
+		/// A value that evaluates to given function evaluated with given arguments.
+		case evaluate(Source, [Source])
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)

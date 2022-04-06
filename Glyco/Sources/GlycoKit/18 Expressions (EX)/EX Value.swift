@@ -34,8 +34,8 @@ extension EX {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
-		/// A value that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Value])
+		/// A value that evaluates to given function evaluated with given arguments.
+		indirect case evaluate(Value, [Value])
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
@@ -98,13 +98,20 @@ extension EX {
 					.init(r, rhs.lowered(in: &context))
 				], in: .binary(.named(l), op, .named(r)))
 				
-				case .evaluate(let name, let arguments):
-				let argumentNamesAndLoweredValues = try arguments.map {
-					(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+				case .evaluate(.function(let name), let arguments):
+				let definitions = try arguments.map {
+					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+				}
+				return .let(definitions, in: .evaluate(.function(name), definitions.map { .named($0.name) }))
+				
+				case .evaluate(let function, let arguments):
+				let f = context.bag.uniqueName(from: "f")
+				let definitions = try arguments.map {
+					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
 				}
 				return .let(
-					argumentNamesAndLoweredValues.map { .init($0.0, $0.1) },
-					in: .evaluate(name, argumentNamesAndLoweredValues.map { .named($0.0) })
+					definitions + [.init(f, try function.lowered(in: &context))],
+					in: .evaluate(.named(f), definitions.map { .named($0.name) })
 				)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):

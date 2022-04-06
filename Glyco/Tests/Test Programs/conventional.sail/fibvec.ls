@@ -1,12 +1,12 @@
 (
-	let((arg0, source(constant(0))) (arg1, source(constant(1))), in: evaluate(fib, named(arg0) named(arg1))),
+	let((ex.arg, source(constant(0))) (ex.arg$1, source(constant(1))), in: evaluate(function(fib), named(ex.arg) named(ex.arg$1))),
 	functions: (
 		fib,
 		takes: (first, s32()) (second, s32()),
 		returns: s32(),
 		in: let(
-			(arg0, source(constant(2))) (arg1, source(constant(29))) (arg2, vector(s32(), count: 30)),
-			in: evaluate(recFib, named(arg0) named(arg1) named(arg2))
+			(ex.arg$2, source(constant(2))) (ex.arg$3, source(constant(29))) (ex.arg$4, vector(s32(), count: 30)),
+			in: evaluate(function(recFib), named(ex.arg$2) named(ex.arg$3) named(ex.arg$4))
 		)
 	)
 	(
@@ -63,15 +63,15 @@
 				),
 				then: let(
 					(
-						arg0,
+						ex.arg$5,
 						let(
 							(ex.lhs$4, source(named(index))) (ex.rhs$4, source(constant(1))),
 							in: binary(named(ex.lhs$4), add, named(ex.rhs$4))
 						)
 					)
-					(arg1, source(named(lastIndex)))
-					(arg2, source(named(nums))),
-					in: evaluate(recFib, named(arg0) named(arg1) named(arg2))
+					(ex.arg$6, source(named(lastIndex)))
+					(ex.arg$7, source(named(nums))),
+					in: evaluate(function(recFib), named(ex.arg$5) named(ex.arg$6) named(ex.arg$7))
 				)
 			)
 		)

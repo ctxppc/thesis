@@ -17,8 +17,8 @@ extension CA {
 		/// An effect that evaluates `to` and puts it in the vector in `of` at zero-based position `at`.
 		case setElement(of: Location, at: Source, to: Source)
 		
-		/// An effect that invokes the labelled procedure passing given arguments and puts the procedure's result in `result`.
-		case call(Label, [Source], result: Location)
+		/// An effect that invokes the procedure with given target code capability with given arguments and puts the procedure's result in `result`.
+		case call(Source, [Source], result: Location)
 		
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
@@ -64,8 +64,8 @@ extension CA {
 				case .setElement(of: let vector, at: let index, to: let element):
 				Lowered.setElement(of: vector, index: index, to: element)
 				
-				case .call(let name, let arguments, result: let result):
-				Lowered.call(.procedure(name), arguments, result: result)
+				case .call(let procedure, let arguments, result: let result):
+				Lowered.call(procedure, arguments, result: result)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

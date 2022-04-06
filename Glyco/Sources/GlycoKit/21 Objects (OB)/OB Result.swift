@@ -6,8 +6,8 @@ extension OB {
 		/// A result that evaluates to given value.
 		case value(Value)
 		
-		/// A result that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Value])
+		/// A result that evaluates to given function evaluated with given arguments.
+		indirect case evaluate(Value, [Value])
 		
 		/// A result that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Result, else: Result)
@@ -25,8 +25,8 @@ extension OB {
 				case .value(let value):
 				return .value(try value.lowered(in: &context))
 				
-				case .evaluate(let name, let arguments):
-				return .evaluate(name, try arguments.lowered(in: &context))
+				case .evaluate(let function, let arguments):
+				return try .evaluate(function.lowered(in: &context), try arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

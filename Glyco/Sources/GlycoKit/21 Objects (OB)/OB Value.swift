@@ -40,8 +40,8 @@ extension OB {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
-		/// A value that evaluates to a function evaluated with given arguments.
-		case evaluate(Label, [Value])
+		/// A value that evaluates to given function evaluated with given arguments.
+		indirect case evaluate(Value, [Value])
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
@@ -90,8 +90,8 @@ extension OB {
 				case .binary(let lhs, let op, let rhs):
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .evaluate(let name, let arguments):
-				return .evaluate(name, try arguments.lowered(in: &context))
+				case .evaluate(let function, let arguments):
+				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

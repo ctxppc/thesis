@@ -43,7 +43,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -53,7 +53,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<OB.Result> ::=
 						"value""("<Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
@@ -104,7 +104,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<NT.Result> ::=
 						"value""("<Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
@@ -123,7 +123,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -172,7 +172,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -194,7 +194,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<Λ.Result> ::=
 						"value""("<Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
@@ -221,7 +221,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -246,7 +246,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<EX.Result> ::=
 						"value""("<Value>")"
-						| "evaluate""("<Label>, <[Value]>")"
+						| "evaluate""("<Value>, <[Value]>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
@@ -285,7 +285,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "element""(""of:" <Symbol>, "at:" <Source>")"
 						| "seal"
 						| "sealed""("<Symbol>, "with:" <Symbol>")"
-						| "evaluate""("<Label>, <[Source]>")"
+						| "evaluate""("<Source>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -315,7 +315,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<LS.Result> ::=
 						"value""("<Value>")"
-						| "evaluate""("<Label>, <[Source]>")"
+						| "evaluate""("<Source>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
@@ -343,7 +343,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<DF.Result> ::=
 						"value""("<Value>")"
 						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
-						| "evaluate""("<Label>, <[Source]>")"
+						| "evaluate""("<Source>, <[Source]>")"
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
 				\par
@@ -365,7 +365,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "element""(""of:" <Location>, "at:" <Source>")"
 						| "seal"
 						| "sealed""("<Location>, "with:" <Location>")"
-						| "evaluate""("<Label>, <[Source]>")"
+						| "evaluate""("<Source>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
@@ -407,7 +407,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "element""(""of:" <Location>, "at:" <Source>")"
 						| "seal"
 						| "sealed""("<Location>, "with:" <Location>")"
-						| "evaluate""("<Label>, <[Source]>")"
+						| "evaluate""("<Source>, <[Source]>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
@@ -427,7 +427,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "set""("<Location>, "to:" <Value>")"
 						| "setField""("<Field.Name>, "of:" <Location>, "to:" <Source>")"
 						| "setElement""(""of:" <Location>, "at:" <Source>, "to:" <Source>")"
-						| "call""("<Label>, <[Source]>, "result:" <Location>")"
+						| "call""("<Source>, <[Source]>, "result:" <Location>")"
 						| "if""("<Predicate>, "then:" <Effect>, "else:" <Effect>")"
 						| "return""("<Source>")"
 				\par

@@ -9,7 +9,7 @@ final class ProcedureTests : XCTestCase {
 		
 		let fortyTwo: EX.Label = "fortytwo"
 		let source = EX.Program(
-			.evaluate(fortyTwo, []),
+			.evaluate(.function(fortyTwo), []),
 			functions:	[
 				.init(fortyTwo, takes: [], returns: .s32, in: .value(.constant(42)))
 			]

@@ -53,7 +53,7 @@ extension CC {
 		/// An effect that performs `then` if the predicate holds, or `else` otherwise.
 		indirect case `if`(Predicate, then: Effect, else: Effect)
 		
-		/// An effect that invokes the procedure with given target code capability with given arguments and putting the procedure's result in `result`.
+		/// An effect that invokes the procedure with given target code capability with given arguments and puts the procedure's result in `result`.
 		case call(Source, [Source], result: Location)
 		
 		/// An effect that returns given result to the caller.

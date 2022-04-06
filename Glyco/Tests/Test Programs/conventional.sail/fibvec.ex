@@ -1,11 +1,11 @@
 (
-	evaluate(fib, constant(0) constant(1)),
+	evaluate(function(fib), constant(0) constant(1)),
 	functions:
 		
 		(fib,
 			takes: (first, s32()) (second, s32()),
 			returns: s32(),
-			in: evaluate(recFib, constant(2) constant(29) vector(s32(), count: 30))
+			in: evaluate(function(recFib), constant(2) constant(29) vector(s32(), count: 30))
 		)
 		
 		(recFib, 
@@ -21,7 +21,7 @@
 						element(of: named(nums), at: binary(named(index), sub, constant(1))),
 					)),
 					then: evaluate(
-						recFib, 
+						function(recFib),
 						binary(named(index), add, constant(1)) 
 						named(lastIndex) 
 						named(nums)

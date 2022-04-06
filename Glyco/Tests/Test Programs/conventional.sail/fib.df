@@ -1,7 +1,7 @@
 (
 	let(
-		(ls.arg0, source(constant(0))) (ls.arg1, source(constant(1))) (ls.arg2, source(constant(30))),
-		in: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+		(ls.arg, source(constant(0))) (ls.arg$1, source(constant(1))) (ls.arg$2, source(constant(30))),
+		in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
 	),
 	functions: (
 		fib,
@@ -14,22 +14,22 @@
 			),
 			then: value(source(location(ls.curr))),
 			else: let(
-				(ls.arg0, source(location(ls.curr)))
+				(ls.arg, source(location(ls.curr)))
 				(
-					ls.arg1,
+					ls.arg$1,
 					let(
 						(ls.lhs$1, source(location(ls.prev))) (ls.rhs$1, source(location(ls.curr))),
 						in: binary(location(ls.lhs$1), add, location(ls.rhs$1))
 					)
 				)
 				(
-					ls.arg2,
+					ls.arg$2,
 					let(
 						(ls.lhs$2, source(location(ls.iter))) (ls.rhs$2, source(constant(1))),
 						in: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
 					)
 				),
-				in: evaluate(fib, location(ls.arg0) location(ls.arg1) location(ls.arg2))
+				in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
 			)
 		)
 	)

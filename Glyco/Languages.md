@@ -122,7 +122,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -134,7 +134,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <dl>
 	<dt><code>OB.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
@@ -201,7 +201,7 @@ A language that introduces named types in a structural type system.
 <dl>
 	<dt><code>NT.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
@@ -222,7 +222,7 @@ A language that introduces named types in a structural type system.
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -288,7 +288,7 @@ A language that introduces anonymous functions and function values.
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -314,7 +314,7 @@ A language that introduces anonymous functions and function values.
 <dl>
 	<dt><code>Λ.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
@@ -353,7 +353,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -383,7 +383,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Value])</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
@@ -431,7 +431,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dd><code><strong>element</strong>(<strong>of:</strong> Symbol, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Symbol, <strong>with:</strong> Symbol)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>evaluate</strong>(Source, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -467,7 +467,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 <dl>
 	<dt><code>LS.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>evaluate</strong>(Source, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
@@ -510,7 +510,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dt><code>DF.Result</code></dt>
 	<dd><code><strong>value</strong>(Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>evaluate</strong>(Source, [Source])</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
@@ -535,7 +535,7 @@ A language that introduces definitions with function-wide namespacing.
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Location, <strong>with:</strong> Location)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>evaluate</strong>(Source, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
@@ -594,7 +594,7 @@ A language that allows a computation to be attached to a value.
 	<dd><code><strong>element</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Location, <strong>with:</strong> Location)</code></dd>
-	<dd><code><strong>evaluate</strong>(Label, [Source])</code></dd>
+	<dd><code><strong>evaluate</strong>(Source, [Source])</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
 </dl>
@@ -628,7 +628,7 @@ A language that groups all effects that write to a location under one canonical 
 	<dd><code><strong>set</strong>(Location, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Location, <strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Location, <strong>at:</strong> Source, <strong>to:</strong> Source)</code></dd>
-	<dd><code><strong>call</strong>(Label, [Source], <strong>result:</strong> Location)</code></dd>
+	<dd><code><strong>call</strong>(Source, [Source], <strong>result:</strong> Location)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Effect, <strong>else:</strong> Effect)</code></dd>
 	<dd><code><strong>return</strong>(Source)</code></dd>
 </dl>
