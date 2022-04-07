@@ -64,6 +64,9 @@ extension FO {
 		/// An effect that calls the procedure with given target code capability.
 		case call(Source)
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Source, data: Source)
+		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
 		
@@ -217,6 +220,13 @@ extension FO {
 				
 				case .call(.capability(to: let name)):
 				Lower.Effect.call(.label(name))
+				
+				case .invoke(target: let target, data: let data):
+				let (loadTarget, target) = try load(.cap, from: target, using: tempRegisterA)
+				let (loadData, data) = try load(.cap, from: data, using: tempRegisterB)
+				loadTarget
+				loadData
+				Lower.Effect.invoke(target: target, data: data)
 				
 				case .return(to: .constant(let value)):
 				throw LoweringError.returningToConstant(value)

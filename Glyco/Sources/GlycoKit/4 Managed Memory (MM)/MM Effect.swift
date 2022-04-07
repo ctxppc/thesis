@@ -94,6 +94,9 @@ extension MM {
 		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
 		case call(Target)
 		
+		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		case invoke(target: Register, data: Register)
+		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
 		/// If scall invocations are used, this effect invokes the target code capability, which is usually `cra`, with the data capability `cfp` thereby unsealing both for the caller. Otherwise, this effect jumps to the target, unsealing it first if it is a sentry capability.
@@ -331,6 +334,17 @@ extension MM {
 					}
 					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: tempRegisterA)	// can't use cnull link register for routine calls
 					ret ~ .copy(.cap, into: .fp, from: .invocationData)	// restore cfp
+					
+				}
+				
+				case .invoke(target: let target, data: let data):
+				switch context.configuration.callingConvention {
+					
+					case .conventional:
+					try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
+					
+					case .heap:
+					_ = TODO.unimplemented
 					
 				}
 				
