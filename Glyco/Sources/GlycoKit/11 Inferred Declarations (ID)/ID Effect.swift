@@ -61,6 +61,11 @@ extension ID {
 		/// This effect assumes a suitable calling convention has already been applied to the program. The parameter registers are only used for the purposes of liveness analysis.
 		case call(Source, parameters: [Register])
 		
+		/// An effect that calls the procedure with given target code capability and data capability (both sealed with the same object type) and uses given unsealed parameter registers.
+		///
+		/// This effect assumes a suitable calling convention has already been applied to the program. The unsealed parameter registers are only used for the purposes of liveness analysis.
+		case callSealed(Source, data: Source, unsealedParameters: [Register])
+		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
 		
@@ -122,6 +127,9 @@ extension ID {
 				
 				case .call(let target, parameters: let parameters):
 				Lowered.call(target, parameters: parameters)
+				
+				case .callSealed(let target, data: let data, unsealedParameters: let unsealedParameters):
+				Lowered.callSealed(target, data: data, unsealedParameters: unsealedParameters)
 				
 				case .return(to: let caller):
 				try context.declarations.require(caller, type: .cap)

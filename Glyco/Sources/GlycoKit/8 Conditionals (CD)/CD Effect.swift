@@ -57,6 +57,9 @@ extension CD {
 		/// An effect that calls the procedure with given target code capability.
 		case call(Source)
 		
+		/// An effect that calls the procedure with given target code capability and data capability (both sealed with the same object type).
+		case callSealed(Source, data: Source)
+		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
 		
@@ -82,7 +85,7 @@ extension CD {
 					.if,
 					.pushFrame, .popFrame,
 					.clearAll,
-					.call, .return:
+					.call, .callSealed, .return:
 				return try [self].lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 				
 			}
@@ -123,7 +126,7 @@ extension CD {
 					.createSeal, .seal,
 					.pushFrame, .popFrame,
 					.clearAll,
-					.call:
+					.call, .callSealed:
 				return false
 				
 				case .if(_, then: let affirmative, else: let negative):
@@ -317,6 +320,11 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			case .call(let procedure):
 			let returnPoint = context.bag.uniqueName(from: "ret")
 			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
+				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
+			
+			case .callSealed(let procedure, data: let data):
+			let returnPoint = context.bag.uniqueName(from: "ret")
+			return try [.init(name: entryLabel, do: previousEffects, then: .callSealed(procedure, data: data, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			
 			case .return(to: let caller):

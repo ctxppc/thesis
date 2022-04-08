@@ -65,6 +65,13 @@ extension ALA {
 		/// A call effect "defines" caller-saved registers.
 		case call(Source, parameters: [Register], analysisAtEntry: Analysis)
 		
+		/// An effect that calls the procedure with given target code capability and data capability (both sealed with the same object type) and uses given unsealed parameter registers.
+		///
+		/// This effect assumes a suitable calling convention has already been applied to the program. The unsealed parameter registers are only used for the purposes of liveness analysis.
+		///
+		/// A sealed call effect "defines" caller-saved registers.
+		case callSealed(Source, data: Source, unsealedParameters: [Register], analysisAtEntry: Analysis)
+		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
 		/// This effect assumes a suitable calling convention has already been applied to the program.
@@ -134,6 +141,9 @@ extension ALA {
 				
 				case .call(let target, parameters: _, analysisAtEntry: _):
 				Lowered.call(try target.lowered(in: &context))
+				
+				case .callSealed(let target, data: let data, unsealedParameters: _, analysisAtEntry: _):
+				try Lowered.callSealed(target.lowered(in: &context), data: data.lowered(in: &context))
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				Lowered.return(to: try caller.lowered(in: &context))
@@ -244,6 +254,9 @@ extension ALA {
 				case .call(let procedure, parameters: let parameters, analysisAtEntry: _):
 				return .call(procedure, parameters: parameters, analysisAtEntry: analysis)
 				
+				case .callSealed(let procedure, data: let data, unsealedParameters: let unsealedParameters, analysisAtEntry: _):
+				return .callSealed(procedure, data: data, unsealedParameters: unsealedParameters, analysisAtEntry: analysis)
+				
 				case .return(to: let caller, analysisAtEntry: _):
 				return .return(to: caller, analysisAtEntry: analysis)
 				
@@ -270,6 +283,7 @@ extension ALA {
 					.popScope(analysisAtEntry: let analysis),
 					.clearAll(except: _, analysisAtEntry: let analysis),
 					.call(_, parameters: _, analysisAtEntry: let analysis),
+					.callSealed(_, data: _, unsealedParameters: _, analysisAtEntry: let analysis),
 					.return(to: _, analysisAtEntry: let analysis):
 				return analysis
 			}
@@ -303,7 +317,7 @@ extension ALA {
 					.filter { !sparedRegisters.contains($0) }
 					.map { .register($0) }
 				
-				case .call:
+				case .call, .callSealed:
 				return configuration.callerSavedRegisters.map { .register($0) }	// includes args and cra
 				
 			}
@@ -346,8 +360,11 @@ extension ALA {
 				case .popScope:
 				return configuration.calleeSavedRegisters.map { .register($0) }
 				
-				case .call(let target, parameters: let parameters, analysisAtEntry: _):
-				return [target].compactMap(\.location) + parameters.map { .register($0) }
+				case .call(let procedure, parameters: let parameters, analysisAtEntry: _):
+				return [procedure].compactMap(\.location) + parameters.map { .register($0) }
+				
+				case .callSealed(let procedure, data: let data, unsealedParameters: let unsealedParameters, analysisAtEntry: _):
+				return [procedure, data].compactMap(\.location) + unsealedParameters.map { .register($0) }
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				return [caller].compactMap(\.location) + [.register(.a0)]
@@ -384,7 +401,7 @@ extension ALA {
 					.createSeal, .seal,
 					.pushScope, .popScope,
 					.clearAll,
-					.call, .return:
+					.call, .callSealed, .return:
 				return nil
 				
 				case .if(let predicate, then: let affirmative, else: let negative, analysisAtEntry: _):

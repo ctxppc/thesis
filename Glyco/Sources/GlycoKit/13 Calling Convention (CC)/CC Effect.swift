@@ -132,8 +132,6 @@ extension CC {
 				case .call(let procedure, let arguments, result: let result):
 				if case .cap(.procedure(let parameters, let resultType)) = try context.type(of: procedure) {
 					
-					// TODO: Update for calls of procedures with a sealed parameter.
-					
 					// Caller-save registers in abstract locations to limit their liveness across a call.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
 						for register in context.configuration.callerSavedRegisters {
@@ -157,11 +155,12 @@ extension CC {
 					
 					// Pass frame-resident arguments first.
 					for field in assignments.parameterRecordType {
-						Lowered.setField(field.name, of: .abstract(argumentsRecord), to: argumentsByParameterName[field.name.rawValue] !! "Missing argument")
+						Lowered.setField(field.name, of: .abstract(argumentsRecord), to: argumentsByParameterName[field.name.rawValue] !! "Missing frame-resident argument")
 					}
 					
-					// Pass register-resident arguments last to limit liveness range of registers.
-					for (asn, arg) in zip(assignments.viaRegisters, arguments) {
+					// Pass (unsealed) register-resident arguments last to limit liveness range of registers.
+					// Sealed arguments are passed via a sealed call effect.
+					for (asn, arg) in zip(assignments.viaRegisters, arguments) where !asn.parameter.sealed {
 						Lowered.set(.register(asn.register), to: arg)
 					}
 					
@@ -170,18 +169,29 @@ extension CC {
 						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
 					}
 					
-					// If using a secure CC, clear all registers except argument registers in use.
-					let argumentRegisters = assignments
+					// If using a secure CC, clear all registers except unsealed argument registers in use.
+					// The sealed argument register (if any) is overwritten anyway so it doesn't matter if it's cleared here.
+					let unsealedArgumentRegisters = assignments
 						.viaRegisters
+						.filter { !$0.parameter.sealed }
 						.map(\.register)
 						.appending(contentsOf: [assignments.argumentsRecordRegister].compacted())
 					if context.configuration.callingConvention != .conventional {
-						Lowered.clearAll(except: argumentRegisters)
+						Lowered.clearAll(except: unsealedArgumentRegisters)
 					}
 					
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
-					Lowered.call(try procedure.lowered(in: &context), parameters: argumentRegisters)
+					let loweredProcedure = try procedure.lowered(in: &context)
+					if let sealedParameter = parameters.first(where: \.sealed) {
+						Lowered.callSealed(
+							loweredProcedure,
+							data: argumentsByParameterName[sealedParameter.location.rawValue] !! "Missing sealed argument",
+							unsealedParameters: unsealedArgumentRegisters
+						)
+					} else {
+						Lowered.call(loweredProcedure, parameters: unsealedArgumentRegisters)
+					}
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {

@@ -61,10 +61,12 @@ extension FO {
 		/// An effect that jumps to given target.
 		case jump(to: Label)
 		
-		/// An effect that calls the procedure with given target code capability.
+		/// An effect that links the return capability and calls the procedure with given target code capability.
 		case call(Source)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		///
+		/// Note that this effect does not link the return capability.
 		case invoke(target: Source, data: Source)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).

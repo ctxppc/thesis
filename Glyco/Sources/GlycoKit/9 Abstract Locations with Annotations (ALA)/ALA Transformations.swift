@@ -88,6 +88,9 @@ extension ALA {
 				case .call(let target, parameters: let parameters, analysisAtEntry: let analysis):
 				return .call(try substitute(target), parameters: parameters, analysisAtEntry: analysis)
 				
+				case .callSealed(let target, data: let data, unsealedParameters: let unsealedParameters, analysisAtEntry: let analysis):
+				return try .callSealed(substitute(target), data: substitute(data), unsealedParameters: unsealedParameters, analysisAtEntry: analysis)
+				
 				case .return(to: let caller, analysisAtEntry: let analysis):
 				return .return(to: try substitute(caller), analysisAtEntry: analysis)
 				

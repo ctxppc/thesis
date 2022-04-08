@@ -16,9 +16,9 @@ extension CC {
 		/// The value type of the argument.
 		public var type: ValueType
 		
-		/// A Boolean value indicating whether the argument to `self` is sealed and unsealed as part of the invocation.
+		/// A Boolean value indicating whether the argument to `self` is sealed and unsealed as part of the sealed call.
 		///
-		/// At most one parameter can be marked as sealed.
+		/// At most one parameter in a procedure can be marked as sealed.
 		public var sealed: Bool
 		
 		/// An assignment of parameters to physical locations.
@@ -79,7 +79,7 @@ extension CC {
 			
 			/// The register that `parameter` is assigned to.
 			///
-			/// The caller puts the argument in and the callee retrieves the argument from this location. For sealed parameters, the caller-side assignment is done as part of the sealed invocation effect instead.
+			/// The caller puts the argument in and the callee retrieves the argument from this location. For sealed parameters, the caller-side assignment is done as part of the sealed call instead.
 			var register: Lower.Register
 			
 		}

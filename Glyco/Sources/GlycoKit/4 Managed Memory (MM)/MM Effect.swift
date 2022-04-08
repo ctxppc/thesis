@@ -95,6 +95,8 @@ extension MM {
 		case call(Target)
 		
 		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
+		///
+		/// Note that this effect does not link the return capability.
 		case invoke(target: Register, data: Register)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).

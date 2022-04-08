@@ -14,6 +14,11 @@ extension PR {
 		/// A continuation that calls the procedure with given target capability then returns to the block labelled `returnPoint`.
 		case call(Source, returnPoint: Label)
 		
+		/// A continuation that invokes the procedure with given target code capability and data capability, then returns to the block labelled `returnPoint`.
+		///
+		/// The code and data capabilities must be sealed with the same object type.
+		case callSealed(Source, data: Source, returnPoint: Label)
+		
 		/// A continuation that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
 		
@@ -35,6 +40,9 @@ extension PR {
 				
 				case .call(let target, returnPoint: let returnPoint):
 				return .call(target, returnPoint: returnPoint)
+				
+				case .callSealed(let target, data: let data, returnPoint: let returnPoint):
+				return .callSealed(target, data: data, returnPoint: returnPoint)
 				
 				case .return(to: let caller):
 				return .return(to: caller)
