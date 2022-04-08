@@ -28,7 +28,7 @@ extension OB {
 				return .init(typeName, try valueType.lowered(in: &context))
 				
 				case .object(let typeName, let objectType):
-				return .init(typeName, .cap(.record(objectType.stateRecordType, sealed: true)))
+				return .init(typeName, .cap(.record(try objectType.stateRecordType.lowered(in: &context), sealed: true)))
 				
 			}
 		}

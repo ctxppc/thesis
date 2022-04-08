@@ -4,7 +4,7 @@ extension CC {
 	public struct Parameter : Codable, Equatable {
 		
 		/// Creates a parameter with given location and value type.
-		public init(_ location: Location, _ type: ValueType, sealed: Bool = false) {
+		public init(_ location: Location, _ type: ValueType, sealed: Bool) {
 			self.location = location
 			self.type = type
 			self.sealed = sealed
@@ -16,7 +16,7 @@ extension CC {
 		/// The value type of the argument.
 		public var type: ValueType
 		
-		/// A Boolean value indicating whether the argument to `self` is sealed and unsealed as part of the sealed call.
+		/// A Boolean value indicating whether an argument to `self` is sealed, to be unsealed by the sealed call.
 		///
 		/// At most one parameter in a procedure can be marked as sealed.
 		public var sealed: Bool

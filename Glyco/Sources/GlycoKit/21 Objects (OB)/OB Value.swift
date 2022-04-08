@@ -49,7 +49,7 @@ extension OB {
 		/// A value that evaluates to given value after associating zero or more values with a name.
 		indirect case `let`([Definition], in: Value)
 		
-		/// A value that evaluates to given value after defining a
+		/// A value that evaluates to given value after associating zero or more types with a name.
 		indirect case letType([TypeDefinition], in: Value)
 		
 		/// A value that evaluates to given value after performing given effects.
@@ -70,7 +70,7 @@ extension OB {
 				return .named(symbol)
 				
 				case .record(let type):
-				return .record(type)
+				return .record(try type.lowered(in: &context))
 				
 				case .field(let fieldName, of: let record):
 				return .field(fieldName, of: try record.lowered(in: &context))

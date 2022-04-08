@@ -234,6 +234,7 @@ extension LS.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case type = "_1"
+		case sealed = "sealed"
 	}
 }
 
@@ -325,6 +326,7 @@ extension NT.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case type = "_1"
+		case sealed = "sealed"
 	}
 }
 
@@ -332,6 +334,13 @@ extension OB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
 		case functions = "functions"
+	}
+}
+
+extension OB.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
 	}
 }
 
@@ -348,6 +357,19 @@ extension OB.Function {
 		case parameters = "takes"
 		case resultType = "returns"
 		case result = "in"
+	}
+}
+
+extension OB.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension OB.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
 	}
 }
 

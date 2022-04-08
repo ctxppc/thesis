@@ -36,15 +36,15 @@ extension OB {
 				return .vector(of: try elementType.lowered(in: &context), sealed: false)
 				
 				case .record(let recordType):
-				return .record(recordType, sealed: false)
+				return .record(try recordType.lowered(in: &context), sealed: false)
 				
 				case .procedure(takes: let parameters, returns: let resultType):
-				return .procedure(takes: parameters, returns: try resultType.lowered(in: &context))
+				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .object(let typeName):
 				guard let definition = context.types.first(where: { $0.name == typeName }) else { throw LoweringError.unknownObjectType(typeName) }
 				guard case .object(_, let objectType) = definition else { throw LoweringError.unknownObjectType(typeName) }
-				return .record(objectType.stateRecordType, sealed: true)
+				return .record(try objectType.stateRecordType.lowered(in: &context), sealed: true)
 				
 			}
 		}

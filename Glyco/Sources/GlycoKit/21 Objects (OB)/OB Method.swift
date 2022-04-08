@@ -48,7 +48,7 @@ extension OB {
 			defer { context.selfName = previousSelfName }
 			return try .init(
 				name.lowered(in: &context),
-				takes:		parameters,
+				takes:		parameters.lowered(in: &context),
 				returns:	resultType.lowered(in: &context),
 				in:			result.lowered(in: &context)
 			)

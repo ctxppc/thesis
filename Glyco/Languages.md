@@ -77,10 +77,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 **Inherited from NT:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Field</code>, 
 <code>Label</code>, 
-<code>Parameter</code>, 
-<code>RecordType</code>, 
 <code>Symbol</code>, 
 <code>TypeName</code>
 <dl>
@@ -95,12 +92,24 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Parameter</code></dt>
+	<dd><code>(Symbol, ValueType)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.Initialiser</code></dt>
 	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Effect</code></dt>
@@ -264,7 +273,7 @@ A language that introduces named types in a structural type system.
 </dl>
 <dl>
 	<dt><code>NT.Parameter</code></dt>
-	<dd><code>(Symbol, ValueType)</code></dd>
+	<dd><code>(Symbol, ValueType, <strong>sealed:</strong> Bool)</code></dd>
 </dl>
 
 <h2 id="Λ">Grammar for Λ (Lambdas)</h2>
@@ -422,7 +431,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 </dl>
 <dl>
 	<dt><code>LS.Parameter</code></dt>
-	<dd><code>(Symbol, ValueType)</code></dd>
+	<dd><code>(Symbol, ValueType, <strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
 	<dt><code>LS.ValueType</code></dt>

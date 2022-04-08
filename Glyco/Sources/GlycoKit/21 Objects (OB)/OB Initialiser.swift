@@ -28,11 +28,11 @@ extension OB {
 			context.selfName = context.symbols.uniqueName(from: "self")
 			defer { context.selfName = previousSelfName }
 			
-			return .init(
+			return try .init(
 				.init(rawValue: "ob.\(context.objectTypeName ?? "")_init"),
-				takes:		parameters,
+				takes:		parameters.lowered(in: &context),
 				returns:	.s32,
-				in:			try result.lowered(in: &context)
+				in:			result.lowered(in: &context)
 			)
 			
 		}
