@@ -1,10 +1,10 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-protocol Name : RawCodable, Hashable, ExpressibleByStringLiteral where RawValue == String {
+public protocol Name : RawCodable, Hashable, ExpressibleByStringInterpolation where RawValue == String {
 	init(rawValue: RawValue)
 }
 
-protocol Named {
+public protocol Named {
 	
 	/// The value's name.
 	var name: Name { get }

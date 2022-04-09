@@ -16,12 +16,6 @@ extension OB {
 			types.reversed()[name]
 		}
 		
-		/// A bag of symbols.
-		var symbols = Bag<Symbol>()
-		
-		/// A bag of labels.
-		var labels = Bag<Label>()
-		
 	}
 	
 }

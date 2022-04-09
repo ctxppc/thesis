@@ -88,8 +88,8 @@ extension CD {
 				return [.init(name: entryLabel, do: previousEffects, then: .branch(if: .relation(lhs, relation, rhs), then: affirmativeTarget, else: negativeTarget))]
 				
 				case .if(let condition, then: let affirmative, else: let negative):
-				let intermediateAffirmative = context.bag.uniqueName(from: "then")
-				let intermediateNegative = context.bag.uniqueName(from: "else")
+				let intermediateAffirmative = context.labels.uniqueName(from: "then")
+				let intermediateNegative = context.labels.uniqueName(from: "else")
 				let conditionBlocks = try condition.lowered(
 					in:					&context,
 					entryLabel:			entryLabel,
@@ -114,7 +114,7 @@ extension CD {
 				return conditionBlocks + affirmativeBlocks + negativeBlocks
 				
 				case .do(let effects, then: let predicate):
-				let predicateLabel = context.bag.uniqueName(from: "pred")
+				let predicateLabel = context.labels.uniqueName(from: "pred")
 				return try Effect.do(effects).lowered(
 					in:					&context,
 					entryLabel:			entryLabel,

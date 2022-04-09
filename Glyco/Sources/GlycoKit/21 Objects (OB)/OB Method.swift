@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A function that can be invoked on an object.
-	public struct Method : Codable, Equatable {
+	public struct Method : Named, Codable, Equatable {
 		
 		/// Creates a method with given name, parameters, result type, and result.
 		public init(_ name: Symbol, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
@@ -13,7 +13,7 @@ extension OB {
 			self.result = result
 		}
 		
-		/// The method's name.
+		// See protocol.
 		public var name: Symbol
 		
 		/// The method's parameters (excluding the `self` value).

@@ -25,8 +25,8 @@ extension EX {
 				return .constant(holds)
 				
 				case .relation(let lhs, let relation, let rhs):
-				let l = context.bag.uniqueName(from: "lhs")
-				let r = context.bag.uniqueName(from: "rhs")
+				let l = context.symbols.uniqueName(from: "lhs")
+				let r = context.symbols.uniqueName(from: "rhs")
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))

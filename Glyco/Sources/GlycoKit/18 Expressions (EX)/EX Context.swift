@@ -6,7 +6,7 @@ extension EX {
 	struct Context {
 		
 		/// The symbol bag.
-		var bag = Bag<Lower.Symbol>()
+		var symbols = Bag<Lower.Symbol>()
 		
 	}
 	

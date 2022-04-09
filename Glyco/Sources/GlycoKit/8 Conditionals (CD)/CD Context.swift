@@ -6,7 +6,7 @@ extension CD {
 	struct Context {
 		
 		/// The label bag.
-		var bag = Bag<Label>()
+		var labels = Bag<Label>()
 		
 	}
 	

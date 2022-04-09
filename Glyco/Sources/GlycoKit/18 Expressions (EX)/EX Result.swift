@@ -28,14 +28,14 @@ extension EX {
 				
 				case .evaluate(.function(let name), let arguments):
 				let definitions = try arguments.map {
-					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+					Lower.Definition(context.symbols.uniqueName(from: "arg"), try $0.lowered(in: &context))
 				}
 				return .let(definitions, in: .evaluate(.function(name), definitions.map { .named($0.name) }))
 				
 				case .evaluate(let function, let arguments):
-				let f = context.bag.uniqueName(from: "f")
+				let f = context.symbols.uniqueName(from: "f")
 				let definitions = try arguments.map {
-					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+					Lower.Definition(context.symbols.uniqueName(from: "arg"), try $0.lowered(in: &context))
 				}
 				return .let(
 					definitions + [.init(f, try function.lowered(in: &context))],

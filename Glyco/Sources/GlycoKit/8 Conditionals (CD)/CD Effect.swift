@@ -240,7 +240,7 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return try effects.lowered(in: &context, entryLabel: entryLabel, previousEffects: previousEffects, exitLabel: exitLabel)
 			
 			case .do(effects: let effects):
-			let restLabel = context.bag.uniqueName(from: "then")
+			let restLabel = context.labels.uniqueName(from: "then")
 			return try effects.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
@@ -278,9 +278,9 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return try simpleLowering(.seal(into: destination, source: source, seal: seal))
 			
 			case .if(let predicate, then: let affirmative, else: let negative):
-			let affirmativeLabel = context.bag.uniqueName(from: "then")
-			let negativeLabel = context.bag.uniqueName(from: "else")
-			let restLabel = rest.doesNothing ? exitLabel : context.bag.uniqueName(from: "endif")
+			let affirmativeLabel = context.labels.uniqueName(from: "then")
+			let negativeLabel = context.labels.uniqueName(from: "else")
+			let restLabel = rest.doesNothing ? exitLabel : context.labels.uniqueName(from: "endif")
 			let conditionalBlocks = try predicate.lowered(
 				in:					&context,
 				entryLabel:			entryLabel,
@@ -318,12 +318,12 @@ fileprivate extension RandomAccessCollection where Element == CD.Effect {
 			return try simpleLowering(.clearAll(except: sparedRegisters))
 			
 			case .call(let procedure):
-			let returnPoint = context.bag.uniqueName(from: "ret")
+			let returnPoint = context.labels.uniqueName(from: "ret")
 			return try [.init(name: entryLabel, do: previousEffects, then: .call(procedure, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			
 			case .callSealed(let procedure, data: let data):
-			let returnPoint = context.bag.uniqueName(from: "ret")
+			let returnPoint = context.labels.uniqueName(from: "ret")
 			return try [.init(name: entryLabel, do: previousEffects, then: .callSealed(procedure, data: data, returnPoint: returnPoint))]
 				+ rest.lowered(in: &context, entryLabel: returnPoint, previousEffects: [], exitLabel: exitLabel)
 			

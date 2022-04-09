@@ -46,6 +46,9 @@ extension OB {
 		/// A value that evaluates to given function evaluated with given arguments.
 		indirect case evaluate(Value, [Value])
 		
+		/// A value that messages the object with given object capability, method name, and arguments.
+		indirect case message(Value, Method.Name, [Value])
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
@@ -84,7 +87,9 @@ extension OB {
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
 				
 				case .object(let typeName, let arguments):
-				TODO.unimplemented
+				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
+				guard case .object(_, let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
+				return .evaluate(.named(objectType.symbolForInitialiser(typeName: typeName)), try arguments.lowered(in: &context))
 				
 				case .function(let name):
 				return .function(name)
@@ -101,6 +106,9 @@ extension OB {
 				case .evaluate(let function, let arguments):
 				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
 				
+				case .message(let receiver, let methodName, let arguments):
+				TODO.unimplemented
+				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
@@ -116,6 +124,29 @@ extension OB {
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
 				
 			}
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating that no object type is known by given name.
+			case unknownObjectType(TypeName)
+			
+			/// An error indicating the type defined with given name is not an object type.
+			case notAnObjectTypeDefinition(TypeName, actual: TypeDefinition)
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+						
+					case .unknownObjectType(let typeName):
+					return "“\(typeName)” is not a known object type"
+					
+					case .notAnObjectTypeDefinition(let typeName, actual: let actual):
+					return "“\(typeName)” is defined as \(actual) and thus not an object type"
+					
+				}
+			}
+			
 		}
 		
 	}

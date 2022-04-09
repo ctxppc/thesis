@@ -6,7 +6,7 @@ extension DF {
 	struct Context {
 		
 		/// The locations bag.
-		var bag = Bag<Location>()
+		var locations = Bag<Location>()
 		
 	}
 	

@@ -25,7 +25,7 @@ extension DF {
 			switch self {
 				
 				case .value(let value):
-				let result = context.bag.uniqueName(from: "result")
+				let result = context.locations.uniqueName(from: "result")
 				Lowered.set(result, to: try value.lowered(in: &context))
 				Lowered.return(.location(result))
 				
@@ -33,7 +33,7 @@ extension DF {
 				try Lowered.if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .evaluate(let function, let arguments):
-				let result = context.bag.uniqueName(from: "result")
+				let result = context.locations.uniqueName(from: "result")
 				Lowered.set(result, to: .evaluate(function, arguments))
 				Lowered.return(.location(result))
 				

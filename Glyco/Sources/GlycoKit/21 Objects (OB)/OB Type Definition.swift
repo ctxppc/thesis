@@ -15,7 +15,7 @@ extension OB {
 		case object(TypeName, ObjectType)
 		
 		// See protocol.
-		var name: TypeName {
+		public var name: TypeName {
 			switch self {
 				case .structural(let name, _),
 					.nominal(let name, _),

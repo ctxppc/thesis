@@ -29,17 +29,17 @@ extension EX {
 				try Lowered.let(definitions.lowered(in: &context), in: effect.lowered(in: &context))
 				
 				case .setField(let fieldName, of: let record, to: let newValue):
-				let rec = context.bag.uniqueName(from: "rec")
-				let val = context.bag.uniqueName(from: "val")
+				let rec = context.symbols.uniqueName(from: "rec")
+				let val = context.symbols.uniqueName(from: "val")
 				try Lowered.let([
 					.init(rec, record.lowered(in: &context)),
 					.init(val, newValue.lowered(in: &context)),
 				], in: .setField(fieldName, of: rec, to: .named(val)))
 				
 				case .setElement(of: let vector, at: let index, to: let element):
-				let vec = context.bag.uniqueName(from: "vec")
-				let idx = context.bag.uniqueName(from: "idx")
-				let elem = context.bag.uniqueName(from: "elem")
+				let vec = context.symbols.uniqueName(from: "vec")
+				let idx = context.symbols.uniqueName(from: "idx")
+				let elem = context.symbols.uniqueName(from: "elem")
 				try Lowered.let([
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context)),

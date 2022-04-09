@@ -60,7 +60,7 @@ extension EX {
 				return .record(type)
 				
 				case .field(let fieldName, of: let record):
-				let rec = context.bag.uniqueName(from: "rec")
+				let rec = context.symbols.uniqueName(from: "rec")
 				return try .let([
 					.init(rec, record.lowered(in: &context)),
 				], in: .field(fieldName, of: rec))
@@ -69,8 +69,8 @@ extension EX {
 				return .vector(valueType, count: count)
 				
 				case .element(of: let vector, at: let index):
-				let vec = context.bag.uniqueName(from: "vec")
-				let idx = context.bag.uniqueName(from: "idx")
+				let vec = context.symbols.uniqueName(from: "vec")
+				let idx = context.symbols.uniqueName(from: "idx")
 				return try .let([
 					.init(vec, vector.lowered(in: &context)),
 					.init(idx, index.lowered(in: &context))
@@ -83,16 +83,16 @@ extension EX {
 				return .seal
 				
 				case .sealed(let cap, with: let seal):
-				let c = context.bag.uniqueName(from: "cap")
-				let s = context.bag.uniqueName(from: "seal")
+				let c = context.symbols.uniqueName(from: "cap")
+				let s = context.symbols.uniqueName(from: "seal")
 				return try .let([
 					.init(c, cap.lowered(in: &context)),
 					.init(s, seal.lowered(in: &context))
 				], in: .sealed(c, with: s))
 				
 				case .binary(let lhs, let op, let rhs):
-				let l = context.bag.uniqueName(from: "lhs")
-				let r = context.bag.uniqueName(from: "rhs")
+				let l = context.symbols.uniqueName(from: "lhs")
+				let r = context.symbols.uniqueName(from: "rhs")
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
 					.init(r, rhs.lowered(in: &context))
@@ -100,14 +100,14 @@ extension EX {
 				
 				case .evaluate(.function(let name), let arguments):
 				let definitions = try arguments.map {
-					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+					Lower.Definition(context.symbols.uniqueName(from: "arg"), try $0.lowered(in: &context))
 				}
 				return .let(definitions, in: .evaluate(.function(name), definitions.map { .named($0.name) }))
 				
 				case .evaluate(let function, let arguments):
-				let f = context.bag.uniqueName(from: "f")
+				let f = context.symbols.uniqueName(from: "f")
 				let definitions = try arguments.map {
-					Lower.Definition(context.bag.uniqueName(from: "arg"), try $0.lowered(in: &context))
+					Lower.Definition(context.symbols.uniqueName(from: "arg"), try $0.lowered(in: &context))
 				}
 				return .let(
 					definitions + [.init(f, try function.lowered(in: &context))],
