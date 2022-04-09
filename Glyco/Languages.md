@@ -125,8 +125,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
-	<dd><code><strong>seal</strong></code></dd>
-	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>

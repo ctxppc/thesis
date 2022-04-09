@@ -26,7 +26,12 @@ extension OB {
 		public var result: Result
 		
 		/// The symbol referring to the `self` value in a method.
-		static let selfName: Symbol = "ob.self"	// shadowing provided by let-binding
+		static let selfName: Lower.Symbol = "ob.self"	// shadowing provided by let-binding
+		
+		/// The symbol of the function for `self`, as defined by in a `letType` value.
+		func symbol(typeName: TypeName) -> Lower.Symbol {
+			"ob.\(typeName).\(name).m"
+		}
 		
 	}
 	

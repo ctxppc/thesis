@@ -22,13 +22,8 @@ extension OB {
 		public var stateRecordType: RecordType
 		
 		/// The symbol of the function for the initialiser, as defined by in a `letType` value.
-		func symbolForInitialiser(typeName: TypeName) -> Symbol {
+		func initialiserSymbol(typeName: TypeName) -> Lower.Symbol {
 			"ob.\(typeName).init"
-		}
-		
-		/// The symbol of the function for the method with given name, as defined by in a `letType` value.
-		func symbolForMethod(named methodName: Method.Name, typeName: TypeName) -> Symbol {
-			"ob.\(typeName).\(methodName).m"
 		}
 		
 	}
