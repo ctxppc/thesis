@@ -3,19 +3,31 @@
 extension NT {
 	
 	/// A definition of a named type.
-	public struct TypeDefinition : Named, Codable, Equatable {
+	public enum TypeDefinition : Named, Codable, Equatable {
 		
-		/// Creates a definition with given name and value type.
-		public init(_ name: TypeName, _ type: ValueType) {
-			self.name = name
-			self.type = type
+		/// A definition of a type that is equivalent to (interchangeable with) its value type.
+		case structural(TypeName, ValueType)
+		
+		/// A definition of a type that is not equivalent to (not interchangeable with) its value type.
+		case nominal(TypeName, ValueType)
+		
+		// See protocol.
+		var name: TypeName {
+			switch self {
+				case .structural(let name, _),
+					.nominal(let name, _):
+				return name
+			}
 		}
 		
-		/// The defined name.
-		public var name: TypeName
-		
-		/// The definition's type.
-		public var type: ValueType
+		/// The value type.
+		var valueType: ValueType {
+			switch self {
+				case .structural(_, let valueType),
+					.nominal(_, let valueType):
+				return valueType
+			}
+		}
 		
 	}
 	

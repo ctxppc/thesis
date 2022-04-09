@@ -22,9 +22,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.Parameter> ::=
 							"("<Symbol>, <ValueType>")"
 				\par
-				<OB.Initialiser> ::=
-							"(""takes:" <[Parameter]>, "in:" <Result>")"
-				\par
 				<OB.Function> ::=
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
@@ -48,6 +45,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "object""("<TypeName>, <[Value]>")"
 						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
@@ -59,7 +57,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<OB.ObjectType> ::=
-							"(""initialiser:" <Initialiser>, "methods:" <[Method]>, "state:" <RecordType>")"
+							"(""initialiser:" <Constructor>, "methods:" <[Method]>, "state:" <RecordType>")"
 				\par
 				<OB.Result> ::=
 						"value""("<Value>")"
@@ -74,6 +72,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "s32"
 						| "cap""("<CapabilityType>")"
 				\par
+				<OB.Constructor> ::=
+							"(""takes:" <[Parameter]>, "in:" <Result>")"
+				\par
 				<OB.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
@@ -81,18 +82,19 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "object""("<TypeName>")"
 				\par
 				<OB.Method> ::=
-							"("<Name>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+							"("<Symbol>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
 				<OB.Definition> ::=
 							"("<Symbol>, <Value>")"
 				\par
 				<OB.TypeDefinition> ::=
-						"alias""("<TypeName>, <ValueType>")"
+						"structural""("<TypeName>, <ValueType>")"
+						| "nominal""("<TypeName>, <ValueType>")"
 						| "object""("<TypeName>, <ObjectType>")"
 				\par
 \end{grammar}
 \par
-\paragraph{ NT (Named Types) } A language that introduces named types in a structural type system.
+\paragraph{ NT (Named Types) } A language that introduces named structural and nominal types.
 \begin{grammar}
 	\footnotesize
 				<NT.Program> ::=
@@ -120,7 +122,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Result>")"
 				\par
 				<NT.TypeDefinition> ::=
-							"("<TypeName>, <ValueType>")"
+						"structural""("<TypeName>, <ValueType>")"
+						| "nominal""("<TypeName>, <ValueType>")"
 				\par
 				<NT.Value> ::=
 						"constant""("<Int>")"

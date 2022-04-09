@@ -28,6 +28,9 @@ extension OB {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
+		/// A value that evaluates to a unique capability to an object constructed with given arguments.
+		case object(TypeName, [Value])
+		
 		/// A value representing a globally defined function with given name.
 		case function(Label)
 		
@@ -60,8 +63,7 @@ extension OB {
 			switch self {
 				
 				case .self:
-				guard let name = context.selfName else { throw LoweringError.selfOutsideMethod }
-				return .named(name)
+				return .named(Method.selfName)
 				
 				case .constant(let value):
 				return .constant(value)
@@ -80,6 +82,9 @@ extension OB {
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
+				
+				case .object(let typeName, let arguments):
+				TODO.unimplemented
 				
 				case .function(let name):
 				return .function(name)
@@ -103,27 +108,14 @@ extension OB {
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .letType(let definitions, in: let body):
+				context.types.append(contentsOf: definitions)
+				defer { context.types.removeLast(definitions.count) }
 				return try .letType(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
 				
 			}
-		}
-		
-		enum LoweringError : LocalizedError {
-			
-			/// An error indicating a use of `self` outside a method.
-			case selfOutsideMethod
-			
-			// See protocol.
-			var errorDescription: String? {
-				switch self {
-					case .selfOutsideMethod:
-					return "Illegal use of self value outside method"
-				}
-			}
-			
 		}
 		
 	}

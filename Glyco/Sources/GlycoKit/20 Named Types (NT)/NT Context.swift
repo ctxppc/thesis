@@ -5,20 +5,12 @@ extension NT {
 	/// A value used while lowering.
 	struct Context {
 		
-		/// The stacks of value types by name.
-		var valueTypesByName = [TypeName : [ValueType]]()
+		/// The type definitions in the current scope, from oldest to newest.
+		var types = [TypeDefinition]()
 		
-		mutating func push(_ definitions: [TypeDefinition]) {
-			for definition in definitions {
-				valueTypesByName[definition.name, default: []].append(definition.type)
-			}
-		}
-		
-		mutating func pop(_ definitions: [TypeDefinition]) {
-			for definition in definitions.reversed() {
-				let removed = valueTypesByName[definition.name, default: []].removeLast()
-				assert(removed == definition.type)
-			}
+		/// Returns the newest definition of a type with given name.
+		func type(named name: TypeName) -> TypeDefinition? {
+			types.reversed()[name]
 		}
 		
 	}

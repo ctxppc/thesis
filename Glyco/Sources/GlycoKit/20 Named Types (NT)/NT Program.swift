@@ -3,7 +3,7 @@
 import Foundation
 
 //sourcery: longname = Named Types
-//sourcery: description = "A language that introduces named types in a structural type system."
+//sourcery: description = "A language that introduces named structural and nominal types."
 public enum NT : Language {
 	
 	/// A program on an NT machine.
@@ -25,7 +25,9 @@ public enum NT : Language {
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate(configuration: CompilationConfiguration) {}
+		public func validate(configuration: CompilationConfiguration) {
+			// TODO: Nominal type checking.
+		}
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {

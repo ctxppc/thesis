@@ -107,8 +107,8 @@ extension NT {
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .letType(let definitions, in: let body):
-				context.push(definitions)
-				defer { context.pop(definitions) }
+				context.types.append(contentsOf: definitions)
+				defer { context.types.removeLast(definitions.count) }
 				return try body.lowered(in: &context)
 				
 				case .do(let effects, then: let value):

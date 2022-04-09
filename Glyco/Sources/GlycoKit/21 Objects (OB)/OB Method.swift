@@ -3,10 +3,10 @@
 extension OB {
 	
 	/// A function that can be invoked on an object.
-	public struct Method : Codable, Equatable, SimplyLowerable {
+	public struct Method : Codable, Equatable {
 		
 		/// Creates a method with given name, parameters, result type, and result.
-		public init(_ name: Name, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
+		public init(_ name: Symbol, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
 			self.name = name
 			self.parameters = parameters
 			self.resultType = resultType
@@ -14,23 +14,7 @@ extension OB {
 		}
 		
 		/// The method's name.
-		public var name: Name
-		public struct Name : GlycoKit.Name, SimplyLowerable {
-			
-			// See protocol.
-			public init(rawValue: String) {
-				self.rawValue = rawValue
-			}
-			
-			// See protocol.
-			public var rawValue: String
-			
-			// See protocol.
-			func lowered(in context: inout Context) -> Label {
-				.init(rawValue: "ob.\(context.objectTypeName ?? "")_\(rawValue)")
-			}
-			
-		}
+		public var name: Symbol
 		
 		/// The method's parameters (excluding the `self` value).
 		public var parameters: [Parameter]
@@ -41,18 +25,8 @@ extension OB {
 		/// The method's result, in terms of its `self` value and parameters.
 		public var result: Result
 		
-		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Function {
-			let previousSelfName = context.selfName
-			context.selfName = context.symbols.uniqueName(from: "self")
-			defer { context.selfName = previousSelfName }
-			return try .init(
-				name.lowered(in: &context),
-				takes:		parameters.lowered(in: &context),
-				returns:	resultType.lowered(in: &context),
-				in:			result.lowered(in: &context)
-			)
-		}
+		/// The symbol referring to the `self` value in a method.
+		static let selfName: Symbol = "ob.self"	// shadowing provided by let-binding
 		
 	}
 	

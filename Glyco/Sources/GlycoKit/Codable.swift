@@ -286,13 +286,6 @@ extension NT.Program {
 	}
 }
 
-extension NT.TypeDefinition {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case type = "_1"
-	}
-}
-
 extension NT.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -344,13 +337,6 @@ extension OB.Parameter {
 	}
 }
 
-extension OB.Initialiser {
-	public enum CodingKeys : String, CodingKey {
-		case parameters = "takes"
-		case result = "in"
-	}
-}
-
 extension OB.Function {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -378,6 +364,13 @@ extension OB.ObjectType {
 		case initialiser = "initialiser"
 		case methods = "methods"
 		case stateRecordType = "state"
+	}
+}
+
+extension OB.Constructor {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case result = "in"
 	}
 }
 

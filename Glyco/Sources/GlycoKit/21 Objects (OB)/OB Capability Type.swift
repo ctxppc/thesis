@@ -12,9 +12,6 @@ extension OB {
 		/// A vector capability points to the first element of the vector, or to the element of a single-element vector.
 		indirect case vector(of: ValueType)
 		
-		/// A capability to a value of given type, which is a capability to a single-element vector.
-		public static func value(_ type: ValueType) -> Self { vector(of: type) }
-		
 		/// A capability to a record of given type.
 		case record(RecordType)
 		
@@ -42,8 +39,8 @@ extension OB {
 				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .object(let typeName):
-				guard let definition = context.types.first(where: { $0.name == typeName }) else { throw LoweringError.unknownObjectType(typeName) }
-				guard case .object(_, let objectType) = definition else { throw LoweringError.unknownObjectType(typeName) }
+				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
+				guard case .object(_, let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
 				return .record(try objectType.stateRecordType.lowered(in: &context), sealed: true)
 				
 			}

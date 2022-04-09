@@ -96,10 +96,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code>(Symbol, ValueType)</code></dd>
 </dl>
 <dl>
-	<dt><code>OB.Initialiser</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
-</dl>
-<dl>
 	<dt><code>OB.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
@@ -127,6 +123,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
@@ -139,7 +136,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(<strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
+	<dd><code>(<strong>initialiser:</strong> Constructor, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -157,6 +154,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Constructor</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
@@ -165,7 +166,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Method</code></dt>
-	<dd><code>(Name, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+	<dd><code>(Symbol, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Definition</code></dt>
@@ -173,12 +174,13 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.TypeDefinition</code></dt>
-	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>structural</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, ObjectType)</code></dd>
 </dl>
 
 <h2 id="NT">Grammar for NT (Named Types)</h2>
-A language that introduces named types in a structural type system.
+A language that introduces named structural and nominal types.
 
 **Inherited from Λ:**
 <code>BinaryOperator</code>, 
@@ -216,7 +218,8 @@ A language that introduces named types in a structural type system.
 </dl>
 <dl>
 	<dt><code>NT.TypeDefinition</code></dt>
-	<dd><code>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>structural</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Value</code></dt>

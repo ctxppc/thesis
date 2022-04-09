@@ -29,9 +29,9 @@ extension NT {
 			switch self {
 				
 				case .named(let name):
-				guard !attemptedResolutions.contains(name) else { throw LoweringError.infiniteType(name, cycle: attemptedResolutions) }
-				guard let type = context.valueTypesByName[name]?.last else { throw LoweringError.undefinedType(name) }
-				return try type.lowered(in: &context, attemptedResolutions: attemptedResolutions.union([name]))
+				guard !attemptedResolutions.contains(name) else { throw TypingError.infiniteType(name, cycle: attemptedResolutions) }
+				guard let typeDefinition = context.type(named: name) else { throw TypingError.undefinedType(name) }
+				return try typeDefinition.valueType.lowered(in: &context, attemptedResolutions: attemptedResolutions.union([name]))
 				
 				case .u8:
 				return .u8
@@ -45,7 +45,7 @@ extension NT {
 			}
 		}
 		
-		enum LoweringError : LocalizedError {
+		enum TypingError : LocalizedError {
 			
 			/// An error indicating that no type is defined with given name.
 			case undefinedType(TypeName)

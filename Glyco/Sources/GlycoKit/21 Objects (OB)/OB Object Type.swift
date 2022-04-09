@@ -6,14 +6,14 @@ extension OB {
 	public struct ObjectType : Equatable, Codable {
 		
 		/// Creates an object type with given initialiser, methods, and state record type.
-		public init(initialiser: Initialiser, methods: [Method], state stateRecordType: RecordType) {
+		public init(initialiser: Constructor, methods: [Method], state stateRecordType: RecordType) {
 			self.initialiser = initialiser
 			self.methods = methods
 			self.stateRecordType = stateRecordType
 		}
 		
 		/// The initialiser for objects of this type.
-		public var initialiser: Initialiser
+		public var initialiser: Constructor
 		
 		/// The methods for objects of this type.
 		public var methods: [Method]

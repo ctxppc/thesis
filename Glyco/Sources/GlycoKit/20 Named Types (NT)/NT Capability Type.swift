@@ -10,9 +10,6 @@ extension NT {
 		/// A vector capability points to the first element of the vector, or to the element of a single-element vector.
 		indirect case vector(of: ValueType, sealed: Bool)
 		
-		/// A (possibly sealed) capability to a value of given type, which is a capability to a single-element vector.
-		public static func value(_ type: ValueType, sealed: Bool) -> Self { vector(of: type, sealed: sealed) }
-		
 		/// A (possibly sealed) capability to a record of given type.
 		case record(RecordType, sealed: Bool)
 		

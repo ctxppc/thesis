@@ -5,7 +5,7 @@ import Foundation
 extension NT {
 	
 	/// A globally scoped location.
-	public struct GlobalDeclaration : Named, Codable, Equatable {
+	public struct GlobalDeclaration : Named, Codable, Equatable {	// TODO
 		
 		/// The location's name.
 		public var name: Symbol
