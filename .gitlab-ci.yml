@@ -23,7 +23,7 @@ build: &build
 
 text:
   stage: build
-  image: danteev/texlive:edge
+  image: texlive/texlive:latest
   script:
       - cd Text
       - wget https://eng.kuleuven.be/docs/kulemt/kulemt-1.12-tex.zip
