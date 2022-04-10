@@ -21,6 +21,18 @@ build: &build
     paths:
       - Glyco_release_Ubuntu20.04
 
+text:
+  stage: build
+  image: danteev/texlive
+  script:
+      - cd Text
+      - wget https://eng.kuleuven.be/docs/kulemt/kulemt-1.12-tex.zip
+      - unzip kulemt-1.12-tex.zip
+      - pdflatex main.tex
+  artifacts:
+    paths:
+      - Text/main.pdf
+
 test: &test
   stage: test
   script:
