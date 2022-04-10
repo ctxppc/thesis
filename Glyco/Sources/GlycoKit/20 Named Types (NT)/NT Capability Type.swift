@@ -13,10 +13,10 @@ extension NT {
 		/// A (possibly sealed) capability to a record of given type.
 		case record(RecordType, sealed: Bool)
 		
-		/// A (possibly sealed) capability to a procedure with given parameters and result type.
+		/// A (possibly sealed) capability to a function with given parameters and result type.
 		///
-		/// A procedure capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
-		indirect case procedure(takes: [Parameter], returns: ValueType)
+		/// A function capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
+		indirect case function(takes: [Parameter], returns: ValueType)
 		
 		/// A (possibly sealed) capability that can be used to seal other capabilities.
 		case seal(sealed: Bool)
@@ -31,8 +31,8 @@ extension NT {
 				case .record(let recordType, sealed: let sealed):
 				return .record(try recordType.lowered(in: &context), sealed: sealed)
 				
-				case .procedure(takes: let parameters, returns: let resultType):
-				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
+				case .function(takes: let parameters, returns: let resultType):
+				return try .function(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .seal(sealed: let sealed):
 				return .seal(sealed: sealed)

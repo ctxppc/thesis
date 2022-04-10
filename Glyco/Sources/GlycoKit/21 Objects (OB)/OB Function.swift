@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
-	public struct Function : Codable, Equatable, SimplyLowerable {
+	public struct Function : Named, Codable, Equatable, SimplyLowerable {
 		
 		/// Creates a function with given name, parameters, result type, and effect.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {

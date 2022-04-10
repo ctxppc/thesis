@@ -15,10 +15,10 @@ extension OB {
 		/// A capability to a record of given type.
 		case record(RecordType)
 		
-		/// A (possibly sealed) capability to a procedure with given parameters and result type.
+		/// A (possibly sealed) capability to a function with given parameters and result type.
 		///
-		/// A procedure capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
-		indirect case procedure(takes: [Parameter], returns: ValueType)
+		/// A function capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
+		indirect case function(takes: [Parameter], returns: ValueType)
 		
 		/// A capability to an object of given type.
 		///
@@ -35,8 +35,8 @@ extension OB {
 				case .record(let recordType):
 				return .record(try recordType.lowered(in: &context), sealed: false)
 				
-				case .procedure(takes: let parameters, returns: let resultType):
-				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
+				case .function(takes: let parameters, returns: let resultType):
+				return try .function(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .object(let typeName):
 				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }

@@ -3,13 +3,13 @@
 	functions:
 		
 		(fib,
-			takes: (first, s32()) (second, s32()),
+			takes: (first, s32(), sealed: false) (second, s32(), sealed: false),
 			returns: s32(),
 			in: evaluate(function(recFib), constant(2) constant(29) vector(s32(), count: 30))
 		)
 		
 		(recFib, 
-			takes: (index, s32()) (lastIndex, s32()) (nums, cap(vector(of: s32(), sealed: false))),
+			takes: (index, s32(), sealed: false) (lastIndex, s32(), sealed: false) (nums, cap(vector(of: s32(), sealed: false)), sealed: false),
 			returns: s32(),
 			in: if(
 				relation(named(index), gt, named(lastIndex)),

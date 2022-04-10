@@ -45,6 +45,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "field""("<Field.Name>, "of:" <Value>")"
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "object""("<TypeName>, <[Value]>")"
 						| "function""("<Label>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -77,7 +78,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
-						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "object""("<TypeName>")"
 				\par
 				<OB.Method> ::=
@@ -110,7 +111,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<NT.CapabilityType> ::=
 						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
 						| "record""("<RecordType>, "sealed:" <Bool>")"
-						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal""(""sealed:" <Bool>")"
 				\par
 				<NT.Result> ::=
@@ -316,7 +317,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<LS.CapabilityType> ::=
 						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
 						| "record""("<RecordType>, "sealed:" <Bool>")"
-						| "procedure""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal""(""sealed:" <Bool>")"
 				\par
 				<LS.Source> ::=

@@ -123,6 +123,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -160,7 +161,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
 </dl>
 <dl>
@@ -204,7 +205,7 @@ A language that introduces named structural and nominal types.
 	<dt><code>NT.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
 	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
-	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>
@@ -464,7 +465,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 	<dt><code>LS.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
 	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
-	<dd><code><strong>procedure</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong>(<strong>sealed:</strong> Bool)</code></dd>
 </dl>
 <dl>

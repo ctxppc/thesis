@@ -2,7 +2,7 @@
 	let((ex.arg, source(constant(0))) (ex.arg$1, source(constant(1))), in: evaluate(function(fib), named(ex.arg) named(ex.arg$1))),
 	functions: (
 		fib,
-		takes: (first, s32()) (second, s32()),
+		takes: (first, s32(), sealed: false) (second, s32(), sealed: false),
 		returns: s32(),
 		in: let(
 			(ex.arg$2, source(constant(2))) (ex.arg$3, source(constant(29))) (ex.arg$4, vector(s32(), count: 30)),
@@ -11,7 +11,9 @@
 	)
 	(
 		recFib,
-		takes: (index, s32()) (lastIndex, s32()) (nums, cap(vector(of: s32(), sealed: false))),
+		takes: (index, s32(), sealed: false)
+		(lastIndex, s32(), sealed: false)
+		(nums, cap(vector(of: s32(), sealed: false)), sealed: false),
 		returns: s32(),
 		in: if(
 			let(

@@ -5,6 +5,9 @@ extension OB {
 	/// A value used while lowering a program, function, or method.
 	struct Context {
 		
+		/// The globally defined functions.
+		let functions: [Function]
+		
 		/// The name of the object type being lowered, or `nil` if no object type is being lowered.
 		var objectTypeName: TypeName?
 		
@@ -25,9 +28,8 @@ extension OB {
 		}
 		
 		/// Ends the declaration of `symbol` as a value of given type.
-		mutating func undeclare(_ symbol: Symbol, _ type: ValueType) {
-			let removed = valueTypesBySymbol[symbol, default: []].removeLast()
-			assert(removed == type)
+		mutating func undeclare(_ symbol: Symbol) {
+			valueTypesBySymbol[symbol, default: []].removeLast()
 		}
 		
 		/// Returns the type of the value bound to `symbol`, or `nil` if `symbol` is not declared.

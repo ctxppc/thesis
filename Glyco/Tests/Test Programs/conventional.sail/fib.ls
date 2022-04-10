@@ -5,7 +5,7 @@
 	),
 	functions: (
 		fib,
-		takes: (prev, s32()) (curr, s32()) (iter, s32()),
+		takes: (prev, s32(), sealed: false) (curr, s32(), sealed: false) (iter, s32(), sealed: false),
 		returns: s32(),
 		in: if(
 			let((ex.lhs, source(named(iter))) (ex.rhs, source(constant(1))), in: relation(named(ex.lhs), le, named(ex.rhs))),
