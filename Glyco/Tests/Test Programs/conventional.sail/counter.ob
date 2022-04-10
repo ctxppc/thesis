@@ -1,0 +1,38 @@
+(
+	value(
+		letType(
+			object(Counter, (
+				initialiser:
+					(takes: (initialValue, s32(), sealed: false), in:
+						let((self, record(((value, s32())))), in:
+							do(
+								setField(value, of: named(self), to: named(initialValue)),
+								then: value(named(self))
+							)
+						)
+					),
+				methods:
+					(increase, takes:, returns: s32(), in:
+						let((newCount, field(value, of: self())), in:
+							do(
+								setField(value, of: self(), to: named(newCount)),
+								then: value(named(newCount))
+							)
+						)
+					)
+					(getCount, takes:, returns: s32(), in:
+						value(field(value, of: self()))
+					),
+				state: ((value, s32()))
+			)), in:
+			let(
+				(counter, object(Counter, constant(32)))
+				(ignored, message(named(counter), increase,))
+				(ignored, message(named(counter), increase,))
+				(ignored, message(named(counter), increase,)), in:
+				message(named(counter), getCount,)
+			)
+		)
+	),
+	functions:
+)
