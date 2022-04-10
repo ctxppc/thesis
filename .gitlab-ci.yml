@@ -8,6 +8,7 @@ default:
 stages:
   - build
   - test
+  - text
 
 build: &build
   stage: build
@@ -22,12 +23,11 @@ build: &build
       - Glyco_release_Ubuntu20.04
 
 text:
-  stage: build
+  stage: text
+  needs: []
   image: texlive/texlive:latest
   script:
       - cd Text
-      - wget https://eng.kuleuven.be/docs/kulemt/kulemt-1.12-tex.zip
-      - unzip kulemt-1.12-tex.zip
       - latexmk -pdf -pdflatex main.tex
   artifacts:
     paths:
@@ -35,6 +35,7 @@ text:
 
 test: &test
   stage: test
+  needs: [build]
   script:
     - cd Glyco
     - swift test
