@@ -1,9 +1,0 @@
-(
-	do(
-		set(ls.answer, to: source(constant(42)))
-		set(ls.answer$1, to: source(constant(28)))
-		set(df.result, to: source(location(ls.answer)))
-		return(location(df.result))
-	),
-	procedures: 
-)

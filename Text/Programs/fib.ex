@@ -1,10 +1,12 @@
 (
-	evaluate(fib, constant(0) constant(1) constant(30)),
+	evaluate(function(fib), constant(0) constant(1) constant(30)),
 	functions:
-		(fib, takes: (prev, s32()) (curr, s32()) (iter, s32()), returns: s32(), in:
-			if(relation(named(iter), le, constant(0)),
+		(fib, 
+			takes: (prev, s32(), sealed: false) (curr, s32(), sealed: false) (iter, s32(), sealed: false), 
+			returns: s32(), 
+			in: if(relation(named(iter), le, constant(0)),
 				then:	value(named(curr)),
-				else:	evaluate(fib, 
+				else:	evaluate(function(fib), 
 					named(curr) 
 					binary(named(prev), add, named(curr)) 
 					binary(named(iter), sub, constant(1))

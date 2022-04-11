@@ -3,7 +3,12 @@
 		set(a, to: source(constant(1)))
 		set(b, to: source(location(a)))
 		set(c, to: binary(constant(1), add, constant(2)))
-		set(d, to: record( (name, vectorCap(u8())) (age, s32()) ))
+		set(d, to: record(
+			(
+				(name, cap(vector(of: u8(), sealed: false)))
+				(age, s32())
+			), sealed: false
+		))
 		set(e, to: field(name, of: d))
 		set(f, to: vector(s32(), count: 100))
 		set(g, to: element(of: f, at: constant(50)))

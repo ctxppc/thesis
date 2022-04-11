@@ -16,10 +16,10 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-Glyco defines 20 \gs{il}. Each language is named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss these \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
+Glyco defines 20 \gs{il}, with a general approach adapted from the student compiler by \cite{compcourse}. Each language is named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
 
 \section{An Expression Language}
-The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (if-then-else), definitions (let-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
+The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
 The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
 \lstinputlisting{Programs/fib.ex}
@@ -28,37 +28,67 @@ This program defines a function \texttt{fib} with three signed 32-bit integer pa
 
 EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it is instead quite explicit and contains little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
 
-EX is \lowered{} to \textbf{LS} (Lexical Scopes). LS does not support subexpressions so the \g{nanopass} binds all subexpressions to names and uses those names in place of the subexpressions. Our Fibonacci example now becomes:
-\lstinputlisting{Programs/fib.ls}
+\paragraph{From EX (Expressions) to LS} LS does not support subexpressions so the \g{nanopass} to LS binds all subexpressions to names (temporaries) and uses those names in place of the subexpressions. For instance, the EX value
+\begin{lstlisting}
+	evaluate(function(fib), ... binary(named(prev), add, named(curr)) ...)
+\end{lstlisting}
+is transformed into the equivalent LS value
+\begin{lstlisting}
+	let(
+		(arg0, ...) (arg1, let(
+			(ex.lhs, source(named(prev))) (ex.rhs, source(named(curr))),
+			in: binary(named(ex.lhs), add, named(ex.rhs))
+		)) (arg2, ...),
+		in: evaluate(fib, named(arg0) named(arg1) named(arg2))
+	)
+\end{lstlisting}
 
-LS is itself \lowered{} to \textbf{DF} (Definitions) which does not support shadowing. For instance, the following LS program defines \texttt{answer} twice but only uses the outer definition. Without shadowing, the program would evaluate to 28. The right answer is 42.
-\lstinputlisting{Programs/shadowing.ls}
+Some transformations are not strictly necessary, e.g., binding \texttt{named(prev)} to \texttt{ex.lhs} instead of using \texttt{named(prev)} directly. They do not however incur any additional overhead in the final executable: a \g{nanopass} further down the compiler pipeline cleans up these redundant temporaries.
 
-The \g{nanopass} to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
-\lstinputlisting{Programs/shadowing.df}
+\paragraph{From LS (Lexical Scopes) to DF} DF does not support shadowing; all \texttt{let} bindings are in a single namespace. The \g{nanopass} from LS to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
 
-Definitions in value position in DF are implemented using \enquote{computed values} (\texttt{do} values) in \textbf{CV} (Computed Values), which are values on which a computation can be attached. The previous DF program is \lowered{} to the following CV program without definitions, i.e., without let-bindings, and with \texttt{do} values instead:
-\lstinputlisting{Programs/shadowing.cv}
+\paragraph{From DF (Definitions) to CV} CV does not support \texttt{let} bindings, i.e., definitions. The \g{nanopass} implements them in CV using \texttt{do} values, i.e., computed values, which are values on which a computation can be attached. For example, the DF value
+\begin{lstlisting}
+	let((answer, source(constant(42))), in: source(location(answer)))
+\end{lstlisting}
+is \lowered{} to the CV value
+\begin{lstlisting}
+	do(set(answer, to: source(constant(42))), then: source(location(answer)))
+\end{lstlisting}
 
-Computed (\texttt{do}) values are themselves implemented by flattening them and binding the result to a name. The \g{nanopass} produces a \textbf{CA} (Canonical Assignments) program. The previous CV program becomes the following CA program, in which it becomes even clearer that the defined symbol with value 28 is not used anywhere in the program:
-\lstinputlisting{Programs/shadowing.ca}
+\paragraph{From CV (Computed Values) to CA} CA does not support \texttt{do} values, but does support \texttt{do} effects, which are sequences of effects. The \g{nanopass} implements \texttt{do} values by extracting their effects into \texttt{do} effects and ending with an additional \texttt{set} effect that moves the result to the intended destination. That is, a CV \texttt{set} effect
+\begin{lstlisting}
+	set(result, to:
+		do(
+			/* effects */,
+			then: /* result */
+		)
+	)
+\end{lstlisting}
+is transformed to a CA \texttt{do} effect
+\begin{lstlisting}
+	do(
+		/* effects */
+		set(result, to: /* result */)
+	)
+\end{lstlisting}
 
-A \enquote{value}, in programming language parlance, is a placeholder for a datum at runtime. In Glyco, a value is an abstraction that is introduced in CA and expanded in the aforementioned higher \gs{il}. They represent the result of one of the effects that are available in its \g{lowerlang}, \textbf{CC} (Calling Convention). For instance, the CA program
+\paragraph{From CA (Canonical Assignments) to CC} The final purely structural transformation lowers \texttt{set} effects in CA using equivalent effects in CC, only keeping the \texttt{set} effects with a constant or location source. For example, the CA program
 \lstinputlisting{Programs/values.ca}
-is \lowered{} as the following CC program:
+is lowered to the CC program
 \lstinputlisting{Programs/values.cc}
 
 \section{A Conventional Calling Convention}
 A \g{cc} is a set of rules imposed by the operating system, instruction set architecture, and/or programming language that specify how procedures are called. A low-level \g{cc} often specifies
 \begin{itemize}[noitemsep]
 	\item where parameters and result values are placed (in dedicated registers, in a particular order on the call stack, or a combination of both);
-	\item how large values are passed to the callee or caller (over multiple registers, on the call stack, or in heap memory);
-	\item the state of the call stack and some registers (like the register keeping the frame pointer) when a procedure starts executing or when it returns to the caller;
+	\item how large values are passed to the callee or caller (over multiple registers, on the call stack, or in heap memory), if supported;
+	\item the state of the call stack and some registers (like the register keeping the frame pointer) when a procedure starts executing and when it returns to the caller;
 	\item which registers a procedure can use freely but for which it cannot assume that their contents will be preserved across a procedure call (\textbf{\gs{cersaved}}); and
 	\item which registers a procedure can only use after saving their previous contents and if they're restored after use (\textbf{\gs{ceesaved}}).
 \end{itemize}
 
-The \g{cc} used in base version of Glyco is called \textbf{\g{ghscc}} and mimics a traditional \g{cc} that would be used for programs written in C, with some parts specified by \cite[chapter~25]{riscv}.
+The \g{cc} used in the base version of Glyco is called \textbf{\g{gccc}} and mimics a traditional \g{cc} that would be used for programs written in C, with some parts specified by \cite[chapter~25]{riscv}.
 
 \paragraph{Call stack} The call stack is a region of memory on which information about procedure calls is stored, such as local state and return addresses. The stack grows downward, i.e., from high to low addresses. The \texttt{csp} register contains the \textbf{\g{stackcap}}, a capability that points to the location of the last pushed datum, i.e., the top of the stack, and gives read-write authority over the stack memory. The \g{stackcap}'s address decreases whenever data are pushed to the call stack and increases whenever data are popped from the stack.
 
@@ -98,20 +128,23 @@ CC (Calling Convention) introduces procedures with parameters and results. It is
 is lowered to the following SV program:
 \lstinputlisting{Programs/42.sv}
 
-It's noteworthy how CC's \g{nanopass} implements \g{cersaved} preservation by binding the register's contents to temporary names before the call and restoring those contents after the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
 
 \section{Structured Values}
-The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of \textbf{vectors} and \textbf{records}. Vectors in SV are homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} arrays and represented with capabilities that points to the vector's first element, similarly to arrays in the C programming language. A record is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and are similar to C \texttt{struct}s. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability.}
+The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of \textbf{vectors} and \textbf{records}. A vector in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A record is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability.}
 
 Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
 \lstinputlisting{Programs/sequences.sv}
 is \lowered{} to the following ID program:
 \lstinputlisting{Programs/sequences.id}
+% TODO: Highlight corresponding parts
 
-We should note that the results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
+The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
 \section{Abstract Locations}
-All programs until now have been able to bind values to names in one form or another, be it let-bindings with shadowing or globally scoped names. These names refer to physical locations where data can be stored, but since the programmer does not specify the names themselves are \emph{abstract} locations, locations that the compiler is to associate with a physical location.
+All programs until now have been able to bind values to names in one form or another, be it \texttt{let} bindings with shadowing or globally scoped names or arbitrarily named locations. These names refer to physical locations where data can be stored, but since the programmer does not specify the names themselves are \textbf{abstract locations}, locations that the compiler is to associate with a \textbf{physical location}.
+
+Since registers are orders of magnitude faster to access than locations in RAM, the compiler attempts to assign as many abstract locations as it can to registers in a process called \textbf{register allocation}. Since the number of registers is limited, the compiler may need to \emph{spill} abstract locations to locations on the call frame. Glyco employs several heuristics to minimise the runtime cost by spilling abstract locations that it thinks will be accessed the least.
 
 % TODO
 
