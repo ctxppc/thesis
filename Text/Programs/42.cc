@@ -1,6 +1,6 @@
 (
 	do(
-		call(sum, constant(19) constant(23), result: the_sum)
+		call(procedure(sum), constant(19) constant(23), result: the_sum)
 		return(location(the_sum))
 	),
 	procedures:

@@ -4,7 +4,7 @@
 		set(abstract(cc.retcap), to: register(ra, cap(code())))
 		set(register(a0), to: constant(19))
 		set(register(a1), to: constant(23))
-		call(sum, parameters: a0 a1)
+		call(capability(to: sum), parameters: a0 a1)
 		set(abstract(the_sum), to: register(a0, s32()))
 		set(register(a0), to: abstract(the_sum))
 		set(register(ra), to: abstract(cc.retcap))

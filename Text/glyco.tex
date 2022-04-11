@@ -146,6 +146,37 @@ All programs until now have been able to bind values to names in one form or ano
 
 Since registers are orders of magnitude faster to access than locations in RAM, the compiler attempts to assign as many abstract locations as it can to registers in a process called \textbf{register allocation}. Since the number of registers is limited, the compiler may need to \emph{spill} abstract locations to locations on the call frame. Glyco employs several heuristics to minimise the runtime cost by spilling abstract locations that it thinks will be accessed the least.
 
+Glyco's register allocator is spread over three \gs{nanopass} which perform the following steps, for the main program and each procedure separately:
+\begin{enumerate}
+	\item Discover the abstract locations that are used and the data types that they take.
+	\item For each abstract location, determine where in the program or procedure it is defined or redefined with a value and where that value is used. The execution path between a definition and that definition's last use is a \textbf{liveness interval}, a period of time where the value is considered \emph{live}.
+	\item Find out which liveness intervals overlap with other liveness intervals. The locations of such overlapping intervals are considered to be \textbf{in conflict} with each other.
+	\item Assign registers to abstract locations so that no two abstract locations are assigned the same register if they are in conflict with each other.
+\end{enumerate}
+
+\paragraph{From ID (Inferred Declarations) to AL} An ID program is \lowered{} to an AL program by inferring a declaration for each abstract location used in the program and each of the program's procedures. Each declaration associates an abstract location with a data type. For example, the ID program
+\lstinputlisting{Programs/buffer.id}
+is \lowered{} to the following AL program:
+\lstinputlisting{Programs/buffer.al}
+
+\paragraph{From AL (Abstract Locations) to ALA} Similar to how the previous \g{nanopass} infers local declarations, the AL to ALA \g{lowering} infers static\footnote{As observed from the code itself, without running or simulating the program.} liveness and conflict information about the program, and associates it with every effect and predicate in an ALA program. It consists of two pieces of information: a liveness set and a conflict graph.
+
+An effect's \textbf{liveness set at entry} is a set of locations that are \textbf{possibly live} right before the effect is executed. Every location that is not in the set is considered \textbf{definitely dead}.\footnote{Due to Rice's theorem it is impossible to ascertain whether a value is actually live in all execution paths since liveness is a property of a program — the value may not ever be live if the effects using the value are never executed. Compilers (including Glyco) therefore take a conservative approach and \emph{assume} that a value is live if they cannot rule out that it's dead. This may cause suboptimal register allocation due to excessive liveness intervals, but guarantees correctness by not accidentally assigning two live values to the same register. In contrast, when an effect overwrites a location's value (without using the previous value), we can be certain about the previous value being dead at the point of entering the effect.} An effect's \textbf{conflict graph at entry} is a undirected graph of locations with an edge connecting every pair of locations that are in conflict right before the effect is executed. An effect's \textbf{liveness set at exit} resp. \textbf{conflict graph at exit} is the next effect's liveness set at entry resp. conflict graph at entry.
+
+An effect's liveness set and conflict graph \emph{at entry} can be derived from the effect's liveness set and conflict graph \emph{at exit} using the following 2 rules.
+
+\begin{itemize}
+	
+	\item If an effect \textbf{defines} a location's value, the location is marked as (definitely) dead at entry and is thus removed from the liveness set at entry. We know for certain that the location is not live right before the effect executes since its value is overwritten.
+	
+	Additionally, the newly defined location is in conflict with all locations that are in the liveness set at exit. The effect (possibly) starts a liveness interval for the newly defined location while the effect may be in the middle of liveness intervals of each location in the liveness set. These liveness intervals overlap; the conflict graph at entry is therefore updated with edges between the newly defined location and every (possibly) live location at exit.
+	
+	\item If an effect \textbf{uses} a location's value, the location is marked as (possibly) live at entry and is thus added to the liveness set at entry. An effect that defines and uses the same location's value, i.e., an assignment to itself, is considered to keep the location (possibly) live.
+	
+\end{itemize}
+
+Since the liveness set and conflict graph at entry depends on the liveness set and conflict graph at exit, the program is traversed backwards, i.e., against the direction of execution and towards the beginning of the program or procedure.
+
 % TODO
 
 \section{Structured Jumps \& Branches}
