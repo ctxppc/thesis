@@ -163,7 +163,7 @@ is \lowered{} to the following AL program:
 
 An effect's \textbf{liveness set at entry} is a set of locations that are \textbf{possibly live} right before the effect is executed. Every location that is not in the set is considered \textbf{definitely dead}.\footnote{Due to Rice's theorem it is impossible to ascertain whether a value is actually live in all execution paths since liveness is a property of a program — the value may not ever be live if the effects using the value are never executed. Compilers (including Glyco) therefore take a conservative approach and \emph{assume} that a value is live if they cannot rule out that it's dead. This may cause suboptimal register allocation due to excessive liveness intervals, but guarantees correctness by not accidentally assigning two live values to the same register. In contrast, when an effect overwrites a location's value (without using the previous value), we can be certain about the previous value being dead at the point of entering the effect.} An effect's \textbf{conflict graph at entry} is a undirected graph of locations with an edge connecting every pair of locations that are in conflict right before the effect is executed. An effect's \textbf{liveness set at exit} resp. \textbf{conflict graph at exit} is the next effect's liveness set at entry resp. conflict graph at entry.
 
-An effect's liveness set and conflict graph \emph{at entry} can be derived from the effect's liveness set and conflict graph \emph{at exit} using the following 2 rules.
+The analysis algorithm derives an effect's liveness set and conflict graph \emph{at entry} from the effect's liveness set and conflict graph \emph{at exit} using the following 2 rules.
 
 \begin{itemize}
 	
@@ -175,9 +175,33 @@ An effect's liveness set and conflict graph \emph{at entry} can be derived from 
 	
 \end{itemize}
 
-Since the liveness set and conflict graph at entry depends on the liveness set and conflict graph at exit, the program is traversed backwards, i.e., against the direction of execution and towards the beginning of the program or procedure.
+Since the liveness set and conflict graph at entry depends on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
 
-% TODO
+\paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \texttt{three} and \texttt{number} in
+\lstinputlisting{Programs/coalescable.al}
+can be coalesced to get
+\lstinputlisting{Programs/coalesced.al}
+thereby saving one \texttt{set} effect and making the liveness set and conflict graph smaller.
+
+The location coalescing optimisation algorithm works as follows:
+\begin{enumerate}
+	\item Select a candidate pair that is involved in a \texttt{set} effect. The algorithm is done if there are no (non-rejected) candidate pairs.
+	\item If the candidate locations are in conflict with each other, reject the pair and try another.
+	\item Tentatively form the union of the location vertices in the conflict graph. If the degree of the merged vertex is equal to or larger than the number of available registers, reject the pair and try another. This conservative heuristic by \cite{briggs} ensures that the merged location will not require spilling (to the call frame) after merging if the individual locations themselves don't require spilling.
+	\item Commit the union of the location vertices in the conflict graph, arbitrarily choose which location to retain, and remove the other location from the program by substituting it everywhere with the retained location.
+	\item Repeat from Step 1.
+\end{enumerate}
+
+\paragraph{From ALA (Abstract Locations, Analysed) to CD} The \g{nanopass} from ALA uses the conflict graph at entry of the program and of each procedure to determine an assignment of abstract locations to physical locations and to then substitute the abstract locations with their assigned physical locations.
+
+Register assignment is a graph colouring problem where the graph is the conflict graph and the colours are the available registers. No two connected locations in the conflict graph can be coloured with the same colour, i.e., no two locations that are in conflict can be assigned to the same register. The register assignment algorithm works as follows:
+\begin{enumerate}
+	\item Select an abstract location $L$ with the lowest degree and without an assigned physical location. The algorithm is done if there is no such location.
+	\item Select an available register. If any abstract location already assigned to this register is in conflict with $L$, reject the register and try another. If no (non-rejected) register is available, spill the abstract location by assigning it a free location on the call frame.
+	\item Repeat from Step 1.
+\end{enumerate}
+
+Unlike most algorithms and \gs{nanopass}, this algorithm runs in $O(n)$ time for $n$ locations, which underlines the importance of minimising the number of abstract locations via optimisations such as location coalescing.
 
 \section{Structured Jumps \& Branches}
 % TODO
