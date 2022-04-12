@@ -107,7 +107,7 @@ extension OB {
 				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
 				guard case .object(_, let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
 				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
-				return .evaluate(.named(method.symbol(typeName: typeName)), try arguments.lowered(in: &context))
+				return .evaluate(.named(method.symbol(typeName: typeName)), try [receiver.lowered(in: &context)] + arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -134,14 +134,13 @@ extension OB {
 						
 						case .object(let typeName, let objectType):
 						let objectValueType = Lower.ValueType.cap(.record(try objectType.stateRecordType.lowered(in: &context), sealed: true))
-						let seal: Lower.Symbol = "ob.seal"
 						return try [
-							.init(seal, .seal),
+							.init(Self.sealName, .seal),
 							.init(objectType.initialiserSymbol(typeName: typeName),
 								try .λ(
 									takes:		objectType.initialiser.parameters.lowered(in: &context),
 									returns:	objectValueType,
-									in:			.value(.sealed(objectType.initialiser.result.lowered(in: &context), with: .named(seal)))
+									in:			.value(.sealed(objectType.initialiser.result.lowered(in: &context), with: .named(Self.sealName)))
 								)
 							)
 						] + objectType.methods.map { method -> Lower.Definition in
@@ -149,11 +148,11 @@ extension OB {
 								method.symbol(typeName: typeName),
 								.sealed(
 									try .λ(
-										takes:		method.parameters.lowered(in: &context) + [.init(Method.selfName, objectValueType, sealed: true)],
+										takes:		[.init(Method.selfName, objectValueType, sealed: true)] + method.parameters.lowered(in: &context),
 										returns:	method.resultType.lowered(in: &context),
 										in:			method.result.lowered(in: &context)
 									),
-									with: .named(seal)
+									with: .named(Self.sealName)
 								)
 							)
 						}
@@ -246,6 +245,9 @@ extension OB {
 				
 			}
 		}
+		
+		/// The symbol referring to the seal value during type defintion.
+		private static let sealName: Lower.Symbol = "ob.seal"
 		
 		enum TypingError : LocalizedError {
 			

@@ -7,7 +7,7 @@
 						let((self, record(((value, s32())))), in:
 							do(
 								setField(value, of: named(self), to: named(initialValue)),
-								then: value(named(self))
+								then: named(self)
 							)
 						)
 					),

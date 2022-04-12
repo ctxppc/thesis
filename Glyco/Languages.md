@@ -155,7 +155,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Constructor</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.CapabilityType</code></dt>
