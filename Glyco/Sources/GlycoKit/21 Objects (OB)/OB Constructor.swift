@@ -6,7 +6,7 @@ extension OB {
 	public struct Constructor : Codable, Equatable {
 		
 		/// Creates a constructor with given parameters and result.
-		public init(takes parameters: [Parameter], in result: Result) {
+		public init(takes parameters: [Parameter], in result: Value) {
 			self.parameters = parameters
 			self.result = result
 		}
@@ -17,7 +17,7 @@ extension OB {
 		/// The constructor's result, in terms of its parameters.
 		///
 		/// The result evaluates to an unsealed capability to the created object's state.
-		public var result: Result
+		public var result: Value
 		
 	}
 	

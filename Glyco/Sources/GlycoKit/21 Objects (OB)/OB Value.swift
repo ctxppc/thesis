@@ -123,10 +123,47 @@ extension OB {
 				}
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
-				case .letType(let definitions, in: let body):
-				context.types.append(contentsOf: definitions)
-				defer { context.types.removeLast(definitions.count) }
-				return try .letType(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				case .letType(let typeDefinitions, in: let body):
+				context.types.append(contentsOf: typeDefinitions)
+				defer { context.types.removeLast(typeDefinitions.count) }
+				let definitions = try typeDefinitions.flatMap { type -> [Lower.Definition] in
+					switch type {
+						
+						case .nominal, .structural:
+						return []
+						
+						case .object(let typeName, let objectType):
+						let objectValueType = Lower.ValueType.cap(.record(try objectType.stateRecordType.lowered(in: &context), sealed: true))
+						let seal: Lower.Symbol = "ob.seal"
+						return try [
+							.init(seal, .seal),
+							.init(objectType.initialiserSymbol(typeName: typeName),
+								try .λ(
+									takes:		objectType.initialiser.parameters.lowered(in: &context),
+									returns:	objectValueType,
+									in:			.value(.sealed(objectType.initialiser.result.lowered(in: &context), with: .named(seal)))
+								)
+							)
+						] + objectType.methods.map { method -> Lower.Definition in
+							.init(
+								method.symbol(typeName: typeName),
+								.sealed(
+									try .λ(
+										takes:		method.parameters.lowered(in: &context) + [.init(Method.selfName, objectValueType, sealed: true)],
+										returns:	method.resultType.lowered(in: &context),
+										in:			method.result.lowered(in: &context)
+									),
+									with: .named(seal)
+								)
+							)
+						}
+						
+					}
+				}
+				return try .letType(
+					typeDefinitions.lowered(in: &context),
+					in: .let(definitions, in: body.lowered(in: &context))
+				)
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
