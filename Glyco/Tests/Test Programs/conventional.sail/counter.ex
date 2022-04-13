@@ -30,10 +30,10 @@
 		(initialValue, s32(), sealed: false),
 		returns: cap(record(((value, s32())), sealed: true)),
 		in: let(
-			(ob.newobj, record(((value, s32())))) (ob.seal, field(seal, of: named(ob.self))),
+			(ob.seal, field(seal, of: named(ob.self))) (ob.self, record(((value, s32())))),
 			in: do(
 				setField(value, of: named(ob.self), to: named(initialValue)),
-				then: value(sealed(named(ob.newobj), with: named(ob.seal)))
+				then: value(sealed(named(ob.self), with: named(ob.seal)))
 			)
 		)
 	)

@@ -25,19 +25,18 @@ extension OB {
 		/// - Parameter context: The lowering context.
 		func lowered(in context: inout Context, type: ObjectType) throws -> Lower.Value {
 			let receiverType = Lower.ValueType.cap(.record(try ObjectType.typeObjectState.lowered(in: &context), sealed: true))
-			let unsealedObjectName: Lower.Symbol = "ob.newobj"
 			let sealName: Lower.Symbol = "ob.seal"
 			return try .λ(
 				takes:		[.init(Method.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
 				returns:	.cap(.record(type.state.lowered(in: &context), sealed: true)),
 				in:			.let(
 					[
-						unsealedObjectName ~ .record(type.state.lowered(in: &context)),
 						sealName ~ .field(ObjectType.typeObjectSealFieldName, of: .named(Method.selfName)),
+						Method.selfName ~ .record(type.state.lowered(in: &context)),
 					],
 					in: .do(
 						[effect.lowered(in: &context)],
-						then: .value(.sealed(.named(unsealedObjectName), with: .named(sealName)))
+						then: .value(.sealed(.named(Method.selfName), with: .named(sealName)))
 					)
 				)
 			)

@@ -81,7 +81,7 @@
 		(initialValue, s32(), sealed: false),
 		returns: cap(record(((value, s32())), sealed: true)),
 		in: let(
-			(ob.newobj, record(((value, s32())))) (ob.seal, let((ex.rec$1, source(named(ob.self))), in: field(seal, of: ex.rec$1))),
+			(ob.seal, let((ex.rec$1, source(named(ob.self))), in: field(seal, of: ex.rec$1))) (ob.self, record(((value, s32())))),
 			in: do(
 				let(
 					(ex.rec$2, source(named(ob.self))) (ex.val$1, source(named(initialValue))),
@@ -89,7 +89,7 @@
 				),
 				then: value(
 					let(
-						(ex.cap$4, source(named(ob.newobj))) (ex.seal$4, source(named(ob.seal))),
+						(ex.cap$4, source(named(ob.self))) (ex.seal$4, source(named(ob.seal))),
 						in: sealed(ex.cap$4, with: ex.seal$4)
 					)
 				)

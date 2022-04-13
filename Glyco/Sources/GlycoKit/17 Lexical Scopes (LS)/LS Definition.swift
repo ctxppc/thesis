@@ -19,7 +19,9 @@ extension LS {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Definition {
-			try .init(name.lowered(in: &context), value.lowered(in: &context))
+			let loweredValue = try value.lowered(in: &context)	// Lower the value in the previous scope.
+			context.pushScope(for: [name])						// Lower the name in the enlarged scope.
+			return .init(try name.lowered(in: &context), loweredValue)
 		}
 		
 	}
