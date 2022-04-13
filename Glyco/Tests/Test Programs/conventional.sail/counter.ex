@@ -32,7 +32,7 @@
 		in: let(
 			(ob.newobj, record(((value, s32())))) (ob.seal, field(seal, of: named(ob.self))),
 			in: do(
-				setField(value, of: named(self), to: named(initialValue)),
+				setField(value, of: named(ob.self), to: named(initialValue)),
 				then: value(sealed(named(ob.newobj), with: named(ob.seal)))
 			)
 		)

@@ -7,8 +7,8 @@
 				initialiser:
 					(takes: (initialValue, s32(), sealed: false), in:
 						do(
-							setField(value, of: named(self), to: named(initialValue)),
-							then: named(self)
+							setField(value, of: self(), to: named(initialValue)),
+							then: self()
 						)
 					),
 				methods:

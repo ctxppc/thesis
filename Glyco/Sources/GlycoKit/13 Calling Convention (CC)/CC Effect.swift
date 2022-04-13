@@ -132,6 +132,9 @@ extension CC {
 				case .call(let procedure, let arguments, result: let result):
 				if case .cap(.procedure(let parameters, let resultType)) = try context.type(of: procedure) {
 					
+					// Declare result.
+					try context.declare(result, resultType)
+					
 					// Caller-save registers in abstract locations to limit their liveness across a call.
 					if context.configuration.limitsCallerSavedRegisterLifetimes {
 						for register in context.configuration.callerSavedRegisters {
