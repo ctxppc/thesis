@@ -25,3 +25,13 @@ extension NT {
 	}
 	
 }
+
+func ~(name: NT.Symbol, value: NT.Value) -> NT.Definition {
+	.init(name, value)
+}
+
+extension Array where Element == NT.Definition {
+	init(@ArrayBuilder<Element> _ elements: () throws -> Self) rethrows {
+		self = try elements()
+	}
+}

@@ -22,6 +22,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.Parameter> ::=
 							"("<Symbol>, <ValueType>")"
 				\par
+				<OB.Initialiser> ::=
+							"(""takes:" <[Parameter]>, "in:" <Effect>")"
+				\par
 				<OB.Function> ::=
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
@@ -57,7 +60,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<OB.ObjectType> ::=
-							"(""initialiser:" <Constructor>, "methods:" <[Method]>, "state:" <RecordType>")"
+							"(""name:" <TypeName>, "initialiser:" <Initialiser>, "methods:" <[Method]>, "state:" <RecordType>")"
 				\par
 				<OB.Result> ::=
 						"value""("<Value>")"
@@ -72,14 +75,12 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "s32"
 						| "cap""("<CapabilityType>")"
 				\par
-				<OB.Constructor> ::=
-							"(""takes:" <[Parameter]>, "in:" <Value>")"
-				\par
 				<OB.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
 						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "object""("<TypeName>")"
+						| "seal"
 				\par
 				<OB.Method> ::=
 							"("<Symbol>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
@@ -90,7 +91,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.TypeDefinition> ::=
 						"structural""("<TypeName>, <ValueType>")"
 						| "nominal""("<TypeName>, <ValueType>")"
-						| "object""("<TypeName>, <ObjectType>")"
+						| "object""("<ObjectType>")"
 				\par
 \end{grammar}
 \par
