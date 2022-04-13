@@ -45,8 +45,8 @@ rv.runtime:		cllc ct0, mm.heap
 				auipcc ct0, 0
 				addi t1, zero, 129
 				candperm ct0, ct0, t1
-				addi t1, t1, 1
-				slli t1, t1, 19
+				addi t1, zero, 1
+				slli t1, t1, 17
 				csetaddr ct0, ct0, t1
 				cllc ct1, mm.cseal_seal_cap
 				csc ct0, 0(ct1)
@@ -188,23 +188,25 @@ cd.then$12:		cmove cs10, ca4
 l.anon$1:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-cd.then$13:		cmove ca4, cs2
-				cmove ca5, cs3
-				cmove ca6, cs4
-				cmove ca7, cs5
-cd.then$17:		cmove ca2, cs10
-				cmove ca3, cs11
+				cmove ca2, cs1
+				cmove ca5, cs2
+				cmove ca6, cs3
+				cmove ca7, cs4
+cd.then$17:		cmove ca3, cs10
+				cmove ca4, cs11
 				cmove ca1, cra
 				cmove cra, ct6
-				clw a0, 0(cra)
+				clw ra, 0(cra)
+				addi s1, zero, 1
+				add a0, ra, s1
 				mv ra, a0
 				csw ra, 0(ct6)
-cd.then$18:		cmove cs2, ca4
-				cmove cs3, ca5
-				cmove cs4, ca6
-				cmove cs5, ca7
-cd.then$22:		cmove cs10, ca2
-				cmove cs11, ca3
+				cmove cs1, ca2
+				cmove cs2, ca5
+				cmove cs3, ca6
+				cmove cs4, ca7
+cd.then$22:		cmove cs10, ca3
+				cmove cs11, ca4
 				cmove cra, ca1
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)

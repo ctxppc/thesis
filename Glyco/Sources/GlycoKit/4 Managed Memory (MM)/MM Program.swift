@@ -134,8 +134,8 @@ public enum MM : Language {
 					
 					// Assign first otype — it will be increased with every cseal.
 					let lengthReg = tempRegisterB
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .constant(1))
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(19))
+					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(1))
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(17))	// 2^18 otypes are available, half of which reserved for scall
 					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: lengthReg)
 					
 					// Derive cseal seal cap cap and store cseal seal cap.

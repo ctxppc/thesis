@@ -101,13 +101,20 @@
 		takes: (ob.self, cap(record(((value, s32())), sealed: true)), sealed: true),
 		returns: s32(),
 		in: let(
-			(newCount, let((ex.rec$3, source(named(ob.self))), in: field(value, of: ex.rec$3))),
+			(
+				newValue,
+				let(
+					(ex.lhs, let((ex.rec$3, source(named(ob.self))), in: field(value, of: ex.rec$3)))
+					(ex.rhs, source(constant(1))),
+					in: binary(named(ex.lhs), add, named(ex.rhs))
+				)
+			),
 			in: do(
 				let(
-					(ex.rec$4, source(named(ob.self))) (ex.val$2, source(named(newCount))),
+					(ex.rec$4, source(named(ob.self))) (ex.val$2, source(named(newValue))),
 					in: setField(value, of: ex.rec$4, to: named(ex.val$2))
 				),
-				then: value(source(named(newCount)))
+				then: value(source(named(newValue)))
 			)
 		)
 	)

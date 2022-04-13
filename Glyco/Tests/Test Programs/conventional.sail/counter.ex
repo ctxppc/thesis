@@ -42,8 +42,8 @@
 		takes: (ob.self, cap(record(((value, s32())), sealed: true)), sealed: true),
 		returns: s32(),
 		in: let(
-			(newCount, field(value, of: named(ob.self))),
-			in: do(setField(value, of: named(ob.self), to: named(newCount)), then: value(named(newCount)))
+			(newValue, binary(field(value, of: named(ob.self)), add, constant(1))),
+			in: do(setField(value, of: named(ob.self), to: named(newValue)), then: value(named(newValue)))
 		)
 	)
 	(

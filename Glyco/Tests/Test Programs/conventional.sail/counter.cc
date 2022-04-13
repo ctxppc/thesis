@@ -59,11 +59,13 @@
 		returns: s32(),
 		in: do(
 			set(ls.rec, to: location(ls.self))
-			getField(value, of: ls.rec, to: ls.newCount)
+			getField(value, of: ls.rec, to: ls.lhs)
+			set(ls.rhs, to: constant(1))
+			compute(ls.newValue, location(ls.lhs), add, location(ls.rhs))
 			set(ls.rec$2, to: location(ls.self))
-			set(ls.val$1, to: location(ls.newCount))
+			set(ls.val$1, to: location(ls.newValue))
 			setField(value, of: ls.rec$2, to: location(ls.val$1))
-			set(df.result$2, to: location(ls.newCount))
+			set(df.result$2, to: location(ls.newValue))
 			return(location(df.result$2))
 		)
 	)

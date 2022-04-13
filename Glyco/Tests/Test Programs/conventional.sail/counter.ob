@@ -13,10 +13,10 @@
 					),
 				methods:
 					(increase, takes:, returns: s32(), in:
-						let((newCount, field(value, of: self())), in:
+						let((newValue, binary(field(value, of: self()), add, constant(1))), in:
 							do(
-								setField(value, of: self(), to: named(newCount)),
-								then: value(named(newCount))
+								setField(value, of: self(), to: named(newValue)),
+								then: value(named(newValue))
 							)
 						)
 					)
