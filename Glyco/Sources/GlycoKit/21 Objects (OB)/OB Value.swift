@@ -141,7 +141,7 @@ extension OB {
 							// The type object.
 							let unsealedTypeObject: Lower.Symbol = "ob.typeobj"
 							objectType.typeObjectName ~ .let(
-								[unsealedTypeObject ~ .record(try objectType.state.lowered(in: &context))],
+								[unsealedTypeObject ~ .record(try ObjectType.typeObjectState.lowered(in: &context))],
 								in: .do(
 									[.setField(
 										ObjectType.typeObjectSealFieldName,

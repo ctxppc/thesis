@@ -5,7 +5,7 @@
 			(
 				ob.Counter.type,
 				let(
-					(ob.typeobj, record(((value, s32())))),
+					(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
 					in: do(
 						setField(seal, of: named(ob.typeobj), to: named(ob.seal)),
 						then: sealed(named(ob.typeobj), with: named(ob.seal))
