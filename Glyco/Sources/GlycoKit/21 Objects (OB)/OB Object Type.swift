@@ -6,7 +6,7 @@ extension OB {
 	public struct ObjectType : Named, Equatable, Codable {
 		
 		/// Creates an object type with given name, initialiser, methods, and state record type.
-		public init(name: TypeName, initialiser: Initialiser, methods: [Method], state: RecordType) {
+		public init(_ name: TypeName, state: RecordType, initialiser: Initialiser, methods: [Method]) {
 			self.name = name
 			self.initialiser = initialiser
 			self.methods = methods
@@ -16,14 +16,14 @@ extension OB {
 		// See protocol.
 		public var name: TypeName
 		
+		/// The record type for objects of this type.
+		public var state: RecordType
+		
 		/// The initialiser for objects of this type.
 		public var initialiser: Initialiser
 		
 		/// The methods for objects of this type.
 		public var methods: [Method]
-		
-		/// The record type for objects of this type.
-		public var state: RecordType
 		
 		/// The name of the type object representing `self`, as defined by a `letType` value.
 		var typeObjectName: Lower.Symbol {

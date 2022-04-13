@@ -368,10 +368,10 @@ extension OB.Field {
 
 extension OB.ObjectType {
 	public enum CodingKeys : String, CodingKey {
-		case name = "name"
+		case name = "_0"
+		case state = "state"
 		case initialiser = "initialiser"
 		case methods = "methods"
-		case state = "state"
 	}
 }
 

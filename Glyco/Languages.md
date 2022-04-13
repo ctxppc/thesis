@@ -140,7 +140,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(<strong>name:</strong> TypeName, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
+	<dd><code>(TypeName, <strong>state:</strong> RecordType, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>

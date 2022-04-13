@@ -90,9 +90,10 @@ extension OB {
 				case .object(let typeName, let arguments):
 				guard let definition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
 				guard case .object(let objectType) = definition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: definition) }
-				return try Self
-					.message(.named(objectType.typeObjectName), ObjectType.typeObjectCreateObjectMethod, arguments)
-					.lowered(in: &context)
+				return .evaluate(
+					.named(Method.symbol(typeName: objectType.typeObjectTypeName, methodName: ObjectType.typeObjectCreateObjectMethod)),
+					try [.named(objectType.typeObjectName)] + arguments.lowered(in: &context)
+				)
 				
 				case .function(let name):
 				return .function(name)
@@ -188,7 +189,7 @@ extension OB {
 				
 				case .constant:
 				return .s32
-					
+				
 				case .named(let symbol):
 				guard let type = context.valueType(of: symbol) else { throw TypingError.undefinedSymbol(symbol) }
 				return type
