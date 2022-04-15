@@ -39,43 +39,43 @@
 				return(location(df.result$2))
 			),
 			else: do(
-				set(ls.vec$1, to: source(location(ls.nums)))
-				set(ls.idx$1, to: source(location(ls.index)))
+				set(ls.vec$2, to: source(location(ls.nums)))
+				set(ls.idx$2, to: source(location(ls.index)))
 				set(
-					ls.elem,
+					ls.elem$1,
 					to: do(
 						set(
-							ls.lhs$1,
-							to: do(
-								set(ls.vec$2, to: source(location(ls.nums)))
-								set(
-									ls.idx$2,
-									to: do(
-										set(ls.lhs$2, to: source(location(ls.index))) set(ls.rhs$2, to: source(constant(2))),
-										then: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
-									)
-								),
-								then: element(of: ls.vec$2, at: location(ls.idx$2))
-							)
-						)
-						set(
-							ls.rhs$1,
+							ls.lhs$2,
 							to: do(
 								set(ls.vec$3, to: source(location(ls.nums)))
 								set(
 									ls.idx$3,
 									to: do(
-										set(ls.lhs$3, to: source(location(ls.index))) set(ls.rhs$3, to: source(constant(1))),
-										then: binary(location(ls.lhs$3), sub, location(ls.rhs$3))
+										set(ls.lhs$1, to: source(location(ls.index))) set(ls.rhs$1, to: source(constant(2))),
+										then: binary(location(ls.lhs$1), sub, location(ls.rhs$1))
 									)
 								),
 								then: element(of: ls.vec$3, at: location(ls.idx$3))
 							)
+						)
+						set(
+							ls.rhs$3,
+							to: do(
+								set(ls.vec$4, to: source(location(ls.nums)))
+								set(
+									ls.idx$4,
+									to: do(
+										set(ls.lhs$3, to: source(location(ls.index))) set(ls.rhs$2, to: source(constant(1))),
+										then: binary(location(ls.lhs$3), sub, location(ls.rhs$2))
+									)
+								),
+								then: element(of: ls.vec$4, at: location(ls.idx$4))
+							)
 						),
-						then: binary(location(ls.lhs$1), add, location(ls.rhs$1))
+						then: binary(location(ls.lhs$2), add, location(ls.rhs$3))
 					)
 				)
-				setElement(of: ls.vec$1, at: location(ls.idx$1), to: location(ls.elem))
+				setElement(of: ls.vec$2, at: location(ls.idx$2), to: location(ls.elem$1))
 				set(
 					ls.arg,
 					to: do(
