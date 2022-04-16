@@ -79,8 +79,7 @@ public enum BB : Language {
 						try appendBlockOrJumpToBlock(named: returnPoint)
 						
 						case .callSealed(let target, data: let data, returnPoint: let returnPoint):
-						loweredProgramEffects.append(.set(.cap, .register(.ra), to: .capability(to: returnPoint)))
-						loweredProgramEffects.append(.invoke(target: target, data: data))
+						loweredProgramEffects.append(.callSealed(target, data: data))
 						try appendBlockOrJumpToBlock(named: returnPoint)
 						
 						case .return(to: let caller):

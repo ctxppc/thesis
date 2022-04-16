@@ -89,15 +89,11 @@ extension MM {
 		/// A hardware exception is raised if `target` doesn't contain a valid capability that permits execution or if the capability is sealed (except as a sentry).
 		case jump(to: Target)
 		
-		/// An effect that links the return capability and calls the procedure with given target code capability.
-		///
-		/// Depending on the calling convention, this effect either jumps to the target or performs a scall.
+		/// An effect that links the return capability and jumps to given target.
 		case call(Target)
 		
-		/// An effect that jumps to the address in `target` after unsealing it, and puts the datum in `data` in `invocationData` after unsealing it.
-		///
-		/// Note that this effect does not link the return capability.
-		case invoke(target: Register, data: Register)
+		/// An effect that links the return capability, unseals given target code capability and data capability pair, and jumps to the target.
+		case callSealed(Register, data: Register)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
@@ -356,14 +352,37 @@ extension MM {
 					
 				}
 				
-				case .invoke(target: let target, data: let data):
+				case .callSealed(let target, data: let data):
+				let ret = context.labels.uniqueName(from: "ret")
+				Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
 				switch context.configuration.callingConvention {
 					
 					case .conventional:
 					try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
+					ret ~ .nop
 					
 					case .heap:
-					_ = TODO.unimplemented
+					do {
+						
+						// Create fresh seal.
+						let csealLinkReg = tempRegisterA			// cf. create seal routine
+						let sealReg = Lower.Register.invocationData	// cf. create seal routine
+						Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: csealLinkReg)
+						
+						// Seal cra and cfp.
+						Lower.Effect.seal(destination: .ra, source: .ra, seal: sealReg)
+						Lower.Effect.seal(destination: .fp, source: .fp, seal: sealReg)
+						
+						// Clear authority.
+						Lower.Effect.clear([csealLinkReg, sealReg])
+						
+						// Invoke capability pair.
+						try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
+						
+						// Restore cfp.
+						ret ~ .copy(.cap, into: .fp, from: .invocationData)
+						
+					}
 					
 				}
 				
