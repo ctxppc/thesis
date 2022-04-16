@@ -40,7 +40,7 @@ rv.runtime:		cllc ct0, mm.heap
 				csetbounds csp, csp, t1
 				cgetaddr t0, ct0
 				csetaddr csp, csp, t0
-				addi t0, zero, 124
+				addi t0, zero, 380
 				candperm csp, csp, t0
 				auipcc ct0, 0
 				addi t1, zero, 129

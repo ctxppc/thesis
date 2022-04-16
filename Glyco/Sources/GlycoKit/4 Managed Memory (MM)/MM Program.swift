@@ -489,13 +489,13 @@ public enum MM : Language {
 		
 		/// The stack capability's permissions.
 		///
-		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions.
-		private static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability]
+		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions. Allocated buffers can be passed as sealed parameters but cannot be used for code.
+		private static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability, .invoke]
 		
 		/// The heap capability's permissions.
 		///
-		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
-		private static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]	// invoke needed for cinvoke cra, cfp
+		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions. Allocated buffers can be passed as sealed parameters but cannot be used for code.
+		private static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]
 		
 		/// The allocation routine capability's permissions.
 		///

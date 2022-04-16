@@ -79,13 +79,13 @@ final class ProcedureTests : XCTestCase {
 						csetbounds csp, csp, t1
 						cgetaddr t0, ct0
 						csetaddr csp, csp, t0
-						addi t0, zero, 124
+						addi t0, zero, 380
 						candperm csp, csp, t0
 						auipcc ct0, 0
 						addi t1, zero, 129
 						candperm ct0, ct0, t1
-						addi t1, t1, 1
-						slli t1, t1, 19
+						addi t1, zero, 1
+						slli t1, t1, 17
 						csetaddr ct0, ct0, t1
 						cllc ct1, mm.cseal_seal_cap
 						csc ct0, 0(ct1)
