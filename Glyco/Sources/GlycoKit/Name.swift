@@ -1,7 +1,19 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
-public protocol Name : RawCodable, Hashable, ExpressibleByStringInterpolation where RawValue == String {
+public protocol Name : RawCodable, Hashable, ExpressibleByStringInterpolation, CustomStringConvertible where RawValue == String {
 	init(rawValue: RawValue)
+}
+
+extension Name {
+	
+	public init(stringLiteral: String) {
+		self.init(rawValue: stringLiteral)
+	}
+	
+	public var description: String {
+		rawValue
+	}
+	
 }
 
 public protocol Named {
@@ -40,12 +52,6 @@ struct Bag<NameType : Name, Language : GlycoKit.Language> {
 	
 	private var usesByPrefix: [String : Int] = [:]
 	
-}
-
-extension Name {
-	public init(stringLiteral: String) {
-		self.init(rawValue: stringLiteral)
-	}
 }
 
 extension Sequence where Element : Named {

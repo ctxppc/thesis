@@ -134,8 +134,8 @@ public enum MM : Language {
 					
 					// Assign first otype — it will be increased with every cseal.
 					let lengthReg = tempRegisterB
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .add, .constant(1))
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(19))
+					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(1))
+					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(17))	// 2^18 otypes are available, half of which reserved for scall
 					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: lengthReg)
 					
 					// Derive cseal seal cap cap and store cseal seal cap.
@@ -489,13 +489,13 @@ public enum MM : Language {
 		
 		/// The stack capability's permissions.
 		///
-		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions.
-		private static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability]
+		/// Stack-allocated buffer capabilities derive their permissions directly from the stack capability; the runtime does not impose further restrictions. Allocated buffers can be passed as sealed parameters but cannot be used for code.
+		private static let stackCapabilityPermissions = [Permission.load, .loadCapability, .store, .storeCapability, .storeLocalCapability, .invoke]
 		
 		/// The heap capability's permissions.
 		///
-		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions.
-		private static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]	// invoke needed for cinvoke cra, cfp
+		/// Heap-allocated buffer capabilities derive their permissions directly from the heap capability; the runtime does not impose further restrictions. Allocated buffers can be passed as sealed parameters but cannot be used for code.
+		private static let heapCapabilityPermissions = [Permission.global, .load, .loadCapability, .store, .storeCapability, .invoke]
 		
 		/// The allocation routine capability's permissions.
 		///

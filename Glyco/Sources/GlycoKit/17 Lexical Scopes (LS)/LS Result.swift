@@ -33,7 +33,7 @@ extension LS {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let result):
-				context.pushScope(for: definitions.lazy.map(\.name))
+				// Definition lowering starts scope
 				defer { context.popScope(for: definitions.lazy.map(\.name)) }
 				return try .let(definitions.lowered(in: &context), in: result.lowered(in: &context))
 				

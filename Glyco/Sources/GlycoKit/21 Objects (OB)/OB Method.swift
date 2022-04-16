@@ -30,7 +30,27 @@ extension OB {
 		
 		/// The symbol of the function for `self`, as defined by in a `letType` value.
 		func symbol(typeName: TypeName) -> Lower.Symbol {
-			"ob.\(typeName).\(name).m"
+			Self.symbol(typeName: typeName, methodName: self.name)
+		}
+		
+		/// The symbol of the function for a method named `methodName` in a object type named `typeName`, as defined by in a `letType` value.
+		static func symbol(typeName: TypeName, methodName: Self.Name) -> Lower.Symbol {
+			"ob.\(typeName).\(methodName).m"
+		}
+		
+		/// Returns an *unsealed* lambda representing `self`.
+		///
+		/// The lambda's parameters consists of one sealed parameter for the method's receiver followed by `parameters`. The lambda's result type and result are `resultType` and `result` respectively.
+		///
+		/// - Parameter type: The object type defining `self`.
+		/// - Parameter context: The lowering context.
+		func lowered(in context: inout Context, type: ObjectType) throws -> Lower.Value {
+			let receiverType = Lower.ValueType.cap(.record(try type.state.lowered(in: &context), sealed: true))
+			return try .λ(
+				takes:		[.init(Self.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
+				returns:	resultType.lowered(in: &context),
+				in:			result.lowered(in: &context)
+			)
 		}
 		
 	}

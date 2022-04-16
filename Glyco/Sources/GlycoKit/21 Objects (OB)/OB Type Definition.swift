@@ -12,15 +12,19 @@ extension OB {
 		case nominal(TypeName, ValueType)
 		
 		/// A definition of a (nominal) object type.
-		case object(TypeName, ObjectType)
+		case object(ObjectType)
 		
 		// See protocol.
 		public var name: TypeName {
 			switch self {
+				
 				case .structural(let name, _),
-					.nominal(let name, _),
-					.object(let name, _):
+					.nominal(let name, _):
 				return name
+				
+				case .object(let type):
+				return type.name
+				
 			}
 		}
 		
@@ -34,8 +38,8 @@ extension OB {
 				case .nominal(let typeName, let valueType):
 				return .nominal(typeName, try valueType.lowered(in: &context))
 				
-				case .object(let typeName, let objectType):
-				return .nominal(typeName, .cap(.record(try objectType.stateRecordType.lowered(in: &context), sealed: true)))
+				case .object(let objectType):
+				return .nominal(objectType.name, .cap(.record(try objectType.state.lowered(in: &context), sealed: true)))
 				
 			}
 		}

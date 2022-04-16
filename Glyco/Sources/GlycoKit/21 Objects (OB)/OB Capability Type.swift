@@ -17,13 +17,16 @@ extension OB {
 		
 		/// A (possibly sealed) capability to a function with given parameters and result type.
 		///
-		/// A function capability may be either unsealed, a sentry capability, or a capability sealed with an object type.
+		/// A function capability may be either unsealed or a sentry capability.
 		indirect case function(takes: [Parameter], returns: ValueType)
 		
 		/// A capability to an object of given type.
 		///
 		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type. Note that the type of `self` in a method is not an object capability but a capability to the object's state record.
 		case object(TypeName)
+		
+		/// A capability that can be used to seal other capabilities.
+		case seal
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.CapabilityType {
@@ -40,8 +43,11 @@ extension OB {
 				
 				case .object(let typeName):
 				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
-				guard case .object(_, let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
-				return .record(try objectType.stateRecordType.lowered(in: &context), sealed: true)
+				guard case .object(let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
+				return .record(try objectType.state.lowered(in: &context), sealed: true)
+				
+				case .seal:
+				return .seal(sealed: false)
 				
 			}
 		}

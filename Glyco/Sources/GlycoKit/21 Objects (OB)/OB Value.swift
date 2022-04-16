@@ -89,8 +89,11 @@ extension OB {
 				
 				case .object(let typeName, let arguments):
 				guard let definition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
-				guard case .object(_, let objectType) = definition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: definition) }
-				return .evaluate(.named(objectType.initialiserSymbol(typeName: typeName)), try arguments.lowered(in: &context))
+				guard case .object(let objectType) = definition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: definition) }
+				return .evaluate(
+					.named(Method.symbol(typeName: objectType.typeObjectTypeName, methodName: ObjectType.typeObjectCreateObjectMethod)),
+					try [.named(objectType.typeObjectName)] + arguments.lowered(in: &context)
+				)
 				
 				case .function(let name):
 				return .function(name)
@@ -105,9 +108,9 @@ extension OB {
 				let receiverType = try receiver.type(in: context)
 				guard case .cap(.object(let typeName)) = receiverType else { throw TypingError.messagingNonobject(receiver, actualType: receiverType) }
 				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
-				guard case .object(_, let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
+				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
 				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
-				return .evaluate(.named(method.symbol(typeName: typeName)), try arguments.lowered(in: &context))
+				return .evaluate(.named(method.symbol(typeName: typeName)), try [receiver.lowered(in: &context)] + arguments.lowered(in: &context))
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -123,10 +126,52 @@ extension OB {
 				}
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
-				case .letType(let definitions, in: let body):
-				context.types.append(contentsOf: definitions)
-				defer { context.types.removeLast(definitions.count) }
-				return try .letType(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				case .letType(let typeDefinitions, in: let body):
+				context.types.append(contentsOf: typeDefinitions)
+				defer { context.types.removeLast(typeDefinitions.count) }
+				return try .letType(
+					typeDefinitions.lowered(in: &context),
+					in: .let(.init {
+						for case .object(let objectType) in typeDefinitions {
+							
+							// A fresh seal for sealing the type object, the type object's createObject method, the type's objects, and the type's methods.
+							let sealName: Lower.Symbol = "ob.seal"
+							sealName ~ .seal
+							
+							// The type object.
+							let unsealedTypeObject: Lower.Symbol = "ob.typeobj"
+							objectType.typeObjectName ~ .let(
+								[unsealedTypeObject ~ .record(try ObjectType.typeObjectState.lowered(in: &context))],
+								in: .do(
+									[.setField(
+										ObjectType.typeObjectSealFieldName,
+										of: .named(unsealedTypeObject),
+										to: .named(sealName)
+									)],
+									then: .sealed(.named(unsealedTypeObject), with: .named(sealName))
+								)
+							)
+							
+							// The type object's createObject method.
+							Method.symbol(
+								typeName: objectType.typeObjectTypeName,
+								methodName: ObjectType.typeObjectCreateObjectMethod
+							) ~ .sealed(
+								try objectType.initialiser.lowered(in: &context, type: objectType),
+								with: .named(sealName)
+							)
+							
+							// The type's methods.
+							for method in objectType.methods {
+								method.symbol(typeName: objectType.name) ~ .sealed(
+									try method.lowered(in: &context, type: objectType),
+									with: .named(sealName)
+								)
+							}
+							
+						}
+					}, in: body.lowered(in: &context))
+				)
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
@@ -144,7 +189,7 @@ extension OB {
 				
 				case .constant:
 				return .s32
-					
+				
 				case .named(let symbol):
 				guard let type = context.valueType(of: symbol) else { throw TypingError.undefinedSymbol(symbol) }
 				return type
@@ -185,7 +230,7 @@ extension OB {
 				let receiverType = try receiver.type(in: context)
 				guard case .cap(.object(let typeName)) = receiverType else { throw TypingError.messagingNonobject(receiver, actualType: receiverType) }
 				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
-				guard case .object(_, let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
+				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
 				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
 				return method.resultType
 				

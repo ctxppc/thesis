@@ -60,10 +60,17 @@ extension CC {
 				let assignments = Parameter.Assignments(parameters: parameters, resultType: resultType, configuration: context.configuration)
 				
 				// Bind local names to register-resident arguments — limit liveness ranges by using the registers as early as possible.
-				// Sealed parameters are passed as part of the sealed invocation effect instead.
-				for asn in assignments.viaRegisters where !asn.parameter.sealed {
+				for asn in assignments.viaRegisters {
 					let parameter = asn.parameter
-					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, parameter.type.lowered()))
+					let valueType: Lower.ValueType = try {
+						if asn.parameter.sealed {
+							guard case .cap(let capType) = parameter.type else { throw LoweringError.noncapabilitySealedParameter(asn.parameter) }
+							return ValueType.cap(capType.sealed(false)).lowered(in: &context)
+						} else {
+							return parameter.type.lowered()
+						}
+					}()
+					Lower.Effect.set(.abstract(parameter.location), to: .register(asn.register, valueType))
 				}
 				
 				// Bind local names to arguments in arguments record.
@@ -88,6 +95,21 @@ extension CC {
 				try effect.lowered(in: &context)
 				
 			})
+			
+		}
+		
+		enum LoweringError : LocalizedError {
+			
+			/// An error indicating the sealed parameter is not a capability type.
+			case noncapabilitySealedParameter(Parameter)
+			
+			// See protocol.
+			var errorDescription: String? {
+				switch self {
+					case .noncapabilitySealedParameter(let parameter):
+					return "\(parameter) is marked as sealed but is not a capability type"
+				}
+			}
 			
 		}
 		

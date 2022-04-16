@@ -108,32 +108,129 @@ mm.cseal_end:	.balign 4
 				.balign 4
 rv.main:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
-				cincoffsetimm csp, csp, -32
-				csc cra, -16(cfp)
-				cjal cra, f
-cd.ret:			clc cra, -16(cfp)
+				cincoffsetimm csp, csp, -80
+				csc cra, -64(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ca2, ct6
+				cincoffsetimm ca1, csp, -16
+				csetboundsimm ca1, ca1, 16
+				cgetaddr t0, ca1
+				csetaddr csp, csp, t0
+				cmove cra, ca1
+				cmove ca0, ca2
+				csc ca0, 0(cra)
+				cmove cra, ca2
+				cseal ca1, ca1, cra
+				cllc cra, l.anon
+				cmove ca0, ca2
+				cseal ca3, cra, ca0
+				cllc cra, l.anon$1
+				cmove ca0, ca2
+				cseal ct4, cra, ca0
+				csc ct4, -48(cfp)
+				cllc ca0, l.anon$2
+				cmove cra, ca2
+				cseal ct4, ca0, cra
+				csc ct4, -32(cfp)
+				cmove ca2, ca1
+				addi a0, zero, 32
+				cmove ca1, ca3
+				cllc cra, cd.ret
+				cinvoke ca1, ca2
+cd.ret:			csc ca0, -16(cfp)
+				clc ca0, -16(cfp)
+				clc ca1, -48(cfp)
+				cllc cra, cd.ret$1
+				cinvoke ca1, ca0
+cd.ret$1:		clc ca0, -16(cfp)
+				clc ca1, -48(cfp)
+				cllc cra, cd.ret$2
+				cinvoke ca1, ca0
+cd.ret$2:		clc ca1, -16(cfp)
+				clc ca0, -48(cfp)
+				cllc cra, cd.ret$3
+				cinvoke ca0, ca1
+cd.ret$3:		clc ca1, -16(cfp)
+				clc ca0, -32(cfp)
+				cllc cra, cd.ret$4
+				cinvoke ca0, ca1
+cd.ret$4:		clc cra, -64(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-f:				csc cfp, -16(csp)
+l.anon:			csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-cd.then:		cmove ca3, cs2
+				cmove ca3, cs1
+				cmove ca6, cs2
+				cmove ca7, cs3
+cd.then$5:		cmove ca4, cs10
+				cmove ca5, cs11
+				cmove ca2, cra
+				clc cs1, 0(ct6)
+				cincoffsetimm ca1, csp, -16
+				csetboundsimm ca1, ca1, 16
+				cgetaddr t0, ca1
+				csetaddr csp, csp, t0
+				cmove cra, ca1
+				csw a0, 0(cra)
+				cseal ca0, ca1, cs1
+				cmove cs1, ca3
+				cmove cs2, ca6
+				cmove cs3, ca7
+cd.then$11:		cmove cs10, ca4
+				cmove cs11, ca5
+				cmove cra, ca2
+				cincoffsetimm csp, cfp, 16
+				clc cfp, 0(cfp)
+				cjalr cnull, cra
+l.anon$1:		csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -16
+				cmove ca2, cs1
+				cmove ca5, cs2
+				cmove ca6, cs3
+				cmove ca7, cs4
+cd.then$16:		cmove ca3, cs10
+				cmove ca4, cs11
+				cmove ca1, cra
+				cmove cra, ct6
+				clw ra, 0(cra)
+				addi s1, zero, 1
+				add a0, ra, s1
+				mv ra, a0
+				csw ra, 0(ct6)
+				cmove cs1, ca2
+				cmove cs2, ca5
+				cmove cs3, ca6
+				cmove cs4, ca7
+cd.then$21:		cmove cs10, ca3
+				cmove cs11, ca4
+				cmove cra, ca1
+				cincoffsetimm csp, cfp, 16
+				clc cfp, 0(cfp)
+				cjalr cnull, cra
+l.anon$2:		csc cfp, -16(csp)
+				cincoffsetimm cfp, csp, -16
+				cincoffsetimm csp, csp, -16
+cd.then$22:		cmove ca3, cs2
 				cmove ca4, cs3
 				cmove ca5, cs4
 				cmove ca6, cs5
 				cmove ca7, cs6
-cd.then$3:		cmove ca1, cs10
+cd.then$25:		cmove ca1, cs10
 				cmove ca2, cs11
-cd.then$4:		addi a0, zero, 42
-cd.then$5:		cmove cs2, ca3
+cd.then$26:		clw a0, 0(ct6)
+cd.then$27:		cmove cs2, ca3
 				cmove cs3, ca4
 				cmove cs4, ca5
 				cmove cs5, ca6
 				cmove cs6, ca7
-cd.then$8:		cmove cs10, ca1
+cd.then$30:		cmove cs10, ca1
 				cmove cs11, ca2
-cd.then$9:		cincoffsetimm csp, cfp, 16
+cd.then$31:		cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 				.balign 16

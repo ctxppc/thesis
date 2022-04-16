@@ -96,6 +96,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code>(Symbol, ValueType)</code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Effect)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
@@ -136,7 +140,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(<strong>initialiser:</strong> Constructor, <strong>methods:</strong> [Method], <strong>state:</strong> RecordType)</code></dd>
+	<dd><code>(TypeName, <strong>state:</strong> RecordType, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -154,15 +158,12 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 </dl>
 <dl>
-	<dt><code>OB.Constructor</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Result)</code></dd>
-</dl>
-<dl>
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Method</code></dt>
@@ -176,7 +177,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dt><code>OB.TypeDefinition</code></dt>
 	<dd><code><strong>structural</strong>(TypeName, ValueType)</code></dd>
 	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
-	<dd><code><strong>object</strong>(TypeName, ObjectType)</code></dd>
+	<dd><code><strong>object</strong>(ObjectType)</code></dd>
 </dl>
 
 <h2 id="NT">Grammar for NT (Named Types)</h2>

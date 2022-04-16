@@ -337,6 +337,13 @@ extension OB.Parameter {
 	}
 }
 
+extension OB.Initialiser {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case effect = "in"
+	}
+}
+
 extension OB.Function {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -361,16 +368,10 @@ extension OB.Field {
 
 extension OB.ObjectType {
 	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case state = "state"
 		case initialiser = "initialiser"
 		case methods = "methods"
-		case stateRecordType = "state"
-	}
-}
-
-extension OB.Constructor {
-	public enum CodingKeys : String, CodingKey {
-		case parameters = "takes"
-		case result = "in"
 	}
 }
 

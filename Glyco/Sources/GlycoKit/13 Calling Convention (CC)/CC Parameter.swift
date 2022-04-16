@@ -14,6 +14,8 @@ extension CC {
 		public var location: Location
 		
 		/// The value type of the argument.
+		///
+		/// The type must be a sealed capability type if `sealed` is `true`. The argument is unsealed on the callee-side.
 		public var type: ValueType
 		
 		/// A Boolean value indicating whether an argument to `self` is sealed, to be unsealed by the sealed call.
