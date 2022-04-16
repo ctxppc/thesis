@@ -21,39 +21,21 @@ extension ALA {
 		/// This set grows and shrinks while traversing a program in reverse order. A location that is defined is removed from the set whereas a location that is used is added to the set.
 		public private(set) var possiblyLiveLocations: Set<Location>
 		
-		/// Updates the analysis with information about an effect or predicate.
+		/// Marks given locations as being defined by the effect.
 		///
-		/// - Parameters:
-		///    - defined: The locations that are defined by the effect.
-		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.    
-		mutating func update<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws where D.Element == Location, U.Element == Location {
-			let possiblyLiveLocationsAtExit = possiblyLiveLocations
-			markAsDefinitelyDiscarded(defined)
-			markAsPossiblyUsedLater(possiblyUsed)	// a self-copy (both "discarded" & "used") is considered possibly used, so add used after discarded
-			for definedLocation in defined {
-				conflicts.insert(between: definedLocation, and: possiblyLiveLocationsAtExit)
+		/// - Parameter definedLocations: The locations that are defined by the effect.
+		mutating func markAsDefined<L : Sequence>(_ locations: L) throws where L.Element == Location {
+			possiblyLiveLocations.subtract(locations)
+			for definedLocation in locations {
+				conflicts.insert(between: definedLocation, and: possiblyLiveLocations)
 			}
 		}
 		
-		/// Returns a copy of `self` with additional information about an effect or predicate applied to it.
+		/// Marks given locations as being used by the effect or predicate.
 		///
-		/// - Parameters:
-		///    - defined: The locations that are defined by the effect.
-		///    - possiblyUsed: The locations that are (possibly) used by the effect or predicate.
-		func updated<D : Sequence, U : Sequence>(defined: D, possiblyUsed: U) throws -> Self where D.Element == Location, U.Element == Location {
-			var copy = self
-			try copy.update(defined: defined, possiblyUsed: possiblyUsed)
-			return copy
-		}
-		
-		/// Marks `locations` as being possibly used by a successor.
-		private mutating func markAsPossiblyUsedLater<Locations : Sequence>(_ locations: Locations) where Locations.Element == Location {
+		/// - Parameter possiblyUsedLocations: The locations that are (possibly) used by the effect or predicate.
+		mutating func markAsPossiblyUsed<L : Sequence>(_ locations: L) throws where L.Element == Location {
 			possiblyLiveLocations.formUnion(locations)
-		}
-		
-		/// Marks `locations` as being definitely discarded by a successor.
-		private mutating func markAsDefinitelyDiscarded<Locations : Sequence>(_ locations: Locations) where Locations.Element == Location {
-			possiblyLiveLocations.subtract(locations)
 		}
 		
 		/// Adds the conflicting location pairs from `other` to `self` and marks the possibly live locations in `other` as possibly live in `self`.

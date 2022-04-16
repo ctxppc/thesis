@@ -53,7 +53,7 @@ extension ALA {
 				return .constant(holds, analysisAtEntry: analysis)
 				
 				case .relation(let lhs, let relation, let rhs, analysisAtEntry: _):
-				try analysis.update(defined: [], possiblyUsed: [lhs, rhs].compactMap(\.location))
+				try analysis.markAsPossiblyUsed([lhs, rhs].compactMap(\.location))
 				return .relation(lhs, relation, rhs, analysisAtEntry: analysis)
 				
 				case .if(let condition, then: let affirmative, else: let negative, analysisAtEntry: _):

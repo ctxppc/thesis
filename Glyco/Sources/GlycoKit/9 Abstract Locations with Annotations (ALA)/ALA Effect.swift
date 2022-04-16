@@ -162,11 +162,14 @@ extension ALA {
 		///
 		/// - Returns: `transform(self)` with updated analysis at entry.
 		func updated(using transform: ALALocalTransformation, analysis: inout Analysis, configuration: CompilationConfiguration) throws -> Self {
+			
 			let transformed = try transform(self)
-			try analysis.update(
-				defined:		transformed.definedLocations(configuration: configuration),
-				possiblyUsed:	transformed.possiblyUsedLocations(configuration: configuration)
-			)
+			
+			// Update analysis in reverse, i.e., from exit to entry.
+			try analysis.markAsDefined(transformed.definedLocationsAfterUses(configuration: configuration))
+			try analysis.markAsPossiblyUsed(transformed.possiblyUsedLocations(configuration: configuration))
+			try analysis.markAsDefined(transformed.definedLocationsBeforeUses(configuration: configuration))
+			
 			switch transformed {
 				
 				case .do(let effects, analysisAtEntry: _):
@@ -261,6 +264,7 @@ extension ALA {
 				return .return(to: caller, analysisAtEntry: analysis)
 				
 			}
+			
 		}
 		
 		/// A function that transforms an effect into the same effect or different effect.
@@ -289,45 +293,23 @@ extension ALA {
 			}
 		}
 		
-		/// Returns the locations defined by `self`.
+		/// Returns the locations defined by `self` before using the locations returned by `possiblyUsedLocations(configuration:)`.
 		///
 		/// - Parameter configuration: The compilation configuration.
 		///
-		/// - Returns: The locations defined by `self`.
-		private func definedLocations(configuration: CompilationConfiguration) -> [Location] {
+		/// - Returns: The locations defined by `self` after using the locations returned by `possiblyUsedLocations(configuration:)`.
+		private func definedLocationsBeforeUses(configuration: CompilationConfiguration) -> [Location] {
 			switch self {
-				
-				case .do, .destroyBuffer, .setElement, .if, .popScope, .return:
-				return []
-				
-				case .set(let destination, to: _, analysisAtEntry: _),
-					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
-					.compute(let destination, _, _, _, analysisAtEntry: _),
-					.createBuffer(bytes: _, capability: let destination, scoped: _, analysisAtEntry: _),
-					.createSeal(in: let destination, analysisAtEntry: _),
-					.seal(into: let destination, source: _, seal: _, analysisAtEntry: _):
-				return [destination]
-				
-				case .pushScope:
-				return configuration.calleeSavedRegisters.map { .register($0) }
-				
-				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
-				let sparedRegisters = Set(sparedRegisters)
-				return Register.assignableRegisters
-					.filter { !sparedRegisters.contains($0) }
-					.map { .register($0) }
-				
-				case .call, .callSealed:
-				return configuration.callerSavedRegisters.map { .register($0) }	// includes args and cra
-				
+				case .call, .callSealed:	return [.register(.ra)]
+				default:					return []
 			}
 		}
 		
-		/// Returns the locations possibly used by `self`.
+		/// Returns the locations possibly used by `self` before defining the locations returned by `definedLocationsBeforeUses(configuration:)`.
 		///
 		/// - Parameter configuration: The compilation configuration.
 		///
-		/// - Returns: The locations possibly used by `self`.
+		/// - Returns: The locations possibly used by `self` before defining the locations returned by `definedLocationsBeforeUses(configuration:)`.
 		private func possiblyUsedLocations(configuration: CompilationConfiguration) -> [Location] {
 			switch self {
 				
@@ -368,6 +350,40 @@ extension ALA {
 				
 				case .return(to: let caller, analysisAtEntry: _):
 				return [caller].compactMap(\.location) + [.register(.a0)]
+				
+			}
+		}
+		
+		/// Returns the locations defined by `self` after using the locations returned by `possiblyUsedLocations(configuration:)`.
+		///
+		/// - Parameter configuration: The compilation configuration.
+		///
+		/// - Returns: The locations defined by `self` after using the locations returned by `possiblyUsedLocations(configuration:)`.
+		private func definedLocationsAfterUses(configuration: CompilationConfiguration) -> [Location] {
+			switch self {
+				
+				case .do, .destroyBuffer, .setElement, .if, .popScope, .return:
+				return []
+				
+				case .set(let destination, to: _, analysisAtEntry: _),
+					.getElement(_, of: _, offset: _, to: let destination, analysisAtEntry: _),
+					.compute(let destination, _, _, _, analysisAtEntry: _),
+					.createBuffer(bytes: _, capability: let destination, scoped: _, analysisAtEntry: _),
+					.createSeal(in: let destination, analysisAtEntry: _),
+					.seal(into: let destination, source: _, seal: _, analysisAtEntry: _):
+				return [destination]
+				
+				case .pushScope:
+				return configuration.calleeSavedRegisters.map { .register($0) }
+				
+				case .clearAll(except: let sparedRegisters, analysisAtEntry: _):
+				let sparedRegisters = Set(sparedRegisters)
+				return Register.assignableRegisters
+					.filter { !sparedRegisters.contains($0) }
+					.map { .register($0) }
+				
+				case .call, .callSealed:
+				return configuration.callerSavedRegisters.map { .register($0) }	// includes args and cra
 				
 			}
 		}
