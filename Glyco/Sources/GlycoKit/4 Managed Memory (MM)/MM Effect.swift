@@ -93,7 +93,9 @@ extension MM {
 		case call(Target)
 		
 		/// An effect that links the return capability, unseals given target code capability and data capability pair, and jumps to the target.
-		case callSealed(Register, data: Register)
+		///
+		/// The next effect must be labelled `returnPoint`.
+		case callSealed(Register, data: Register, returnPoint: Label)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		///
@@ -352,14 +354,12 @@ extension MM {
 					
 				}
 				
-				case .callSealed(let target, data: let data):
-				let ret = context.labels.uniqueName(from: "ret")
-				Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
+				case .callSealed(let target, data: let data, returnPoint: let returnPoint):
 				switch context.configuration.callingConvention {
 					
 					case .conventional:
+					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: returnPoint)
 					try Lower.Effect.invoke(target: target.lowered(), data: data.lowered())
-					ret ~ .nop
 					
 					case .heap:
 					do {
@@ -368,6 +368,10 @@ extension MM {
 						let csealLinkReg = tempRegisterA			// cf. create seal routine
 						let sealReg = Lower.Register.invocationData	// cf. create seal routine
 						Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: csealLinkReg)
+						
+						// Link cra.
+						let ret = context.labels.uniqueName(from: "ret")
+						Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
 						
 						// Seal cra and cfp.
 						Lower.Effect.seal(destination: .ra, source: .ra, seal: sealReg)

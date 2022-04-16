@@ -1169,7 +1169,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Label)</code></dd>
 	<dd><code><strong>call</strong>(Source)</code></dd>
-	<dd><code><strong>callSealed</strong>(Source, <strong>data:</strong> Source)</code></dd>
+	<dd><code><strong>callSealed</strong>(Source, <strong>data:</strong> Source, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Source)</code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>
@@ -1237,7 +1237,7 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 	<dd><code><strong>branch</strong>(<strong>to:</strong> Label, Register, BranchRelation, Register)</code></dd>
 	<dd><code><strong>jump</strong>(<strong>to:</strong> Target)</code></dd>
 	<dd><code><strong>call</strong>(Target)</code></dd>
-	<dd><code><strong>callSealed</strong>(Register, <strong>data:</strong> Register)</code></dd>
+	<dd><code><strong>callSealed</strong>(Register, <strong>data:</strong> Register, <strong>returnPoint:</strong> Label)</code></dd>
 	<dd><code><strong>return</strong>(<strong>to:</strong> Target)</code></dd>
 	<dd><code><strong>labelled</strong>(Label, Effect)</code></dd>
 </dl>

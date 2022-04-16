@@ -65,7 +65,9 @@ extension FO {
 		case call(Source)
 		
 		/// An effect that links the return capability, unseals given target code capability and data capability pair, and jumps to the target.
-		case callSealed(Source, data: Source)
+		///
+		/// The next effect must be labelled `returnPoint`.
+		case callSealed(Source, data: Source, returnPoint: Label)
 		
 		/// An effect that returns control to the caller with given target code capability (which is usually `cra`).
 		case `return`(to: Source)
@@ -221,12 +223,12 @@ extension FO {
 				case .call(.capability(to: let name)):
 				Lower.Effect.call(.label(name))
 				
-				case .callSealed(let target, data: let data):
+				case .callSealed(let target, data: let data, returnPoint: let returnPoint):
 				let (loadTarget, target) = try load(.cap, from: target, using: tempRegisterA)
 				let (loadData, data) = try load(.cap, from: data, using: tempRegisterB)
 				loadTarget
 				loadData
-				Lower.Effect.callSealed(target, data: data)
+				Lower.Effect.callSealed(target, data: data, returnPoint: returnPoint)
 				
 				case .return(to: .constant(let value)):
 				throw LoweringError.returningToConstant(value)

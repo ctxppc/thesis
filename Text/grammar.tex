@@ -844,7 +844,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "branch""(""to:" <Label>, <Source>, <BranchRelation>, <Source>")"
 						| "jump""(""to:" <Label>")"
 						| "call""("<Source>")"
-						| "callSealed""("<Source>, "data:" <Source>")"
+						| "callSealed""("<Source>, "data:" <Source>, "returnPoint:" <Label>")"
 						| "return""(""to:" <Source>")"
 						| "labelled""("<Label>, <Effect>")"
 				\par
@@ -903,7 +903,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "branch""(""to:" <Label>, <Register>, <BranchRelation>, <Register>")"
 						| "jump""(""to:" <Target>")"
 						| "call""("<Target>")"
-						| "callSealed""("<Register>, "data:" <Register>")"
+						| "callSealed""("<Register>, "data:" <Register>, "returnPoint:" <Label>")"
 						| "return""(""to:" <Target>")"
 						| "labelled""("<Label>, <Effect>")"
 				\par
