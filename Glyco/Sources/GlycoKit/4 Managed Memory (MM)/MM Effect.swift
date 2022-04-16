@@ -328,14 +328,31 @@ extension MM {
 					Lower.Effect.jump(to: try target.lowered(), link: .ra)
 						
 					case .heap:
-					let ret = context.labels.uniqueName(from: "ret")
-					Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)	// scall doesn't support sentries so we need to link cra manually
-					switch target {
-						case .label(let name):	Lower.Effect.deriveCapabilityFromLabel(destination: .invocationData, label: name)
-						case .register(let r):	Lower.Effect.copy(.cap, into: .invocationData, from: try r.lowered())
+					do {
+						
+						// Create fresh seal.
+						let csealLinkReg = tempRegisterA			// cf. create seal routine
+						let sealReg = Lower.Register.invocationData	// cf. create seal routine
+						Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: csealLinkReg)
+						
+						// Link cra.
+						let ret = context.labels.uniqueName(from: "ret")
+						Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
+						
+						// Seal cra and cfp.
+						Lower.Effect.seal(destination: .ra, source: .ra, seal: sealReg)
+						Lower.Effect.seal(destination: .fp, source: .fp, seal: sealReg)
+						
+						// Clear authority.
+						Lower.Effect.clear([csealLinkReg, sealReg])
+						
+						// Jump to callee (without linking again).
+						Lower.Effect.jump(to: try target.lowered(), link: .zero)
+						
+						// Restore cfp.
+						ret ~ .copy(.cap, into: .fp, from: .invocationData)
+						
 					}
-					Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: tempRegisterA)	// can't use cnull link register for routine calls
-					ret ~ .copy(.cap, into: .fp, from: .invocationData)	// restore cfp
 					
 				}
 				

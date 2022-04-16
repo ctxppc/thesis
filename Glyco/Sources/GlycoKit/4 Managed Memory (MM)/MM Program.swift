@@ -37,20 +37,12 @@ public enum MM : Language {
 			let stackLowLabel = context.labels.uniqueName(from: "stack_low")
 			let stackHighLabel = context.labels.uniqueName(from: "stack_high")
 			
-			let scallLabel = context.labels.uniqueName(from: "scall")
-			let scallEndLabel = context.labels.uniqueName(from: "scall_end")
-			let scallCapLabel = Label.secureCallingRoutineCapability
-			let scallSealCapLabel = context.labels.uniqueName(from: "scall_seal_cap")
-			
 			let csealLabel = context.labels.uniqueName(from: "cseal")
 			let csealEndLabel = context.labels.uniqueName(from: "cseal_end")
 			let csealCapLabel = Label.createSealRoutineCapability
 			let csealSealCapLabel = context.labels.uniqueName(from: "cseal_seal_cap")
 			
 			let userEndLabel = context.labels.uniqueName(from: "user_end")
-			
-			let savedRA = context.labels.uniqueName(from: "savedRA")
-			let ret = context.labels.uniqueName(from: "ret")
 			
 			// Implementation note: the following code is structured as to facilitate manual register allocation. #ohno
 			
@@ -120,23 +112,8 @@ public enum MM : Language {
 					let bitmaskReg = tempRegisterB
 					Lower.Effect.permit(Self.sealCapabilityPermissions, destination: sealCapReg, source: sealCapReg, using: bitmaskReg)
 					
-					if configuration.callingConvention.requiresCallRoutine {
-						
-						// Assign first otype — it will be increased with every scall.
-						Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
-						
-						// Derive scall seal cap cap and store scall seal cap.
-						let sealCapCapReg = tempRegisterB
-						Lower.Effect.deriveCapabilityFromLabel(destination: sealCapCapReg, label: scallSealCapLabel)
-						Lower.Effect.store(.cap, address: sealCapCapReg, source: sealCapReg, offset: 0)
-						
-					}
-					
 					// Assign first otype — it will be increased with every cseal.
-					let lengthReg = tempRegisterB
-					Lower.Effect.compute(destination: lengthReg, .zero, .add, .constant(1))
-					Lower.Effect.compute(destination: lengthReg, lengthReg, .sll, .constant(17))	// 2^18 otypes are available, half of which reserved for scall
-					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: lengthReg)
+					Lower.Effect.setCapabilityAddress(destination: sealCapReg, source: sealCapReg, address: .zero)
 					
 					// Derive cseal seal cap cap and store cseal seal cap.
 					let csealSealCapCapReg = tempRegisterB
@@ -171,33 +148,6 @@ public enum MM : Language {
 					
 				}
 				
-				// Initialise scall cap.
-				if configuration.callingConvention.requiresCallRoutine {
-					// TODO: Remove scall routine in favour of high-level implementation with create seal effects?
-					
-					// Derive scall cap.
-					let scallCapReg = tempRegisterA
-					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapReg, label: scallLabel)
-					
-					// Restrict scall cap bounds.
-					let scallCapEndReg = tempRegisterB
-					let scallCapLengthReg = tempRegisterB
-					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapEndReg, label: scallEndLabel)
-					Lower.Effect.getCapabilityDistance(destination: scallCapLengthReg, cs1: scallCapEndReg, cs2: scallCapReg)
-					Lower.Effect.setCapabilityBounds(destination: scallCapReg, base: scallCapReg, length: .register(scallCapLengthReg))
-					
-					// Restrict scall cap permissions.
-					let bitmaskReg = tempRegisterB
-					Lower.Effect.permit(Self.scallCapabilityPermissions, destination: scallCapReg, source: scallCapReg, using: bitmaskReg)
-					Lower.Effect.sealEntry(destination: scallCapReg, source: scallCapReg)
-					
-					// Derive scall cap cap and store scall cap.
-					let scallCapCapReg = tempRegisterB
-					Lower.Effect.deriveCapabilityFromLabel(destination: scallCapCapReg, label: scallCapLabel)
-					Lower.Effect.store(.cap, address: scallCapCapReg, source: scallCapReg, offset: 0)
-					
-				}
-				
 				// Initialise create seal cap.
 				do {
 					
@@ -227,53 +177,61 @@ public enum MM : Language {
 				// Execute user program & return.
 				do {
 					
-					// Derive user cap.
-					let userCapReg = Lower.Register.invocationData	// cf. scall routine
-					Lower.Effect.deriveCapabilityFromLabel(destination: userCapReg, label: .programEntry)
+					// Derive program entry cap (so that we can restrict it before jumping to it).
+					let programEntryReg = tempRegisterC	// survives cseal routine
+					Lower.Effect.deriveCapabilityFromLabel(destination: programEntryReg, label: .programEntry)
 					
 					// Restrict user cap bounds.
 					let userEndReg = tempRegisterA
 					let userLengthReg = tempRegisterA
 					Lower.Effect.deriveCapabilityFromLabel(destination: userEndReg, label: userEndLabel)
-					Lower.Effect.getCapabilityDistance(destination: userLengthReg, cs1: userEndReg, cs2: userCapReg)
-					Lower.Effect.setCapabilityBounds(destination: userCapReg, base: userCapReg, length: .register(userLengthReg))
+					Lower.Effect.getCapabilityDistance(destination: userLengthReg, cs1: userEndReg, cs2: programEntryReg)
+					Lower.Effect.setCapabilityBounds(destination: programEntryReg, base: programEntryReg, length: .register(userLengthReg))
 					
 					// Restrict user cap permissions.
 					let bitmaskReg = tempRegisterA
-					Lower.Effect.permit(Self.userPPCPermissions, destination: userCapReg, source: userCapReg, using: bitmaskReg)
+					Lower.Effect.permit(Self.userPPCPermissions, destination: programEntryReg, source: programEntryReg, using: bitmaskReg)
 					
 					// Call user program.
 					switch configuration.callingConvention {
 						
 						case .conventional:
 						Lower.Effect.clear([.fp])
-						Lower.Effect.jump(to: .register(userCapReg), link: .zero)
+						Lower.Effect.jump(to: .register(programEntryReg), link: .zero)
 						// This is a tail-call so we don't link, thereaby avoiding the need to store the previous cra (to the OS) somewhere.
 						
 						case .heap:
 						do {
 							
 							// Save return cap.
+							let savedRA = context.labels.uniqueName(from: "savedRA")
 							let savedRACapReg = tempRegisterA
 							Lower.Effect.deriveCapabilityFromLabel(destination: savedRACapReg, label: savedRA)
 							Lower.Effect.store(.cap, address: savedRACapReg, source: .ra, offset: 0)
 							
-							// cfp can be anything but must be a valid unsealed capability for the scall. (It will be sealed by the scall.)
-							// It must be nonexecutable for cinvoke.
-							let bitmaskReg = tempRegisterA
-							Lower.Effect.copy(.cap, into: .fp, from: userCapReg)
-							Lower.Effect.permit(Self.heapCapabilityPermissions, destination: .fp, source: .fp, using: bitmaskReg)
+							// Create fresh seal.
+							let csealLinkReg = tempRegisterA			// cf. create seal routine
+							let sealReg = Lower.Register.invocationData	// cf. create seal routine
+							Lower.Effect.callRuntimeRoutine(capability: .createSealRoutineCapability, link: csealLinkReg)
 							
-							// Manually link cra to avoid it becoming a sentry for the scall (which requires unsealed cra).
+							// Link & seal cra.
+							let ret = context.labels.uniqueName(from: "ret")
 							Lower.Effect.deriveCapabilityFromLabel(destination: .ra, label: ret)
+							Lower.Effect.seal(destination: .ra, source: .ra, seal: sealReg)
+							
+							// Derive an arbitrary cfp & seal it.
+							// The callee expects a valid, global, nonexecutable, cinvoke-able, sealed cap.
+							let bitmaskReg = tempRegisterA
+							Lower.Effect.deriveCapabilityFromPCC(destination: .fp, upperBits: 0)
+							Lower.Effect.permit([.global, .invoke], destination: .fp, source: .fp, using: bitmaskReg)
+							Lower.Effect.seal(destination: .fp, source: .fp, seal: sealReg)
 							
 							// Clear all registers except (selected) user authority.
-							let preservedRegisters = [.ra, .fp, userCapReg]	// Set is probably less efficient for merely 3 elements
+							let preservedRegisters = [.ra, .fp, programEntryReg]	// Set is probably less efficient for merely 3 elements
 							Lower.Effect.clear(Lower.Register.allCases.filter { !preservedRegisters.contains($0) })
 							
-							// Perform scall.
-							let scallCapReg = tempRegisterA	// don't replace manually linked cra
-							Lower.Effect.callRuntimeRoutine(capability: .secureCallingRoutineCapability, link: scallCapReg)
+							// Jump to callee (without linking again).
+							Lower.Effect.jump(to: .register(programEntryReg), link: .zero)
 							
 							// Restore saved return cap.
 							let savedRACapReg2 = tempRegisterA
@@ -351,43 +309,6 @@ public enum MM : Language {
 				
 			}
 			
-			// A routine that performs a secure function call transition — see also MM.Label.secureCallingRoutineCapability.
-			@ArrayBuilder<Lower.Statement>
-			var scallRoutine: [Lower.Statement] {
-				
-				let targetReg = Lower.Register.invocationData	// argument
-				
-				Lower.Statement.padding()
-				
-				// Load seal cap.
-				let sealCapCap = tempRegisterA
-				let sealCap = tempRegisterB
-				scallLabel ~ .deriveCapabilityFromLabel(destination: sealCapCap, label: scallSealCapLabel)
-				Lower.Effect.load(.cap, destination: sealCap, address: sealCapCap, offset: 0)
-				
-				// Seal return & frame capabilities.
-				Lower.Effect.seal(destination: .ra, source: .ra, seal: sealCap)
-				Lower.Effect.seal(destination: .fp, source: .fp, seal: sealCap)
-				
-				// Update seal cap for next invocation.
-				Lower.Effect.offsetCapability(destination: sealCap, source: sealCap, offset: .constant(1))
-				Lower.Effect.store(.cap, address: sealCapCap, source: sealCap, offset: 0)
-				
-				// Clear authority.
-				Lower.Effect.clear([sealCapCap, sealCap])
-				
-				// Jump to callee — while preserving link.
-				Lower.Effect.jump(to: .register(targetReg), link: .zero)
-				
-				// The seal capability.
-				Lower.Statement.padding(alignment: DataType.cap)
-				scallSealCapLabel ~ .data(type: .cap)
-				
-				// Label end of routine.
-				scallEndLabel ~ .padding()
-				
-			}
-			
 			// A routine that creates a new seal capability — see also MM.Label.secureCallingRoutineCapability.
 			@ArrayBuilder<Lower.Statement>
 			var createSealRoutine: [Lower.Statement] {
@@ -437,11 +358,6 @@ public enum MM : Language {
 					Lower.Statement.padding(alignment: DataType.cap)
 					allocCapLabel ~ .data(type: .cap)
 					
-					// Scall capability.
-					if configuration.callingConvention.requiresCallRoutine {
-						scallCapLabel ~ .data(type: .cap)
-					}
-					
 					// Create seal capability.
 					csealCapLabel ~ .data(type: .cap)
 					
@@ -471,9 +387,6 @@ public enum MM : Language {
 				
 				runtime
 				allocationRoutine
-				if configuration.callingConvention.requiresCallRoutine {
-					scallRoutine
-				}
 				createSealRoutine
 				try user
 				
@@ -501,11 +414,6 @@ public enum MM : Language {
 		///
 		/// The capability is used for executing the routine as well as to load & store (update) the heap capability which is stored inside the routine's memory region.
 		private static let allocCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
-		
-		/// The secure calling routine capability's permissions.
-		///
-		/// The capability is used for executing the routine as well as to load & store (update) the seal capability which is stored inside the routine's memory region.
-		private static let scallCapabilityPermissions = [Permission.global, .execute, .load, .loadCapability, .store, .storeCapability]
 		
 		/// The create seal routine capability's permissions.
 		///
@@ -541,20 +449,9 @@ extension MM.Label {
 	/// The allocation routine takes a length in `MM.tempRegisterA`, a valid, executable return capability in `MM.tempRegisterB`, and returns a valid, capability-aligned buffer capability in `MM.tempRegisterA`. The routine may also touch any register reserved for MM, but will not leak any unintended new authority. `MM.tempRegisterB` **is not overwritten.**
 	static var allocationRoutineCapability: Self { "mm.alloc_cap" }
 	
-	/// The label for the capability to the secure calling (scall) routine.
-	///
-	/// The scall routine takes a valid, executable target capability in `invocationData`, a valid, *unsealed*, executable return capability in `cra`, a valid, unsealed frame capability in `cfp`, and function arguments in argument registers. The target capability must be either unsealed or a sentry capability.
-	///
-	/// It returns the same frame capability in `invocationData` and any function results in argument registers.
-	///
-	/// The routine may touch any non-argument register but will not leak any unintended new authority. Procedures are expected to perform appropriate clearing of registers not used for arguments or for the scall itself before invoking the scall routine or before returning to the callee.
-	///
-	/// The callee receives a sealed return–frame capability pair in `cra` and `cfp` as well as function arguments in argument registers, and returns function results in argument registers. It can return to the caller by invoking the return–frame capability pair.
-	static var secureCallingRoutineCapability: Self { "mm.scall_cap" }
-	
 	/// The label for the capability to the create seal routine.
 	///
-	/// The routine takes a valid, executable return capability in `MM.tempRegisterA` and returns a unique seal capability in `invocationData`. It may touch any register reserved for MM but will not leak any unintended new authority.
+	/// The routine takes a valid, executable return capability in `MM.tempRegisterA` and returns a unique seal capability in `invocationData`. It may touch `MM.tempRegisterB` but will not leak any unintended new authority.
 	static var createSealRoutineCapability: Self { "mm.cseal_cap" }
 	
 }
