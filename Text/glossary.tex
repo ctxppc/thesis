@@ -30,8 +30,6 @@
 \newcommand{\unsealcap}{\gls{unsealcap}}
 
 \newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a \gls{nanopass} as part of the compiler's routine}
-\newcommand{\il}{\gls{il}}
-\newcommand{\ils}{\glspl{il}}
 
 \newglossaryentry{lowering}{
 	name=lowering,
@@ -54,8 +52,6 @@
 	name=calling convention,
 	description={a set of rules governing the invocation of procedures on a specific platform dealing with matters such as parameter \& result passing, register availability, call frame structure, jumping to the callee, and returning to the caller}
 }
-\newcommand{\cc}{\gls{cc}}
-\newcommand{\ccs}{\glspl{cc}}
 
 \newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \cc{}}
 
@@ -110,6 +106,11 @@
 \newglossaryentry{framecap}{
 	name=frame capability,
 	description={a capability in the \texttt{cfp} register that points to the base of the current call frame}
+}
+
+\newglossaryentry{bblock}{
+	name=basic block,
+	description={a sequence of effects that is executed from beginning to end. The first effect is labelled and can be jumped to, the last effect jumps to itself or a different basic block, and no other effect in the block is labelled or a jump, call, or branch}
 }
 
 \makeglossaries

@@ -1,0 +1,13 @@
+(
+	labelled(rv.main, set(cap, register(s1), to: register(ra)))
+	set(s32, register(a0), to: constant(42))
+	call(capability(to: abs))
+	labelled(cd.ret, compute(register(zero), register(zero), add, register(zero)))
+	return(to: register(s1))
+	labelled(abs, compute(register(zero), register(zero), add, register(zero)))
+	branch(to: cd.then, register(a0), le, constant(0))
+	labelled(cd.else, compute(register(a0), register(a0), mul, constant(-1)))
+	return(to: register(ra))
+	labelled(cd.then, compute(register(zero), register(zero), add, register(zero)))
+	return(to: register(ra))
+)

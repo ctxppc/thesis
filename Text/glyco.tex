@@ -9,27 +9,27 @@ We begin this chapter in \cref{sct:nanopass} by giving a concise description of 
 
 In \cref{sct:ex} we discuss the high-level language EX, a functional programming language with support for common features such as functions, conditionals, definitions, vectors, and records. These features are implemented in several transformations from EX to the CC language.
 
-\Cref{sct:cc} deals with CC, a procedural programming language with support for procedures, variables, conditionals, vectors, and records. It is also the highest-level language in Glyco that supports the notion of a procedure. CC programs are transformed to SV programs by imposing a set of rules governing procedure calls, i.e., a calling convention.
+\Cref{sct:cc} deals with CC, a procedural programming language with support for procedures, variables, conditionals, vectors, and records. It is also the highest-level language in Glyco that supports the notion of a procedure with parameters and results. CC programs are transformed to SV programs by imposing a set of rules governing procedure calls, i.e., a calling convention.
 
-SV is an imperative programming language with support for variables, conditionals, vectors, and records, and is discussed in \cref{sct:sv}. SV programs are transformed to ID programs by substituting indices and fields with byte offsets.
+SV is a structured imperative programming language with support for variables, conditionals, vectors, and records, and is discussed in \cref{sct:sv}. SV programs are transformed to ID programs by substituting indices and fields with byte offsets.
 
-ID, AL, and ALA are three imperative languages with support for variables; all three are discussed in \cref{sct:id}. ID programs don't need to declare local variables whereas AL programs do need to declare them. The transformation between the two languages performs a basic inference algorithm to discover the names and types of variables. ALA programs are AL programs with additional liveness and conflict information, information which is necessary to perform register allocation and assign a register or memory location to each variable.
+ID, AL, and ALA are three structured imperative languages with support for variables and conditionals; all three are discussed in \cref{sct:id}. ID programs don't need to declare local variables whereas AL programs do need to declare them. The transformation between the two languages performs a basic inference algorithm to discover the names and types of variables. AL programs are then \lowered{} to ALA programs which contain additional liveness and conflict information. This information is then used to perform register allocation and assign a register or memory location to each variable, resulting in a CD program.
 
-Finally, in \cref{sct:cd}, we discuss the compiler's low-level languages starting with CD, a language with support for conditionals, which is eventually transformed to CHERI-RISC-V assembly.
+In \cref{sct:cd} we go over CD, a structured imperative language with support for conditionals. CD programs are flattened over several passes to FO programs, which consists of labelled and unlabelled effects in a similar way to labelled and unlabelled instructions in an assembly program. We then tackle the last few transformations in \cref{sct:fo} before getting an assembly program.
 
-Later chapters discuss extensions and changes to this first version of the compiler. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+Later chapters explore extensions and changes to this first version of the compiler. A full language reference of the final compiler can be found in \cref{ch:grammar}.
 
 \section{Background: Nanopass Compilers} \label{sct:nanopass}
-Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \textbf{\glspl{nanopass}}, which translate one \textbf{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \glspl{nanopass} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \textbf{\glspl{nanopass}}, which translate one \textbf{\g{il}} to another. Source code is parsed into the compiler’s first \g{il}, which is then translated via \glspl{nanopass} through different \gs{il}, ending up in the compiler's final \g{il}. This final \g{il} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
 
-The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \gls{nanopass} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \gls{nanopass}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
+The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \g{il} that implements that abstraction as well as a \gls{nanopass} which transforms programs written in the new \g{il} to the target language. The compiler engineer then repeats this process, this time abstracting over the \g{il} with a new \g{il} and \gls{nanopass}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
 
-An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
+An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \g{il} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
 Glyco defines 20 \gs{il}, with a general approach adapted from the student compiler by \cite{compcourse}. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
 
 \section{An Expression Language} \label{sct:ex}
-The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
+The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
 The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
 \lstinputlisting{Programs/fib.ex}
@@ -135,8 +135,9 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 \hspace{0pt} \\
 CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program
 \lstinputlisting{Programs/42.cc}
-is lowered to the following SV program:
-\lstinputlisting{Programs/42.sv}	% TODO: Highlight corresponding parts.
+is \lowered{} to the following SV program:
+\lstinputlisting{Programs/42.sv}
+\todo{Highlight corresponding parts.}
 
 The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
 
@@ -146,7 +147,8 @@ The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstracti
 Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
 \lstinputlisting{Programs/sequences.sv}
 is \lowered{} to the following ID program:
-\lstinputlisting{Programs/sequences.id}	% TODO: Highlight corresponding parts.
+\lstinputlisting{Programs/sequences.id}
+\todo{Highlight corresponding parts.}
 
 The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
@@ -215,10 +217,44 @@ Register assignment is a graph colouring problem on the conflict graph where the
 Unlike most algorithms in the compiler's \gs{nanopass}, this algorithm runs in $O(n^2)$ time for $n$ locations, which underlines the importance of minimising the number of abstract locations via optimisations such as location coalescing.
 
 \section{Structured Jumps \& Branches} \label{sct:cd}
-% TODO
+The final major abstractions over straight-line programs are conditionals (\texttt{if}-\texttt{then}-\texttt{else} effects), sequences (\texttt{do} effects), and procedures.
+
+A \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to a given destination. These three features make CD a block-structured programming language which the upcoming \gs{nanopass} remove to get to a form that can be readily translated into assembly.
+
+\paragraph{From CD (Conditionals) to PR} The CD to PR \g{nanopass} flattens conditionals, sequences, and procedures into \gs{bblock}. A \textbf{\g{bblock}} is \glsdesc*{bblock}. A \g{bblock}'s last effect is a \textbf{continuation}. For example, the CD program
+\lstinputlisting{Programs/ifproc.cd}
+is \lowered{} to the PR program
+\lstinputlisting{Programs/ifproc.pr}
+\todo{Highlight corresponding parts and labels. Add flow diagram.}
+
+\paragraph{From PR (Predicates) to BB} The next \g{il} BB does not support predicates so the \g{nanopass} maps predicates to appropriate continuations. For example, the above program is \lowered{} to the BB program
+\lstinputlisting{Programs/ifproc.bb}
+\todo{Highlight corresponding parts and labels.}
+
+\paragraph{From BB (Basic Blocks) to FO} The final structural transformation linearises \gs{bblock} in BB programs to get an FO program with a single list of unlabelled and labelled effects.
+
+The \g{nanopass} attempts to get an optimal placement of \gs{bblock}, i.e., an optimal trace, by juxtaposing successive blocks where possible. Unconditional jumps between juxtaposed blocks can therefore be elided avoiding the costs associated with jumps such as redundant instructions and pipeline stalls.
+
+The above BB program becomes the following FO program:
+\lstinputlisting{Programs/ifproc.fo}
+\todo{Highlight corresponding parts and labels.}
 
 \section{Basic Abstractions over Assembly} \label{sct:fo}
-% TODO
+The last \gs{il} provide some useful basic abstractions over the CHERI-RISC-V instruction set.
+
+\paragraph{From FO (Flexible Operands) to MM} FO effects accept input from several kinds of sources such as constants, registers, and (call) frame locations; and can produce results in registers or frame locations. Some source–destination combinations are not available as CHERI-RISC-V instructions. There is for instance no addition instruction that can load operands from memory or store a result in memory. There's also no subtraction instruction that takes an immediate minuend (first term).
+
+To abstract this complexity away in FO and higher \gs{il}, the FO to MM \g{nanopass} takes care of inserting the necessary loads and stores and of reordering operands that are needed to realise an effect using CHERI-RISC-V instructions in a lower \g{nanopass}.
+
+\paragraph{From MM (Managed Memory) to RV} MM introduces the call stack and heap and operations on them such as call frame pushing and popping and buffer allocation.
+
+The MM to RV \g{nanopass} translates call frame operations such as \texttt{pushFrame}, \texttt{popFrame}, \texttt{load}, and \texttt{store} into manipulations of the stack capability register \texttt{csp} and frame capability register \texttt{cfp}.
+
+Buffer allocation is implemented using a dedicated heap capability register \texttt{ctp}. The heap capability points to the next free location on the heap and allocation increases the heap capability address — deallocation is not supported.
+
+\paragraph{From RV (CHERI-RISC-V) to S (CHERI-RISC-V Assembly)} An RV program consists of CHERI-RISC-V instructions. The RV to S \g{nanopass} serialises these instructions. For example, \texttt{copyWord(destination: a0, source: a1)} instruction is serialised as \hbox{\texttt{mv a0, a1}}.
+
+\paragraph{From S to ELF} The final step of the compiler pipeline is assembling and linking. These two steps are delegated to Clang from the CHERI-LLVM compiler toolchain. The result is an ELF file that, depending on the compilation target, can be executed in either the Sail-based CHERI-RISC-V emulator or in CheriBSD.
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

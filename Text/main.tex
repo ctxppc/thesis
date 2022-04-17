@@ -22,11 +22,11 @@
 \usepackage[capitalise, nameinlink]{cleveref}	% Better references — keep after hyperref
 \usepackage[toc]{glossaries}					% Glossary — keep after hyperref!
 
-\usepackage{lipsum}								% Fake lorem ipsum text
+\usepackage{lipsum}								% Fake lorem ipsum text — TODO: Remove when done
 \usepackage{listings}							% Source code
 \usepackage{subfiles}							% Modular documents
 \usepackage{syntax}								% Grammar
-\usepackage{todonotes}							% Marks TODOs
+\usepackage{todonotes}							% Marks TODOs — TODO: Remove when done
 \usepackage{xparse}								% Advanced command parsing — used in newdualentry
 
 \DeclareUnicodeCharacter{039B}{$\Lambda$}
@@ -59,9 +59,9 @@
 	numberstyle=\tiny\color{Gray},		% the style that is used for the line numbers
 	stringstyle=\color{TealBlue},		% string literal style
 	tabsize=2,							% sets default tab size to 2 spaces
-	morekeywords={*, let, set, source, evaluate, constant, s32, u8, vectorCap, cap, value, location, binary, relation, true, false, vector, record, element, getElement, createVector, getField, createRecord, compute, field, createBuffer, setElement, getElement, pushScope, popScope, abstract, setField, registerDatum, code, named, le, add, sub},
+	morekeywords={*, let, set, source, evaluate, constant, s32, u8, vectorCap, cap, value, location, binary, relation, true, false, vector, record, element, getElement, createVector, getField, createRecord, compute, field, createBuffer, setElement, getElement, pushScope, popScope, abstract, setField, registerDatum, code, named, le, add, sub, mul, call, branch},
 	keywordstyle=\color{BlueViolet},
-	moreemph={then, takes, returns, functions, procedures, in, to, of, count, capability, scoped, index, bytes, sealed, offset, locals},
+	moreemph={then, takes, returns, functions, procedures, in, to, of, count, capability, scoped, index, bytes, sealed, offset, locals, name, returnPoint, else},
 	emphstyle=\color{Fuchsia},
 }
 

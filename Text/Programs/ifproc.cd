@@ -1,0 +1,18 @@
+(
+	do(
+		set(cap, register(s1), to: register(ra))
+		set(s32, register(a0), to: constant(42))
+		call(capability(to: abs))
+		return(to: register(s1))
+	),
+	procedures: (abs, in:
+		if(
+			relation(register(a0), le, constant(0)),
+			then: return(to: register(ra)),
+			else: do(
+				compute(register(a0), register(a0), mul, constant(-1))
+				return(to: register(ra))
+			)
+		)
+	)
+)
