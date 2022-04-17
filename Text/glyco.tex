@@ -5,20 +5,30 @@
 \chapter{Glyco: A Nanopass Compiler for CHERI-RISC-V}
 Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}o$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
-We begin by giving a concise description of the nanopass compiler design, which is used for Glyco. We then describe the design \& implementation of the base compiler, a compiler that emits CHERI-RISC-V instructions but has almost no additional features taking advantage of the capability machine proper. We do so using a few example programs, working our way from the high-end language to the machine language. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+We begin this chapter in \cref{sct:nanopass} by giving a concise description of the nanopass compiler design used by Glyco, an iterative approach to designing and implementing a compiler that results in a series of transformations of a program from a high-level language to a low-level language (such as assembly) via several intermediate languages.
 
-Later chapters discuss extensions and changes to this first version of the compiler.
+In \cref{sct:ex} we discuss the high-level language EX, a functional programming language with support for common features such as functions, conditionals, definitions, vectors, and records. These features are implemented in several transformations from EX to the CC language.
 
-\section{Background: Nanopass Compilers}
-Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \emph{\glspl{nanopass}}, which translate one \emph{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \glspl{nanopass} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
+\Cref{sct:cc} deals with CC, a procedural programming language with support for procedures, variables, conditionals, vectors, and records. It is also the highest-level language in Glyco that supports the notion of a procedure. CC programs are transformed to SV programs by imposing a set of rules governing procedure calls, i.e., a calling convention.
+
+SV is an imperative programming language with support for variables, conditionals, vectors, and records, and is discussed in \cref{sct:sv}. SV programs are transformed to ID programs by substituting indices and fields with byte offsets.
+
+ID, AL, and ALA are three imperative languages with support for variables; all three are discussed in \cref{sct:id}. ID programs don't need to declare local variables whereas AL programs do need to declare them. The transformation between the two languages performs a basic inference algorithm to discover the names and types of variables. ALA programs are AL programs with additional liveness and conflict information, information which is necessary to perform register allocation and assign a register or memory location to each variable.
+
+Finally, in \cref{sct:cd}, we discuss the compiler's low-level languages starting with CD, a language with support for conditionals, which is eventually transformed to CHERI-RISC-V assembly.
+
+Later chapters discuss extensions and changes to this first version of the compiler. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+
+\section{Background: Nanopass Compilers} \label{sct:nanopass}
+Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \textbf{\glspl{nanopass}}, which translate one \textbf{\il{}} to another. Source code is parsed into the compiler’s first \il{}, which is then translated via \glspl{nanopass} through different \ils{}, ending up in the compiler's final \il{}. This final \il{} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
 
 The nanopass design allows the compiler engineer to design and implement their compiler \emph{by iterated abstraction}. A simplified description follows. The engineer first chooses a target language (usually a machine language such as x86-64 or indeed CHERI-RISC-V) and determines an abstraction over it. The engineer then defines an \il{} that implements that abstraction as well as a \gls{nanopass} which transforms programs written in the new \il{} to the target language. The compiler engineer then repeats this process, this time abstracting over the \il{} with a new \il{} and \gls{nanopass}. This process goes on until a level of abstraction has been reached that can either be directly used as a source language (by human users), or be easily produced by parser actions.
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \il{} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-Glyco defines 20 \gs{il}, with a general approach adapted from the student compiler by \cite{compcourse}. Each language is named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
+Glyco defines 20 \gs{il}, with a general approach adapted from the student compiler by \cite{compcourse}. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
 
-\section{An Expression Language}
+\section{An Expression Language} \label{sct:ex}
 The highest \il{} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
 The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
@@ -78,7 +88,7 @@ is transformed to a CA \texttt{do} effect
 is lowered to the CC program
 \lstinputlisting{Programs/values.cc}
 
-\section{A Conventional Calling Convention}
+\section{A Conventional Calling Convention} \label{sct:cc}
 A \g{cc} is a set of rules imposed by the operating system, instruction set architecture, and/or programming language that specify how procedures are called. A low-level \g{cc} often specifies
 \begin{itemize}[noitemsep]
 	\item where parameters and result values are placed (in dedicated registers, in a particular order on the call stack, or a combination of both);
@@ -102,13 +112,13 @@ A procedure pops its call frame when it is done using it, e.g., when returning t
 
 The set of argument parameters in Glyco is customisable via a command-line option. The default set is \texttt{a0}, \texttt{a1}, \texttt{a2}, \texttt{a3}, \texttt{a4}, \texttt{a5}, \texttt{a6}, and \texttt{a7}.
 
-All of Glyco's supported data types in Glyco fit in a register. Vectors and records are returned by reference as capabilities.
+All of Glyco's supported data types in Glyco fit in a register. Vectors and records are passed by reference as capabilities.
 
-\paragraph{Results} A procedure can return a single value via \texttt{a0}. Vectors and records are passed by reference as capabilities.
+\paragraph{Results} A procedure can return a single value via the \texttt{a0} register. Vectors and records are returned by reference as capabilities.
 
 \paragraph{Available registers} The set of \gs{cersaved} and \gs{ceesaved} registers is customisable via command-line options. The default \gs{cersaved} are \texttt{s1}, \texttt{s2}, \texttt{s3}, \texttt{s4}, \texttt{s5}, \texttt{s6}, \texttt{s7}, \texttt{s8}, \texttt{s9}, \texttt{s10}, and \texttt{s11}; the default \gs{ceesaved} are the remaining 9 registers available in CC.
 
-\paragraph{Local state} A procedure call's local state comprises saved register data (cf. supra), data for which no register is available, and stack-allocated buffers. These are reside at lower addresses than the call's \g{framecap}; the procedure can therefore access them using negative offsets of the \g{framecap}.
+\paragraph{Local state} A procedure call's local state comprises saved register data (cf. supra), data for which no register is available, and stack-allocated buffers. These reside at lower addresses than the call's \g{framecap}; the procedure can therefore access them using negative offsets of the \g{framecap}.
 
 \paragraph{Return address} The caller provides a return address capability in the \texttt{cra} register.\footnote{\texttt{cra} is a \g{ceesaved}, so if the callee needs to call another procedure, it will need to save the contents of \texttt{cra} before overwriting the register, except in the special case of a tail-call.} The callee can return control to the callee by jumping to this return capability.
 
@@ -126,32 +136,33 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program
 \lstinputlisting{Programs/42.cc}
 is lowered to the following SV program:
-\lstinputlisting{Programs/42.sv}
+\lstinputlisting{Programs/42.sv}	% TODO: Highlight corresponding parts.
 
-The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
 
-\section{Structured Values}
-The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of \textbf{vectors} and \textbf{records}. A vector in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A record is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability.}
+\section{Structured Values} \label{sct:sv}
+The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of vectors and records. A \textbf{vector} in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A \textbf{record} is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability, thereby ensuring that no other buffer can occupy this extra space accessible by the first capability.}
 
 Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
 \lstinputlisting{Programs/sequences.sv}
 is \lowered{} to the following ID program:
-\lstinputlisting{Programs/sequences.id}
-% TODO: Highlight corresponding parts
+\lstinputlisting{Programs/sequences.id}	% TODO: Highlight corresponding parts.
 
 The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
-\section{Abstract Locations}
-All programs until now have been able to bind values to names in one form or another, be it \texttt{let} bindings with shadowing or globally scoped names or arbitrarily named locations. These names refer to physical locations where data can be stored, but since the programmer does not specify the names themselves are \textbf{abstract locations}, locations that the compiler is to associate with a \textbf{physical location}.
+\section{Abstract Locations} \label{sct:id}
+All programs until now have been able to bind values to names in one form or another, be it by using new named locations in effects or binding values to names with \texttt{let}. These names refer to physical locations where data can be stored, but without the programmer explicitly specifying the physical location itself, and are therefore referred to as \textbf{abstract locations}. The compiler is responsible for assigning each abstract location a \textbf{physical location} like a register or location in the call frame.
 
-Since registers are orders of magnitude faster to access than locations in RAM, the compiler attempts to assign as many abstract locations as it can to registers in a process called \textbf{register allocation}. Since the number of registers is limited, the compiler may need to \emph{spill} abstract locations to locations on the call frame. Glyco employs several heuristics to minimise the runtime cost by spilling abstract locations that it thinks will be accessed the least.
+Since registers are orders of magnitude faster to access than locations in RAM, the compiler attempts to assign as many abstract locations as it can to registers in a process called \textbf{register allocation}. Since the number of registers is limited, the compiler may need to \textbf{spill} abstract locations to locations on the call frame. Glyco employs several heuristics to minimise the runtime cost by spilling abstract locations that it thinks will be accessed the least.
 
 Glyco's register allocator is spread over three \gs{nanopass} which perform the following steps, for the main program and each procedure separately:
 \begin{enumerate}
 	\item Discover the abstract locations that are used and the data types that they take.
 	\item For each abstract location, determine where in the program or procedure it is defined or redefined with a value and where that value is used. The execution path between a definition and that definition's last use is a \textbf{liveness interval}, a period of time where the value is considered \emph{live}.
 	\item Find out which liveness intervals overlap with other liveness intervals. The locations of such overlapping intervals are considered to be \textbf{in conflict} with each other.
-	\item Assign registers to abstract locations so that no two abstract locations are assigned the same register if they are in conflict with each other.
+	\item Assign registers to abstract locations so that no two abstract locations are assigned the same register if they are in conflict with each other. If no register is available for an abstract location, allocate space on the call frame and assign it that location.
+	
+	Prioritise abstract locations with few conflicts when assigning registers as they're likely to maximise the number of abstract locations that can be assigned to a register.
 \end{enumerate}
 
 \paragraph{From ID (Inferred Declarations) to AL} An ID program is \lowered{} to an AL program by inferring a declaration for each abstract location used in the program and each of the program's procedures. Each declaration associates an abstract location with a data type. For example, the ID program
@@ -167,15 +178,15 @@ The analysis algorithm derives an effect's liveness set and conflict graph \emph
 
 \begin{itemize}
 	
-	\item If an effect \textbf{defines} a location's value, the location is marked as (definitely) dead at entry and is thus removed from the liveness set at entry. We know for certain that the location is not live right before the effect executes since its value is overwritten.
+	\item If an effect \textbf{defines} a location's value, the location is marked as (definitely) dead at entry and thus removed from the liveness set at entry. We know for certain that the location is not live right before the effect executes since its value is overwritten.
 	
-	Additionally, the newly defined location is in conflict with all locations that are in the liveness set at exit. The effect (possibly) starts a liveness interval for the newly defined location while the effect may be in the middle of liveness intervals of each location in the liveness set. These liveness intervals overlap; the conflict graph at entry is therefore updated with edges between the newly defined location and every (possibly) live location at exit.
+	Additionally, the newly defined location is in conflict with all locations that are in the liveness set at exit. The effect (possibly) starts a liveness interval for the newly defined location in the middle of liveness intervals of each location in the liveness set. These liveness intervals overlap; the conflict graph at entry is therefore updated with edges between the newly defined location and every location in the liveness set at exit.
 	
 	\item If an effect \textbf{uses} a location's value, the location is marked as (possibly) live at entry and is thus added to the liveness set at entry. An effect that defines and uses the same location's value, i.e., an assignment to itself, is considered to keep the location (possibly) live.
 	
 \end{itemize}
 
-Since the liveness set and conflict graph at entry depends on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
+Since the liveness set and conflict graph at entry depend on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
 
 \paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \texttt{three} and \texttt{number} in
 \lstinputlisting{Programs/coalescable.al}
@@ -188,25 +199,25 @@ The location coalescing optimisation algorithm works as follows:
 	\item Select a candidate pair that is involved in a \texttt{set} effect. The algorithm is done if there are no (non-rejected) candidate pairs.
 	\item If the candidate locations are in conflict with each other, reject the pair and try another.
 	\item Tentatively form the union of the location vertices in the conflict graph. If the degree of the merged vertex is equal to or larger than the number of available registers, reject the pair and try another. This conservative heuristic by \cite{briggs} ensures that the merged location will not require spilling (to the call frame) after merging if the individual locations themselves don't require spilling.
-	\item Commit the union of the location vertices in the conflict graph, arbitrarily choose which location to retain, and remove the other location from the program by substituting it everywhere with the retained location.
+	\item Commit the union of the location vertices in the conflict graph, arbitrarily choose which location to retain, and remove the other location from the program by substituting it everywhere with the retained location. If the pair consists of a physical and an abstract location,\footnote{Usually a result of the CC to SV \g{nanopass} which puts arguments and results in dedicated registers.} retain the physical location.
 	\item Repeat from Step 1.
 \end{enumerate}
 
-\paragraph{From ALA (Abstract Locations, Analysed) to CD} The \g{nanopass} from ALA uses the conflict graph at entry of the program and of each procedure to determine an assignment of abstract locations to physical locations and to then substitute the abstract locations with their assigned physical locations.
+\paragraph{From ALA (Abstract Locations, Analysed) to CD} The \g{nanopass} from ALA to CD uses the conflict graph at entry of the program and of each procedure to determine an assignment of abstract locations to physical locations, and substitutes each abstract locations with its assigned physical location.
 
-Register assignment is a graph colouring problem where the graph is the conflict graph and the colours are the available registers. No two connected locations in the conflict graph can be coloured with the same colour, i.e., no two locations that are in conflict can be assigned to the same register. The register assignment algorithm works as follows:
+Register assignment is a graph colouring problem on the conflict graph where the colours are the available registers. No two connected locations in the conflict graph can be coloured with the same colour, i.e., no two locations that are in conflict can be assigned to the same register. The register assignment algorithm works as follows:
 \begin{enumerate}
 	\item Select an abstract location $L$ with the lowest degree and without an assigned physical location. The algorithm is done if there is no such location.
 	\item Select an available register. If any abstract location already assigned to this register is in conflict with $L$, reject the register and try another. If no (non-rejected) register is available, spill the abstract location by assigning it a free location on the call frame.
 	\item Repeat from Step 1.
 \end{enumerate}
 
-Unlike most algorithms and \gs{nanopass}, this algorithm runs in $O(n)$ time for $n$ locations, which underlines the importance of minimising the number of abstract locations via optimisations such as location coalescing.
+Unlike most algorithms in the compiler's \gs{nanopass}, this algorithm runs in $O(n^2)$ time for $n$ locations, which underlines the importance of minimising the number of abstract locations via optimisations such as location coalescing.
 
-\section{Structured Jumps \& Branches}
+\section{Structured Jumps \& Branches} \label{sct:cd}
 % TODO
 
-\section{Basic Abstractions over Assembly}
+\section{Basic Abstractions over Assembly} \label{sct:fo}
 % TODO
 
 \biblio{}
