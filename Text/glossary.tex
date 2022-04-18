@@ -29,6 +29,11 @@
 }
 \newcommand{\unsealcap}{\gls{unsealcap}}
 
+\newglossaryentry{otype}{
+	name=object type,
+	description={a numerical property of a capability indicating if it's unsealed (object type $-1$), sealed as a \g{sentry} (object type $-2$), or sealed using a \g{sealcap} (object type matching the \g{sealcap}'s address)}
+}
+
 \newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a \gls{nanopass} as part of the compiler's routine}
 
 \newglossaryentry{lowering}{
@@ -111,6 +116,11 @@
 \newglossaryentry{bblock}{
 	name=basic block,
 	description={a sequence of effects that is executed from beginning to end. The first effect is labelled and can be jumped to, the last effect jumps to itself or a different basic block, and no other effect in the block is labelled or a jump, call, or branch}
+}
+
+\newglossaryentry{scall}{
+	name=s-call,
+	description={a procedure call mediated by the s-call \g{rtrt} which seals the frame and return capabilities using a unique \g{sealcap}, thereby ensuring the callee cannot dereference either capability and requiring that the callee use \texttt{CInvoke} to return to the caller}
 }
 
 \makeglossaries

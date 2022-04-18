@@ -17,7 +17,7 @@ ID, AL, and ALA are three structured imperative languages with support for varia
 
 In \cref{sct:cd} we go over CD, a structured imperative language with support for conditionals. CD programs are flattened over several passes to FO programs, which consists of labelled and unlabelled effects in a similar way to labelled and unlabelled instructions in an assembly program. We then tackle the last few transformations in \cref{sct:fo} before getting an assembly program.
 
-Later chapters explore extensions and changes to this first version of the compiler. A full language reference of the final compiler can be found in \cref{ch:grammar}.
+This chapter discusses the feature set and languages of Glyco 0.1.0,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.1.0/}.} however example programs in this chapter follow the grammar of the final version of the compiler, Glyco 1.0.0. A full language reference of this final compiler can be found in \cref{ch:grammar}. Later chapters explore extensions to this first version of the compiler.
 
 \section{Background: Nanopass Compilers} \label{sct:nanopass}
 Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \textbf{\glspl{nanopass}}, which translate one \textbf{\g{il}} to another. Source code is parsed into the compiler’s first \g{il}, which is then translated via \glspl{nanopass} through different \gs{il}, ending up in the compiler's final \g{il}. This final \g{il} contains a string representation of the assembly code that is fed to the Clang compiler from the LLVM compiler toolchain for building \& linking an executable ELF file. This last step is unrelated to the research problem, hence this dependency on LLVM.
@@ -57,7 +57,7 @@ Some transformations are not strictly necessary, e.g., binding \texttt{named(pre
 
 \paragraph{From LS (Lexical Scopes) to DF} DF does not support shadowing; all \texttt{let} bindings are in a single namespace. The \g{nanopass} from LS to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
 
-\paragraph{From DF (Definitions) to CV} CV does not support \texttt{let} bindings, i.e., definitions. The \g{nanopass} implements them in CV using \texttt{do} values, i.e., computed values, which are values on which a computation can be attached. For example, the DF value
+\paragraph{From DF (Definitions) to CV} CV does not support \texttt{let} bindings, i.e., definitions. The \g{nanopass} implements each definition in CV using a \texttt{do} value, i.e., a computed value, a value on which a computation can be attached, with a \texttt{set} effect in it. For example, the DF value
 \begin{lstlisting}
 	let((answer, source(constant(42))), in: source(location(answer)))
 \end{lstlisting}
@@ -66,7 +66,7 @@ is \lowered{} to the CV value
 	do(set(answer, to: source(constant(42))), then: source(location(answer)))
 \end{lstlisting}
 
-\paragraph{From CV (Computed Values) to CA} CA does not support \texttt{do} values, but does support \texttt{do} effects, which are sequences of effects. The \g{nanopass} implements \texttt{do} values by extracting their effects into \texttt{do} effects and ending with an additional \texttt{set} effect that moves the result to the intended destination. That is, a CV \texttt{set} effect
+\paragraph{From CV (Computed Values) to CA} CA does not support \texttt{do} \emph{values}, but does support \texttt{do} \emph{effects}, which are sequences of effects. The \g{nanopass} implements \texttt{do} values by extracting their effects into \texttt{do} effects and ending with an additional \texttt{set} effect that moves the result to the intended destination. That is, a CV \texttt{set} effect
 \begin{lstlisting}
 	set(result, to:
 		do(
