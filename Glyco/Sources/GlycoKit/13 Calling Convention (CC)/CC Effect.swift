@@ -172,6 +172,13 @@ extension CC {
 						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
 					}
 					
+					// If using GHSCC, create a seal for tracking returns.
+					let returnSeal = context.locations.uniqueName(from: "retseal")
+					if context.configuration.callingConvention == .heap {
+						try context.declare(returnSeal, .cap(.seal(sealed: false)))
+						Lowered.createSeal(in: .abstract(returnSeal))
+					}
+					
 					// If using a secure CC, clear all registers except unsealed argument registers in use.
 					// The sealed argument register (if any) is overwritten anyway so it doesn't matter if it's cleared here.
 					let unsealedArgumentRegisters = assignments
@@ -194,6 +201,12 @@ extension CC {
 						)
 					} else {
 						Lowered.call(loweredProcedure, parameters: unsealedArgumentRegisters)
+					}
+					
+					// If using GHSCC, assert that this is the first return by sealing the return seal using the return seal.
+					// The return seal is only unsealed after the first return. Sealing an already sealed cap fails, thereby ensuring WBCF.
+					if context.configuration.callingConvention == .heap {
+						Lowered.seal(into: .abstract(returnSeal), source: .abstract(returnSeal), seal: .abstract(returnSeal))
 					}
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)

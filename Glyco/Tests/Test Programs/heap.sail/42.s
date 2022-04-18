@@ -115,13 +115,18 @@ mm.cseal:		cllc ct1, mm.cseal_seal_cap
 mm.cseal_seal_cap:	.octa 0
 mm.cseal_end:	.balign 4
 				.balign 4
-rv.main:		addi t0, zero, 32
+rv.main:		addi t0, zero, 48
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
 				csc cra, 16(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
+				csc ct4, 32(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
@@ -136,7 +141,11 @@ rv.main:		addi t0, zero, 32
 				.4byte 4277010523 # cclear 3, 128
 				cjal cnull, f
 mm.ret$1:		cmove cfp, ct6
-cd.ret:			clc cra, 16(cfp)
+cd.ret:			clc ct4, 32(cfp)
+				clc ct5, 32(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 32(cfp)
+				clc cra, 16(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

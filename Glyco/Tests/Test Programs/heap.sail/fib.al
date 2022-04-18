@@ -1,5 +1,6 @@
 (
 	locals: abstract(cc.retcap, cap)
+	abstract(cc.retseal, cap)
 	abstract(df.result, s32)
 	abstract(ls.arg, s32)
 	abstract(ls.arg$1, s32)
@@ -13,8 +14,10 @@
 		set(register(a0), to: abstract(ls.arg))
 		set(register(a1), to: abstract(ls.arg$1))
 		set(register(a2), to: abstract(ls.arg$2))
+		createSeal(in: abstract(cc.retseal))
 		clearAll(except: a0 a1 a2)
 		call(capability(to: fib), parameters: a0 a1 a2)
+		seal(into: abstract(cc.retseal), source: abstract(cc.retseal), seal: abstract(cc.retseal))
 		set(abstract(df.result), to: register(a0, s32))
 		set(register(a0), to: abstract(df.result))
 		set(register(ra), to: abstract(cc.retcap))
@@ -25,6 +28,7 @@
 	procedures: (
 		fib,
 		locals: abstract(cc.retcap, cap)
+		abstract(cc.retseal, cap)
 		abstract(df.result$1, s32)
 		abstract(df.result$2, s32)
 		abstract(ls.arg, s32)
@@ -69,8 +73,10 @@
 					set(register(a0), to: abstract(ls.arg))
 					set(register(a1), to: abstract(ls.arg$1))
 					set(register(a2), to: abstract(ls.arg$2))
+					createSeal(in: abstract(cc.retseal))
 					clearAll(except: a0 a1 a2)
 					call(capability(to: fib), parameters: a0 a1 a2)
+					seal(into: abstract(cc.retseal), source: abstract(cc.retseal), seal: abstract(cc.retseal))
 					set(abstract(df.result$2), to: register(a0, s32))
 					set(register(a0), to: abstract(df.result$2))
 					set(register(ra), to: abstract(cc.retcap))

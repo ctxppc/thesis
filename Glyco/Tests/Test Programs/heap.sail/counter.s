@@ -115,13 +115,13 @@ mm.cseal:		cllc ct1, mm.cseal_seal_cap
 mm.cseal_seal_cap:	.octa 0
 mm.cseal_end:	.balign 4
 				.balign 4
-rv.main:		addi t0, zero, 240
+rv.main:		addi t0, zero, 320
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 224(cfp)
+				csc cra, 304(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -142,19 +142,24 @@ rv.main:		addi t0, zero, 240
 				cllc cra, l.anon$1
 				cmove cs1, ca2
 				cseal ct4, cra, cs1
-				csc ct4, 208(cfp)
+				csc ct4, 272(cfp)
 				cllc cra, l.anon$2
 				cseal ct4, cra, ca2
-				csc ct4, 192(cfp)
-				csc ca0, 80(cfp)
+				csc ct4, 288(cfp)
+				csc ca0, 160(cfp)
 				addi a0, zero, 32
-				csc ca1, 48(cfp)
+				csc ca1, 96(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
+				csc ct4, 64(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
-				clc ct4, 48(cfp)
-				clc ct5, 80(cfp)
+				clc ct4, 96(cfp)
+				clc ct5, 160(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -165,17 +170,26 @@ rv.main:		addi t0, zero, 240
 				.4byte 4277010523 # cclear 3, 128
 				cinvoke ct4, ct5
 mm.ret$1:		cmove cfp, ct6
-cd.ret:			csc ca0, 176(cfp)
-				clc ct4, 176(cfp)
-				csc ct4, 96(cfp)
-				clc ct4, 208(cfp)
-				csc ct4, 144(cfp)
+cd.ret:			clc ct4, 64(cfp)
+				clc ct5, 64(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 64(cfp)
+				csc ca0, 256(cfp)
+				clc ct4, 256(cfp)
+				csc ct4, 176(cfp)
+				clc ct4, 272(cfp)
+				csc ct4, 224(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
+				csc ct4, 128(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
-				clc ct4, 144(cfp)
-				clc ct5, 96(cfp)
+				clc ct4, 224(cfp)
+				clc ct5, 176(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -186,16 +200,25 @@ cd.ret:			csc ca0, 176(cfp)
 				.4byte 4277010523 # cclear 3, 128
 				cinvoke ct4, ct5
 mm.ret$2:		cmove cfp, ct6
-cd.ret$1:		clc ct4, 176(cfp)
-				csc ct4, 112(cfp)
-				clc ct4, 208(cfp)
-				csc ct4, 160(cfp)
+cd.ret$1:		clc ct4, 128(cfp)
+				clc ct5, 128(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 128(cfp)
+				clc ct4, 256(cfp)
+				csc ct4, 192(cfp)
+				clc ct4, 272(cfp)
+				csc ct4, 240(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
+				csc ct4, 144(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
-				clc ct4, 160(cfp)
-				clc ct5, 112(cfp)
+				clc ct4, 240(cfp)
+				clc ct5, 192(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -206,16 +229,25 @@ cd.ret$1:		clc ct4, 176(cfp)
 				.4byte 4277010523 # cclear 3, 128
 				cinvoke ct4, ct5
 mm.ret$3:		cmove cfp, ct6
-cd.ret$2:		clc ct4, 176(cfp)
-				csc ct4, 128(cfp)
-				clc ct4, 208(cfp)
-				csc ct4, 64(cfp)
+cd.ret$2:		clc ct4, 144(cfp)
+				clc ct5, 144(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 144(cfp)
+				clc ct4, 256(cfp)
+				csc ct4, 208(cfp)
+				clc ct4, 272(cfp)
+				csc ct4, 112(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
+				csc ct4, 80(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
-				clc ct4, 64(cfp)
-				clc ct5, 128(cfp)
+				clc ct4, 112(cfp)
+				clc ct5, 208(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -226,16 +258,25 @@ cd.ret$2:		clc ct4, 176(cfp)
 				.4byte 4277010523 # cclear 3, 128
 				cinvoke ct4, ct5
 mm.ret$4:		cmove cfp, ct6
-cd.ret$3:		clc ct4, 176(cfp)
+cd.ret$3:		clc ct4, 80(cfp)
+				clc ct5, 80(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 80(cfp)
+				clc ct4, 256(cfp)
+				csc ct4, 48(cfp)
+				clc ct4, 288(cfp)
 				csc ct4, 32(cfp)
-				clc ct4, 192(cfp)
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ct4, ct6
 				csc ct4, 16(cfp)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276588379 # cclear 1, 254
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
-				clc ct4, 16(cfp)
-				clc ct5, 32(cfp)
+				clc ct4, 32(cfp)
+				clc ct5, 48(cfp)
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -246,7 +287,11 @@ cd.ret$3:		clc ct4, 176(cfp)
 				.4byte 4277010523 # cclear 3, 128
 				cinvoke ct4, ct5
 mm.ret$5:		cmove cfp, ct6
-cd.ret$4:		clc cra, 224(cfp)
+cd.ret$4:		clc ct4, 16(cfp)
+				clc ct5, 16(cfp)
+				cseal ct4, ct4, ct5
+				csc ct4, 16(cfp)
+				clc cra, 304(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
