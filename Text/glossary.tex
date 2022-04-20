@@ -13,21 +13,18 @@
 	plural=sentry capabilities,
 	description={a sealed entry capability, a sealed capability created with the \texttt{CSealEntry} instruction which can only be unsealed by jumping to its address using the \texttt{CJALR} instruction}
 }
-\newcommand{\sentry}{\gls{sentry}}
 
 \newglossaryentry{sealcap}{
 	name=seal capability,
 	plural=seal capabilities,
 	description={a capability with the \emph{Permit seal} permission which can be used with the \texttt{CSeal} instruction to seal an unsealed capability with the seal capability's address}
 }
-\newcommand{\sealcap}{\gls{sealcap}}
 
 \newglossaryentry{unsealcap}{
 	name=unseal capability,
 	plural=unseal capabilities,
 	description={a capability with the \emph{Permit unseal} permission which can be used with the \texttt{CUnseal} instruction to unseal a capability sealed with the unseal capability's address}
 }
-\newcommand{\unsealcap}{\gls{unsealcap}}
 
 \newglossaryentry{otype}{
 	name=object type,
@@ -50,7 +47,7 @@
 
 \newglossaryentry{lowerlang}{
 	name=lower language,
-	description=the \il{} output by a single \lowering{} of a program in the \il{} currently being discussed
+	description=the \g{il} output by a single \g{lowering} of a program in the \g{il} currently being discussed
 }
 
 \newglossaryentry{cc}{
@@ -58,7 +55,7 @@
 	description={a set of rules governing the invocation of procedures on a specific platform dealing with matters such as parameter \& result passing, register availability, call frame structure, jumping to the callee, and returning to the caller}
 }
 
-\newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \cc{}}
+\newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \g{cc}}
 
 \newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \cc{} implemented in Glyco that ensures \gls{lse} by securely allocating call frames on the heap and sealing return \& frame capabilities with a unique seal before invocation}
 
@@ -111,6 +108,11 @@
 \newglossaryentry{framecap}{
 	name=frame capability,
 	description={a capability in the \texttt{cfp} register that points to the base of the current call frame}
+}
+
+\newglossaryentry{heapcap}{
+	name=heap capability,
+	description={a capability that grants access to the heap and points to the next free location}
 }
 
 \newglossaryentry{bblock}{

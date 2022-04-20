@@ -2,10 +2,10 @@
 \begin{document}
 \onlyinsubfile{\mainmatter{}}
 
-\chapter{\acrlong*{ghscc}}
+\chapter{Glyco Heap-based Secure Calling Convention}
 The previous chapter discussed the first milestone of the Glyco compiler, namely a nanopass compiler producing fairly traditional executables for CHERI-RISC-V targets, with almost no special considerations for capability machines, except for minor enhancements such as bounded heap-allocated buffers. This chapter discusses the first significant upgrade of the Glyco compiler, namely one where procedure calls are implemented using a secure \g{cc} named \textbf{\g{ghscc}} and adapted from the heap-based \g{cc} proposed by \cite{cerise}.
 
-In \cref{sct:scc}, we first describe the desired security properties of a \enquote{secure} \g{cc} and list a few theoretical \gs{cc} proposed in the literature that conform to those properties. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two runtime routines that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} the implementation of the \g{cc} itself. We finish in \cref{sct:ghscc-eval} with an evaluation of \g{ghscc} against \g{gccc} in terms of \g{lse}, changes to the compiler and its \gs{il}, generated codesize, and runtime performance.
+In \cref{sct:scc}, we first describe the desired security properties of a \enquote{secure} \g{cc} and list a few theoretical \gs{cc} proposed in the literature that conform to those properties. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two runtime routines that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} and \cref{sct:ghscc-changes} the implementation of the \g{cc} itself. We finish in \cref{sct:ghscc-eval} with an evaluation of \g{ghscc} against \g{gccc} in terms of \g{lse}, changes to the compiler and its \gs{il}, generated codesize, and runtime performance.
 
 This chapter discusses the feature set and languages of Glyco 0.2.0,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.2.0/}.} however example programs in this chapter follow the grammar of the final version of the compiler, Glyco 1.0.0. A full language reference of this final compiler can be found in \cref{ch:grammar}.
 
@@ -114,15 +114,17 @@ As part of an \g{scall}, the callee receives arguments and a return–frame capa
 Before invoking the \g{scall} routine, the caller creates a \g{sealcap} and stores it in its call frame. When the callee returns control to the caller, the caller attempts to seal this \g{sealcap}. This operation succeeds the first time but fails if repeated since \g{sealing} an already sealed capability causes a machine trap. This ensures that a \g{retcap} associated with a specific \g{scall} can be used at most once and thus preserves \g{wbcf}. Since \g{lse} protects the call frame from external access, it also protects the \g{sealcap} from the same.
 
 \section{Changes to Glyco} \label{sct:ghscc-changes}
-% TODO
+We now present some significant changes to Glyco, going from low-level to high-level \gs{il}.
 
-\paragraph{CHERI-RISC-V (RV)} The ground language is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
+\paragraph{CHERI-RISC-V (RV)} The low-level language RV is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
 
 \paragraph{Canonical Effects (CE)} To avoid overloading MM's \g{nanopass} with responsibilities, a new \g{il} is defined above RV grouping related instructions. Instructions such as \texttt{copyWord} and \texttt{copyCapability} are for instance exposed under a single \texttt{copy} effect in CE, which MM inherits.
 
-\paragraph{Runtime (RT)} To facilitate calling \gs{rtrt} (which behave differently than ordinary procedures), a new \g{il} is defined above CE providing a \texttt{callRuntimeRoutine} effect. This effect accepts a label to a capability located in memory accessible to the \g{userp}, loads the capability, and jumps to its address. These capabilities are \gs{sentry} to \g{rt} memory; \gs{userp} cannot dereference these capabilities but they can jump to their address. This prevents a \g{userp} from accessing the \g{rt}'s internal data structures like the heap.
+\paragraph{Runtime (RT)} To facilitate calling \gs{rtrt} (which behave differently than ordinary procedures), a new \g{il} is defined above CE providing a \texttt{callRuntimeRoutine} effect. This effect accepts a label to a capability located in memory accessible to the \g{userp}, loads the capability, and jumps to its address. These capabilities are \gs{sentry} to \g{rt} memory; \gs{userp} cannot dereference these capabilities but they can jump to their address. This prevents a \g{userp} from accessing the \g{rt}'s internal data structures like the \g{heapcap}.
 
-\paragraph{Managed Memory (MM)} MM moves above RT but its grammar remains mostly the same as in the previous version. Its \g{nanopass} however changes significantly. When a \texttt{Program} is lowered, MM now includes runtime initialisation code, explicit ELF sections for the call stack and heap, and a \g{sentry} to the allocation \g{rtrt}. The \g{lowering} of the \texttt{createBuffer} effect is updated to invoke the allocation routine instead of directly manipulating the heap capability (previously kept in register \texttt{ctp}).
+\paragraph{Managed Memory (MM)} MM moves above RT but its grammar remains mostly the same as in the previous version. The MM (to RT) \g{nanopass} however changes significantly. When a \texttt{Program} is lowered, MM now includes runtime initialisation code, explicit ELF sections for the call stack and heap, and \gs{sentry} to the allocation and \g{scall} \gs{rtrt}. The \g{lowering} of the \texttt{createBuffer} effect is updated to invoke the allocation routine instead of directly manipulating the heap capability (previously kept in register \texttt{ctp}). The \texttt{pushFrame} effect now allocates a call frame on the heap.
+
+\paragraph{Calling Convention (CC)} The call effect in CC is updated to allocate an arguments record for arguments that don't fit in the available argument registers, and to clear registers before calling the procedure.
 
 % TODO
 
