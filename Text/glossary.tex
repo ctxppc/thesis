@@ -102,22 +102,25 @@
 
 \newglossaryentry{stackcap}{
 	name=stack capability,
+	plural=stack capabilities,
 	description={a capability in the \texttt{csp} register that points to the last pushed datum on the call stack, i.e., the top of the stack}
 }
 
 \newglossaryentry{framecap}{
 	name=frame capability,
+	plural=frame capabilities,
 	description={a capability in the \texttt{cfp} register that points to the base of the current call frame}
 }
 
 \newglossaryentry{heapcap}{
 	name=heap capability,
+	plural=heap capabilities,
 	description={a capability that grants access to the heap and points to the next free location}
 }
 
 \newglossaryentry{bblock}{
 	name=basic block,
-	description={a sequence of effects that is executed from beginning to end. The first effect is labelled and can be jumped to, the last effect jumps to itself or a different basic block, and no other effect in the block is labelled or a jump, call, or branch}
+	description={a labelled sequence of effects that is executed from beginning to end, before jumping or branching to itself or other code. No effect in the block is labelled or is a jump, call, or branch}
 }
 
 \newglossaryentry{scall}{
