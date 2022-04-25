@@ -28,17 +28,12 @@ extension MM {
 		
 		/// Allocates appropriately aligned space for `count` data of type `type` and returns its location.
 		public mutating func allocate(_ type: DataType, count: Int = 1, configuration: CompilationConfiguration) -> Location {
-			allocateAlignmentPadding(for: type)
+			allocatedByteSize = allocatedByteSize.aligned(type)
 			defer { allocatedByteSize += type.byteSize * count }	// fp[±allocatedByteSize] points to next free location
 			switch configuration.callingConvention {
 				case .conventional:	return .init(offset: -allocatedByteSize)
 				case .heap:			return .init(offset: allocatedByteSize)
 			}
-		}
-		
-		/// Allocates sufficient padding to ensure that a `dataType` datum is appropriately aligned.
-		private mutating func allocateAlignmentPadding(for dataType: DataType) {
-			allocatedByteSize += allocatedByteSize % dataType.byteSize
 		}
 		
 		/// A location to a datum on a frame.

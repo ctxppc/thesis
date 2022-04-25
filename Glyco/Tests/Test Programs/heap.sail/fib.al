@@ -1,10 +1,12 @@
 (
-	locals: abstract(cc.retcap, cap)
-	abstract(cc.retseal, cap)
+	locals: abstract(cc.empty, cap)
+	abstract(cc.retcap, cap)
+	abstract(cc.returned, s32)
 	abstract(df.result, s32)
 	abstract(ls.arg, s32)
 	abstract(ls.arg$1, s32)
-	abstract(ls.arg$2, s32),
+	abstract(ls.arg$2, s32)
+	abstract(sv.offset, s32),
 	in: do(
 		pushScope()
 		set(abstract(cc.retcap), to: register(ra, cap))
@@ -14,10 +16,18 @@
 		set(register(a0), to: abstract(ls.arg))
 		set(register(a1), to: abstract(ls.arg$1))
 		set(register(a2), to: abstract(ls.arg$2))
-		createSeal(in: abstract(cc.retseal))
+		set(abstract(cc.returned), to: constant(0))
 		clearAll(except: a0 a1 a2)
 		call(capability(to: fib), parameters: a0 a1 a2)
-		seal(into: abstract(cc.retseal), source: abstract(cc.retseal), seal: abstract(cc.retseal))
+		if(
+			relation(abstract(cc.returned), ne, constant(0)),
+			then: do(
+				createBuffer(bytes: 0, capability: abstract(cc.empty), scoped: true)
+				compute(abstract(sv.offset), constant(0), sll, constant(2))
+				getElement(s32, of: abstract(cc.empty), offset: abstract(sv.offset), to: register(zero))
+			),
+			else: set(abstract(cc.returned), to: constant(1))
+		)
 		set(abstract(df.result), to: register(a0, s32))
 		set(register(a0), to: abstract(df.result))
 		set(register(ra), to: abstract(cc.retcap))
@@ -27,8 +37,9 @@
 	),
 	procedures: (
 		fib,
-		locals: abstract(cc.retcap, cap)
-		abstract(cc.retseal, cap)
+		locals: abstract(cc.empty, cap)
+		abstract(cc.retcap, cap)
+		abstract(cc.returned, s32)
 		abstract(df.result$1, s32)
 		abstract(df.result$2, s32)
 		abstract(ls.arg, s32)
@@ -42,7 +53,8 @@
 		abstract(ls.prev, s32)
 		abstract(ls.rhs, s32)
 		abstract(ls.rhs$1, s32)
-		abstract(ls.rhs$2, s32),
+		abstract(ls.rhs$2, s32)
+		abstract(sv.offset, s32),
 		in: do(
 			pushScope()
 			set(abstract(cc.retcap), to: register(ra, cap))
@@ -73,10 +85,18 @@
 					set(register(a0), to: abstract(ls.arg))
 					set(register(a1), to: abstract(ls.arg$1))
 					set(register(a2), to: abstract(ls.arg$2))
-					createSeal(in: abstract(cc.retseal))
+					set(abstract(cc.returned), to: constant(0))
 					clearAll(except: a0 a1 a2)
 					call(capability(to: fib), parameters: a0 a1 a2)
-					seal(into: abstract(cc.retseal), source: abstract(cc.retseal), seal: abstract(cc.retseal))
+					if(
+						relation(abstract(cc.returned), ne, constant(0)),
+						then: do(
+							createBuffer(bytes: 0, capability: abstract(cc.empty), scoped: true)
+							compute(abstract(sv.offset), constant(0), sll, constant(2))
+							getElement(s32, of: abstract(cc.empty), offset: abstract(sv.offset), to: register(zero))
+						),
+						else: set(abstract(cc.returned), to: constant(1))
+					)
 					set(abstract(df.result$2), to: register(a0, s32))
 					set(register(a0), to: abstract(df.result$2))
 					set(register(ra), to: abstract(cc.retcap))

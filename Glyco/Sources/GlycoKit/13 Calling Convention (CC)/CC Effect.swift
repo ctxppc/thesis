@@ -172,11 +172,11 @@ extension CC {
 						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
 					}
 					
-					// If using GHSCC, create a seal for tracking returns.
-					let returnSeal = context.locations.uniqueName(from: "retseal")
+					// If using GHSCC, initialise Boolean value for tracking returns.
+					let hasReturned = context.locations.uniqueName(from: "returned")
 					if context.configuration.callingConvention == .heap {
-						try context.declare(returnSeal, .cap(.seal(sealed: false)))
-						Lowered.createSeal(in: .abstract(returnSeal))
+						try context.declare(hasReturned, .s32)
+						Lowered.set(.abstract(hasReturned), to: .constant(0))
 					}
 					
 					// If using a secure CC, clear all registers except unsealed argument registers in use.
@@ -203,10 +203,17 @@ extension CC {
 						Lowered.call(loweredProcedure, parameters: unsealedArgumentRegisters)
 					}
 					
-					// If using GHSCC, assert that this is the first return by sealing the return seal using the return seal.
-					// The return seal is only unsealed after the first return. Sealing an already sealed cap fails, thereby ensuring WBCF.
+					// If using GHSCC, assert that this is the first return by crashing if the assertion doesn't hold and updating the Boolean value otherwise.
 					if context.configuration.callingConvention == .heap {
-						Lowered.seal(into: .abstract(returnSeal), source: .abstract(returnSeal), seal: .abstract(returnSeal))
+						Lowered.if(
+							.relation(.abstract(hasReturned), .ne, .constant(0)),
+							then: .do {
+								let emptyVector = context.locations.uniqueName(from: "empty")
+								Lowered.createVector(.s32, count: 0, capability: .abstract(emptyVector), scoped: true)
+								Lowered.getElement(of: .abstract(emptyVector), index: .constant(0), to: .register(.zero))
+							},
+							else: .set(.abstract(hasReturned), to: .constant(1))
+						)
 					}
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)

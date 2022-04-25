@@ -136,6 +136,9 @@ extension MM {
 					Lower.Effect.store(dataType, address: tempRegisterA, source: try source.lowered(), offset: 0)
 				}
 				
+				case .createBuffer(bytes: .constant(0), capability: let destinationBuffer, onFrame: _):
+				Lower.Effect.copy(.cap, into: try destinationBuffer.lowered(), from: .zero)
+				
 				case .createBuffer(bytes: let bytes, capability: let destinationBuffer, onFrame: false):
 				let lengthReg = tempRegisterA	// cf. alloc routine
 				let bufferReg = tempRegisterA	// cf. alloc routine — same register as length
