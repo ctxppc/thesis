@@ -113,13 +113,13 @@ mm.scall:		cllc ct0, mm.seal_cap
 mm.seal_cap:	.octa 0
 mm.scall_end:	.balign 4
 				.balign 4
-rv.main:		addi t0, zero, 40
+rv.main:		addi t0, zero, 48
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 24(cfp)
+				csc cra, 32(cfp)
 				addi t4, zero, 0
 				cincoffsetimm ct0, cfp, 16
 				sw.cap t4, 0(ct0)
@@ -141,7 +141,7 @@ cd.ret:			nop
 cd.else:		addi t4, zero, 1
 				cincoffsetimm ct0, cfp, 16
 				sw.cap t4, 0(ct0)
-cd.endif:		clc cra, 24(cfp)
+cd.endif:		clc cra, 32(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

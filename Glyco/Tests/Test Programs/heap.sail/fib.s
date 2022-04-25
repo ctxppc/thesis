@@ -113,13 +113,13 @@ mm.scall:		cllc ct0, mm.seal_cap
 mm.seal_cap:	.octa 0
 mm.scall_end:	.balign 4
 				.balign 4
-rv.main:		addi t0, zero, 40
+rv.main:		addi t0, zero, 48
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 24(cfp)
+				csc cra, 32(cfp)
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
@@ -144,7 +144,7 @@ cd.ret:			nop
 cd.else:		addi t4, zero, 1
 				cincoffsetimm ct0, cfp, 16
 				sw.cap t4, 0(ct0)
-cd.endif:		clc cra, 24(cfp)
+cd.endif:		clc cra, 32(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
@@ -157,13 +157,13 @@ cd.then:		cmove cra, cnull
 				cincoffset cnull, cra, s1
 				lw.cap zero, 0(cnull)
 				cjal cnull, cd.endif
-fib:			addi t0, zero, 40
+fib:			addi t0, zero, 48
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 24(cfp)
+				csc cra, 32(cfp)
 				mv a3, a0
 				mv ra, a2
 				addi s1, zero, 0
@@ -194,7 +194,7 @@ cd.ret$1:		nop
 cd.else$2:		addi t4, zero, 1
 				cincoffsetimm ct0, cfp, 16
 				sw.cap t4, 0(ct0)
-cd.endif$1:		clc cra, 24(cfp)
+cd.endif$1:		clc cra, 32(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
@@ -208,7 +208,7 @@ cd.then$2:		cmove cra, cnull
 				lw.cap zero, 0(cnull)
 				cjal cnull, cd.endif$1
 cd.then$1:		mv a0, a1
-				clc cra, 24(cfp)
+				clc cra, 32(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
