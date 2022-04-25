@@ -54,7 +54,7 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 	
 	\item Just as with \g{gccc}, the caller puts the arguments for the callee in argument registers. However, if there are more parameters than there are argument registers, an arguments record is allocated on the heap (using the \g{rtrt} described above), a capability to it is put in the last argument register, and any arguments that don't fit in registers are stored in the arguments record. The callee never needs to access the caller's call frame to gain access to arguments that didn't fit in registers.
 	
-	\item \label{itm:retseal} The caller creates a unique \g{sealcap} and stores it in its call frame. This capability is itself unsealed and will be used to ensure that the callee can only return to the caller once.\footnote{This step is not part of Glyco 0.2 but instead added in a later version.} % TODO: Remove if cherry-picking change into Glyco 0.2.
+	\item \label{itm:returned-init} The caller initialises a value \texttt{returned} to 0 and stores it in its call frame.
 	
 	\item The caller clears all registers except those used for the \g{framecap} and for arguments. This ensures that the callee doesn't accidentally receive any authority beyond what is explicitly passed to it.
 	
@@ -72,7 +72,7 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 	
 	\item The caller restores its \g{framecap} by moving the capability in \texttt{ct6} back to \texttt{cfp}.
 	
-	\item The caller seals the \g{sealcap} from Step~\ref{itm:retseal} using the \g{sealcap} itself, replacing the previous copy in the call frame.\footnotemark[\value{footnote}] A sealed capability cannot be sealed again nor can a sealed \g{sealcap} be used to seal a capability, which causes this step to fail if the callee attempts to use the \g{retcap} a second time for the same \g{scall}.
+	\item The caller checks whether \texttt{returned} from Step~\ref{itm:returned-init} is equal to 0. If it is, it is set to 1; otherwise, the program crashes by attempting to load a value using the null capability.
 	
 	\item The caller resumes execution.
 	
@@ -80,7 +80,7 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 
 As part of an \g{scall}, the callee receives arguments and a return–frame capability pair sealed with a unique \g{otype} for which the callee has no \g{unsealcap} and therefore cannot dereference. The callee thus cannot access the caller's local state, thereby preserving \g{lse}. The capabilities are only unsealed when control is returned to the caller using the atomic \texttt{CInvoke} instruction. Since the callee also doesn't have a \g{sealcap} for that \g{otype}, it cannot forge a call stack to manipulate the procedure's local state, nor can it forge a \g{retcap} to trick \texttt{CInvoke} into unsealing the sealed \g{framecap} before invoking adversarial code.
 
-Before invoking the \g{scall} routine, the caller creates a \g{sealcap} and stores it in its call frame. When the callee returns control to the caller, the caller attempts to seal this \g{sealcap}. This operation succeeds the first time but fails if repeated since \g{sealing} an already sealed capability causes a machine trap. This ensures that a \g{retcap} associated with a specific \g{scall} can be used at most once and thus preserves \g{wbcf}. Since \g{lse} protects the call frame from external access, it also protects the \g{sealcap} from the same.
+Before invoking the \g{scall} routine, the caller initialises an indicator value to 0 and stores it in its call frame. When the callee returns control to the caller, the caller checks if the value is still 0 and crashes otherwise. It then sets the value to 1 to ensure that subsequent uses of the \g{retcap} result in a machine trap, thereby ensuring \g{wbcf}. Since \g{lse} protects the call frame from external access, it also protects the indicator value from the same.
 
 \section{Changes to Glyco} \label{sct:ghscc-changes}
 We now present some significant changes to Glyco, going from low-level to high-level \gs{il}.
