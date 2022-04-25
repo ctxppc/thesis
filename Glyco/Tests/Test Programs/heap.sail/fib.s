@@ -113,16 +113,19 @@ mm.scall:		cllc ct0, mm.seal_cap
 mm.seal_cap:	.octa 0
 mm.scall_end:	.balign 4
 				.balign 4
-rv.main:		addi t0, zero, 32
+rv.main:		addi t0, zero, 40
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 16(cfp)
+				csc cra, 24(cfp)
 				addi a0, zero, 0
 				addi a1, zero, 1
 				addi a2, zero, 30
+				addi t4, zero, 0
+				cincoffsetimm ct0, cfp, 16
+				sw.cap t4, 0(ct0)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276584795 # cclear 1, 226
 				.4byte 4276850651 # cclear 2, 255
@@ -133,29 +136,46 @@ rv.main:		addi t0, zero, 32
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 mm.ret$1:		cmove cfp, ct6
-cd.ret:			clc cra, 16(cfp)
+cd.ret:			nop
+				cincoffsetimm ct0, cfp, 16
+				lw.cap t4, 0(ct0)
+				addi t5, zero, 0
+				bne t4, t5, cd.then
+cd.else:		addi t4, zero, 1
+				cincoffsetimm ct0, cfp, 16
+				sw.cap t4, 0(ct0)
+cd.endif:		clc cra, 24(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
-fib:			addi t0, zero, 32
+cd.then:		cmove cra, cnull
+				addi t4, zero, 0
+				slli s1, t4, 2
+				cincoffset cnull, cra, s1
+				lw.cap zero, 0(cnull)
+				cjal cnull, cd.endif
+fib:			addi t0, zero, 40
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				csc cra, 16(cfp)
+				csc cra, 24(cfp)
 				mv a3, a0
 				mv ra, a2
 				addi s1, zero, 0
 cd.pred:		nop
-				ble ra, s1, cd.then
-cd.else:		mv a0, a1
+				ble ra, s1, cd.then$1
+cd.else$1:		mv a0, a1
 				add a1, a3, a1
 				addi ra, zero, 1
 				sub a2, a2, ra
+				addi t4, zero, 0
+				cincoffsetimm ct0, cfp, 16
+				sw.cap t4, 0(ct0)
 				.4byte 4276322779 # cclear 0, 227
 				.4byte 4276584795 # cclear 1, 226
 				.4byte 4276850651 # cclear 2, 255
@@ -166,15 +186,29 @@ cd.else:		mv a0, a1
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 mm.ret$2:		cmove cfp, ct6
-cd.ret$1:		clc cra, 16(cfp)
+cd.ret$1:		nop
+				cincoffsetimm ct0, cfp, 16
+				lw.cap t4, 0(ct0)
+				addi t5, zero, 0
+				bne t4, t5, cd.then$2
+cd.else$2:		addi t4, zero, 1
+				cincoffsetimm ct0, cfp, 16
+				sw.cap t4, 0(ct0)
+cd.endif$1:		clc cra, 24(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255
 				.4byte 4277112795 # cclear 3, 255
 				clc cfp, 0(cfp)
 				cinvoke cra, cfp
-cd.then:		mv a0, a1
-				clc cra, 16(cfp)
+cd.then$2:		cmove cra, cnull
+				addi t4, zero, 0
+				slli s1, t4, 2
+				cincoffset cnull, cra, s1
+				lw.cap zero, 0(cnull)
+				cjal cnull, cd.endif$1
+cd.then$1:		mv a0, a1
+				clc cra, 24(cfp)
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

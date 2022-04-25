@@ -1,9 +1,12 @@
 (
-	locals: abstract(cc.retcap, cap)
+	locals: abstract(cc.empty, cap)
+	abstract(cc.retcap, cap)
+	abstract(cc.returned, s32)
 	abstract(df.result, s32)
 	abstract(ls.arg0, s32)
 	abstract(ls.arg1, s32)
-	abstract(ls.arg2, s32),
+	abstract(ls.arg2, s32)
+	abstract(sv.offset, s32),
 	in: do(
 		pushScope()
 		set(abstract(cc.retcap), to: register(ra, cap))
@@ -13,8 +16,18 @@
 		set(register(a0), to: abstract(ls.arg0))
 		set(register(a1), to: abstract(ls.arg1))
 		set(register(a2), to: abstract(ls.arg2))
+		set(abstract(cc.returned), to: constant(0))
 		clearAll(except: a0 a1 a2)
 		call(fib, parameters: a0 a1 a2)
+		if(
+			relation(abstract(cc.returned), ne, constant(0)),
+			then: do(
+				createBuffer(bytes: 0, capability: abstract(cc.empty), scoped: true)
+				compute(abstract(sv.offset), constant(0), sll, constant(2))
+				getElement(s32, of: abstract(cc.empty), offset: abstract(sv.offset), to: register(zero))
+			),
+			else: set(abstract(cc.returned), to: constant(1))
+		)
 		set(abstract(df.result), to: register(a0, s32))
 		set(register(a0), to: abstract(df.result))
 		set(register(ra), to: abstract(cc.retcap))
@@ -24,7 +37,9 @@
 	),
 	procedures: (
 		fib,
-		locals: abstract(cc.retcap, cap)
+		locals: abstract(cc.empty$1, cap)
+		abstract(cc.retcap, cap)
+		abstract(cc.returned$1, s32)
 		abstract(df.result$1, s32)
 		abstract(df.result$2, s32)
 		abstract(ls.arg0, s32)
@@ -38,7 +53,8 @@
 		abstract(ls.prev, s32)
 		abstract(ls.rhs, s32)
 		abstract(ls.rhs$1, s32)
-		abstract(ls.rhs$2, s32),
+		abstract(ls.rhs$2, s32)
+		abstract(sv.offset, s32),
 		in: do(
 			pushScope()
 			set(abstract(cc.retcap), to: register(ra, cap))
@@ -69,8 +85,18 @@
 					set(register(a0), to: abstract(ls.arg0))
 					set(register(a1), to: abstract(ls.arg1))
 					set(register(a2), to: abstract(ls.arg2))
+					set(abstract(cc.returned$1), to: constant(0))
 					clearAll(except: a0 a1 a2)
 					call(fib, parameters: a0 a1 a2)
+					if(
+						relation(abstract(cc.returned$1), ne, constant(0)),
+						then: do(
+							createBuffer(bytes: 0, capability: abstract(cc.empty$1), scoped: true)
+							compute(abstract(sv.offset), constant(0), sll, constant(2))
+							getElement(s32, of: abstract(cc.empty$1), offset: abstract(sv.offset), to: register(zero))
+						),
+						else: set(abstract(cc.returned$1), to: constant(1))
+					)
 					set(abstract(df.result$2), to: register(a0, s32))
 					set(register(a0), to: abstract(df.result$2))
 					set(register(ra), to: abstract(cc.retcap))

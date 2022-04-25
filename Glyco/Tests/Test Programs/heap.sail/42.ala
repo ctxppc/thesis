@@ -1,9 +1,14 @@
 (
-	locals: abstract(cc.retcap, cap),
+	locals: abstract(cc.empty, cap) abstract(cc.retcap, cap) abstract(cc.returned, s32) abstract(sv.offset, s32),
 	in: do(
 		pushScope(
 			analysisAtEntry: (
 				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
 					(abstract(cc.retcap), register(a0))
 					(abstract(cc.retcap), register(a1))
 					(abstract(cc.retcap), register(a2))
@@ -25,6 +30,29 @@
 					(abstract(cc.retcap), register(s7))
 					(abstract(cc.retcap), register(s8))
 					(abstract(cc.retcap), register(s9))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(cc.returned), register(a1))
+					(abstract(cc.returned), register(a2))
+					(abstract(cc.returned), register(a3))
+					(abstract(cc.returned), register(a4))
+					(abstract(cc.returned), register(a5))
+					(abstract(cc.returned), register(a6))
+					(abstract(cc.returned), register(a7))
+					(abstract(cc.returned), register(invocationData))
+					(abstract(cc.returned), register(ra))
+					(abstract(cc.returned), register(s1))
+					(abstract(cc.returned), register(s10))
+					(abstract(cc.returned), register(s11))
+					(abstract(cc.returned), register(s2))
+					(abstract(cc.returned), register(s3))
+					(abstract(cc.returned), register(s4))
+					(abstract(cc.returned), register(s5))
+					(abstract(cc.returned), register(s6))
+					(abstract(cc.returned), register(s7))
+					(abstract(cc.returned), register(s8))
+					(abstract(cc.returned), register(s9))
+					(abstract(sv.offset), register(a0))
 				),
 				possiblyLiveLocations: register(ra)
 			)
@@ -34,6 +62,11 @@
 			to: register(ra, cap),
 			analysisAtEntry: (
 				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
 					(abstract(cc.retcap), register(a0))
 					(abstract(cc.retcap), register(a1))
 					(abstract(cc.retcap), register(a2))
@@ -55,14 +88,100 @@
 					(abstract(cc.retcap), register(s7))
 					(abstract(cc.retcap), register(s8))
 					(abstract(cc.retcap), register(s9))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(cc.returned), register(a1))
+					(abstract(cc.returned), register(a2))
+					(abstract(cc.returned), register(a3))
+					(abstract(cc.returned), register(a4))
+					(abstract(cc.returned), register(a5))
+					(abstract(cc.returned), register(a6))
+					(abstract(cc.returned), register(a7))
+					(abstract(cc.returned), register(invocationData))
+					(abstract(cc.returned), register(ra))
+					(abstract(cc.returned), register(s1))
+					(abstract(cc.returned), register(s10))
+					(abstract(cc.returned), register(s11))
+					(abstract(cc.returned), register(s2))
+					(abstract(cc.returned), register(s3))
+					(abstract(cc.returned), register(s4))
+					(abstract(cc.returned), register(s5))
+					(abstract(cc.returned), register(s6))
+					(abstract(cc.returned), register(s7))
+					(abstract(cc.returned), register(s8))
+					(abstract(cc.returned), register(s9))
+					(abstract(sv.offset), register(a0))
 				),
 				possiblyLiveLocations: register(ra)
+			)
+		)
+		set(
+			abstract(cc.returned),
+			to: constant(0),
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
+					(abstract(cc.retcap), register(a0))
+					(abstract(cc.retcap), register(a1))
+					(abstract(cc.retcap), register(a2))
+					(abstract(cc.retcap), register(a3))
+					(abstract(cc.retcap), register(a4))
+					(abstract(cc.retcap), register(a5))
+					(abstract(cc.retcap), register(a6))
+					(abstract(cc.retcap), register(a7))
+					(abstract(cc.retcap), register(invocationData))
+					(abstract(cc.retcap), register(ra))
+					(abstract(cc.retcap), register(s1))
+					(abstract(cc.retcap), register(s10))
+					(abstract(cc.retcap), register(s11))
+					(abstract(cc.retcap), register(s2))
+					(abstract(cc.retcap), register(s3))
+					(abstract(cc.retcap), register(s4))
+					(abstract(cc.retcap), register(s5))
+					(abstract(cc.retcap), register(s6))
+					(abstract(cc.retcap), register(s7))
+					(abstract(cc.retcap), register(s8))
+					(abstract(cc.retcap), register(s9))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(cc.returned), register(a1))
+					(abstract(cc.returned), register(a2))
+					(abstract(cc.returned), register(a3))
+					(abstract(cc.returned), register(a4))
+					(abstract(cc.returned), register(a5))
+					(abstract(cc.returned), register(a6))
+					(abstract(cc.returned), register(a7))
+					(abstract(cc.returned), register(invocationData))
+					(abstract(cc.returned), register(ra))
+					(abstract(cc.returned), register(s1))
+					(abstract(cc.returned), register(s10))
+					(abstract(cc.returned), register(s11))
+					(abstract(cc.returned), register(s2))
+					(abstract(cc.returned), register(s3))
+					(abstract(cc.returned), register(s4))
+					(abstract(cc.returned), register(s5))
+					(abstract(cc.returned), register(s6))
+					(abstract(cc.returned), register(s7))
+					(abstract(cc.returned), register(s8))
+					(abstract(cc.returned), register(s9))
+					(abstract(sv.offset), register(a0))
+				),
+				possiblyLiveLocations: abstract(cc.retcap)
 			)
 		)
 		clearAll(
 			except: ,
 			analysisAtEntry: (
 				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
 					(abstract(cc.retcap), register(a0))
 					(abstract(cc.retcap), register(a1))
 					(abstract(cc.retcap), register(a2))
@@ -84,8 +203,31 @@
 					(abstract(cc.retcap), register(s7))
 					(abstract(cc.retcap), register(s8))
 					(abstract(cc.retcap), register(s9))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(cc.returned), register(a1))
+					(abstract(cc.returned), register(a2))
+					(abstract(cc.returned), register(a3))
+					(abstract(cc.returned), register(a4))
+					(abstract(cc.returned), register(a5))
+					(abstract(cc.returned), register(a6))
+					(abstract(cc.returned), register(a7))
+					(abstract(cc.returned), register(invocationData))
+					(abstract(cc.returned), register(ra))
+					(abstract(cc.returned), register(s1))
+					(abstract(cc.returned), register(s10))
+					(abstract(cc.returned), register(s11))
+					(abstract(cc.returned), register(s2))
+					(abstract(cc.returned), register(s3))
+					(abstract(cc.returned), register(s4))
+					(abstract(cc.returned), register(s5))
+					(abstract(cc.returned), register(s6))
+					(abstract(cc.returned), register(s7))
+					(abstract(cc.returned), register(s8))
+					(abstract(cc.returned), register(s9))
+					(abstract(sv.offset), register(a0))
 				),
-				possiblyLiveLocations: abstract(cc.retcap)
+				possiblyLiveLocations: abstract(cc.retcap) abstract(cc.returned)
 			)
 		)
 		call(
@@ -93,6 +235,11 @@
 			parameters: ,
 			analysisAtEntry: (
 				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
 					(abstract(cc.retcap), register(a0))
 					(abstract(cc.retcap), register(a1))
 					(abstract(cc.retcap), register(a2))
@@ -114,8 +261,126 @@
 					(abstract(cc.retcap), register(s7))
 					(abstract(cc.retcap), register(s8))
 					(abstract(cc.retcap), register(s9))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(cc.returned), register(a1))
+					(abstract(cc.returned), register(a2))
+					(abstract(cc.returned), register(a3))
+					(abstract(cc.returned), register(a4))
+					(abstract(cc.returned), register(a5))
+					(abstract(cc.returned), register(a6))
+					(abstract(cc.returned), register(a7))
+					(abstract(cc.returned), register(invocationData))
+					(abstract(cc.returned), register(ra))
+					(abstract(cc.returned), register(s1))
+					(abstract(cc.returned), register(s10))
+					(abstract(cc.returned), register(s11))
+					(abstract(cc.returned), register(s2))
+					(abstract(cc.returned), register(s3))
+					(abstract(cc.returned), register(s4))
+					(abstract(cc.returned), register(s5))
+					(abstract(cc.returned), register(s6))
+					(abstract(cc.returned), register(s7))
+					(abstract(cc.returned), register(s8))
+					(abstract(cc.returned), register(s9))
+					(abstract(sv.offset), register(a0))
 				),
-				possiblyLiveLocations: abstract(cc.retcap)
+				possiblyLiveLocations: abstract(cc.retcap) abstract(cc.returned)
+			)
+		)
+		if(
+			relation(
+				abstract(cc.returned),
+				ne,
+				constant(0),
+				analysisAtEntry: (
+					conflicts: (
+						(abstract(cc.empty), abstract(cc.retcap))
+						(abstract(cc.empty), abstract(sv.offset))
+						(abstract(cc.empty), register(a0))
+						(abstract(cc.retcap), abstract(cc.returned))
+						(abstract(cc.retcap), abstract(sv.offset))
+						(abstract(cc.retcap), register(zero))
+						(abstract(cc.returned), register(a0))
+						(abstract(sv.offset), register(a0))
+					),
+					possiblyLiveLocations: abstract(cc.retcap) abstract(cc.returned) register(a0)
+				)
+			),
+			then: do(
+				createBuffer(
+					bytes: 0,
+					capability: abstract(cc.empty),
+					scoped: true,
+					analysisAtEntry: (
+						conflicts: (
+							(abstract(cc.empty), abstract(cc.retcap))
+							(abstract(cc.empty), abstract(sv.offset))
+							(abstract(cc.empty), register(a0))
+							(abstract(cc.retcap), abstract(sv.offset))
+							(abstract(cc.retcap), register(zero))
+							(abstract(sv.offset), register(a0))
+						),
+						possiblyLiveLocations: abstract(cc.retcap) register(a0)
+					)
+				)
+				compute(
+					abstract(sv.offset),
+					constant(0),
+					sll,
+					constant(2),
+					analysisAtEntry: (
+						conflicts: (
+							(abstract(cc.empty), abstract(sv.offset))
+							(abstract(cc.retcap), abstract(sv.offset))
+							(abstract(cc.retcap), register(zero))
+							(abstract(sv.offset), register(a0))
+						),
+						possiblyLiveLocations: abstract(cc.empty) abstract(cc.retcap) register(a0)
+					)
+				)
+				getElement(
+					s32,
+					of: abstract(cc.empty),
+					offset: abstract(sv.offset),
+					to: register(zero),
+					analysisAtEntry: (
+						conflicts: ((abstract(cc.retcap), register(zero))),
+						possiblyLiveLocations: abstract(cc.empty) abstract(cc.retcap) abstract(sv.offset) register(a0)
+					)
+				),
+				analysisAtEntry: (
+					conflicts: (
+						(abstract(cc.empty), abstract(cc.retcap))
+						(abstract(cc.empty), abstract(sv.offset))
+						(abstract(cc.empty), register(a0))
+						(abstract(cc.retcap), abstract(sv.offset))
+						(abstract(cc.retcap), register(zero))
+						(abstract(sv.offset), register(a0))
+					),
+					possiblyLiveLocations: abstract(cc.retcap) register(a0)
+				)
+			),
+			else: set(
+				abstract(cc.returned),
+				to: constant(1),
+				analysisAtEntry: (
+					conflicts: ((abstract(cc.retcap), abstract(cc.returned)) (abstract(cc.returned), register(a0))),
+					possiblyLiveLocations: abstract(cc.retcap) register(a0)
+				)
+			),
+			analysisAtEntry: (
+				conflicts: (
+					(abstract(cc.empty), abstract(cc.retcap))
+					(abstract(cc.empty), abstract(sv.offset))
+					(abstract(cc.empty), register(a0))
+					(abstract(cc.retcap), abstract(cc.returned))
+					(abstract(cc.retcap), abstract(sv.offset))
+					(abstract(cc.retcap), register(zero))
+					(abstract(cc.returned), register(a0))
+					(abstract(sv.offset), register(a0))
+				),
+				possiblyLiveLocations: abstract(cc.retcap) abstract(cc.returned) register(a0)
 			)
 		)
 		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0)))
@@ -130,6 +395,11 @@
 		return(to: register(ra, cap), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra))),
 		analysisAtEntry: (
 			conflicts: (
+				(abstract(cc.empty), abstract(cc.retcap))
+				(abstract(cc.empty), abstract(sv.offset))
+				(abstract(cc.empty), register(a0))
+				(abstract(cc.retcap), abstract(cc.returned))
+				(abstract(cc.retcap), abstract(sv.offset))
 				(abstract(cc.retcap), register(a0))
 				(abstract(cc.retcap), register(a1))
 				(abstract(cc.retcap), register(a2))
@@ -151,6 +421,29 @@
 				(abstract(cc.retcap), register(s7))
 				(abstract(cc.retcap), register(s8))
 				(abstract(cc.retcap), register(s9))
+				(abstract(cc.retcap), register(zero))
+				(abstract(cc.returned), register(a0))
+				(abstract(cc.returned), register(a1))
+				(abstract(cc.returned), register(a2))
+				(abstract(cc.returned), register(a3))
+				(abstract(cc.returned), register(a4))
+				(abstract(cc.returned), register(a5))
+				(abstract(cc.returned), register(a6))
+				(abstract(cc.returned), register(a7))
+				(abstract(cc.returned), register(invocationData))
+				(abstract(cc.returned), register(ra))
+				(abstract(cc.returned), register(s1))
+				(abstract(cc.returned), register(s10))
+				(abstract(cc.returned), register(s11))
+				(abstract(cc.returned), register(s2))
+				(abstract(cc.returned), register(s3))
+				(abstract(cc.returned), register(s4))
+				(abstract(cc.returned), register(s5))
+				(abstract(cc.returned), register(s6))
+				(abstract(cc.returned), register(s7))
+				(abstract(cc.returned), register(s8))
+				(abstract(cc.returned), register(s9))
+				(abstract(sv.offset), register(a0))
 			),
 			possiblyLiveLocations: register(ra)
 		)

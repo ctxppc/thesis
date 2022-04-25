@@ -132,6 +132,12 @@ extension CC {
 						Lowered.set(.register(recordRegister), to: .abstract(argumentsRecord))
 					}
 					
+					// If using GHSCC, initialise Boolean value for tracking returns.
+					let hasReturned = context.locations.uniqueName(from: "returned")
+					if context.configuration.callingConvention == .heap {
+						Lowered.set(.abstract(hasReturned), to: .constant(0))
+					}
+					
 					// If using a secure CC, clear all registers except argument registers in use.
 					let argumentRegisters = assignments
 						.viaRegisters
@@ -144,6 +150,19 @@ extension CC {
 					// Call or scall procedure.
 					// Frame locations are not considered "in use" since frame-resident arguments are passed via an allocated record.
 					Lowered.call(name, parameters: argumentRegisters)
+					
+					// If using GHSCC, assert that this is the first return by crashing if the assertion doesn't hold and updating the Boolean value otherwise.
+					if context.configuration.callingConvention == .heap {
+						Lowered.if(
+							.relation(.abstract(hasReturned), .ne, .constant(0)),
+							then: .do {
+								let emptyVector = context.locations.uniqueName(from: "empty")
+								Lowered.createVector(.s32, count: 0, capability: .abstract(emptyVector), scoped: true)
+								Lowered.getElement(of: .abstract(emptyVector), index: .constant(0), to: .register(.zero))
+							},
+							else: .set(.abstract(hasReturned), to: .constant(1))
+						)
+					}
 					
 					// Destroy arguments record, if it exists. (This does nothing when the call stack is discontiguous.)
 					if !assignments.parameterRecordType.isEmpty {

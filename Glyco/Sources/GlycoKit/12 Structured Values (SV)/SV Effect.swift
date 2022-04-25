@@ -137,6 +137,7 @@ extension SV {
 				}
 				
 				case .createVector(let elementType, count: let count, capability: let vector, scoped: let scoped):
+				context.elementTypesByVectorLocation[vector] = elementType
 				Lowered.createBuffer(bytes: elementType.byteSize * count, capability: vector, scoped: scoped)
 				
 				case .getElement(of: let vector, index: let index, to: let destination):
