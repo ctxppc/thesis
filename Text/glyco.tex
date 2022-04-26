@@ -137,22 +137,20 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 \end{figure}
 
 \hspace{0pt} \\
-CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program
-\ilfile{Programs/42.cc}
-is \lowered{} to the following SV program:
-\ilfile{Programs/42.sv}
-\todo{Highlight corresponding parts.}
+CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program (with the call effect highlighted)
+\ilfile[highlightlines={3}]{Programs/42.cc}
+is \lowered{} to the following SV program (with the call effect's \g{lowering} highlighted):
+\ilfile[highlightlines={5-8}, samepage=true]{Programs/42.sv}
 
 The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
 
 \section{Structured Values} \label{sct:sv}
 The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of vectors and records. A \textbf{vector} in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A \textbf{record} is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability, thereby ensuring that no other buffer can occupy this extra space accessible by the first capability.}
 
-Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
-\ilfile{Programs/sequences.sv}
-is \lowered{} to the following ID program:
-\ilfile{Programs/sequences.id}
-\todo{Highlight corresponding parts.}
+Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program (with alternating effects highlighted)
+\ilfile[highlightlines={4-10, 12, 14, 16, 18, 20}]{Programs/sequences.sv}
+is \lowered{} to the following ID program (with the above highlighted effects' \gs{lowering} highlighted):
+\ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}, tabsize=1]{Programs/sequences.id}
 
 The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
@@ -173,8 +171,8 @@ Glyco's register allocator is spread over three \gs{nanopass} which perform the 
 
 \paragraph{From ID (Inferred Declarations) to AL} An ID program is \lowered{} to an AL program by inferring a declaration for each abstract location used in the program and each of the program's procedures. Each declaration associates an abstract location with a data type. For example, the ID program
 \ilfile{Programs/buffer.id}
-is \lowered{} to the following AL program:
-\ilfile{Programs/buffer.al}
+is \lowered{} to the following AL program (declarations highlighted):
+\ilfile[highlightlines={2}]{Programs/buffer.al}
 
 \paragraph{From AL (Abstract Locations) to ALA} Similar to how the previous \g{nanopass} infers local declarations, the AL to ALA \g{lowering} infers static\footnote{As observed from the code itself, without running or simulating the program.} liveness and conflict information about the program, and associates it with every effect and predicate in an ALA program. It consists of two data structures: a liveness set and a conflict graph.
 
@@ -195,10 +193,10 @@ The analysis algorithm derives an effect's liveness set and conflict graph \emph
 Since the liveness set and conflict graph at entry depend on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
 
 \paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \texttt{three} and \texttt{number} in
-\ilfile{Programs/coalescable.al}
+\ilfile[highlightlines={6}]{Programs/coalescable.al}
 can be coalesced to get
 \ilfile{Programs/coalesced.al}
-thereby saving one \texttt{set} effect and making the liveness set and conflict graph smaller.
+thereby saving one \texttt{set} effect (highlighted) and making the liveness set and conflict graph smaller.
 
 The location coalescing optimisation algorithm works as follows:
 \begin{enumerate}
@@ -226,14 +224,13 @@ The final major abstractions over straight-line programs are conditionals (\text
 In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to the procedure's code. These three features make CD a block-structured programming language which the upcoming \gs{nanopass} remove to get to a form that can be readily translated into assembly.
 
 \paragraph{From CD (Conditionals) to PR} The CD to PR \g{nanopass} flattens conditionals, sequences, and procedures into \gs{bblock}. A \textbf{\g{bblock}} is \glsdesc*{bblock}. A \g{bblock}'s effects are followed by a \textbf{continuation}, which is a jump, branch, or call. For example, the CD program
-\ilfile{Programs/ifproc.cd}
+\ilfile[highlightlines={3-5, 9-10, 12-15}]{Programs/ifproc.cd}
 is \lowered{} to the PR program
-\ilfile{Programs/ifproc.pr}
-\todo{Highlight corresponding parts and labels. Add flow diagram.}
+\ilfile[highlightlines={2-6, 8-12, 14-18}, tabsize=1]{Programs/ifproc.pr}
+\todo{Maybe add a flow diagram for extra clarification?}
 
 \paragraph{From PR (Predicates) to BB} The next \g{il} BB does not support predicates so the \g{nanopass} maps predicates to appropriate continuations. For example, the above program is \lowered{} to the BB program
 \ilfile{Programs/ifproc.bb}
-\todo{Highlight corresponding parts and labels.}
 
 \paragraph{From BB (Basic Blocks) to FO} The final structural transformation linearises \gs{bblock} in BB programs to get an FO program with a single list of unlabelled and labelled effects.
 
@@ -241,7 +238,6 @@ The \g{nanopass} attempts to get an optimal placement of \gs{bblock}, i.e., an o
 
 The above BB program becomes the following FO program:
 \ilfile{Programs/ifproc.fo}
-\todo{Highlight corresponding parts and labels.}
 
 \section{Basic Abstractions over Assembly} \label{sct:fo}
 The last \gs{il} provide some useful basic abstractions over the CHERI-RISC-V instruction set.
@@ -256,7 +252,7 @@ The MM to RV \g{nanopass} translates call frame operations such as \texttt{pushF
 
 Buffer allocation is implemented using a dedicated heap capability register \texttt{ctp}. The heap capability points to the next free location on the heap and allocation increases the heap capability address — deallocation is not supported.
 
-\paragraph{From RV (CHERI-RISC-V) to S (CHERI-RISC-V Assembly)} An RV program consists of CHERI-RISC-V instructions. The RV to S \g{nanopass} serialises these instructions. For example, \texttt{copyWord(destination: a0, source: a1)} instruction is serialised as \hbox{\texttt{mv a0, a1}}.
+\paragraph{From RV (CHERI-RISC-V) to S (CHERI-RISC-V Assembly)} An RV program consists of CHERI-RISC-V instructions. The RV to S \g{nanopass} serialises these instructions. For example, \iil/copyWord(destination: a0, source: a1)/ instruction is serialised as \irv/mv a0, a1/.
 
 \paragraph{From S to ELF} The final step of the compiler pipeline is assembling and linking. These two steps are delegated to Clang from the CHERI-LLVM compiler toolchain.\footnote{This last step is unrelated to the research problem, hence this dependency on LLVM.} The result is an ELF file that, depending on the compilation target, can be executed in either the Sail-based CHERI-RISC-V emulator or in CheriBSD.
 
