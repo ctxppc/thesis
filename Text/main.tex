@@ -24,6 +24,7 @@
 
 \usepackage{lipsum}								% Fake lorem ipsum text — TODO: Remove when done
 \usepackage{listings}							% Source code
+\usepackage{minted}                             % Source code
 \usepackage{subfiles}							% Modular documents
 \usepackage{syntax}								% Grammar
 \usepackage{todonotes}							% Marks TODOs — TODO: Remove when done
@@ -45,6 +46,16 @@
 \renewcommand{\syntright}{}
 \renewcommand{\ulitleft}{\normalfont\bfseries\frenchspacing}
 \renewcommand{\ulitright}{}
+
+\setminted{
+    autogobble=true,			% remove leading whitespace
+    fontsize=\footnotesize,
+    linenos=true,
+    style=xcode,
+    stripall=true,				% remove leading/trailing whitespace
+    stripnl=true,				% remove leading/trailing newlines
+	tabsize=2
+}
 
 \lstset{ 
 	basicstyle=\footnotesize,			% the size of the fonts that are used for the code
