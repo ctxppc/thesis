@@ -34,7 +34,7 @@ Glyco 0.1 defines 20 \gs{il}, with a general approach adapted from the student c
 The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
 The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
-\lstinputlisting{Programs/fib.ex}
+\ilfile{Programs/fib.ex}
 
 This program defines a function \texttt{fib} with three signed 32-bit integer parameters \texttt{prev}, \texttt{curr}, and \texttt{iter} and which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \texttt{fib} where \texttt{prev} is 0, \texttt{curr} is 1, and \texttt{iter} is 30.
 
@@ -43,11 +43,11 @@ EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly}
 \todo{Define records, vectors, and let-bindings; show examples. It's late to introduce them in lower ILs since they're also part of EX's vocabulary and feature set.}
 
 \paragraph{From EX (Expressions) to LS} LS does not support subexpressions so the \g{nanopass} to LS binds all subexpressions to names (temporaries) and uses those names in place of the subexpressions. For instance, the EX value
-\begin{lstlisting}
+\begin{il}
 	evaluate(function(fib), ... binary(named(prev), add, named(curr)) ...)
-\end{lstlisting}
+\end{il}
 is transformed into the equivalent LS value
-\begin{lstlisting}
+\begin{il}
 	let(
 		(arg0, ...) (arg1, let(
 			(ex.lhs, source(named(prev))) (ex.rhs, source(named(curr))),
@@ -55,42 +55,42 @@ is transformed into the equivalent LS value
 		)) (arg2, ...),
 		in: evaluate(fib, named(arg0) named(arg1) named(arg2))
 	)
-\end{lstlisting}
+\end{il}
 
 Some transformations are not strictly necessary, e.g., binding \texttt{named(prev)} to \texttt{ex.lhs} instead of using \texttt{named(prev)} directly. They do not however incur any additional overhead in the final executable: a \g{nanopass} further down the compiler pipeline cleans up these redundant temporaries.
 
 \paragraph{From LS (Lexical Scopes) to DF} DF does not support shadowing; all \texttt{let} bindings are in a single namespace. The \g{nanopass} from LS to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
 
 \paragraph{From DF (Definitions) to CV} CV does not support \texttt{let} bindings, i.e., definitions. The \g{nanopass} implements each definition in CV using a \texttt{do} value, i.e., a computed value, a value on which a computation can be attached, with a \texttt{set} effect in it. For example, the DF value
-\begin{lstlisting}
+\begin{il}
 	let((answer, source(constant(42))), in: source(location(answer)))
-\end{lstlisting}
+\end{il}
 is \lowered{} to the CV value
-\begin{lstlisting}
+\begin{il}
 	do(set(answer, to: source(constant(42))), then: source(location(answer)))
-\end{lstlisting}
+\end{il}
 
 \paragraph{From CV (Computed Values) to CA} CA does not support \texttt{do} \emph{values}, but does support \texttt{do} \emph{effects}, which are sequences of effects. The \g{nanopass} implements \texttt{do} values by extracting their effects into \texttt{do} effects and ending with an additional \texttt{set} effect that moves the result to the intended destination. That is, a CV \texttt{set} effect
-\begin{lstlisting}
+\begin{il}
 	set(result, to:
 		do(
 			/* effects */,
 			then: /* result */
 		)
 	)
-\end{lstlisting}
+\end{il}
 is transformed to a CA \texttt{do} effect
-\begin{lstlisting}
+\begin{il}
 	do(
 		/* effects */
 		set(result, to: /* result */)
 	)
-\end{lstlisting}
+\end{il}
 
 \paragraph{From CA (Canonical Assignments) to CC} The final purely structural transformation lowers \texttt{set} effects in CA using equivalent effects in CC, only keeping the \texttt{set} effects with a constant or location source. For example, the CA program
-\lstinputlisting{Programs/values.ca}
+\ilfile{Programs/values.ca}
 is lowered to the CC program
-\lstinputlisting{Programs/values.cc}
+\ilfile{Programs/values.cc}
 
 \section{A Conventional Calling Convention} \label{sct:cc}
 A \g{cc} is a set of rules imposed by the operating system, instruction set architecture, and/or programming language that specify how procedures are called. A low-level \g{cc} often specifies
@@ -138,9 +138,9 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 
 \hspace{0pt} \\
 CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program
-\lstinputlisting{Programs/42.cc}
+\ilfile{Programs/42.cc}
 is \lowered{} to the following SV program:
-\lstinputlisting{Programs/42.sv}
+\ilfile{Programs/42.sv}
 \todo{Highlight corresponding parts.}
 
 The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
@@ -149,9 +149,9 @@ The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the re
 The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of vectors and records. A \textbf{vector} in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A \textbf{record} is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability, thereby ensuring that no other buffer can occupy this extra space accessible by the first capability.}
 
 Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program
-\lstinputlisting{Programs/sequences.sv}
+\ilfile{Programs/sequences.sv}
 is \lowered{} to the following ID program:
-\lstinputlisting{Programs/sequences.id}
+\ilfile{Programs/sequences.id}
 \todo{Highlight corresponding parts.}
 
 The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
@@ -172,9 +172,9 @@ Glyco's register allocator is spread over three \gs{nanopass} which perform the 
 \end{enumerate}
 
 \paragraph{From ID (Inferred Declarations) to AL} An ID program is \lowered{} to an AL program by inferring a declaration for each abstract location used in the program and each of the program's procedures. Each declaration associates an abstract location with a data type. For example, the ID program
-\lstinputlisting{Programs/buffer.id}
+\ilfile{Programs/buffer.id}
 is \lowered{} to the following AL program:
-\lstinputlisting{Programs/buffer.al}
+\ilfile{Programs/buffer.al}
 
 \paragraph{From AL (Abstract Locations) to ALA} Similar to how the previous \g{nanopass} infers local declarations, the AL to ALA \g{lowering} infers static\footnote{As observed from the code itself, without running or simulating the program.} liveness and conflict information about the program, and associates it with every effect and predicate in an ALA program. It consists of two data structures: a liveness set and a conflict graph.
 
@@ -195,9 +195,9 @@ The analysis algorithm derives an effect's liveness set and conflict graph \emph
 Since the liveness set and conflict graph at entry depend on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
 
 \paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \texttt{three} and \texttt{number} in
-\lstinputlisting{Programs/coalescable.al}
+\ilfile{Programs/coalescable.al}
 can be coalesced to get
-\lstinputlisting{Programs/coalesced.al}
+\ilfile{Programs/coalesced.al}
 thereby saving one \texttt{set} effect and making the liveness set and conflict graph smaller.
 
 The location coalescing optimisation algorithm works as follows:
@@ -226,13 +226,13 @@ The final major abstractions over straight-line programs are conditionals (\text
 In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to the procedure's code. These three features make CD a block-structured programming language which the upcoming \gs{nanopass} remove to get to a form that can be readily translated into assembly.
 
 \paragraph{From CD (Conditionals) to PR} The CD to PR \g{nanopass} flattens conditionals, sequences, and procedures into \gs{bblock}. A \textbf{\g{bblock}} is \glsdesc*{bblock}. A \g{bblock}'s effects are followed by a \textbf{continuation}, which is a jump, branch, or call. For example, the CD program
-\lstinputlisting{Programs/ifproc.cd}
+\ilfile{Programs/ifproc.cd}
 is \lowered{} to the PR program
-\lstinputlisting{Programs/ifproc.pr}
+\ilfile{Programs/ifproc.pr}
 \todo{Highlight corresponding parts and labels. Add flow diagram.}
 
 \paragraph{From PR (Predicates) to BB} The next \g{il} BB does not support predicates so the \g{nanopass} maps predicates to appropriate continuations. For example, the above program is \lowered{} to the BB program
-\lstinputlisting{Programs/ifproc.bb}
+\ilfile{Programs/ifproc.bb}
 \todo{Highlight corresponding parts and labels.}
 
 \paragraph{From BB (Basic Blocks) to FO} The final structural transformation linearises \gs{bblock} in BB programs to get an FO program with a single list of unlabelled and labelled effects.
@@ -240,7 +240,7 @@ is \lowered{} to the PR program
 The \g{nanopass} attempts to get an optimal placement of \gs{bblock}, i.e., an optimal trace, by juxtaposing successive blocks where possible. Unconditional jumps between juxtaposed blocks can be elided thereby avoiding the cost associated with jumps such as redundant instructions and pipeline stalls.
 
 The above BB program becomes the following FO program:
-\lstinputlisting{Programs/ifproc.fo}
+\ilfile{Programs/ifproc.fo}
 \todo{Highlight corresponding parts and labels.}
 
 \section{Basic Abstractions over Assembly} \label{sct:fo}

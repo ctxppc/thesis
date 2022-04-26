@@ -24,5 +24,4 @@ Text/*.gls
 Text/*.glsdefs
 Text/*.ist
 default.profraw
-Text/_minted-main
-Text/_minted-objects
+Text/_minted-*

@@ -28,7 +28,7 @@ text:
   image: texlive/texlive:latest
   script:
       - cd Text
-      - latexmk -pdf -pdflatex main.tex
+      - latexmk -shell-escape -pdf -pdflatex main.tex
   artifacts:
     paths:
       - Text/main.pdf
