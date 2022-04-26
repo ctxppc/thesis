@@ -40,6 +40,8 @@ This program defines a function \texttt{fib} with three signed 32-bit integer pa
 
 EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it is instead quite explicit and contains little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
 
+\todo{Define records, vectors, and let-bindings; show examples. It's late to introduce them in lower ILs since they're also part of EX's vocabulary and feature set.}
+
 \paragraph{From EX (Expressions) to LS} LS does not support subexpressions so the \g{nanopass} to LS binds all subexpressions to names (temporaries) and uses those names in place of the subexpressions. For instance, the EX value
 \begin{lstlisting}
 	evaluate(function(fib), ... binary(named(prev), add, named(curr)) ...)

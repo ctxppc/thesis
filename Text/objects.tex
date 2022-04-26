@@ -5,19 +5,38 @@
 \chapter{Sealed Objects}
 The previous chapter discussed a first extension of the Glyco compiler, namely a secure calling convention. This chapter treats a second extension, a feature we call \emph{sealed objects}.
 
-A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{methods}. An object belongs to an \textbf{object type}, which determines the record type and methods of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of methods.
-
-We begin this chapter in \cref{sct:secobj} we list a few security properties afforded by sealed objects. We then discuss the semantics of objects and methods in \cref{sct:objmeth} and of object types in \cref{sct:objty}. We finish this chapter by outlining the changes to the compiler in \cref{sct:obj-changes} and evaluating sealed objects in \cref{sct:obj-eval}.
+Sealed objects depend on two new features; we begin by defining lambdas in \cref{sct:lambda} and named \& nominal types in \cref{sct:named-ty} before defining the semantics of objects and methods in \cref{sct:obj-meth}. We then list in \cref{sct:obj-sec} a few security properties afforded by sealed objects. We finish this chapter by outlining the changes to the compiler in \cref{sct:obj-changes} and evaluating sealed objects in \cref{sct:obj-eval}.
 
 This chapter discusses the feature set and languages of Glyco 1.0.\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/1.0/}.} A full language reference can be found in \cref{ch:grammar}.
 
-\section{Secure Objects} \label{sct:secobj}
+\section{Lambdas} \label{sct:lambda}
+A first new addition to Glyco is the \textbf{lambda}, which is an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas). Lambdas allow the programmer to define functions at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
+\lstinputlisting{Programs/sum.l}
+
+\section{Named \& Nominal Types} \label{sct:named-ty}
 % TODO
 
-\section{Objects \& Methods} \label{sct:objmeth}
+\section{Objects \& Methods} \label{sct:obj-meth}
+A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{methods}.
+
+An object belongs to an \textbf{object type}, which determines the record type and methods of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of methods.
+
+The highest \g{il} in Glyco is called \textbf{OB} (Objects), a language similar to EX but with support for named types, anonymous functions, and sealed objects.
+
+The following OB program implements a \texttt{Counter} object type, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
+\lstinputlisting{Programs/counter.ob}
+
+An object type consists of three parts:
+\begin{itemize}
+    \item A \textbf{name}, which is \texttt{Counter} in the example.
+\end{itemize}
+
+An object in Glyco is represented as a sealed capability to a record.
+
+\subsection{Object Types are Objects}
 % TODO
 
-\section{Object Types} \label{sct:objty}
+\section{Object State Encapsulation} \label{sct:obj-sec}
 % TODO
 
 \section{Changes to Glyco} \label{sct:obj-changes}
