@@ -10,18 +10,44 @@ Sealed objects depend on two new features; we begin by defining lambdas in \cref
 This chapter discusses the feature set and languages of Glyco 1.0.\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/1.0/}.} A full language reference can be found in \cref{ch:grammar}.
 
 \section{Lambdas} \label{sct:lambda}
-A first new addition to Glyco is the \textbf{lambda}, which is an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas). Lambdas allow the programmer to define functions at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
+A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
 \ilfile{Programs/sum.l}
 
+The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with a auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
+\ilfile{Programs/sum.ex}
+
 \section{Named \& Nominal Types} \label{sct:named-ty}
-% TODO
+A second feature is the ability to name types, by either defining a nominal type or a structural type, in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
+\begin{itemize}[nosep]
+	\item an (8-bit) byte, an \iil/u8()/;
+	\item a (32-bit) signed integer, an \iil/s32()/;
+	\item a capability to a vector of \iil/T/s, a \iil/cap(vector(T, sealed: S))/;
+	\item a capability to a record, a \iil/cap(record((name, type) …, sealed: S))/;
+	\item a capability to a function, a \iil/cap(function(takes: p …, returns: r))/;
+	\item a \g{sealcap}, a \iil/cap(seal(sealed: S))/; or
+	\item a type named \iil/T/, spelled \iil/named(T)/
+\end{itemize}
+where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise.
+
+Types can be named using a \texttt{letType} value in one of two ways. A \textbf{structural type definition} creates a \textbf{named structural type}, a type that is equivalent to the type it's defined to be. A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself.
+
+For instance, the following NT program using structural types is valid:
+% TODO: Add NT example program.
+
+The following program using nominal types is also valid:
+% TODO: Add NT example program.
+
+However, this program is not valid since the nominal type cannot be converted to a \iil/s32()/ even though it is defined using \iil/s32()/:
+% TODO: Add NT example program.
+
+The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 
 \section{Objects \& Methods} \label{sct:obj-meth}
 A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{methods}.
 
 An object belongs to an \textbf{object type}, which determines the record type and methods of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of methods.
 
-The highest \g{il} in Glyco is called \textbf{OB} (Objects), a language similar to EX but with support for named types, anonymous functions, and sealed objects.
+Object types can be defined using an \textbf{object type definition} in a \texttt{letType} value.
 
 The following OB program implements a \texttt{Counter} object type, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
 \ilfile{Programs/counter.ob}
