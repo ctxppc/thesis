@@ -3,7 +3,7 @@
 extension NT {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
-	public struct Function : Codable, Equatable, SimplyLowerable {
+	public struct Function : Named, Codable, Equatable, SimplyLowerable {
 		
 		/// Creates a function with given name, parameters, result type, and result.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
@@ -26,7 +26,7 @@ extension NT {
 		public var result: Result
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Function {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Function {
 			try .init(name, takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: result.lowered(in: &context))
 		}
 		

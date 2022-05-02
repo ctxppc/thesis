@@ -18,7 +18,7 @@ extension NT {
 		indirect case `let`([Definition], in: Predicate)
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Predicate {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Predicate {
 			switch self {
 				
 				case .constant(let holds):

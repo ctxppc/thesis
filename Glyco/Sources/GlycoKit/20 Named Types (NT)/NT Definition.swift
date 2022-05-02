@@ -18,7 +18,7 @@ extension NT {
 		public var value: Value
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Definition {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Definition {
 			.init(name, try value.lowered(in: &context))
 		}
 		

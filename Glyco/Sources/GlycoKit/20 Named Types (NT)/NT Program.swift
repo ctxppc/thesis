@@ -31,7 +31,7 @@ public enum NT : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context()
+			var context = LoweringContext()
 			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context))
 		}
 		

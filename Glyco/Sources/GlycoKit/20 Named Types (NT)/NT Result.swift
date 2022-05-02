@@ -19,7 +19,7 @@ extension NT {
 		indirect case `do`([Effect], then: Result)
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Result {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Result {
 			switch self {
 				
 				case .value(let value):
@@ -36,6 +36,45 @@ extension NT {
 				
 				case .do(let effects, then: let result):
 				return try .do(effects.lowered(in: &context), then: result.lowered(in: &context))
+				
+			}
+		}
+		
+		/// Determines the normalised value type of `self`.
+		func normalisedValueType(in context: TypingContext) throws -> ValueType {
+			switch self {
+				
+				case .value(let value):
+				return try value.normalisedValueType(in: context)
+				
+				case .evaluate(let function, let arguments):
+				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.normalisedValueType(in: context) else {
+					throw TypingError.nonfunctionValue(function)
+				}
+				for (parameter, argument) in zip(parameters, arguments) {
+					if try argument.normalisedValueType(in: context) != parameter.type {	// parameter is already normalised in a normalised function type
+						throw TypingError.argumentTypeMismatch(argument, parameter)
+					}
+				}
+				return resultType	// result type is already normalised in a normalised function type
+				
+				case .if(_, then: let affirmative, else: let negative):
+				// TODO: Type-check predicate?
+				let affirmativeType = try affirmative.normalisedValueType(in: context)
+				let negativeType = try negative.normalisedValueType(in: context)
+				guard affirmativeType == negativeType else { throw TypingError.branchTypeMismatch(affirmative: affirmativeType, negative: negativeType) }
+				return affirmativeType
+				
+				case .let(let definitions, in: let body):
+				var context = context
+				for definition in definitions {
+					context.normalisedTypesBySymbol[definition.name] = try definition.value.normalisedValueType(in: context)
+				}
+				return try body.normalisedValueType(in: context)
+				
+				case .do(_, then: let value):
+				// TODO: Type-check effects?
+				return try value.normalisedValueType(in: context)
 				
 			}
 		}

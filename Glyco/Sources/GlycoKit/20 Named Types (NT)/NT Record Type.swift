@@ -16,7 +16,7 @@ extension NT {
 		public var fields: [Field]
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.RecordType {
+		func lowered(in context: inout LoweringContext) throws -> Lower.RecordType {
 			.init(try fields.lowered(in: &context))
 		}
 		
@@ -39,7 +39,7 @@ extension NT {
 		public var valueType: ValueType
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Field {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Field {
 			.init(name, try valueType.lowered(in: &context))
 		}
 		

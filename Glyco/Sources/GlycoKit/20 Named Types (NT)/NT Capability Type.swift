@@ -22,7 +22,7 @@ extension NT {
 		case seal(sealed: Bool)
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.CapabilityType {
+		func lowered(in context: inout LoweringContext) throws -> Lower.CapabilityType {
 			switch self {
 				
 				case .vector(of: let elementType, sealed: let sealed):

@@ -21,11 +21,11 @@ extension NT {
 		case cap(CapabilityType)
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.ValueType {
+		func lowered(in context: inout LoweringContext) throws -> Lower.ValueType {
 			try lowered(in: &context, attemptedResolutions: [])
 		}
 		
-		private func lowered(in context: inout Context, attemptedResolutions: OrderedSet<TypeName>) throws -> Lower.ValueType {
+		private func lowered(in context: inout LoweringContext, attemptedResolutions: OrderedSet<TypeName>) throws -> Lower.ValueType {
 			switch self {
 				
 				case .named(let name):
@@ -41,6 +41,24 @@ extension NT {
 				
 				case .cap(let type):
 				return .cap(try type.lowered(in: &context))
+				
+			}
+		}
+		
+		/// Returns a copy of `self` that does not name a structural type.
+		///
+		/// The normalised types of two types *A* and *B* are equal iff *A* and *B* are interchangeable.
+		func normalised(in context: NTTypeContext, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
+			guard case .named(let name) = self else { return self }
+			guard !attemptedResolutions.contains(name) else { throw TypingError.infiniteType(name, cycle: attemptedResolutions) }
+			guard let typeDefinition = context.type(named: name) else { throw TypingError.undefinedType(name) }
+			switch typeDefinition {
+				
+				case .structural(_, let valueType):
+				return try valueType.normalised(in: context, attemptedResolutions: attemptedResolutions.union([name]))
+				
+				case .nominal:
+				return self
 				
 			}
 		}

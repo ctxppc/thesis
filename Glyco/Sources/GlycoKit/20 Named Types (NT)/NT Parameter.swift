@@ -22,7 +22,7 @@ extension NT {
 		public var sealed: Bool
 		
 		// See protocol.
-		func lowered(in context: inout Context) throws -> Lower.Parameter {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Parameter {
 			.init(name, try type.lowered(in: &context), sealed: sealed)
 		}
 		

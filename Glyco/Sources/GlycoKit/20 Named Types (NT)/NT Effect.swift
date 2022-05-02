@@ -17,7 +17,7 @@ extension NT {
 		
 		// See protocol.
 		@EffectBuilder<Lowered>
-		func lowered(in context: inout Context) throws -> Lower.Effect {
+		func lowered(in context: inout LoweringContext) throws -> Lower.Effect {
 			switch self {
 				
 				case .do(let effects):
