@@ -13,7 +13,7 @@ This chapter discusses the feature set and languages of Glyco 1.0.\footnote{The 
 A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
 \ilfile{Programs/sum.l}
 
-The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with a auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
+The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with an auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
 \section{Named \& Nominal Types} \label{sct:named-ty}
@@ -25,14 +25,14 @@ A second feature is the ability to name types, by either defining a nominal type
 	\item a capability to a record, a \iil/cap(record((name, type) …, sealed: S))/;
 	\item a capability to a function, a \iil/cap(function(takes: p …, returns: r))/;
 	\item a \g{sealcap}, a \iil/cap(seal(sealed: S))/; or
-	\item a type named \iil/T/, spelled \iil/named(T)/
+	\item a value of a type named \iil/T/, spelled \iil/named(T)/
 \end{itemize}
 where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise.
 
-Types can be named using a \texttt{letType} value in one of two ways. A \textbf{structural type definition} creates a \textbf{named structural type}, a type that is equivalent to the type it's defined to be. A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself.
+Types can be named using a \texttt{letType} value in one of two ways. A \textbf{structural type definition} creates a \textbf{named structural type}, a type that is equivalent to the type it's defined as. A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself.
 
 For instance, the following NT program using structural types is valid:
-% TODO: Add NT example program.
+\ilfile{Programs/structural.nt}
 
 The following program using nominal types is also valid:
 % TODO: Add NT example program.
