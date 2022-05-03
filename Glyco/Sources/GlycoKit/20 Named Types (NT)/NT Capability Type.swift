@@ -21,6 +21,16 @@ extension NT {
 		/// A (possibly sealed) capability that can be used to seal other capabilities.
 		case seal(sealed: Bool)
 		
+		/// Returns a copy of `self` but sealed iff `sealed`.
+		func sealed(_ sealed: Bool) -> Self {
+			switch self {
+				case .vector(of: let elementType, sealed: _):	return .vector(of: elementType, sealed: sealed)
+				case .record(let recordType, sealed: _):		return .record(recordType, sealed: sealed)
+				case .function:									return self
+				case .seal(sealed: _):							return .seal(sealed: sealed)
+			}
+		}
+		
 		// See protocol.
 		func lowered(in context: inout LoweringContext) throws -> Lower.CapabilityType {
 			switch self {

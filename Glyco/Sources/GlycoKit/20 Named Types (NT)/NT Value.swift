@@ -165,10 +165,17 @@ extension NT {
 				case .λ(takes: let parameters, returns: let resultType, in: let result):
 				let normalisedDeclaredResultType = try resultType.normalised(in: context)
 				var bodyContext = context
-				bodyContext.valueTypesBySymbol = .init(uniqueKeysWithValues: parameters.map { ($0.name, $0.type) })
+				bodyContext.valueTypesBySymbol = .init(uniqueKeysWithValues: try parameters.map { parameter in
+					if parameter.sealed {
+						guard case .cap(let capType) = parameter.type else { throw TypingError.noncapabilitySealedParameter(parameter) }
+						return (parameter.name, .cap(capType.sealed(false)))
+					} else {
+						return (parameter.name, parameter.type)
+					}
+				})
 				let normalisedActualResultType = try result.normalisedValueType(in: bodyContext)
 				guard normalisedActualResultType == normalisedDeclaredResultType else { throw TypingError.resultTypeMismatch(result, expected: normalisedDeclaredResultType, actual: normalisedActualResultType) }
-				return resultType
+				return .cap(.function(takes: parameters, returns: resultType))
 				
 				case .function(let name):
 				guard let function = context.functions[name] else { throw TypingError.undefinedFunction(name) }
@@ -300,6 +307,9 @@ extension NT {
 		/// An error indicating that given argument has the wrong type for given parameter.
 		case argumentTypeMismatch(Value, Parameter)
 		
+		/// An error indicating that given sealed parameter has a noncapability value type.
+		case noncapabilitySealedParameter(Parameter)
+		
 		/// An error indicating that a value cannot be casted.
 		case incompatibleStructuralTypes(castedValue: Value, sourceType: ValueType, targetType: ValueType)
 		
@@ -348,6 +358,9 @@ extension NT {
 				
 				case .argumentTypeMismatch(let value, let parameter):
 				return "\(value) cannot be used for \(parameter)"
+				
+				case .noncapabilitySealedParameter(let parameter):
+				return "\(parameter) is sealed but doesn't take capabilities"
 				
 				case .incompatibleStructuralTypes(castedValue: let value, sourceType: let sourceType, targetType: let targetType):
 				return "\(value) is of type \(sourceType) which cannot be casted to \(targetType)"
