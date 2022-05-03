@@ -200,9 +200,6 @@ A language that introduces named structural and nominal types.
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
-	<dt><code>NT.GlobalDeclaration</code></dt>
-</dl>
-<dl>
 	<dt><code>NT.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
 	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
@@ -236,6 +233,7 @@ A language that introduces named structural and nominal types.
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
+	<dd><code><strong>cast</strong>(Value, <strong>as:</strong> TypeName)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>

@@ -25,8 +25,20 @@ public enum NT : Language {
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
 		
 		// See protocol.
-		public func validate(configuration: CompilationConfiguration) {
-			// TODO: Nominal type checking.
+		public func validate(configuration: CompilationConfiguration) throws {
+			
+			let context = TypingContext(functions: functions)
+			
+			let actualResultType = try result.normalisedValueType(in: context)
+			guard actualResultType == .s32 else { throw TypingError.resultTypeMismatch(result, expected: .s32, actual: actualResultType) }
+			
+			for function in functions {
+				let actualResultType = try function.result.normalisedValueType(in: context)
+				guard actualResultType == function.resultType else {
+					throw TypingError.resultTypeMismatch(function.result, expected: function.resultType, actual: actualResultType)
+				}
+			}
+			
 		}
 		
 		// See protocol.

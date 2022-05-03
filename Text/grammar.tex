@@ -107,8 +107,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
 						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
 				\par
-				<NT.GlobalDeclaration> ::=
-				\par
 				<NT.CapabilityType> ::=
 						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
 						| "record""("<RecordType>, "sealed:" <Bool>")"
@@ -139,6 +137,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Value>, <[Value]>")"
+						| "cast""("<Value>, "as:" <TypeName>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
