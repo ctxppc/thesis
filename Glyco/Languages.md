@@ -121,8 +121,8 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <dl>
 	<dt><code>OB.Value</code></dt>
 	<dd><code><strong>self</strong></code></dd>
-	<dd><code><strong>constant</strong>(Int)</code></dd>
-	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>

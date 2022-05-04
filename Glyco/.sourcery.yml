@@ -12,5 +12,10 @@ configurations:
 - sources:
     - Sources
   templates:
+    - Sourcery/Literal Codable.swift.stencil
+  output: Sources/GlycoKit/Literal Codable.swift
+- sources:
+    - Sources
+  templates:
     - Sourcery/Languages.tex.stencil
   output: ../Text/grammar.tex

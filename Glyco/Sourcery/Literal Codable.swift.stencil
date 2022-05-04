@@ -1,0 +1,24 @@
+import Sisp
+
+{% for lang in types.enums|public|implements: "Language" %}
+	{% for type in lang.containedTypes %}
+		{% for case in type.cases|annotated: "stringCodable" %}
+extension {{type.globalName}} : PartiallyStringCodable {
+	public init(stringValue: String) { self = .{{ case.name }}(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .{{ case.name }}(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+		{% endfor %}
+		{% for case in type.cases|annotated: "integerCodable" %}
+extension {{type.globalName}} : PartiallyIntCodable {
+	public init(intValue: Int) { self = .{{ case.name }}(intValue) }
+	public var intValue: Int? {
+		guard case .{{ case.name }}(let value) = self else { return nil }
+		return value
+	}
+}
+		{% endfor %}
+	{% endfor %}
+{% endfor %}

@@ -11,9 +11,11 @@ extension OB {
 		/// `self` is not valid outside methods.
 		case `self`
 		
+		// sourcery: integerCodable
 		/// A value that evaluates to given number.
 		case constant(Int)
 		
+		// sourcery: stringCodable
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		

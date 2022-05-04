@@ -32,7 +32,11 @@ N/A
 							{% endif %}
 						{% endfor %}
 						{% for case in codableType.cases %}
+							{% if case|annotated: "integerCodable" or case|annotated: "stringCodable" %}
+	<dd><code>{{ case.associatedValues.first.typeName }}</code></dd>
+							{% else %}
 	<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
+							{% endif %}
 						{% endfor %}
 </dl>
 					{% endif %}
