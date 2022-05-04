@@ -10,6 +10,22 @@ extension AL.Predicate {
 	}
 }
 
+extension ALA.Source {
+	public init(stringValue: String) { self = .abstract(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .abstract(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+
+extension ALA.Source {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension CA.Predicate {
 	public init(boolValue: Bool) { self = .constant(boolValue) }
 	public var boolValue: Bool? {
@@ -47,6 +63,22 @@ extension CD.Predicate {
 	public var boolValue: Bool? {
 		guard case .constant(let value) = self else { return nil }
 		return value
+	}
+}
+
+extension CE.Source {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension CE.Target {
+	public init(stringValue: String) { self = .label(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .label(let value) = self else { return nil }
+		return value.rawValue
 	}
 }
 
@@ -90,6 +122,14 @@ extension EX.Predicate {
 	}
 }
 
+extension FO.Source {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension ID.Predicate {
 	public init(boolValue: Bool) { self = .constant(boolValue) }
 	public var boolValue: Bool? {
@@ -115,6 +155,22 @@ extension LS.Source {
 }
 
 extension LS.Source {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension MM.Target {
+	public init(stringValue: String) { self = .label(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .label(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+
+extension MM.Source {
 	public init(intValue: Int) { self = .constant(intValue) }
 	public var intValue: Int? {
 		guard case .constant(let value) = self else { return nil }
@@ -189,6 +245,22 @@ extension OB.ValueType {
 extension PR.Predicate {
 	public init(boolValue: Bool) { self = .constant(boolValue) }
 	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension SV.Source {
+	public init(stringValue: String) { self = .abstract(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .abstract(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+
+extension SV.Source {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
 		guard case .constant(let value) = self else { return nil }
 		return value
 	}

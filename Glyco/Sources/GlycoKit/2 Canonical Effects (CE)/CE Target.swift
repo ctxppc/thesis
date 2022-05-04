@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension CE {
 	
 	/// A jump target.
-	public enum Target : Codable, Equatable {
+	public enum Target : PartiallyStringCodable, Equatable {
 		
 		/// The jump target is labelled.
 		case label(Label)

@@ -565,6 +565,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "registerDatum"
 				\par
 				<SV.Source> ::=
+						<Int> |
+								<AbstractLocation> |
 						"constant""("<Int>")"
 						| "abstract""("<AbstractLocation>")"
 						| "register""("<Register>, <ValueType>")"
@@ -713,6 +715,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Predicate>, "analysisAtEntry:" <Analysis>")"
 				\par
 				<ALA.Source> ::=
+						<Int> |
+								<AbstractLocation> |
 						"constant""("<Int>")"
 						| "abstract""("<AbstractLocation>")"
 						| "register""("<Register>, <DataType>")"
@@ -851,6 +855,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<[Effect]>")"
 				\par
 				<FO.Source> ::=
+						<Int> |
 						"constant""("<Int>")"
 						| "register""("<Register>")"
 						| "frame""("<Frame.Location>")"
@@ -961,10 +966,12 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "invocationData"
 				\par
 				<MM.Target> ::=
+								<Label> |
 						"label""("<Label>")"
 						| "register""("<Register>")"
 				\par
 				<MM.Source> ::=
+						<Int> |
 						"constant""("<Int>")"
 						| "register""("<Register>")"
 				\par
@@ -1042,10 +1049,12 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "cap"
 				\par
 				<CE.Source> ::=
+						<Int> |
 						"constant""("<Int>")"
 						| "register""("<Register>")"
 				\par
 				<CE.Target> ::=
+								<Label> |
 						"label""("<Label>")"
 						| "register""("<Register>")"
 				\par

@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension FO {
 	
 	/// A datum source.
-	public enum Source : Codable, Equatable {
+	public enum Source : PartiallyIntCodable, Equatable {
 		
 		/// Creates a source with given location.
 		init(_ location: Location) {

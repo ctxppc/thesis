@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension MM {
 	
 	/// A datum source.
-	public enum Source : Codable, Equatable, SimplyLowerable {
+	public enum Source : PartiallyIntCodable, Equatable, SimplyLowerable {
 		
 		/// The operand is given value.
 		case constant(Int)

@@ -791,6 +791,8 @@ A language that introduces structured values, i.e., vectors and records.
 </dl>
 <dl>
 	<dt><code>SV.Source</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>AbstractLocation</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
 	<dd><code><strong>register</strong>(Register, ValueType)</code></dd>
@@ -987,6 +989,8 @@ A language that introduces abstract locations, annotated with liveness and confl
 </dl>
 <dl>
 	<dt><code>ALA.Source</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>AbstractLocation</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>abstract</strong>(AbstractLocation)</code></dd>
 	<dd><code><strong>register</strong>(Register, DataType)</code></dd>
@@ -1174,6 +1178,7 @@ A language that introduces flexible operands in instructions, i.e., instructions
 </dl>
 <dl>
 	<dt><code>FO.Source</code></dt>
+	<dd><code>Int</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 	<dd><code><strong>frame</strong>(Frame.Location)</code></dd>
@@ -1296,11 +1301,13 @@ A language that introduces a runtime, call stack, heap, and operations on them.
 </dl>
 <dl>
 	<dt><code>MM.Target</code></dt>
+	<dd><code>Label</code></dd>
 	<dd><code><strong>label</strong>(Label)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
 <dl>
 	<dt><code>MM.Source</code></dt>
+	<dd><code>Int</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
@@ -1399,11 +1406,13 @@ A language grouping related instructions under a single effect.
 </dl>
 <dl>
 	<dt><code>CE.Source</code></dt>
+	<dd><code>Int</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
 <dl>
 	<dt><code>CE.Target</code></dt>
+	<dd><code>Label</code></dd>
 	<dd><code><strong>label</strong>(Label)</code></dd>
 	<dd><code><strong>register</strong>(Register)</code></dd>
 </dl>
