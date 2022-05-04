@@ -2,12 +2,12 @@
 	do(
 		pushFrame((allocatedByteSize: 32))
 		set(cap, frame((offset: -16)), to: register(ra))
-		set(s32, register(a0), to: constant(0))
-		set(s32, register(a1), to: constant(1))
-		set(s32, register(a2), to: constant(30))
+		set(s32, register(a0), to: 0)
+		set(s32, register(a1), to: 1)
+		set(s32, register(a2), to: 30)
 		call(capability(to: fib))
 		set(cap, register(ra), to: frame((offset: -16)))
-		popFrame()
+		popFrame
 		return(to: register(ra))
 	),
 	procedures: (
@@ -29,7 +29,7 @@
 			set(s32, register(a3), to: register(a0))
 			if(
 				do(
-					set(s32, register(ra), to: register(a2)) set(s32, register(s1), to: constant(1)),
+					set(s32, register(ra), to: register(a2)) set(s32, register(s1), to: 1),
 					then: relation(register(ra), le, register(s1))
 				),
 				then: do(
@@ -46,13 +46,13 @@
 					do()
 					do()
 					set(cap, register(ra), to: frame((offset: -32)))
-					popFrame()
+					popFrame
 					return(to: register(ra))
 				),
 				else: do(
 					set(s32, register(a0), to: register(a1))
 					compute(register(a1), register(a3), add, register(a1))
-					set(s32, register(ra), to: constant(1))
+					set(s32, register(ra), to: 1)
 					compute(register(a2), register(a2), sub, register(ra))
 					call(capability(to: fib))
 					set(cap, register(s1), to: frame((offset: -16)))
@@ -67,7 +67,7 @@
 					do()
 					do()
 					set(cap, register(ra), to: frame((offset: -32)))
-					popFrame()
+					popFrame
 					return(to: register(ra))
 				)
 			)

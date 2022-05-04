@@ -1,7 +1,7 @@
 (
 	do(
 		call(procedure(f),, result: res)
-		return(location(res))
+		return(res)
 	),
-	procedures: (f, takes:, returns: s32(), in: return(constant(42)))
+	procedures: (f, takes:, returns: s32, in: return(42))
 )

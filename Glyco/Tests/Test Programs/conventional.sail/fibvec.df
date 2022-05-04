@@ -1,85 +1,68 @@
 (
-	let(
-		(ls.arg, source(constant(0))) (ls.arg$1, source(constant(1))),
-		in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1))
-	),
+	let((ls.arg, source(0)) (ls.arg$1, source(1)), in: evaluate(procedure(fib), ls.arg ls.arg$1)),
 	functions: (
 		fib,
-		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
-		returns: s32(),
+		takes: (ls.first, s32, sealed: false) (ls.second, s32, sealed: false),
+		returns: s32,
 		in: let(
-			(ls.arg, source(constant(2))) (ls.arg$1, source(constant(29))) (ls.arg$2, vector(s32(), count: 30)),
-			in: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
+			(ls.arg, source(2)) (ls.arg$1, source(29)) (ls.arg$2, vector(s32, count: 30)),
+			in: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2)
 		)
 	)
 	(
 		recFib,
-		takes: (ls.index, s32(), sealed: false)
-		(ls.lastIndex, s32(), sealed: false)
-		(ls.nums, cap(vector(of: s32(), sealed: false)), sealed: false),
-		returns: s32(),
+		takes: (ls.index, s32, sealed: false)
+		(ls.lastIndex, s32, sealed: false)
+		(ls.nums, cap(vector(of: s32, sealed: false)), sealed: false),
+		returns: s32,
 		in: if(
-			let(
-				(ls.lhs, source(location(ls.index))) (ls.rhs, source(location(ls.lastIndex))),
-				in: relation(location(ls.lhs), gt, location(ls.rhs))
-			),
-			then: value(
-				let(
-					(ls.vec, source(location(ls.nums))) (ls.idx, source(location(ls.lastIndex))),
-					in: element(of: ls.vec, at: location(ls.idx))
-				)
-			),
+			let((ls.lhs, source(ls.index)) (ls.rhs, source(ls.lastIndex)), in: relation(ls.lhs, gt, ls.rhs)),
+			then: value(let((ls.vec, source(ls.nums)) (ls.idx, source(ls.lastIndex)), in: element(of: ls.vec, at: ls.idx))),
 			else: do(
 				let(
-					(ls.vec$2, source(location(ls.nums)))
-					(ls.idx$2, source(location(ls.index)))
+					(ls.vec$2, source(ls.nums))
+					(ls.idx$2, source(ls.index))
 					(
 						ls.elem$1,
 						let(
 							(
 								ls.lhs$2,
 								let(
-									(ls.vec$3, source(location(ls.nums)))
+									(ls.vec$3, source(ls.nums))
 									(
 										ls.idx$3,
 										let(
-											(ls.lhs$1, source(location(ls.index))) (ls.rhs$1, source(constant(2))),
-											in: binary(location(ls.lhs$1), sub, location(ls.rhs$1))
+											(ls.lhs$1, source(ls.index)) (ls.rhs$1, source(2)),
+											in: binary(ls.lhs$1, sub, ls.rhs$1)
 										)
 									),
-									in: element(of: ls.vec$3, at: location(ls.idx$3))
+									in: element(of: ls.vec$3, at: ls.idx$3)
 								)
 							)
 							(
 								ls.rhs$3,
 								let(
-									(ls.vec$4, source(location(ls.nums)))
+									(ls.vec$4, source(ls.nums))
 									(
 										ls.idx$4,
 										let(
-											(ls.lhs$3, source(location(ls.index))) (ls.rhs$2, source(constant(1))),
-											in: binary(location(ls.lhs$3), sub, location(ls.rhs$2))
+											(ls.lhs$3, source(ls.index)) (ls.rhs$2, source(1)),
+											in: binary(ls.lhs$3, sub, ls.rhs$2)
 										)
 									),
-									in: element(of: ls.vec$4, at: location(ls.idx$4))
+									in: element(of: ls.vec$4, at: ls.idx$4)
 								)
 							),
-							in: binary(location(ls.lhs$2), add, location(ls.rhs$3))
+							in: binary(ls.lhs$2, add, ls.rhs$3)
 						)
 					),
-					in: setElement(of: ls.vec$2, at: location(ls.idx$2), to: location(ls.elem$1))
+					in: setElement(of: ls.vec$2, at: ls.idx$2, to: ls.elem$1)
 				),
 				then: let(
-					(
-						ls.arg,
-						let(
-							(ls.lhs$4, source(location(ls.index))) (ls.rhs$4, source(constant(1))),
-							in: binary(location(ls.lhs$4), add, location(ls.rhs$4))
-						)
-					)
-					(ls.arg$1, source(location(ls.lastIndex)))
-					(ls.arg$2, source(location(ls.nums))),
-					in: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
+					(ls.arg, let((ls.lhs$4, source(ls.index)) (ls.rhs$4, source(1)), in: binary(ls.lhs$4, add, ls.rhs$4)))
+					(ls.arg$1, source(ls.lastIndex))
+					(ls.arg$2, source(ls.nums)),
+					in: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2)
 				)
 			)
 		)

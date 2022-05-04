@@ -72,7 +72,7 @@
 		)
 		set(
 			register(a0),
-			to: constant(0),
+			to: 0,
 			analysisAtEntry: (
 				conflicts: (
 					(abstract(cc.retcap), register(a0))
@@ -102,7 +102,7 @@
 		)
 		set(
 			register(a1),
-			to: constant(1),
+			to: 1,
 			analysisAtEntry: (
 				conflicts: (
 					(abstract(cc.retcap), register(a0))
@@ -133,7 +133,7 @@
 		)
 		set(
 			register(a2),
-			to: constant(30),
+			to: 30,
 			analysisAtEntry: (
 				conflicts: (
 					(abstract(cc.retcap), register(a0))
@@ -332,7 +332,7 @@
 		)
 		set(
 			register(ra),
-			to: abstract(cc.retcap),
+			to: cc.retcap,
 			analysisAtEntry: (
 				conflicts: (),
 				possiblyLiveLocations: abstract(cc.retcap)
@@ -5862,7 +5862,7 @@
 					)
 					set(
 						abstract(ls.rhs),
-						to: constant(1),
+						to: 1,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), abstract(ls.rhs))
@@ -6103,9 +6103,9 @@
 						)
 					),
 					then: relation(
-						abstract(ls.lhs),
+						ls.lhs,
 						le,
-						abstract(ls.rhs),
+						ls.rhs,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), abstract(ls.rhs$2))
@@ -6771,7 +6771,7 @@
 					)
 					set(
 						register(s1),
-						to: abstract(cc.savedS1),
+						to: cc.savedS1,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s1))
@@ -6858,7 +6858,7 @@
 					)
 					set(
 						register(s2),
-						to: abstract(cc.savedS2),
+						to: cc.savedS2,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -6934,7 +6934,7 @@
 					)
 					set(
 						register(s3),
-						to: abstract(cc.savedS3),
+						to: cc.savedS3,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7000,7 +7000,7 @@
 					)
 					set(
 						register(s4),
-						to: abstract(cc.savedS4),
+						to: cc.savedS4,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7057,7 +7057,7 @@
 					)
 					set(
 						register(s5),
-						to: abstract(cc.savedS5),
+						to: cc.savedS5,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7106,7 +7106,7 @@
 					)
 					set(
 						register(s6),
-						to: abstract(cc.savedS6),
+						to: cc.savedS6,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7148,7 +7148,7 @@
 					)
 					set(
 						register(s7),
-						to: abstract(cc.savedS7),
+						to: cc.savedS7,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7184,7 +7184,7 @@
 					)
 					set(
 						register(s8),
-						to: abstract(cc.savedS8),
+						to: cc.savedS8,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7215,7 +7215,7 @@
 					)
 					set(
 						register(s9),
-						to: abstract(cc.savedS9),
+						to: cc.savedS9,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7242,7 +7242,7 @@
 					)
 					set(
 						register(s10),
-						to: abstract(cc.savedS10),
+						to: cc.savedS10,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -7266,7 +7266,7 @@
 					)
 					set(
 						register(s11),
-						to: abstract(cc.savedS11),
+						to: cc.savedS11,
 						analysisAtEntry: (
 							conflicts: ((abstract(cc.retcap), register(s11))),
 							possiblyLiveLocations: abstract(cc.retcap)
@@ -7286,7 +7286,7 @@
 					)
 					set(
 						register(ra),
-						to: abstract(cc.retcap),
+						to: cc.retcap,
 						analysisAtEntry: (
 							conflicts: (),
 							possiblyLiveLocations: abstract(cc.retcap)
@@ -8098,7 +8098,7 @@
 					)
 					compute(
 						register(a1),
-						abstract(ls.prev),
+						ls.prev,
 						add,
 						register(a1, s32),
 						analysisAtEntry: (
@@ -8548,7 +8548,7 @@
 					)
 					set(
 						abstract(ls.rhs$2),
-						to: constant(1),
+						to: 1,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), abstract(ls.rhs$2))
@@ -8774,7 +8774,7 @@
 						register(a2),
 						register(a2, s32),
 						sub,
-						abstract(ls.rhs$2),
+						ls.rhs$2,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(a0))
@@ -9989,7 +9989,7 @@
 					)
 					set(
 						register(s1),
-						to: abstract(cc.savedS1),
+						to: cc.savedS1,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s1))
@@ -10076,7 +10076,7 @@
 					)
 					set(
 						register(s2),
-						to: abstract(cc.savedS2),
+						to: cc.savedS2,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10152,7 +10152,7 @@
 					)
 					set(
 						register(s3),
-						to: abstract(cc.savedS3),
+						to: cc.savedS3,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10218,7 +10218,7 @@
 					)
 					set(
 						register(s4),
-						to: abstract(cc.savedS4),
+						to: cc.savedS4,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10275,7 +10275,7 @@
 					)
 					set(
 						register(s5),
-						to: abstract(cc.savedS5),
+						to: cc.savedS5,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10324,7 +10324,7 @@
 					)
 					set(
 						register(s6),
-						to: abstract(cc.savedS6),
+						to: cc.savedS6,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10366,7 +10366,7 @@
 					)
 					set(
 						register(s7),
-						to: abstract(cc.savedS7),
+						to: cc.savedS7,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10402,7 +10402,7 @@
 					)
 					set(
 						register(s8),
-						to: abstract(cc.savedS8),
+						to: cc.savedS8,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10433,7 +10433,7 @@
 					)
 					set(
 						register(s9),
-						to: abstract(cc.savedS9),
+						to: cc.savedS9,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10460,7 +10460,7 @@
 					)
 					set(
 						register(s10),
-						to: abstract(cc.savedS10),
+						to: cc.savedS10,
 						analysisAtEntry: (
 							conflicts: (
 								(abstract(cc.retcap), register(s10))
@@ -10484,7 +10484,7 @@
 					)
 					set(
 						register(s11),
-						to: abstract(cc.savedS11),
+						to: cc.savedS11,
 						analysisAtEntry: (
 							conflicts: ((abstract(cc.retcap), register(s11))),
 							possiblyLiveLocations: abstract(cc.retcap)
@@ -10504,7 +10504,7 @@
 					)
 					set(
 						register(ra),
-						to: abstract(cc.retcap),
+						to: cc.retcap,
 						analysisAtEntry: (
 							conflicts: (),
 							possiblyLiveLocations: abstract(cc.retcap)

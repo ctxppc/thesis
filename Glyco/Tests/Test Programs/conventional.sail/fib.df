@@ -1,35 +1,17 @@
 (
-	let(
-		(ls.arg, source(constant(0))) (ls.arg$1, source(constant(1))) (ls.arg$2, source(constant(30))),
-		in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
-	),
+	let((ls.arg, source(0)) (ls.arg$1, source(1)) (ls.arg$2, source(30)), in: evaluate(procedure(fib), ls.arg ls.arg$1 ls.arg$2)),
 	functions: (
 		fib,
-		takes: (ls.prev, s32(), sealed: false) (ls.curr, s32(), sealed: false) (ls.iter, s32(), sealed: false),
-		returns: s32(),
+		takes: (ls.prev, s32, sealed: false) (ls.curr, s32, sealed: false) (ls.iter, s32, sealed: false),
+		returns: s32,
 		in: if(
-			let(
-				(ls.lhs, source(location(ls.iter))) (ls.rhs, source(constant(1))),
-				in: relation(location(ls.lhs), le, location(ls.rhs))
-			),
-			then: value(source(location(ls.curr))),
+			let((ls.lhs, source(ls.iter)) (ls.rhs, source(1)), in: relation(ls.lhs, le, ls.rhs)),
+			then: value(source(ls.curr)),
 			else: let(
-				(ls.arg, source(location(ls.curr)))
-				(
-					ls.arg$1,
-					let(
-						(ls.lhs$1, source(location(ls.prev))) (ls.rhs$1, source(location(ls.curr))),
-						in: binary(location(ls.lhs$1), add, location(ls.rhs$1))
-					)
-				)
-				(
-					ls.arg$2,
-					let(
-						(ls.lhs$2, source(location(ls.iter))) (ls.rhs$2, source(constant(1))),
-						in: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
-					)
-				),
-				in: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2))
+				(ls.arg, source(ls.curr))
+				(ls.arg$1, let((ls.lhs$1, source(ls.prev)) (ls.rhs$1, source(ls.curr)), in: binary(ls.lhs$1, add, ls.rhs$1)))
+				(ls.arg$2, let((ls.lhs$2, source(ls.iter)) (ls.rhs$2, source(1)), in: binary(ls.lhs$2, sub, ls.rhs$2))),
+				in: evaluate(procedure(fib), ls.arg ls.arg$1 ls.arg$2)
 			)
 		)
 	)

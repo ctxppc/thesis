@@ -117,7 +117,7 @@
 		)
 		set(
 			abstract(cc.returned),
-			to: constant(0),
+			to: 0,
 			analysisAtEntry: (
 				conflicts: (
 					(abstract(cc.empty), abstract(cc.retcap))
@@ -290,9 +290,9 @@
 		)
 		if(
 			relation(
-				abstract(cc.returned),
+				cc.returned,
 				ne,
-				constant(0),
+				0,
 				analysisAtEntry: (
 					conflicts: (
 						(abstract(cc.empty), abstract(cc.retcap))
@@ -326,9 +326,9 @@
 				)
 				compute(
 					abstract(sv.offset),
-					constant(0),
+					0,
 					sll,
-					constant(2),
+					2,
 					analysisAtEntry: (
 						conflicts: (
 							(abstract(cc.empty), abstract(sv.offset))
@@ -342,7 +342,7 @@
 				getElement(
 					s32,
 					of: abstract(cc.empty),
-					offset: abstract(sv.offset),
+					offset: sv.offset,
 					to: register(zero),
 					analysisAtEntry: (
 						conflicts: ((abstract(cc.retcap), register(zero))),
@@ -363,7 +363,7 @@
 			),
 			else: set(
 				abstract(cc.returned),
-				to: constant(1),
+				to: 1,
 				analysisAtEntry: (
 					conflicts: ((abstract(cc.retcap), abstract(cc.returned)) (abstract(cc.returned), register(a0))),
 					possiblyLiveLocations: abstract(cc.retcap) register(a0)
@@ -387,7 +387,7 @@
 		do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0)))
 		set(
 			register(ra),
-			to: abstract(cc.retcap),
+			to: cc.retcap,
 			analysisAtEntry: (conflicts: (), possiblyLiveLocations: abstract(cc.retcap) register(a0))
 		)
 		clearAll(except: a0 ra, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
@@ -454,7 +454,7 @@
 		in: do(
 			pushScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
 			do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
-			set(register(a0), to: constant(42), analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
+			set(register(a0), to: 42, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(ra)))
 			do(, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
 			clearAll(except: a0 ra, analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))
 			popScope(analysisAtEntry: (conflicts: (), possiblyLiveLocations: register(a0) register(ra)))

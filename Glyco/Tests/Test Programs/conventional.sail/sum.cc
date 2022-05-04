@@ -1,19 +1,9 @@
 (
-	do(
-		set(ls.arg, to: constant(1080))
-		set(ls.arg$1, to: constant(-80))
-		call(procedure(l.anon), location(ls.arg) location(ls.arg$1), result: df.result)
-		return(location(df.result))
-	),
+	do(set(ls.arg, to: 1080) set(ls.arg$1, to: -80) call(procedure(l.anon), ls.arg ls.arg$1, result: df.result) return(df.result)),
 	procedures: (
 		l.anon,
-		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
-		returns: s32(),
-		in: do(
-			set(ls.lhs, to: location(ls.first))
-			set(ls.rhs, to: location(ls.second))
-			compute(df.result$1, location(ls.lhs), add, location(ls.rhs))
-			return(location(df.result$1))
-		)
+		takes: (ls.first, s32, sealed: false) (ls.second, s32, sealed: false),
+		returns: s32,
+		in: do(set(ls.lhs, to: ls.first) set(ls.rhs, to: ls.second) compute(df.result$1, ls.lhs, add, ls.rhs) return(df.result$1))
 	)
 )

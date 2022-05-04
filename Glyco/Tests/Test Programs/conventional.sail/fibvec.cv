@@ -1,92 +1,89 @@
 (
 	do(
-		set(ls.arg, to: source(constant(0)))
-		set(ls.arg$1, to: source(constant(1)))
-		set(df.result, to: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1)))
-		return(location(df.result))
+		set(ls.arg, to: source(0))
+		set(ls.arg$1, to: source(1))
+		set(df.result, to: evaluate(procedure(fib), ls.arg ls.arg$1))
+		return(df.result)
 	),
 	procedures: (
 		fib,
-		takes: (ls.first, s32(), sealed: false) (ls.second, s32(), sealed: false),
-		returns: s32(),
+		takes: (ls.first, s32, sealed: false) (ls.second, s32, sealed: false),
+		returns: s32,
 		in: do(
-			set(ls.arg, to: source(constant(2)))
-			set(ls.arg$1, to: source(constant(29)))
-			set(ls.arg$2, to: vector(s32(), count: 30))
-			set(df.result$1, to: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
-			return(location(df.result$1))
+			set(ls.arg, to: source(2))
+			set(ls.arg$1, to: source(29))
+			set(ls.arg$2, to: vector(s32, count: 30))
+			set(df.result$1, to: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2))
+			return(df.result$1)
 		)
 	)
 	(
 		recFib,
-		takes: (ls.index, s32(), sealed: false)
-		(ls.lastIndex, s32(), sealed: false)
-		(ls.nums, cap(vector(of: s32(), sealed: false)), sealed: false),
-		returns: s32(),
+		takes: (ls.index, s32, sealed: false)
+		(ls.lastIndex, s32, sealed: false)
+		(ls.nums, cap(vector(of: s32, sealed: false)), sealed: false),
+		returns: s32,
 		in: if(
-			do(
-				set(ls.lhs, to: source(location(ls.index))) set(ls.rhs, to: source(location(ls.lastIndex))),
-				then: relation(location(ls.lhs), gt, location(ls.rhs))
-			),
+			do(set(ls.lhs, to: source(ls.index)) set(ls.rhs, to: source(ls.lastIndex)), then: relation(ls.lhs, gt, ls.rhs)),
 			then: do(
 				set(
 					df.result$2,
 					to: do(
-						set(ls.vec, to: source(location(ls.nums))) set(ls.idx, to: source(location(ls.lastIndex))),
-						then: element(of: ls.vec, at: location(ls.idx))
+						set(ls.vec, to: source(ls.nums)) set(ls.idx, to: source(ls.lastIndex)),
+						then: element(of: ls.vec, at: ls.idx)
 					)
 				)
-				return(location(df.result$2))
+				return(df.result$2)
 			),
 			else: do(
-				set(ls.vec$2, to: source(location(ls.nums)))
-				set(ls.idx$2, to: source(location(ls.index)))
+				set(ls.vec$2, to: source(ls.nums))
+				set(ls.idx$2, to: source(ls.index))
 				set(
 					ls.elem$1,
 					to: do(
 						set(
 							ls.lhs$2,
 							to: do(
-								set(ls.vec$3, to: source(location(ls.nums)))
+								set(ls.vec$3, to: source(ls.nums))
 								set(
 									ls.idx$3,
 									to: do(
-										set(ls.lhs$1, to: source(location(ls.index))) set(ls.rhs$1, to: source(constant(2))),
-										then: binary(location(ls.lhs$1), sub, location(ls.rhs$1))
+										set(ls.lhs$1, to: source(ls.index)) set(ls.rhs$1, to: source(2)),
+										then: binary(ls.lhs$1, sub, ls.rhs$1)
 									)
 								),
-								then: element(of: ls.vec$3, at: location(ls.idx$3))
+								then: element(of: ls.vec$3, at: ls.idx$3)
 							)
 						)
 						set(
 							ls.rhs$3,
 							to: do(
-								set(ls.vec$4, to: source(location(ls.nums)))
+								set(ls.vec$4, to: source(ls.nums))
 								set(
 									ls.idx$4,
 									to: do(
-										set(ls.lhs$3, to: source(location(ls.index))) set(ls.rhs$2, to: source(constant(1))),
-										then: binary(location(ls.lhs$3), sub, location(ls.rhs$2))
+										set(ls.lhs$3, to: source(ls.index)) set(ls.rhs$2, to: source(1)),
+										then: binary(ls.lhs$3, sub, ls.rhs$2)
 									)
 								),
-								then: element(of: ls.vec$4, at: location(ls.idx$4))
+								then: element(of: ls.vec$4, at: ls.idx$4)
 							)
 						),
-						then: binary(location(ls.lhs$2), add, location(ls.rhs$3))
+						then: binary(ls.lhs$2, add, ls.rhs$3)
 					)
 				)
-				setElement(of: ls.vec$2, at: location(ls.idx$2), to: location(ls.elem$1))
+				setElement(of: ls.vec$2, at: ls.idx$2, to: ls.elem$1)
 				set(
 					ls.arg,
 					to: do(
-						set(ls.lhs$4, to: source(location(ls.index))) set(ls.rhs$4, to: source(constant(1))),
-						then: binary(location(ls.lhs$4), add, location(ls.rhs$4))
+						set(ls.lhs$4, to: source(ls.index)) set(ls.rhs$4, to: source(1)),
+						then: binary(ls.lhs$4, add, ls.rhs$4)
 					)
 				)
-				set(ls.arg$1, to: source(location(ls.lastIndex)))
-				set(ls.arg$2, to: source(location(ls.nums)))
-				set(df.result$3, to: evaluate(procedure(recFib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
-				return(location(df.result$3))
+				set(ls.arg$1, to: source(ls.lastIndex))
+				set(ls.arg$2, to: source(ls.nums))
+				set(df.result$3, to: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2))
+				return(df.result$3)
 			)
 		)
 	)

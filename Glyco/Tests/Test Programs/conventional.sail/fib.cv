@@ -1,39 +1,33 @@
 (
 	do(
-		set(ls.arg, to: source(constant(0)))
-		set(ls.arg$1, to: source(constant(1)))
-		set(ls.arg$2, to: source(constant(30)))
-		set(df.result, to: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
-		return(location(df.result))
+		set(ls.arg, to: source(0))
+		set(ls.arg$1, to: source(1))
+		set(ls.arg$2, to: source(30))
+		set(df.result, to: evaluate(procedure(fib), ls.arg ls.arg$1 ls.arg$2))
+		return(df.result)
 	),
 	procedures: (
 		fib,
-		takes: (ls.prev, s32(), sealed: false) (ls.curr, s32(), sealed: false) (ls.iter, s32(), sealed: false),
-		returns: s32(),
+		takes: (ls.prev, s32, sealed: false) (ls.curr, s32, sealed: false) (ls.iter, s32, sealed: false),
+		returns: s32,
 		in: if(
-			do(
-				set(ls.lhs, to: source(location(ls.iter))) set(ls.rhs, to: source(constant(1))),
-				then: relation(location(ls.lhs), le, location(ls.rhs))
-			),
-			then: do(set(df.result$1, to: source(location(ls.curr))) return(location(df.result$1))),
+			do(set(ls.lhs, to: source(ls.iter)) set(ls.rhs, to: source(1)), then: relation(ls.lhs, le, ls.rhs)),
+			then: do(set(df.result$1, to: source(ls.curr)) return(df.result$1)),
 			else: do(
-				set(ls.arg, to: source(location(ls.curr)))
+				set(ls.arg, to: source(ls.curr))
 				set(
 					ls.arg$1,
 					to: do(
-						set(ls.lhs$1, to: source(location(ls.prev))) set(ls.rhs$1, to: source(location(ls.curr))),
-						then: binary(location(ls.lhs$1), add, location(ls.rhs$1))
+						set(ls.lhs$1, to: source(ls.prev)) set(ls.rhs$1, to: source(ls.curr)),
+						then: binary(ls.lhs$1, add, ls.rhs$1)
 					)
 				)
 				set(
 					ls.arg$2,
-					to: do(
-						set(ls.lhs$2, to: source(location(ls.iter))) set(ls.rhs$2, to: source(constant(1))),
-						then: binary(location(ls.lhs$2), sub, location(ls.rhs$2))
-					)
+					to: do(set(ls.lhs$2, to: source(ls.iter)) set(ls.rhs$2, to: source(1)), then: binary(ls.lhs$2, sub, ls.rhs$2))
 				)
-				set(df.result$2, to: evaluate(procedure(fib), location(ls.arg) location(ls.arg$1) location(ls.arg$2)))
-				return(location(df.result$2))
+				set(df.result$2, to: evaluate(procedure(fib), ls.arg ls.arg$1 ls.arg$2))
+				return(df.result$2)
 			)
 		)
 	)
