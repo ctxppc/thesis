@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension AL {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable, Equatable, SimplyLowerable {
+	public enum Predicate : PartiallyBoolCodable, Equatable, SimplyLowerable {
 		
 		/// A constant predicate.
 		case constant(Bool)

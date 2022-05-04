@@ -113,6 +113,8 @@ struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 	func decode<T : Decodable>(_ type: T.Type) throws -> T {
 		if case .integer(let value) = sisp, let type = T.self as? (PartiallyIntDecodable).Type {
 			return type.init(intValue: value) as! T
+		} else if case .string(let stringValue) = sisp, let value = Bool(stringValue), let type = T.self as? (PartiallyBoolDecodable).Type {
+			return type.init(boolValue: value) as! T
 		} else if case .string(let value) = sisp, let type = T.self as? (PartiallyStringDecodable).Type {
 			return type.init(stringValue: value) as! T
 		} else {

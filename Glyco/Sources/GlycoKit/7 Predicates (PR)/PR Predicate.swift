@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension PR {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : Codable, Equatable {
+	public enum Predicate : PartiallyBoolCodable, Equatable {
 		
 		/// A constant predicate.
 		case constant(Bool)

@@ -86,6 +86,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -274,6 +275,7 @@ A language that introduces named structural and nominal types.
 </dl>
 <dl>
 	<dt><code>NT.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -323,6 +325,7 @@ A language that introduces anonymous functions and function values.
 </dl>
 <dl>
 	<dt><code>Λ.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -394,6 +397,7 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 	<dt><code>EX.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -436,6 +440,7 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 </dl>
 <dl>
 	<dt><code>LS.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -552,6 +557,7 @@ A language that introduces definitions with function-wide namespacing.
 </dl>
 <dl>
 	<dt><code>DF.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -598,6 +604,7 @@ A language that allows a computation to be attached to a value.
 </dl>
 <dl>
 	<dt><code>CV.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -666,6 +673,7 @@ A language that groups all effects that write to a location under one canonical 
 </dl>
 <dl>
 	<dt><code>CA.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -716,6 +724,7 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -827,6 +836,7 @@ A language that introduces structured values, i.e., vectors and records.
 </dl>
 <dl>
 	<dt><code>SV.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -880,6 +890,7 @@ A language that infers declarations from definitions.
 </dl>
 <dl>
 	<dt><code>ID.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -907,6 +918,7 @@ A language that introduces abstract locations, i.e., locations whose physical lo
 </dl>
 <dl>
 	<dt><code>AL.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -1038,6 +1050,7 @@ A language that introduces conditionals in effects and predicates, thereby abstr
 </dl>
 <dl>
 	<dt><code>CD.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
@@ -1099,6 +1112,7 @@ A language that introduces predicates in branches.
 </dl>
 <dl>
 	<dt><code>PR.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
 	<dd><code><strong>relation</strong>(Source, BranchRelation, Source)</code></dd>
 </dl>

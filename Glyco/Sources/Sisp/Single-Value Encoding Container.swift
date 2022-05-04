@@ -99,6 +99,8 @@ struct SingleValueEncodingContainer : Swift.SingleValueEncodingContainer {
 	func encode<T : Encodable>(_ value: T) throws {
 		if let value = (value as? PartiallyIntEncodable)?.intValue {
 			try encode(value)
+		} else if let value = (value as? PartiallyBoolEncodable)?.boolValue {
+			try encode(value)
 		} else if let value = (value as? PartiallyStringEncodable)?.stringValue {
 			try encode(value)
 		} else {

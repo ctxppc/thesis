@@ -2,6 +2,30 @@
 // DO NOT EDIT
 
 
+extension AL.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension CA.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension CC.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension CC.Source {
 	public init(stringValue: String) { self = .location(.init(rawValue: stringValue)) }
 	public var stringValue: String? {
@@ -18,6 +42,30 @@ extension CC.Source {
 	}
 }
 
+extension CD.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension CV.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension DF.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension EX.Value {
 	public init(stringValue: String) { self = .named(.init(rawValue: stringValue)) }
 	public var stringValue: String? {
@@ -29,6 +77,30 @@ extension EX.Value {
 extension EX.Value {
 	public init(intValue: Int) { self = .constant(intValue) }
 	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension EX.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension ID.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension LS.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
 		guard case .constant(let value) = self else { return nil }
 		return value
 	}
@@ -74,6 +146,22 @@ extension NT.ValueType {
 	}
 }
 
+extension NT.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension OB.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension OB.Value {
 	public init(stringValue: String) { self = .named(.init(rawValue: stringValue)) }
 	public var stringValue: String? {
@@ -98,6 +186,22 @@ extension OB.ValueType {
 	}
 }
 
+extension PR.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension SV.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension Λ.Value {
 	public init(stringValue: String) { self = .named(.init(rawValue: stringValue)) }
 	public var stringValue: String? {
@@ -109,6 +213,14 @@ extension Λ.Value {
 extension Λ.Value {
 	public init(intValue: Int) { self = .constant(intValue) }
 	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension Λ.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
 		guard case .constant(let value) = self else { return nil }
 		return value
 	}

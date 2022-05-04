@@ -30,6 +30,9 @@ N/A
 	<dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
 						{% endif %}
 					{% endfor %}
+					{% if codableType|implements: "PartiallyBoolCodable" %}
+						<dd><code>Bool</code></dd>
+					{% endif %}
 					{% if codableType|implements: "PartiallyIntCodable" %}
 	<dd><code>Int</code></dd>
 					{% endif %}

@@ -14,6 +14,18 @@ extension {{type.globalName}} {
 				{% endif %}
 			{% endfor %}
 		{% endif %}
+		{% if type|implements: "PartiallyBoolCodable" %}
+			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and case.associatedValues.first.typeName|hasPrefix:"Bool" %}
+extension {{type.globalName}} {
+	public init(boolValue: Bool) { self = .{{ case.name }}(boolValue) }
+	public var boolValue: Bool? {
+		guard case .{{ case.name }}(let value) = self else { return nil }
+		return value
+	}
+}
+
+			{% endfor %}
+		{% endif %}
 		{% if type|implements: "PartiallyIntCodable" %}
 			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and case.associatedValues.first.typeName|hasPrefix:"Int" %}
 extension {{type.globalName}} {
