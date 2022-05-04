@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 public protocol Name : RawCodable, Hashable, ExpressibleByStringInterpolation, CustomStringConvertible where RawValue == String {
 	init(rawValue: RawValue)
 }

@@ -1,9 +1,14 @@
-// Glyco © 2021–2022 Constantino Tsarouhas
+// Sisp © 2021–2022 Constantino Tsarouhas
 
 import Foundation
 
+/// A value that can be encoded by encoding its raw value.
 public protocol RawEncodable : Encodable, RawRepresentable where RawValue : Encodable {}
+
+/// A value that can be decoded by decoding its raw value.
 public protocol RawDecodable : Decodable, RawRepresentable where RawValue : Decodable {}
+
+/// A value whose encoded representation is its raw value.
 public typealias RawCodable = RawEncodable & RawDecodable
 
 extension RawEncodable {

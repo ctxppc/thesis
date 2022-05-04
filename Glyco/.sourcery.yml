@@ -1,16 +1,16 @@
 configurations:
 - sources:
-    - Sources/GlycoKit
+    - Sources
   templates:
     - Sourcery/Languages.md.stencil
   output: Languages.md
 - sources:
-    - Sources/GlycoKit
+    - Sources
   templates:
     - Sourcery/Codable.swift.stencil
   output: Sources/GlycoKit/Codable.swift
 - sources:
-    - Sources/GlycoKit
+    - Sources
   templates:
     - Sourcery/Languages.tex.stencil
   output: ../Text/grammar.tex

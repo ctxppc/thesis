@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// An identifier that can be used to jump execution to.
-	public struct Label : Name, RawCodable {
+	public struct Label : Name {
 		
 		/// The label for the runtime.
 		public static let runtime: Self = "rv.runtime"
