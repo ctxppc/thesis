@@ -1,7 +1,7 @@
 {% for lang in types.enums|public|implements: "Language" %}
 	{% for type in lang.containedTypes|public|enum %}
 		{% if type|implements: "PartiallyStringCodable" %}
-			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
+			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Location" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
 				{% if forloop.first %}
 extension {{type.globalName}} {
 	public init(stringValue: String) { self = .{{ case.name }}(.init(rawValue: stringValue)) }

@@ -2,11 +2,12 @@
 
 import Foundation
 import OrderedCollections
+import Sisp
 
 extension NT {
 	
 	/// A value denoting the type of a value.
-	public enum ValueType : Equatable, Codable, SimplyLowerable {
+	public enum ValueType : PartiallyStringCodable, Equatable, SimplyLowerable {
 		
 		/// A named type.
 		case named(TypeName)

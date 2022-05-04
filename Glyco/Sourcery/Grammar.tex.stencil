@@ -20,7 +20,7 @@
 						<Int> |
 					{% endif %}
 					{% if codableType|implements: "PartiallyStringCodable" %}
-						{% for case in codableType.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
+						{% for case in codableType.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Location" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
 							{% if forloop.first %}
 								<{{ case.associatedValues.first.typeName }}> |
 							{% endif %}

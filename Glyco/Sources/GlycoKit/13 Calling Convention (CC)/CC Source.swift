@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension CC {
 	
 	/// A datum source.
-	public enum Source : Codable, Equatable, SimplyLowerable {
+	public enum Source : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
 		
 		/// An integer with given value.
 		case constant(Int)

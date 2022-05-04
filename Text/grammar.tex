@@ -128,6 +128,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "nominal""("<TypeName>, <ValueType>")"
 				\par
 				<NT.Value> ::=
+						<Int> |
+								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
 						| "record""("<RecordType>")"
@@ -162,6 +164,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
 				<NT.ValueType> ::=
+								<TypeName> |
 						"named""("<TypeName>")"
 						| "u8"
 						| "s32"
@@ -185,6 +188,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Result>, "functions:" <[Function]>")"
 				\par
 				<Λ.Value> ::=
+						<Int> |
+								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
 						| "record""("<RecordType>")"
@@ -235,6 +240,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Result>, "functions:" <[Function]>")"
 				\par
 				<EX.Value> ::=
+						<Int> |
+								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
 						| "record""("<RecordType>")"
@@ -324,6 +331,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "seal""(""sealed:" <Bool>")"
 				\par
 				<LS.Source> ::=
+						<Int> |
+								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
 						| "function""("<Label>")"
@@ -501,6 +510,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Predicate>")"
 				\par
 				<CC.Source> ::=
+						<Int> |
+								<Location> |
 						"constant""("<Int>")"
 						| "location""("<Location>")"
 						| "procedure""("<Label>")"

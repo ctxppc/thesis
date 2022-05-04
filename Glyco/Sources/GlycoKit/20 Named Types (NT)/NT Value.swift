@@ -1,10 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 import Foundation
+import Sisp
 
 extension NT {
 	
-	public enum Value : Codable, Equatable, SimplyLowerable {
+	public enum Value : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
 		
 		/// A value that evaluates to given number.
 		case constant(Int)

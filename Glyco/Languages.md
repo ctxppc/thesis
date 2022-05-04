@@ -224,6 +224,8 @@ A language that introduces named structural and nominal types.
 </dl>
 <dl>
 	<dt><code>NT.Value</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
@@ -264,6 +266,7 @@ A language that introduces named structural and nominal types.
 </dl>
 <dl>
 	<dt><code>NT.ValueType</code></dt>
+	<dd><code>TypeName</code></dd>
 	<dd><code><strong>named</strong>(TypeName)</code></dd>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
@@ -300,6 +303,8 @@ A language that introduces anonymous functions and function values.
 </dl>
 <dl>
 	<dt><code>Λ.Value</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
@@ -366,6 +371,8 @@ A language that introduces expression semantics for values, thereby abstracting 
 </dl>
 <dl>
 	<dt><code>EX.Value</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
@@ -472,6 +479,8 @@ A language that introduces lexical scopes of definitions, thereby removing name 
 </dl>
 <dl>
 	<dt><code>LS.Source</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
@@ -714,6 +723,8 @@ A language that introduces parameters & result values in procedures via the low-
 </dl>
 <dl>
 	<dt><code>CC.Source</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Location</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>location</strong>(Location)</code></dd>
 	<dd><code><strong>procedure</strong>(Label)</code></dd>
