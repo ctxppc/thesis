@@ -31,14 +31,16 @@ where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwis
 
 Types can be named using a \texttt{letType} value in one of two ways. A \textbf{structural type definition} creates a \textbf{named structural type}, a type that is equivalent to the type it's defined as. A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself.
 
-For instance, the following NT program using structural types is valid:
+For instance, the following NT program using structural types is valid.
 \ilfile{Programs/structural.nt}
 
-The following program using nominal types is also valid:
-% TODO: Add NT example program.
+The following program using nominal types is also valid.
+% TODO: Add valid NT example program.
 
-However, this program is not valid since the nominal type cannot be converted to a \iil/s32()/ even though it is defined using \iil/s32()/:
-% TODO: Add NT example program.
+However, the following program is not valid since the value \iil/pi/ of type \\ \iil/cap(vector(of: s32(), sealed: false))/ is not implicitly convertible to a value of the nominal type \iil/named(numbers)/ even though they are representationally the same.
+\ilfile{Programs/nominal.nt}
+
+NT provides a \texttt{cast} operation that (…)
 
 The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 

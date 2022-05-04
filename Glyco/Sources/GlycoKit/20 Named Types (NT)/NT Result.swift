@@ -52,8 +52,9 @@ extension NT {
 					throw TypingError.nonfunctionValue(function)
 				}
 				for (parameter, argument) in zip(parameters, arguments) {
-					if try argument.normalisedValueType(in: context) != parameter.type {	// parameter is already normalised in a normalised function type
-						throw TypingError.argumentTypeMismatch(argument, parameter)
+					let argumentType = try argument.normalisedValueType(in: context)
+					if argumentType != parameter.type {	// parameter is already normalised in a normalised function type
+						throw TypingError.argumentTypeMismatch(argument, argumentType, parameter)
 					}
 				}
 				return resultType	// result type is already normalised in a normalised function type

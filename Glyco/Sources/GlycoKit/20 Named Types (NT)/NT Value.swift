@@ -216,8 +216,9 @@ extension NT {
 					throw TypingError.nonfunctionValue(function)
 				}
 				for (parameter, argument) in zip(parameters, arguments) {
-					if try argument.normalisedValueType(in: context) != parameter.type {	// parameter is already normalised in a normalised function type
-						throw TypingError.argumentTypeMismatch(argument, parameter)
+					let argumentType = try argument.normalisedValueType(in: context)
+					if argumentType != parameter.type {	// parameter is already normalised in a normalised function type
+						throw TypingError.argumentTypeMismatch(argument, argumentType, parameter)
 					}
 				}
 				return resultType	// result type is already normalised in a normalised function type
@@ -305,7 +306,7 @@ extension NT {
 		case nonfunctionValue(Value)
 		
 		/// An error indicating that given argument has the wrong type for given parameter.
-		case argumentTypeMismatch(Value, Parameter)
+		case argumentTypeMismatch(Value, ValueType, Parameter)
 		
 		/// An error indicating that given sealed parameter has a noncapability value type.
 		case noncapabilitySealedParameter(Parameter)
@@ -356,8 +357,8 @@ extension NT {
 				case .nonfunctionValue(let value):
 				return "\(value) is not a function"
 				
-				case .argumentTypeMismatch(let value, let parameter):
-				return "\(value) cannot be used for \(parameter)"
+				case .argumentTypeMismatch(let value, let valueType, let parameter):
+				return "\(value) is of type \(valueType) and thus cannot be used for \(parameter)"
 				
 				case .noncapabilitySealedParameter(let parameter):
 				return "\(parameter) is sealed but doesn't take capabilities"
