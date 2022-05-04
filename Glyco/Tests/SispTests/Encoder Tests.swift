@@ -93,4 +93,26 @@ final class EncoderTests : XCTestCase {
 		
 	}
 	
+	func testPartiallyIntEncodable() throws {
+		
+		struct Building : Encodable, Equatable {
+			var name: String?
+			var age: Age
+			enum Age : PartiallyIntEncodable, Equatable {
+				case new
+				case old
+				case years(Int)
+				var intValue: Int? {
+					guard case .years(let value) = self else { return nil }
+					return value
+				}
+			}
+		}
+		
+		let actual = try SispEncoder().encode(Building(name: "White House", age: .years(222)))
+		let expected = Sisp.structure(type: nil, children: ["name": "White House", "age": 222])
+		XCTAssertEqual(actual, expected)
+		
+	}
+	
 }

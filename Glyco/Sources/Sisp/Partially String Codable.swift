@@ -10,7 +10,7 @@ public protocol PartiallyStringEncodable : Encodable {
 	
 }
 
-/// A value that may be decoded by decoding its raw value.
+/// A value that may be decoded as a string.
 ///
 /// Decoders supporting this protocol check conformance to this protocol and decode values using the string value when available.
 public protocol PartiallyStringDecodable : Decodable {
@@ -20,5 +20,5 @@ public protocol PartiallyStringDecodable : Decodable {
 	
 }
 
-/// A value whose encoded representation is its raw value.
+/// A value that can be encoded and decoded as a string.
 public typealias PartiallyStringCodable = PartiallyStringEncodable & PartiallyStringDecodable
