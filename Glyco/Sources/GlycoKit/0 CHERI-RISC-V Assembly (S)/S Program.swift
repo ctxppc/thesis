@@ -1,27 +1,28 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 import Foundation
+import Sisp
 
 //sourcery: longname = CHERI-RISC-V Assembly
 //sourcery: description = The ground language as provided to Clang for assembly and linking.
 public enum S : Language {
 	
 	/// A program in the S language.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : RawCodable, GlycoKit.Program {
 		
 		// See protocol.
 		//sourcery: isInternalForm
 		public init(fromEncoded encoded: String) throws {
-			self.init(assembly: encoded)
+			self.init(rawValue: encoded)
 		}
 		
 		/// Creates a program with given assembly.
-		public init(assembly: String) {
-			self.assembly = assembly
+		public init(rawValue: String) {
+			self.rawValue = rawValue
 		}
 		
 		/// The program's assembly representation.
-		public let assembly: String
+		public let rawValue: String
 		
 		// See protocol.
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
@@ -42,7 +43,7 @@ public enum S : Language {
 			
 			let assemblyURL = tmpURL.appendingPathComponent("asm.S")
 			let elfURL = tmpURL.appendingPathComponent("elf")
-			try assembly.write(to: assemblyURL, atomically: false, encoding: .utf8)
+			try rawValue.write(to: assemblyURL, atomically: false, encoding: .utf8)
 			
 			let clang = Process()
 			clang.executableURL = configuration.toolchainURL
@@ -88,7 +89,7 @@ public enum S : Language {
 		}
 		
 		// See protocol.
-		public func encoded(maxLineLength: Int) throws -> String { assembly }
+		public func encoded(maxLineLength: Int) throws -> String { rawValue }
 		
 	}
 	

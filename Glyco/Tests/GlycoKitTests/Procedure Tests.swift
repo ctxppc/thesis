@@ -204,7 +204,7 @@ final class ProcedureTests : XCTestCase {
 		tohost:			.dword 0
 		"""
 		
-		XCTAssertEqual(loweredProgram.assembly, expected)
+		XCTAssertEqual(loweredProgram.rawValue, expected)
 		
 	}
 	

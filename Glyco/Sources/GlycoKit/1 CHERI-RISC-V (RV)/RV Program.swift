@@ -27,7 +27,7 @@ public enum RV : Language {
 			switch configuration.target {
 				
 				case .cheriBSD:
-				return .init(assembly: """
+				return .init(rawValue: """
 								.text
 								
 								.attribute	4, 16
@@ -51,7 +51,7 @@ public enum RV : Language {
 				""")
 				
 				case .sail:
-				return .init(assembly: """
+				return .init(rawValue: """
 								.text
 								
 								.global _start

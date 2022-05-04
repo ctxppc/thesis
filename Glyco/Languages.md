@@ -1553,5 +1553,5 @@ The ground language as provided to Clang for assembly and linking.
 
 <dl>
 	<dt><code>S.Program</code></dt>
-	<dd><code>(<strong>assembly:</strong> String)</code></dd>
+	<dd><code>String</code></dd>
 </dl>

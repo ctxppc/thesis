@@ -417,12 +417,6 @@ extension RV.Program {
 	}
 }
 
-extension S.Program {
-	public enum CodingKeys : String, CodingKey {
-		case assembly = "assembly"
-	}
-}
-
 extension SV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"
