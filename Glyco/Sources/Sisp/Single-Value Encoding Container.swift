@@ -97,19 +97,23 @@ struct SingleValueEncodingContainer : Swift.SingleValueEncodingContainer {
 	
 	// See protocol.
 	func encode<T : Encodable>(_ value: T) throws {
-		
-		ensureSingleValue(newValue: value)
-		
-		let previousIndexPath = encoder.indexPath
-		encoder.indexPath = indexPath
-		defer { encoder.indexPath = previousIndexPath }
-		
-		let previousCodingPath = encoder.codingPath
-		encoder.codingPath = codingPath
-		defer { encoder.codingPath = previousCodingPath }
-		
-		try value.encode(to: encoder)
-		
+		if let value = (value as? PartiallyStringEncodable)?.stringValue {
+			try encode(value)
+		} else {
+			
+			ensureSingleValue(newValue: value)
+			
+			let previousIndexPath = encoder.indexPath
+			encoder.indexPath = indexPath
+			defer { encoder.indexPath = previousIndexPath }
+			
+			let previousCodingPath = encoder.codingPath
+			encoder.codingPath = codingPath
+			defer { encoder.codingPath = previousCodingPath }
+			
+			try value.encode(to: encoder)
+			
+		}
 	}
 	
 	private func encode<Integer : BinaryInteger>(exactly value: Integer) throws {

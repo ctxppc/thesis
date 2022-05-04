@@ -139,4 +139,29 @@ final class DecoderTests : XCTestCase {
 		
 	}
 	
+	func testPartiallyStringDecodable() throws {
+		
+		struct Building : Decodable, Equatable {
+			
+			var name: Name
+			enum Name : PartiallyStringDecodable, Equatable {
+				init(stringValue: String) { self = .named(stringValue) }
+				case unnamed
+				case named(String)
+			}
+			
+			var age: Int
+			
+		}
+		
+		let expected = Building(name: .named("White House"), age: 222)
+		
+		let literal = try SispDecoder(from: #"(name: "White House", age: 222)"#).decode(Building.self)
+		XCTAssertEqual(literal, expected)
+		
+		let explicit = try SispDecoder(from: #"(name: named("White House"), age: 222)"#).decode(Building.self)
+		XCTAssertEqual(explicit, expected)
+		
+	}
+	
 }

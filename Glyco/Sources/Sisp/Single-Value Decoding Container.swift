@@ -111,7 +111,11 @@ struct SingleValueDecodingContainer : Swift.SingleValueDecodingContainer {
 	
 	// See protocol.
 	func decode<T : Decodable>(_ type: T.Type) throws -> T {
-		try T(from: decoder)
+		if case .string(let value) = sisp, let type = T.self as? (PartiallyStringDecodable).Type {
+			return type.init(stringValue: value) as! T
+		} else {
+			return try T(from: decoder)
+		}
 	}
 	
 	/// Extracts an integer from the Sisp value.
