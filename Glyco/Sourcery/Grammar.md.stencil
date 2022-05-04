@@ -15,31 +15,36 @@ N/A
 	{% for language in types.enums|public|implements: "Language" %}
 		{% if language.name == lang.type.name %}
 			{% for codableType in language.containedTypes|public %}
-				{% if true %}
-					{% if codableType|implements: "RawCodable" %}
+				{% if codableType|implements: "RawCodable" %}
 <dl>
 	<dt><code>{{codableType.name}}</code></dt>
-						{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
+					{% for initialiser in codableType.initializers|public where initialiser.selectorName == "init(rawValue:)" %}
 	<dd><code>{{initialiser.parameters[0].typeName}}</code></dd>
-						{% endfor %}
+					{% endfor %}
 </dl>
-					{% else %}
+				{% else %}
 <dl>
 	<dt><code>{{codableType.name}}</code></dt>
-						{% for initialiser in codableType.initializers|public %}
-							{% if initialiser|!annotated: "isInternalForm" %}
+					{% for initialiser in codableType.initializers|public %}
+						{% if initialiser|!annotated: "isInternalForm" %}
 	<dd><code>({% for par in initialiser.parameters %}{% if par.argumentLabel %}<strong>{{par.argumentLabel}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %})</code></dd>
-							{% endif %}
-						{% endfor %}
-						{% for case in codableType.cases %}
-							{% if case|annotated: "integerCodable" or case|annotated: "stringCodable" %}
-	<dd><code>{{ case.associatedValues.first.typeName }}</code></dd>
-							{% else %}
-	<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
-							{% endif %}
-						{% endfor %}
-</dl>
+						{% endif %}
+					{% endfor %}
+					{% if codableType|implements: "PartiallyIntCodable" %}
+	<dd><code>Int</code></dd>
 					{% endif %}
+					{% if codableType|implements: "PartiallyStringCodable" %}
+						{% for case in codableType.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
+							{% if forloop.first %}
+	<dd><code>{{ case.associatedValues.first.typeName }}</code></dd>
+							{% endif %}
+						{% endfor %}
+					{% endif %}
+					{% for case in codableType.cases %}
+	<dd><code><strong>{{case.name|replace:"`",""}}</strong>{% if case.associatedValues %}({% for par in case.associatedValues %}{% if par.localName %}<strong>{{par.localName}}:</strong> {% endif %}{{par.typeName}}{% if not forloop.last %}, {% endif %}{% endfor %}){% endif %}</code></dd>
+					{% endfor %}
+					
+</dl>
 				{% endif %}
 			{% endfor %}
 		{% endif %}

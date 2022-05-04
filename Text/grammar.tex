@@ -41,6 +41,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
 				\par
 				<OB.Value> ::=
+						<Int> |
+								<Symbol> |
 						"self"
 						| "constant""("<Int>")"
 						| "named""("<Symbol>")"
@@ -70,6 +72,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Result>")"
 				\par
 				<OB.ValueType> ::=
+								<TypeName> |
 						"named""("<TypeName>")"
 						| "u8"
 						| "s32"

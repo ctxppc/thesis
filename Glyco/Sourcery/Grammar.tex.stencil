@@ -16,6 +16,16 @@
 							"("{% for par in initialiser.parameters %}{% if par.argumentLabel %}"{{par.argumentLabel}}:" {% endif %}<{{par.typeName}}>{% if not forloop.last %}, {% endif %}{% endfor %}")"
 						{% endif %}
 					{% endfor %}
+					{% if codableType|implements: "PartiallyIntCodable" %}
+						<Int> |
+					{% endif %}
+					{% if codableType|implements: "PartiallyStringCodable" %}
+						{% for case in codableType.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
+							{% if forloop.first %}
+								<{{ case.associatedValues.first.typeName }}> |
+							{% endif %}
+						{% endfor %}
+					{% endif %}
 					{% for case in codableType.cases %}
 						{% if not forloop.first %}{% if codableType|annotated: "heavyGrammar" %}\alt{% else %}|{% endif %} {% endif %}"{{case.name|replace:"`",""}}"{% if case.associatedValues %}"("{% for par in case.associatedValues %}{% if par.localName %}"{{par.localName}}:" {% endif %}<{{par.typeName}}>{% if not forloop.last %}, {% endif %}{% endfor %}")"{% endif %}
 					{% endfor %}

@@ -2,20 +2,19 @@
 
 import DepthKit
 import Foundation
+import Sisp
 
 extension OB {
-	public enum Value : Codable, Equatable, SimplyLowerable {
+	public enum Value : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
 		
 		/// A value that evaluates to an unsealed capability to the current object.
 		///
 		/// `self` is not valid outside methods.
 		case `self`
 		
-		// sourcery: integerCodable
 		/// A value that evaluates to given number.
 		case constant(Int)
 		
-		// sourcery: stringCodable
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		

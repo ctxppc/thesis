@@ -1,9 +1,11 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension OB {
 	
 	/// A value denoting the type of a value.
-	public enum ValueType : Equatable, Codable, SimplyLowerable {
+	public enum ValueType : PartiallyStringCodable, Equatable, Codable, SimplyLowerable {
 		
 		/// A named type.
 		case named(TypeName)

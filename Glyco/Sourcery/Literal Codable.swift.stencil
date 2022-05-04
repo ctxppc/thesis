@@ -1,24 +1,30 @@
-import Sisp
-
 {% for lang in types.enums|public|implements: "Language" %}
-	{% for type in lang.containedTypes %}
-		{% for case in type.cases|annotated: "stringCodable" %}
-extension {{type.globalName}} : PartiallyStringCodable {
+	{% for type in lang.containedTypes|public|enum %}
+		{% if type|implements: "PartiallyStringCodable" %}
+			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and (case.associatedValues.first.typeName|hasPrefix:"Symbol" or case.associatedValues.first.typeName|hasPrefix:"Label" or case.associatedValues.first.typeName|hasSuffix:"Name") %}
+				{% if forloop.first %}
+extension {{type.globalName}} {
 	public init(stringValue: String) { self = .{{ case.name }}(.init(rawValue: stringValue)) }
 	public var stringValue: String? {
 		guard case .{{ case.name }}(let value) = self else { return nil }
 		return value.rawValue
 	}
 }
-		{% endfor %}
-		{% for case in type.cases|annotated: "integerCodable" %}
-extension {{type.globalName}} : PartiallyIntCodable {
+
+				{% endif %}
+			{% endfor %}
+		{% endif %}
+		{% if type|implements: "PartiallyIntCodable" %}
+			{% for case in type.cases where case.associatedValues.count == 1 and not case.associatedValues.first.localName and case.associatedValues.first.typeName|hasPrefix:"Int" %}
+extension {{type.globalName}} {
 	public init(intValue: Int) { self = .{{ case.name }}(intValue) }
 	public var intValue: Int? {
 		guard case .{{ case.name }}(let value) = self else { return nil }
 		return value
 	}
 }
-		{% endfor %}
+
+			{% endfor %}
+		{% endif %}
 	{% endfor %}
 {% endfor %}

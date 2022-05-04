@@ -120,9 +120,11 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Value</code></dt>
-	<dd><code><strong>self</strong></code></dd>
 	<dd><code>Int</code></dd>
 	<dd><code>Symbol</code></dd>
+	<dd><code><strong>self</strong></code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
@@ -152,6 +154,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ValueType</code></dt>
+	<dd><code>TypeName</code></dd>
 	<dd><code><strong>named</strong>(TypeName)</code></dd>
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
