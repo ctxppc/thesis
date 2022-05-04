@@ -19,13 +19,13 @@ The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} val
 \section{Named \& Nominal Types} \label{sct:named-ty}
 A second feature is the ability to name types, by either defining a nominal type or a structural type, in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
 \begin{itemize}[nosep]
-	\item an (8-bit) byte, an \iil/u8()/;
-	\item a (32-bit) signed integer, an \iil/s32()/;
+	\item an (8-bit) byte, a \iil/u8/;
+	\item a (32-bit) signed integer, an \iil/s32/;
 	\item a capability to a vector of \iil/T/s, a \iil/cap(vector(T, sealed: S))/;
 	\item a capability to a record, a \iil/cap(record((name, type) …, sealed: S))/;
 	\item a capability to a function, a \iil/cap(function(takes: p …, returns: r))/;
 	\item a \g{sealcap}, a \iil/cap(seal(sealed: S))/; or
-	\item a value of a type named \iil/T/, spelled \iil/named(T)/
+	\item a value of a type named \iil/T/
 \end{itemize}
 where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise.
 
@@ -37,7 +37,7 @@ For instance, the following NT program using structural types is valid.
 The following program using nominal types is also valid.
 % TODO: Add valid NT example program.
 
-However, the following program is not valid since the value \iil/pi/ of type \\ \iil/cap(vector(of: s32(), sealed: false))/ is not implicitly convertible to a value of the nominal type \iil/named(numbers)/ even though they are representationally the same.
+However, the following program is not valid since the value \iil/pi/ of type \\ \iil/cap(vector(of: s32, sealed: false))/ is not implicitly convertible to a value of the nominal type \iil/Sequence/ even though they are representationally the same.
 \ilfile{Programs/nominal.nt}
 
 NT provides a \texttt{cast} operation that (…)
@@ -56,7 +56,7 @@ The following OB program implements a \texttt{Counter} object type, creates a co
 
 An object type consists of three parts:
 \begin{itemize}
-    \item A \textbf{name}, which is \texttt{Counter} in the example.
+    \item A \textbf{name}, which is \iil/Counter/ in the previous example.
 \end{itemize}
 
 An object in Glyco is represented as a sealed capability to a record.

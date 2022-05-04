@@ -7,7 +7,7 @@
 				initialiser:
 					(takes: (initialValue, s32, sealed: false), in:
 						do(
-							setField(value, of: self, to: named(initialValue)),
+							setField(value, of: self, to: initialValue),
 							then: self
 						)
 					),

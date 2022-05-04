@@ -3,7 +3,7 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Glyco: A Nanopass Compiler for CHERI-RISC-V}
-Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}ò$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
+Glyco\footnote{From the Greek term $\gamma\lambda\upsilon\kappa{}\text{ò}$ meaning \enquote{sweet}, alluding to the taste of a wild cherry.} is a compiler targeting the CHERI-RISC-V architecture, producing software running on CheriBSD systems and on a Sail-based emulator of the CHERI-RISC-V ISA.
 
 We begin this chapter in \cref{sct:nanopass} by giving a concise description of the nanopass compiler design used by Glyco, an iterative approach to designing and implementing a compiler that results in a series of transformations of a program from a high-level language to a low-level language (such as assembly) via several intermediate languages.
 
@@ -36,38 +36,38 @@ The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressi
 The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
 \ilfile{Programs/fib.ex}
 
-This program defines a function \texttt{fib} with three signed 32-bit integer parameters \texttt{prev}, \texttt{curr}, and \texttt{iter} and which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \texttt{fib} where \texttt{prev} is 0, \texttt{curr} is 1, and \texttt{iter} is 30.
+This program defines a function \iil/fib/ with three signed 32-bit integer parameters \iil/prev/, \iil/curr/, and \iil/iter/ which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \iil/fib/ where \iil/prev/ is 0, \iil/curr/ is 1, and \iil/iter/ is 30.
 
-EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it is instead quite explicit and contains little syntactical sugar. For example, a value representing the constant 30 is written as \texttt{constant(30)}, the value of a variable or parameter named \texttt{iter} is written as \texttt{named(iter)}, and the predicate $ \textit{iter} \le 0 $ is written as \texttt{relation(named(iter), le, constant(0))}. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can, however, define a more user-friendly language and write a parser that emits EX.
+EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it contains little syntactical sugar. For example, the predicate $ \textit{iter} \le 1 $ is written as \iil/relation(iter, le, 1)/. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can however define a more user-friendly language and write a parser that emits EX.
 
 \todo{Define records, vectors, and let-bindings; show examples. It's late to introduce them in lower ILs since they're also part of EX's vocabulary and feature set.}
 
 \paragraph{From EX (Expressions) to LS} LS does not support subexpressions so the \g{nanopass} to LS binds all subexpressions to names (temporaries) and uses those names in place of the subexpressions. For instance, the EX value
 \begin{il}
-	evaluate(function(fib), ... binary(named(prev), add, named(curr)) ...)
+	evaluate(function(fib), ... binary(prev, add, curr) ...)
 \end{il}
 is transformed into the equivalent LS value
-\begin{il}
+\begin{il*}{samepage=true}
 	let(
 		(arg0, ...) (arg1, let(
-			(ex.lhs, source(named(prev))) (ex.rhs, source(named(curr))),
-			in: binary(named(ex.lhs), add, named(ex.rhs))
+			(ex.lhs, source(prev)) (ex.rhs, source(curr)),
+			in: binary(ex.lhs, add, ex.rhs)
 		)) (arg2, ...),
-		in: evaluate(fib, named(arg0) named(arg1) named(arg2))
+		in: evaluate(fib, arg0 arg1 arg2)
 	)
-\end{il}
+\end{il*}
 
-Some transformations are not strictly necessary, e.g., binding \texttt{named(prev)} to \texttt{ex.lhs} instead of using \texttt{named(prev)} directly. They do not however incur any additional overhead in the final executable: a \g{nanopass} further down the compiler pipeline cleans up these redundant temporaries.
+Some transformations are not strictly necessary, e.g., binding \iil/prev/ to \iil/ex.lhs/ instead of using \iil/prev/ directly. They do not however incur any additional overhead in the final executable: a \g{nanopass} further down the compiler pipeline cleans up these redundant temporaries.
 
 \paragraph{From LS (Lexical Scopes) to DF} DF does not support shadowing; all \texttt{let} bindings are in a single namespace. The \g{nanopass} from LS to DF implements shadowing by renaming symbols such that each definition uses a globally unique symbol.
 
 \paragraph{From DF (Definitions) to CV} CV does not support \texttt{let} bindings, i.e., definitions. The \g{nanopass} implements each definition in CV using a \texttt{do} value, i.e., a computed value, a value on which a computation can be attached, with a \texttt{set} effect in it. For example, the DF value
 \begin{il}
-	let((answer, source(constant(42))), in: source(location(answer)))
+	let((answer, source(42)), in: source(answer))
 \end{il}
 is \lowered{} to the CV value
 \begin{il}
-	do(set(answer, to: source(constant(42))), then: source(location(answer)))
+	do(set(answer, to: source(42)), then: source(answer))
 \end{il}
 
 \paragraph{From CV (Computed Values) to CA} CA does not support \texttt{do} \emph{values}, but does support \texttt{do} \emph{effects}, which are sequences of effects. The \g{nanopass} implements \texttt{do} values by extracting their effects into \texttt{do} effects and ending with an additional \texttt{set} effect that moves the result to the intended destination. That is, a CV \texttt{set} effect
@@ -89,7 +89,7 @@ is transformed to a CA \texttt{do} effect
 
 \paragraph{From CA (Canonical Assignments) to CC} The final purely structural transformation lowers \texttt{set} effects in CA using equivalent effects in CC, only keeping the \texttt{set} effects with a constant or location source. For example, the CA program
 \ilfile{Programs/values.ca}
-is lowered to the CC program
+is \lowered{} to the CC program
 \ilfile{Programs/values.cc}
 
 \section{A Conventional Calling Convention} \label{sct:cc}
@@ -150,9 +150,9 @@ The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstracti
 Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program (with alternating effects highlighted)
 \ilfile[highlightlines={4-10, 12, 14, 16, 18, 20}]{Programs/sequences.sv}
 is \lowered{} to the following ID program (with the above highlighted effects' \gs{lowering} highlighted):
-\ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}, tabsize=1]{Programs/sequences.id}
+\ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}]{Programs/sequences.id}
 
-The results of the \texttt{sll} (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
+The results of the \iil/sll/ (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
 
 \section{Abstract Locations} \label{sct:id}
 All programs until now have been able to bind values to names in one form or another, be it by using new named locations in effects or binding values to names with \texttt{let}. These names refer to physical locations where data can be stored, but without the programmer explicitly specifying the physical location itself, and are therefore referred to as \textbf{abstract locations}. The compiler is responsible for assigning each abstract location a \textbf{physical location} like a register or location in the call frame.
@@ -192,7 +192,7 @@ The analysis algorithm derives an effect's liveness set and conflict graph \emph
 
 Since the liveness set and conflict graph at entry depend on the liveness set and conflict graph at exit, the algorithm traverses the program backwards, i.e., against the direction of execution and towards the beginning of the program or procedure. The algorithm starts with an empty initial liveness set and conflict graph, i.e., a \texttt{return} effect's liveness set and conflict graph at exit are empty.
 
-\paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \texttt{three} and \texttt{number} in
+\paragraph{Location coalescing} The number of locations in a program can often be reduced by merging locations that are assigned the same value and are not in conflict with each other. For example, \iil/three/ and \iil/number/ in
 \ilfile[highlightlines={6}]{Programs/coalescable.al}
 can be coalesced to get
 \ilfile{Programs/coalesced.al}

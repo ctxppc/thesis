@@ -3,33 +3,33 @@
 		letType(
 			object((
 				Counter,
-				state: ((value, s32())),
+				state: ((value, s32)),
 				initialiser:
-					(takes: (initialValue, s32(), sealed: false), in:
+					(takes: (initialValue, s32, sealed: false), in:
 						do(
-							setField(value, of: self(), to: named(initialValue)),
-							then: self()
+							setField(value, of: self, to: initialValue),
+							then: self
 						)
 					),
 				methods:
-					(increase, takes:, returns: s32(), in:
-						let((newValue, binary(field(value, of: self()), add, constant(1))), in:
+					(increase, takes:, returns: s32, in:
+						let((newValue, binary(field(value, of: self), add, 1)), in:
 							do(
-								setField(value, of: self(), to: named(newValue)),
-								then: value(named(newValue))
+								setField(value, of: self, to: newValue),
+								then: value(newValue)
 							)
 						)
 					)
-					(getCount, takes:, returns: s32(), in:
-						value(field(value, of: self()))
+					(getCount, takes:, returns: s32, in:
+						value(field(value, of: self))
 					)
 			)), in:
 			let(
-				(counter, object(Counter, constant(32)))
-				(ignored, message(named(counter), increase,))
-				(ignored, message(named(counter), increase,))
-				(ignored, message(named(counter), increase,)), in:
-				message(named(counter), getCount,)
+				(counter, object(Counter, 32))
+				(ignored, message(counter, increase,))
+				(ignored, message(counter, increase,))
+				(ignored, message(counter, increase,)), in:
+				message(counter, getCount,)
 			)
 		)
 	),

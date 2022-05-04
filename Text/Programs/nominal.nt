@@ -1,20 +1,16 @@
 (
 	value(letType(
-		nominal(numbers, cap(vector(of: s32(), sealed: false))), in:
+		nominal(Sequence, cap(vector(of: s32, sealed: false))), in:
 		let(
-			(sumOfFirstAndSecond, λ(takes: (sequence, named(numbers), sealed: false), returns: s32(), in:
-				value(binary(
-					element(of: named(sequence), at: constant(0)),
-					add,
-					element(of: named(sequence), at: constant(1))
-				))
+			(sumOfFirstAndSecond, λ(takes: (sequence, Sequence, sealed: false), returns: s32, in:
+				value(binary(element(of: sequence, at: 0), add, element(of: sequence, at: 1)))
 			))
-			(pi, vector(s32(), count: 3)),
+			(pi, vector(s32, count: 3)),
 			in: do(
-				setElement(of: named(pi), at: constant(0), to: constant(3))
-				setElement(of: named(pi), at: constant(1), to: constant(1))
-				setElement(of: named(pi), at: constant(2), to: constant(4)), then:
-				evaluate(named(sumOfFirstAndSecond), named(pi))
+				setElement(of: pi, at: 0, to: 3)
+				setElement(of: pi, at: 1, to: 1)
+				setElement(of: pi, at: 2, to: 4), then:
+				evaluate(sumOfFirstAndSecond, pi)
 			)
 		)
 	)),
