@@ -48,6 +48,23 @@ final class EncoderTests : XCTestCase {
 		
 	}
 
+	func testMixedPayload() throws {
+		
+		enum Value : Codable, Equatable {
+			case unknown
+			case string(text: String)
+		}
+		
+		let actual1 = try SispEncoder().encode(Value.unknown)
+		let expected1 = Sisp.string("unknown")
+		XCTAssertEqual(actual1, expected1)
+		
+		let actual2 = try SispEncoder().encode(Value.string(text: "test"))
+		let expected2 = Sisp.structure(type: "string", children: ["text": "test"])
+		XCTAssertEqual(actual2, expected2)
+		
+	}
+	
 	func testNestedPayload() throws {
 
 		enum Value : Codable, Equatable {

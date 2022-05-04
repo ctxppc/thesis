@@ -48,6 +48,25 @@ final class DecoderTests : XCTestCase {
 		
 	}
 	
+	func testMixedPayloads() throws {
+		
+		enum Value : Codable, Equatable {
+			case unknown
+			case string(String)
+		}
+		
+		let actual1a = try SispDecoder(from: "unknown").decode(Value.self)
+		let actual1b = try SispDecoder(from: "unknown()").decode(Value.self)
+		let expected1 = Value.unknown
+		XCTAssertEqual(actual1a, expected1)
+		XCTAssertEqual(actual1b, expected1)
+		
+		let actual2 = try SispDecoder(from: "string(test)").decode(Value.self)
+		let expected2 = Value.string("test")
+		XCTAssertEqual(actual2, expected2)
+		
+	}
+	
 	func testNestedPayload() throws {
 		
 		enum Value : Codable, Equatable {

@@ -62,13 +62,16 @@ public struct SispDecoder : Decoder {
 	public func container<Key : CodingKey>(keyedBy type: Key.Type) throws -> KeyedDecodingContainer<Key> {
 		switch sisp {
 			
+			case .string(let type):
+			return .init(StructureDecodingContainer(structureType: type, structureChildren: [:], decoder: self))
+			
 			case .structure(type: let type?, children: let children):
 			return .init(StructureDecodingContainer(structureType: type, structureChildren: children, decoder: self))
 			
 			case .structure(type: nil, children: let children):
 			return .init(StructureBodyDecodingContainer(children: children, decoder: self))
 			
-			default:
+			case .integer, .list:
 			throw DecodingError.dataCorrupted(.init(
 				codingPath:			codingPath,
 				debugDescription:	"Expected to decode structure; found \(sisp.typeDescription) instead",

@@ -41,7 +41,7 @@ public final class SispEncoder : Encoder {
 	public func encode<T : Encodable>(_ value: T) throws -> Sisp {
 		precondition(sisp == [], "Cannot reuse encoder")	// TODO: Make reusable by hiding actual encoder.
 		try value.encode(to: self)
-		return sisp
+		return sisp.flatteningEmptyTypedStructures()
 	}
 	
 }

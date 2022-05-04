@@ -50,6 +50,25 @@ public enum Sisp : Hashable {
 		}
 	}
 	
+	/// Returns a copy of `self` where empty, typed structures are replaced by their type name, i.e., where `type()` is substituted with `type`.
+	func flatteningEmptyTypedStructures() -> Self {
+		switch self {
+			
+			case .integer, .string:
+			return self
+			
+			case .list(let elements):
+			return .list(elements.map { $0.flatteningEmptyTypedStructures() })
+			
+			case .structure(type: let type?, children: [:]):
+			return .string(type)
+			
+			case .structure(type: let type, children: let children):
+			return .structure(type: type, children: children.mapValues { $0.flatteningEmptyTypedStructures() })
+			
+		}
+	}
+	
 }
 
 extension Sisp : ExpressibleByIntegerLiteral {
