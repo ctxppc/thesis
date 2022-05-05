@@ -1,5 +1,5 @@
 default:
-  image: swift:5.5.3-focal
+  image: swift:5.6.1-focal
   cache:
     key: "shared cache"
     paths:
@@ -15,9 +15,8 @@ build: &build
   script:
     - cd Glyco
     - swift build -c release -Xswiftc -static-executable
+    - cp -a $(swift build -c release --show-bin-path) ../Glyco_release_Ubuntu20.04
     - cd ..
-    - mkdir Glyco_release_Ubuntu20.04
-    - cp Glyco/.build/release/Glyco Glyco_release_Ubuntu20.04/Glyco
   artifacts:
     paths:
       - Glyco_release_Ubuntu20.04
