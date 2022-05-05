@@ -16,6 +16,8 @@ public enum NT : Language {
 		}
 		
 		/// The program's result.
+		///
+		/// The result must be a `s32`. If the result is of a nominal type, it is implicitly casted to `s32`.
 		public var result: Result
 		
 		/// The program's functions.
@@ -29,14 +31,31 @@ public enum NT : Language {
 			
 			let context = TypingContext(functions: functions)
 			
-			let actualResultType = try result.normalisedValueType(in: context)
+			let actualResultType = try result.assignedType(in: context).structural
 			guard actualResultType == .s32 else { throw TypingError.resultTypeMismatch(result, expected: .s32, actual: actualResultType) }
 			
 			for function in functions {
-				let actualResultType = try function.result.normalisedValueType(in: context)
-				guard actualResultType == function.resultType else {
-					throw TypingError.resultTypeMismatch(function.result, expected: function.resultType, actual: actualResultType)
+				
+				var bodyContext = context
+				bodyContext.assignedTypesBySymbol = .init(uniqueKeysWithValues: try function.parameters.map { parameter in
+					if parameter.sealed {
+						guard case .cap(let capType) = parameter.type else { throw TypingError.noncapabilitySealedParameter(parameter) }
+						return (parameter.name, try .init(from: .cap(capType.sealed(false)), in: context))
+					} else {
+						return (parameter.name, try .init(from: parameter.type, in: context))
+					}
+				})
+				
+				let normalisedDeclaredResultType = try function.resultType.normalised(in: context)
+				let normalisedActualResultType = try result.assignedType(in: bodyContext).normalised
+				
+				let typesMatchDirectly = normalisedActualResultType == normalisedDeclaredResultType
+				let typesMatchAfterConversion = { try normalisedActualResultType == normalisedDeclaredResultType.structural(in: context) }
+				
+				guard try typesMatchDirectly || typesMatchAfterConversion() else {
+					throw TypingError.resultTypeMismatch(function.result, expected: normalisedDeclaredResultType, actual: normalisedActualResultType)
 				}
+				
 			}
 			
 		}

@@ -40,12 +40,12 @@ extension NT {
 			}
 		}
 		
-		/// Determines the normalised value type of `self`.
-		func normalisedValueType(in context: TypingContext) throws -> ValueType {
+		/// Determines the value type of `self`.
+		func assignedType(in context: TypingContext) throws -> AssignedValueType {
 			switch self {
 				
 				case .value(let value):
-				return try value.assignedType(in: context).normalised
+				return try value.assignedType(in: context)
 				
 				case .evaluate(let function, let arguments):
 				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.assignedType(in: context).normalised else {
@@ -57,25 +57,25 @@ extension NT {
 						throw TypingError.argumentTypeMismatch(argument, argumentType, parameter)
 					}
 				}
-				return resultType	// result type is already normalised in a normalised function type
+				return try .init(from: resultType, in: context)
 				
 				case .if(_, then: let affirmative, else: let negative):
 				// TODO: Type-check predicate?
-				let affirmativeType = try affirmative.normalisedValueType(in: context)
-				let negativeType = try negative.normalisedValueType(in: context)
+				let affirmativeType = try affirmative.assignedType(in: context).normalised
+				let negativeType = try negative.assignedType(in: context).normalised
 				guard affirmativeType == negativeType else { throw TypingError.branchTypeMismatch(affirmative: affirmativeType, negative: negativeType) }
-				return affirmativeType
+				return try .init(from: affirmativeType, in: context)
 				
 				case .let(let definitions, in: let body):
 				var context = context
 				for definition in definitions {
 					context.assignedTypesBySymbol[definition.name] = try definition.value.assignedType(in: context)
 				}
-				return try body.normalisedValueType(in: context)
+				return try body.assignedType(in: context)
 				
 				case .do(_, then: let value):
 				// TODO: Type-check effects?
-				return try value.normalisedValueType(in: context)
+				return try value.assignedType(in: context)
 				
 			}
 		}

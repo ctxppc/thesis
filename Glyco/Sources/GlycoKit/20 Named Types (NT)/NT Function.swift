@@ -23,6 +23,8 @@ extension NT {
 		public var resultType: ValueType
 		
 		/// The function's result, in terms of its parameters.
+		///
+		/// If `resultType` is a nominal type and `result` is of a structural type, it is implicitly casted to `resultType`.
 		public var result: Result
 		
 		// See protocol.

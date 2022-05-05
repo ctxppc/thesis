@@ -26,10 +26,12 @@ extension NT {
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
 		///
-		/// The vector may be of a nominal type. The index must be a (structural) `s32` value.
+		/// The vector may be of a nominal type.
 		indirect case element(of: Value, at: Value)
 		
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
+		///
+		/// If the result type is a nominal type and the result is of a structural type, it is implicitly converted.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
 		/// A value representing a globally defined function with given name.
@@ -49,8 +51,8 @@ extension NT {
 		/// A value that evaluates to given function evaluated with given arguments.
 		indirect case evaluate(Value, [Value])
 		
-		/// A value that evaluates to given value but is typed as the type with given name, ignoring nominal typing rules.
-		indirect case cast(Value, as: TypeName)
+		/// A value that evaluates to given value but is typed as given type, ignoring nominal typing rules.
+		indirect case cast(Value, as: ValueType)
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
@@ -166,7 +168,6 @@ extension NT {
 				return try .init(from: elementType, in: context)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let result):
-				let normalisedDeclaredResultType = try resultType.normalised(in: context)
 				var bodyContext = context
 				bodyContext.assignedTypesBySymbol = .init(uniqueKeysWithValues: try parameters.map { parameter in
 					if parameter.sealed {
@@ -176,8 +177,11 @@ extension NT {
 						return (parameter.name, try .init(from: parameter.type, in: context))
 					}
 				})
-				let normalisedActualResultType = try result.normalisedValueType(in: bodyContext)
-				guard normalisedActualResultType == normalisedDeclaredResultType else { throw TypingError.resultTypeMismatch(result, expected: normalisedDeclaredResultType, actual: normalisedActualResultType) }
+				let normalisedDeclaredResultType = try resultType.normalised(in: context)
+				let normalisedActualResultType = try result.assignedType(in: bodyContext).normalised
+				let typesMatchDirectly = normalisedActualResultType == normalisedDeclaredResultType
+				let typesMatchAfterConversion = { try normalisedActualResultType == normalisedDeclaredResultType.structural(in: context) }
+				guard try typesMatchDirectly || typesMatchAfterConversion() else { throw TypingError.resultTypeMismatch(result, expected: normalisedDeclaredResultType, actual: normalisedActualResultType) }
 				return try .init(from: .cap(.function(takes: parameters, returns: resultType)), in: context)
 				
 				case .function(let name):
@@ -242,11 +246,13 @@ extension NT {
 				}
 				return try .init(from: resultType, in: context)
 				
-				case .cast(let value, as: let typeName):
-				let sourceType = try value.assignedType(in: context).structural
-				let targetType = try ValueType.named(typeName).structural(in: context)
-				guard sourceType == targetType else { throw TypingError.incompatibleStructuralTypes(castedValue: value, sourceType: sourceType, targetType: targetType) }
-				return try .init(from: .named(typeName), in: context)
+				case .cast(let value, as: let type):
+				let sourceType = try value.assignedType(in: context)
+				let targetType = try AssignedValueType(from: type, in: context)
+				guard sourceType.structural == targetType.structural else {
+					throw TypingError.incompatibleStructuralTypes(castedValue: value, sourceType: sourceType.actual, targetType: targetType.actual)
+				}
+				return targetType
 				
 				case .if(_, then: let affirmative, else: let negative):
 				// TODO: Type-check predicate?
