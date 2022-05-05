@@ -31,7 +31,7 @@ public enum NT : Language {
 			
 			let context = TypingContext(functions: functions)
 			
-			let actualResultType = try result.assignedType(in: context).structural
+			let actualResultType = try result.assignedType(in: context).structural()
 			guard actualResultType == .s32 else { throw TypingError.resultTypeMismatch(result, expected: .s32, actual: actualResultType) }
 			
 			for function in functions {
@@ -40,14 +40,14 @@ public enum NT : Language {
 				bodyContext.assignedTypesBySymbol = .init(uniqueKeysWithValues: try function.parameters.map { parameter in
 					if parameter.sealed {
 						guard case .cap(let capType) = parameter.type else { throw TypingError.noncapabilitySealedParameter(parameter) }
-						return (parameter.name, try .init(from: .cap(capType.sealed(false)), in: context))
+						return (parameter.name, .init(from: .cap(capType.sealed(false)), in: context))
 					} else {
-						return (parameter.name, try .init(from: parameter.type, in: context))
+						return (parameter.name, .init(from: parameter.type, in: context))
 					}
 				})
 				
 				let normalisedDeclaredResultType = try function.resultType.normalised(in: context)
-				let normalisedActualResultType = try result.assignedType(in: bodyContext).normalised
+				let normalisedActualResultType = try result.assignedType(in: bodyContext).normalised()
 				
 				let typesMatchDirectly = normalisedActualResultType == normalisedDeclaredResultType
 				let typesMatchAfterConversion = { try normalisedActualResultType == normalisedDeclaredResultType.structural(in: context) }

@@ -38,20 +38,26 @@ extension NT {
 	struct AssignedValueType {
 		
 		/// Determines the value type assigned to a value in some context.
-		init(from actual: ValueType, in context: TypingContext) throws {
+		init(from actual: ValueType, in context: TypingContext) {
 			self.actual = actual
-			self.normalised = try actual.normalised(in: context)
-			self.structural = try actual.structural(in: context)
+			self.context = context
 		}
 		
 		/// The value's actual type, without any type name resolution.
 		let actual: ValueType
 		
-		/// The value's normalised type.
-		let normalised: ValueType
+		/// The typing context of `actual`.
+		let context: TypingContext
 		
-		/// The value's structural type.
-		let structural: ValueType
+		/// Returns the value's normalised type.
+		func normalised(recursively: Bool = true) throws -> ValueType {
+			try actual.normalised(in: context, recursively: recursively)
+		}
+		
+		/// Returns the value's structural type.
+		func structural(recursively: Bool = true) throws -> ValueType {
+			try actual.structural(in: context, recursively: recursively)
+		}
 		
 	}
 	

@@ -34,32 +34,39 @@ extension NT {
 		/// Returns a copy of `self` that does not name an alias type.
 		///
 		/// The normalised types of two types *A* and *B* are equal iff *A* and *B* are interchangeable.
-		func normalised(in context: NTTypeContext, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
-			switch self {
+		func normalised(in context: NTTypeContext, recursively: Bool = true, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
+			switch (self, recursively) {
 				
-				case .named(let name):
+				case (.named(let name), _):
 				guard !attemptedResolutions.contains(name) else { throw TypingError.infiniteType(name, cycle: attemptedResolutions) }
 				guard let typeDefinition = context.type(named: name) else { throw TypingError.undefinedType(name) }
 				switch typeDefinition {
 					
 					case .alias(_, let valueType):
-					return try valueType.normalised(in: context, attemptedResolutions: attemptedResolutions.union([name]))
+					return recursively
+						? try valueType.normalised(in: context, attemptedResolutions: attemptedResolutions.union([name]))
+						: valueType
 					
 					case .nominal:
 					return self
 					
 				}
 				
-				case .u8, .s32, .cap(.seal):
+				case (.u8, _),
+					(.s32, _),
+					(.cap(.seal), _),
+					(.cap(.vector), false),
+					(.cap(.record), false),
+					(.cap(.function), false):
 				return self
 				
-				case .cap(.vector(of: let elementType, sealed: let sealed)):
+				case (.cap(.vector(of: let elementType, sealed: let sealed)), true):
 				return .cap(.vector(
 					of:		try elementType.normalised(in: context, attemptedResolutions: attemptedResolutions),
 					sealed:	sealed
 				))
 				
-				case .cap(.record(let recordType, sealed: let sealed)):
+				case (.cap(.record(let recordType, sealed: let sealed)), true):
 				return .cap(.record(
 					.init(try recordType.fields.map {
 						.init($0.name, try $0.valueType.normalised(in: context, attemptedResolutions: attemptedResolutions))
@@ -67,7 +74,7 @@ extension NT {
 					sealed: sealed
 				))
 				
-				case .cap(.function(takes: let parameters, returns: let resultType)):
+				case (.cap(.function(takes: let parameters, returns: let resultType)), true):
 				return .cap(try .function(
 					takes:		parameters.map {
 						.init(
@@ -83,24 +90,31 @@ extension NT {
 		}
 		
 		/// Returns a copy of `self` that does not name a type.
-		func structural(in context: NTTypeContext, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
-			switch self {
+		func structural(in context: NTTypeContext, recursively: Bool = true, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
+			switch (self, recursively) {
 				
-				case .named(let name):
+				case (.named(let name), _):
 				guard !attemptedResolutions.contains(name) else { throw TypingError.infiniteType(name, cycle: attemptedResolutions) }
 				guard let typeDefinition = context.type(named: name) else { throw TypingError.undefinedType(name) }
-				return try typeDefinition.valueType.structural(in: context, attemptedResolutions: attemptedResolutions.union([name]))
+				return recursively
+					? try typeDefinition.valueType.structural(in: context, attemptedResolutions: attemptedResolutions.union([name]))
+					: typeDefinition.valueType
 				
-				case .u8, .s32, .cap(.seal):
+				case (.u8, _),
+					(.s32, _),
+					(.cap(.seal), _),
+					(.cap(.vector), false),
+					(.cap(.record), false),
+					(.cap(.function), false):
 				return self
 				
-				case .cap(.vector(of: let elementType, sealed: let sealed)):
+				case (.cap(.vector(of: let elementType, sealed: let sealed)), true):
 				return .cap(.vector(
 					of:		try elementType.structural(in: context, attemptedResolutions: attemptedResolutions),
 					sealed:	sealed
 				))
 				
-				case .cap(.record(let recordType, sealed: let sealed)):
+				case (.cap(.record(let recordType, sealed: let sealed)), true):
 				return .cap(.record(
 					.init(try recordType.fields.map {
 						.init($0.name, try $0.valueType.structural(in: context, attemptedResolutions: attemptedResolutions))
@@ -108,7 +122,7 @@ extension NT {
 					sealed: sealed
 				))
 				
-				case .cap(.function(takes: let parameters, returns: let resultType)):
+				case (.cap(.function(takes: let parameters, returns: let resultType)), true):
 				return .cap(try .function(
 					takes:		parameters.map {
 						.init(
