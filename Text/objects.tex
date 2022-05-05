@@ -16,8 +16,8 @@ A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, i
 The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with an auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
-\section{Named \& Nominal Types} \label{sct:named-ty}
-A second feature is the ability to name types, by either defining a nominal type or a named structural type, in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
+\section{Alias \& Nominal Types} \label{sct:named-ty}
+A second new feature is support for defining new (named) types in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
 \begin{itemize}[nosep]
 	\item an (8-bit) byte, a \iil/u8/;
 	\item a (32-bit) signed integer, an \iil/s32/;
@@ -29,24 +29,36 @@ A second feature is the ability to name types, by either defining a nominal type
 \end{itemize}
 where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise. A type can be defined using a \textbf{\texttt{letType} value} in one of two ways.
 
-An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it's defined as. An alias type can have a shorter or semantically meaningful type name that the type it's defined as. For instance, the following NT program defines an alias type and evaluates to 4.
-\ilfile{Programs/structural.nt}
+\paragraph{Alias types} An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it's defined as. An alias type can have a shorter or semantically meaningful type name that the type it's defined as.
 
-A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself. A value of a nominal type cannot be used in an expression expecting a value of a structural type
+For instance, the following NT program defines an alias type named \iil/Sequence/ and uses it in a simple computation that evaluates to 4. The value \iil/pi/ created by \iil/vector(s32, count: 3)/ is typed \iil/cap(vector(s32, sealed: false))/ but is accepted by the function which takes an argument typed \iil/Sequence/.
+\ilfile{Programs/alias.nt}
 
-The following program using nominal types is also valid.
-% TODO: Add valid NT example program.
+\paragraph{Nominal types} A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is only equivalent to itself. A nominal type is effectively a new type by itself and can be used to ensure that two representationally identical but semantically different types of values cannot accidentally be mixed. However, a value can be explicitly \texttt{cast}ed to a value of a different type that has the same representation.
 
-However, the following program is not valid since the value \iil/pi/ of type \\ \iil/cap(vector(of: s32, sealed: false))/ is not implicitly convertible to a value of the nominal type \iil/Sequence/ even though they are representationally the same.
-\ilfile{Programs/nominal.nt}
+For example, the following NT program defines two nominal types \iil/Kelvin/ and \iil/Celsius/ and uses them to convert 500 °C to K and back to °C.
+\ilfile{Programs/temp.nt}
+
+However, the following program is not valid since the second invocation of \iil/toCelsius/, which excepts a value in \iil/Kelvin/, is given a value in \iil/Celsius/. Nominal type rules prevent the accidental conversion from \iil/Kelvin/ to \iil/Celsius/, even though both types are represented by \iil/s32/.
+\ilfile{Programs/tempbad.nt}
+
 \begin{quote}
 	\ttfamily\footnotesize
-	Error: \iil/named(pi)/ is of type \iil/cap(vector(of: s32, sealed: false))/ and thus cannot be used for \iil/(sequence, Sequence, sealed: false)/
+	Error: \iil/evaluate(toCelsius, 500)/ is of type \iil/named(Celsius)/ and thus cannot be used for \iil/(k, Kelvin, sealed: false)/
 \end{quote}
 
-NT provides a \texttt{cast} operation that (…)
+\paragraph{Implicit type casts} With some exceptions, the type checker rejects any uses of values of a structural type such as \iil/s32/ in contexts where a nominal type is expected and vice versa. This restriction can be bypassed using a \texttt{cast}. For ergonomic reasons, the type-checker performs an implicit cast on
+\begin{itemize}[nosep]
+	\item an argument of structural type that is passed to a parameter of nominal type, like in \iil/evaluate(toKelvin, 500)/ above;
+	\item a record value of nominal type in a \texttt{field} value;
+	\item a vector value of nominal type in an \texttt{element} value;
+	\item a seal value of nominal type in a \texttt{sealed} value;
+	\item an operand of structural type in a \texttt{binary} value when the other operand is of nominal type — the result of the \texttt{binary} value is of nominal type;
+	\item a function's or lambda's result value of structural type when the result type is nominal; and
+	\item a program's result value of nominal type (to \iil/s32/), like the result in \iil/Celsius/ above.
+\end{itemize}
 
-The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
+\paragraph{From NT to Λ} The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 
 \section{Objects \& Methods} \label{sct:obj-meth}
 A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{methods}.
