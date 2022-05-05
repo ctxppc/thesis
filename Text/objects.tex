@@ -13,7 +13,7 @@ This chapter discusses the feature set and languages of Glyco 1.0.\footnote{The 
 A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
 \ilfile{Programs/sum.l}
 
-The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with an auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
+\paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with an auto-generated name) and replaces the \texttt{λ} values by code capabilities to those functions. The above program is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
 \section{Alias \& Nominal Types} \label{sct:named-ty}

@@ -29,7 +29,7 @@ extension CE {
 		func supports(constant: Int) -> Bool {
 			switch self {
 				case .u8:	return UInt8(exactly: constant) != nil
-				case .s32:	return Int8(exactly: constant) != nil
+				case .s32:	return Int32(exactly: constant) != nil
 				case .cap:	return false
 			}
 		}
