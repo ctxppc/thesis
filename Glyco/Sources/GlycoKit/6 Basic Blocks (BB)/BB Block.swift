@@ -5,7 +5,7 @@ import DepthKit
 extension BB {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public struct Block : Named, Codable, Equatable {
+	public struct Block : Named, Element {
 		
 		/// Creates a block with given name, effects, and continuation.
 		public init(name: Label, do effects: [Effect], then continuation: Continuation) {

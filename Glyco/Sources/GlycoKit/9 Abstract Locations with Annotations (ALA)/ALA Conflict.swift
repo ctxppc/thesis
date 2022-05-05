@@ -5,7 +5,7 @@ import DepthKit
 
 extension ALA {
 	
-	public struct Conflict : Hashable, Codable {
+	public struct Conflict : Hashable, Element {
 		
 		/// Creates a conflict between two given locations.
 		public init(_ first: Location, _ second: Location) {

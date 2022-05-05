@@ -6,7 +6,7 @@ import Foundation
 extension ALA {
 	
 	/// A location.
-	public enum Location : Codable, Hashable, Comparable, SimplyLowerable {
+	public enum Location : Hashable, Comparable, SimplyLowerable, Element {
 		
 		/// An abstract location, to be lowered to a physical location after register allocation.
 		case abstract(AbstractLocation)

@@ -5,7 +5,7 @@ import Sisp
 extension MM {
 	
 	/// A datum source.
-	public enum Source : PartiallyIntCodable, Equatable, SimplyLowerable {
+	public enum Source : PartiallyIntCodable, SimplyLowerable, Element {
 		
 		/// The operand is given value.
 		case constant(Int)

@@ -11,7 +11,7 @@ extension RV {
 	/// * a datum is *loaded from* or *stored in* memory;
 	/// * a datum is *retrieved from* or *put in* a register; and
 	/// * a datum is *copied from* a register *to* a register.
-	public enum Instruction : Codable, Equatable, SimplyLowerable {
+	public enum Instruction : SimplyLowerable, Element {
 		
 		/// An instruction that copies the word from `source` to `destination`.
 		case copyWord(destination: Register, source: Register)

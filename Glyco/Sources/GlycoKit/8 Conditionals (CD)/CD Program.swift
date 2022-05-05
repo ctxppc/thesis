@@ -7,7 +7,7 @@ import Foundation
 public enum CD : Language {
 	
 	/// A program on an CD machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {
 			self.effect = effect

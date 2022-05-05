@@ -5,7 +5,7 @@
 public enum DF : Language {
 	
 	/// A program on a DF machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(_ result: Result, functions: [Function]) {
 			self.result = result

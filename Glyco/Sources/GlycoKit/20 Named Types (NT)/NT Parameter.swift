@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension NT {
-	public struct Parameter : Codable, Equatable, SimplyLowerable {
+	public struct Parameter : SimplyLowerable, Element {
 		
 		/// Creates a parameter with given name and value type.
 		public init(_ name: Symbol, _ type: ValueType, sealed: Bool) {

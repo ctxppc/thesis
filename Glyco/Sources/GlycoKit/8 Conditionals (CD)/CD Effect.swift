@@ -5,7 +5,7 @@ import Foundation
 extension CD {
 	
 	/// An effect on an CD machine.
-	public enum Effect : ComposableEffect, Codable, Equatable, Optimisable {
+	public enum Effect : Optimisable, ComposableEffect {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])

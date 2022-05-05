@@ -3,7 +3,7 @@
 extension CE {
 	
 	/// A value denoting the type of a datum.
-	public enum DataType : String, Codable {
+	public enum DataType : String, Element {
 		
 		/// An unsigned byte or 1-byte integer.
 		case u8

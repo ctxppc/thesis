@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension CC {
-	public struct Parameter : Codable, Equatable {
+	public struct Parameter : Element {
 		
 		/// Creates a parameter with given location and value type.
 		public init(_ location: Location, _ type: ValueType, sealed: Bool) {

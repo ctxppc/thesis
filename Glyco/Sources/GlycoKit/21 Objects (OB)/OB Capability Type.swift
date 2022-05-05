@@ -5,7 +5,7 @@ import Foundation
 extension OB {
 	
 	/// A value denoting the type of a capability.
-	public enum CapabilityType : Equatable, Codable, SimplyLowerable {
+	public enum CapabilityType : SimplyLowerable, Element {
 		
 		/// A capability to a vector containing elements of given type.
 		///

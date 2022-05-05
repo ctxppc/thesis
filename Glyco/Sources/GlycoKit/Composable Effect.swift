@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 /// An effect that can be composed out of effects.
-protocol ComposableEffect {
+protocol ComposableEffect : Element {
 	
 	/// Creates an effect that sequentially executes `effects`.
 	static func `do`(_ effects: [Self]) -> Self

@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A definition of a named type.
-	public enum TypeDefinition : Named, Codable, Equatable, SimplyLowerable {
+	public enum TypeDefinition : Named, SimplyLowerable, Element {
 		
 		/// A definition of a type that is equivalent to (interchangeable with) its value type.
 		case structural(TypeName, ValueType)

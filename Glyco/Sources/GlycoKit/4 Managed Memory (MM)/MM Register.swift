@@ -3,7 +3,7 @@
 extension MM {
 	
 	/// A machine register.
-	public enum Register : String, Codable, Equatable, SimplyLowerable {
+	public enum Register : String, SimplyLowerable, Element {
 		
 		/// The always-zero register.
 		case zero

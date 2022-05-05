@@ -5,7 +5,7 @@ import Sisp
 extension OB {
 	
 	/// A value denoting the type of a value.
-	public enum ValueType : PartiallyStringCodable, Equatable, SimplyLowerable {
+	public enum ValueType : PartiallyStringCodable, SimplyLowerable, Element {
 		
 		/// A named type.
 		case named(TypeName)

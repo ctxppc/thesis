@@ -5,7 +5,7 @@ import Collections
 extension FO {
 	
 	/// A machine register.
-	public enum Register : String, Codable, Equatable, CaseIterable, SimplyLowerable {
+	public enum Register : String, CaseIterable, SimplyLowerable, Element {
 		
 		/// The set of registers that can be used for storing data.
 		///

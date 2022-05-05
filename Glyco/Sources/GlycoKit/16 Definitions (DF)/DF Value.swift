@@ -2,7 +2,7 @@
 
 extension DF {
 	
-	public enum Value : Codable, Equatable, SimplyLowerable {
+	public enum Value : SimplyLowerable, Element {
 		
 		/// A value that evaluates to the value of given source.
 		case source(Source)

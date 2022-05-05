@@ -8,7 +8,7 @@ import OrderedCollections
 public enum BB : Language {
 	
 	/// A program on an BB machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		/// Creates a program with given blocks
 		public init(_ blocks: [BB.Block]) {

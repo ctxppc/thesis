@@ -5,7 +5,7 @@
 public enum RV : Language {
 	
 	/// A program in the RV language.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		/// Creates a program with given statements.
 		public init(_ statements: [Statement]) {

@@ -9,7 +9,7 @@ extension MM {
 	/// In GCCC, a call frame consists of two segments: a caller-managed segment for any provided arguments and a callee-managed segment for allocated frame locations. The first segment grows in memory order whereas the second segment grows opposite, in stack order. In GHSCC, a call frame only consists of allocated frame locations and grows in memory order.
 	///
 	/// The first allocated frame location always contains the caller's frame capability. A call frame is capability-aligned, i.e., a frame location with offset 0 points to a location that is appropriately aligned for a capability.
-	public struct Frame : Codable, Equatable {
+	public struct Frame : Element {
 		
 		/// Returns an initial frame, containing one allocated location for the caller's frame capability.
 		public static func initial(configuration: CompilationConfiguration) -> Self {

@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A function that initialises an object's state.
-	public struct Initialiser : Codable, Equatable {
+	public struct Initialiser : Element {
 		
 		/// Creates a constructor with given parameters and effect.
 		public init(takes parameters: [Parameter], in effect: Effect) {

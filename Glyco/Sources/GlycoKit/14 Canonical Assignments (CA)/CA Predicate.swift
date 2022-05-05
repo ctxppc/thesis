@@ -5,7 +5,7 @@ import Sisp
 extension CA {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : PartiallyBoolCodable, Equatable, SimplyLowerable {
+	public enum Predicate : PartiallyBoolCodable, SimplyLowerable, Element {
 		
 		/// A constant predicate.
 		case constant(Bool)

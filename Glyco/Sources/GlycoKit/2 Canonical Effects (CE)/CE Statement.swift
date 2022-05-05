@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension CE {
-	public enum Statement : Codable, Equatable, MultiplyLowerable {
+	public enum Statement : MultiplyLowerable, Element {
 		
 		/// A machine effect.
 		case effect(Effect)

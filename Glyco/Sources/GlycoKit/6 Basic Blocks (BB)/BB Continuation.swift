@@ -3,7 +3,7 @@
 extension BB {
 	
 	/// A value describing the action to take after a block executes its effects.
-	public enum Continuation : Codable, Equatable {
+	public enum Continuation : Element {
 		
 		/// A continuation that continues to the block with given label.
 		case `continue`(to: Label)

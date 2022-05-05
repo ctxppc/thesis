@@ -2,7 +2,7 @@
 
 extension CA {
 	
-	public enum Value : Codable, Equatable {
+	public enum Value : Element {
 		
 		/// A value that evaluates to given source.
 		case source(Source)

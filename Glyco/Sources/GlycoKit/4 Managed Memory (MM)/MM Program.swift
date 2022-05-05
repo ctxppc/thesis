@@ -5,7 +5,7 @@
 public enum MM : Language {
 	
 	/// An MM program.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		/// Creates a program with given effects.
 		public init(_ effects: [Effect] = []) {

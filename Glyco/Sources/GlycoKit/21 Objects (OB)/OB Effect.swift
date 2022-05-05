@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension OB {
-	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, ComposableEffect {
 		
 		/// An effect that performs given effects.
 		case `do`([Effect])

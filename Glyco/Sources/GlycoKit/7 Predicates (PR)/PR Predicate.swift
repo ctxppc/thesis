@@ -5,7 +5,7 @@ import Sisp
 extension PR {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : PartiallyBoolCodable, Equatable {
+	public enum Predicate : PartiallyBoolCodable, Element {
 		
 		/// A constant predicate.
 		case constant(Bool)

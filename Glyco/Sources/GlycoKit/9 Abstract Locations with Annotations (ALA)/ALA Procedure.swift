@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, Optimisable {
+	public struct Procedure : Optimisable, Element {
 		
 		/// Creates a procedure with given name, locals, and effect.
 		public init(_ name: Label, locals: Declarations, in effect: Effect) {

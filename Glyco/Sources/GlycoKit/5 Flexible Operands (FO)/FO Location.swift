@@ -3,7 +3,7 @@
 extension FO {
 	
 	/// A register or memory location.
-	public enum Location : Codable, Equatable {
+	public enum Location : Element {
 		
 		/// A location on the register bank.
 		case register(Register)

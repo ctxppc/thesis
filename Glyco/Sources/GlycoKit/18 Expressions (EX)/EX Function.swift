@@ -3,7 +3,7 @@
 extension EX {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
-	public struct Function : Codable, Equatable, SimplyLowerable {
+	public struct Function : SimplyLowerable, Element {
 		
 		/// Creates a function with given name, parameters, result type, and result.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {

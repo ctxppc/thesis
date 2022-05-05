@@ -3,7 +3,7 @@
 extension SV {
 	
 	/// A value denoting the type of a capability.
-	public enum CapabilityType : Equatable, Codable {
+	public enum CapabilityType : Element {
 		
 		/// A (possibly sealed) capability to a vector containing elements of given type.
 		///

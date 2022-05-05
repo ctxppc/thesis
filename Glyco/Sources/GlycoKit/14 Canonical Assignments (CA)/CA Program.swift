@@ -5,7 +5,7 @@
 public enum CA : Language {
 	
 	/// A program on a CA machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(_ effect: Effect, procedures: [Procedure]) {
 			self.effect = effect

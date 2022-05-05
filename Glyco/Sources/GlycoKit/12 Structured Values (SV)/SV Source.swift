@@ -5,7 +5,7 @@ import Sisp
 extension SV {
 	
 	/// A value source.
-	public enum Source : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
+	public enum Source : PartiallyStringCodable, PartiallyIntCodable, SimplyLowerable, Element {
 		
 		/// The operand is given value.
 		case constant(Int)

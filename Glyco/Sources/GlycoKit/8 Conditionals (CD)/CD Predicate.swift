@@ -5,7 +5,7 @@ import Sisp
 extension CD {
 	
 	/// A value that can be used in a conditional.
-	public enum Predicate : PartiallyBoolCodable, Equatable, Optimisable {
+	public enum Predicate : PartiallyBoolCodable, Optimisable, Element {
 		
 		/// A constant predicate.
 		case constant(Bool)

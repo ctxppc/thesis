@@ -5,7 +5,7 @@ import Foundation
 extension SV {
 	
 	/// An effect on an SV machine.
-	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, ComposableEffect {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])

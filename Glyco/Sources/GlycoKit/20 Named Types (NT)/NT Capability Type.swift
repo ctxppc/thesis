@@ -3,7 +3,7 @@
 extension NT {
 	
 	/// A value denoting the type of a capability.
-	public enum CapabilityType : Equatable, Codable, SimplyLowerable {
+	public enum CapabilityType : SimplyLowerable, Element {
 		
 		/// A (possibly sealed) capability to a vector containing elements of given type.
 		///

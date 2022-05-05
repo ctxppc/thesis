@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// An arithmetic operator over two registers.
-	public enum BinaryOperator : String, Equatable, Codable {
+	public enum BinaryOperator : String, Element {
 		case add, sub
 		case mul
 		case and, or, xor

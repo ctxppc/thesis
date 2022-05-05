@@ -3,7 +3,7 @@
 extension BB {
 	
 	/// An effect on an BB machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, Element {
 		
 		/// An effect that retrieves the value in `from` and puts it in `to`.
 		case set(DataType, Location, to: Source)

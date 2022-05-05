@@ -3,7 +3,7 @@
 extension LS {
 	
 	/// A value denoting the type of a record.
-	public struct RecordType : Codable, Equatable, SimplyLowerable {
+	public struct RecordType : SimplyLowerable, Element {
 		
 		/// Creates a record type with given fields.
 		///
@@ -23,7 +23,7 @@ extension LS {
 	}
 	
 	/// A field of a record.
-	public struct Field : Named, Codable, Equatable, SimplyLowerable {
+	public struct Field : Named, SimplyLowerable, Element {
 		
 		/// Creates a field with given name and value type.
 		public init(_ name: Name, _ valueType: ValueType) {

@@ -7,7 +7,7 @@ import Foundation
 public enum NT : Language {
 	
 	/// A program on an NT machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		/// Creates a program.
 		public init(_ result: Result, functions: [Function]) {

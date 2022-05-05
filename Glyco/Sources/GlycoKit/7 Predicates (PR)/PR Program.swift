@@ -5,7 +5,7 @@
 public enum PR : Language {
 	
 	/// A program on a PR machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(_ blocks: [Block]) {
 			self.blocks = blocks

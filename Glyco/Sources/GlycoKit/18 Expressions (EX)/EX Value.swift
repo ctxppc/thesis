@@ -4,7 +4,7 @@ import Sisp
 
 extension EX {
 	
-	public enum Value : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
+	public enum Value : PartiallyStringCodable, PartiallyIntCodable, SimplyLowerable, Element {
 		
 		/// A value that evaluates to given number.
 		case constant(Int)

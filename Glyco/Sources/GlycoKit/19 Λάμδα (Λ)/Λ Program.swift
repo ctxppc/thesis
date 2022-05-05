@@ -5,7 +5,7 @@
 public enum Λ : Language {
 	
 	/// A program on a Λ machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(_ result: Result, functions: [Function]) {
 			self.result = result

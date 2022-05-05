@@ -5,7 +5,7 @@ import Sisp
 extension FO {
 	
 	/// A datum source.
-	public enum Source : PartiallyIntCodable, Equatable {
+	public enum Source : PartiallyIntCodable, Element {
 		
 		/// Creates a source with given location.
 		init(_ location: Location) {

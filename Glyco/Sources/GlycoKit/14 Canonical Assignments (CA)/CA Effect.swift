@@ -3,7 +3,7 @@
 extension CA {
 	
 	/// An effect on a CA machine.
-	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
+	public enum Effect : ComposableEffect, SimplyLowerable, Element {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])

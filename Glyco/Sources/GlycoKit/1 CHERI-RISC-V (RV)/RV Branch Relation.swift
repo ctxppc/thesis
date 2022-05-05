@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// A relation between values that can be used to decide whether to take a branch.
-	public enum BranchRelation : String, Equatable, Codable {
+	public enum BranchRelation : String, Element {
 		
 		/// The branch is taken if the values are equal.
 		case eq

@@ -6,7 +6,7 @@ extension ALA {
 	
 	//sourcery: hasOpaqueRepresentation
 	/// A list of defined typed locations.
-	public struct Declarations : Equatable {
+	public struct Declarations : Element {
 		
 		//sourcery: isInternalForm
 		/// Creates an empty definitions list.

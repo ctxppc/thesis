@@ -3,7 +3,7 @@
 extension LS {
 	
 	/// An effect on an LS machine.
-	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, ComposableEffect {
 		
 		/// An effect that performs given effects.
 		case `do`([Effect])

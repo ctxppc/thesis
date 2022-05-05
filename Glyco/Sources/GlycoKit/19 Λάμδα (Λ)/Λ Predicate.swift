@@ -3,7 +3,7 @@
 import Sisp
 
 extension Λ {
-	public enum Predicate : PartiallyBoolCodable, Equatable, SimplyLowerable {
+	public enum Predicate : PartiallyBoolCodable, SimplyLowerable, Element {
 		
 		/// A constant predicate.
 		case constant(Bool)

@@ -5,7 +5,7 @@
 public enum ALA : Language {
 	
 	/// A program on an ALA machine.
-	public struct Program : Codable, GlycoKit.Program {
+	public struct Program : GlycoKit.Program {
 		
 		public init(locals: Declarations, in effect: Effect, procedures: [Procedure]) {
 			self.locals = locals

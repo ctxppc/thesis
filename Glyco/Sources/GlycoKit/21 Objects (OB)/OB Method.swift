@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A function that can be invoked on an object.
-	public struct Method : Named, Codable, Equatable {
+	public struct Method : Named, Element {
 		
 		/// Creates a method with given name, parameters, result type, and result.
 		public init(_ name: Symbol, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {

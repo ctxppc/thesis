@@ -3,7 +3,7 @@
 extension OB {
 	
 	/// A value denoting the type of an object.
-	public struct ObjectType : Named, Equatable, Codable {
+	public struct ObjectType : Named, Element {
 		
 		/// Creates an object type with given name, initialiser, methods, and state record type.
 		public init(_ name: TypeName, state: RecordType, initialiser: Initialiser, methods: [Method]) {

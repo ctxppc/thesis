@@ -3,7 +3,7 @@
 extension AL {
 	
 	/// An effect on an AL machine.
-	public enum Effect : ComposableEffect, Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, ComposableEffect {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect])

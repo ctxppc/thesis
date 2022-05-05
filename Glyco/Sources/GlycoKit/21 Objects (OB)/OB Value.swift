@@ -5,7 +5,7 @@ import Foundation
 import Sisp
 
 extension OB {
-	public enum Value : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
+	public enum Value : PartiallyStringCodable, PartiallyIntCodable, SimplyLowerable, Element {
 		
 		/// A value that evaluates to an unsealed capability to the current object.
 		///

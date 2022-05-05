@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 extension NT {
-	public enum Result : Codable, Equatable, SimplyLowerable {
+	public enum Result : SimplyLowerable, Element {
 		
 		/// A result that evaluates to given value.
 		case value(Value)

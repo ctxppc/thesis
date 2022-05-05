@@ -3,7 +3,7 @@
 extension LS {
 	
 	/// An identifier for a named value.
-	public struct Symbol : Name, SimplyLowerable {
+	public struct Symbol : SimplyLowerable, Name {
 		
 		// See protocol.
 		public init(rawValue: String) {

@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// A value describing the liveness set and conflict graph at entry of the effect or predicate it's attached to.
-	public struct Analysis : Equatable, Codable {
+	public struct Analysis : Element {
 		
 		/// Constructs an analysis value.
 		public init(conflicts: ConflictGraph = .init([]), possiblyLiveLocations: Set<Location> = []) {

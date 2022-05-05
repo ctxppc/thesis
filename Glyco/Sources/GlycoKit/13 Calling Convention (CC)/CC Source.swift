@@ -5,7 +5,7 @@ import Sisp
 extension CC {
 	
 	/// A datum source.
-	public enum Source : PartiallyStringCodable, PartiallyIntCodable, Equatable, SimplyLowerable {
+	public enum Source : PartiallyStringCodable, PartiallyIntCodable, SimplyLowerable, Element {
 		
 		/// An integer with given value.
 		case constant(Int)

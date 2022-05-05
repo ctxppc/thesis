@@ -3,7 +3,7 @@
 extension NT {
 	
 	/// A named value.
-	public struct Definition : Codable, Equatable, SimplyLowerable {
+	public struct Definition : SimplyLowerable, Element {
 		
 		/// Creates a definition with given name and value.
 		public init(_ name: Symbol, _ value: Value) {

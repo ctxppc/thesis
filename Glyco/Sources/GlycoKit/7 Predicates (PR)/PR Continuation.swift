@@ -3,7 +3,7 @@
 extension PR {
 	
 	/// A value describing the action to take after a block executes its effects.
-	public enum Continuation : Codable, Equatable, SimplyLowerable {
+	public enum Continuation : SimplyLowerable, Element {
 		
 		/// A continuation that continues to the block with given label.
 		case `continue`(to: Label)

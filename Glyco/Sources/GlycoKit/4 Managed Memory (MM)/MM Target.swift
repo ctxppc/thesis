@@ -5,7 +5,7 @@ import Sisp
 extension MM {
 	
 	/// A jump target.
-	public enum Target : PartiallyStringCodable, Equatable, SimplyLowerable {
+	public enum Target : PartiallyStringCodable, SimplyLowerable, Element {
 		
 		/// The jump target is labelled.
 		case label(Label)

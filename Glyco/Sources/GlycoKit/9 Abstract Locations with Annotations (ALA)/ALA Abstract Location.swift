@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// An abstract storage location on an AL machine.
-	public struct AbstractLocation : Name, SimplyLowerable {
+	public struct AbstractLocation : SimplyLowerable, Name {
 		
 		// See protocol.
 		public init(rawValue: String) {

@@ -3,7 +3,7 @@
 extension CD {
 	
 	/// A program element that can be invoked by name.
-	public struct Procedure : Codable, Equatable, Named, MultiplyLowerable, Optimisable {
+	public struct Procedure : Named, MultiplyLowerable, Optimisable, Element {
 		
 		/// Creates a procedure with given name and effect.
 		public init(_ name: Label, in effect: Effect) {

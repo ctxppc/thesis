@@ -8,7 +8,7 @@ extension SV {
 	/// A value denoting the type of a record.
 	///
 	/// Like vectors, records are always stored in memory and are created using allocation effects. Like vectors and unlike C structs, records are never implicitly copied in SV. Records can therefore not be assigned to or from a location, are always referred to by capability, and cannot directly contain other records.
-	public struct RecordType : Equatable {
+	public struct RecordType : Element {
 		
 		/// Creates a record type with given fields.
 		///
@@ -66,7 +66,7 @@ extension SV {
 	}
 	
 	/// A field of a record.
-	public struct Field : Named, Equatable, Codable {
+	public struct Field : Named, Element {
 		
 		/// Creates a field with given name and value type.
 		public init(_ name: Name, _ valueType: ValueType) {

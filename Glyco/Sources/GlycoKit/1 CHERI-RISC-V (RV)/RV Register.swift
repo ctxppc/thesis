@@ -5,7 +5,7 @@ import DepthKit
 extension RV {
 	
 	/// A machine register.
-	public enum Register : String, Codable, Equatable, CaseIterable {
+	public enum Register : String, CaseIterable, Element {
 		
 		/// The always-zero register.
 		case zero

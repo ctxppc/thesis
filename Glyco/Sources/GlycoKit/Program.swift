@@ -3,7 +3,7 @@
 import Foundation
 import Sisp
 
-public protocol Program : Codable, Equatable, Optimisable, Validatable, CustomStringConvertible {
+public protocol Program : Element, Optimisable, Validatable {
 	
 	/// Creates a program from given encoded representation.
 	init(fromEncoded encoded: String) throws
@@ -29,14 +29,6 @@ extension Program {
 		try SispEncoder()
 			.encode(self)
 			.serialised(maxLineLength: maxLineLength)
-	}
-	
-	public var description: String {
-		do {
-			return try encoded(maxLineLength: 120)
-		} catch {
-			return "Could not serialise program: \(error)"
-		}
 	}
 	
 }

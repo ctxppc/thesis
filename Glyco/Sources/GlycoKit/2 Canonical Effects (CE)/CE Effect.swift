@@ -6,7 +6,7 @@ extension CE {
 	
 	//sourcery: heavyGrammar
 	/// A CE effect.
-	public enum Effect : Codable, Equatable, MultiplyLowerable {
+	public enum Effect : MultiplyLowerable, Element {
 		
 		/// An effect that copies the contents from `from` to `into`.
 		case copy(DataType, into: Register, from: Register)

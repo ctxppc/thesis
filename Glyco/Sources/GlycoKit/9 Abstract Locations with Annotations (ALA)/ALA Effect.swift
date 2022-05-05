@@ -3,7 +3,7 @@
 extension ALA {
 	
 	/// An effect on an ALA machine.
-	public enum Effect : Codable, Equatable, SimplyLowerable {
+	public enum Effect : SimplyLowerable, Element {
 		
 		/// An effect that performs `effects`.
 		case `do`([Effect], analysisAtEntry: Analysis)

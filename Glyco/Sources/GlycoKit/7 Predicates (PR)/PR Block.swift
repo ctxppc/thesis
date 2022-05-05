@@ -3,7 +3,7 @@
 extension PR {
 	
 	/// A sequence of effects with a single entry and exit point.
-	public struct Block : Codable, Equatable, Named, SimplyLowerable {
+	public struct Block : Named, SimplyLowerable, Element {
 		
 		/// Creates a block with given name, effects, and continuation.
 		public init(name: Label, do effects: [Effect], then continuation: Continuation) {

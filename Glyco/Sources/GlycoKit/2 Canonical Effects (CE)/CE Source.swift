@@ -5,7 +5,7 @@ import Sisp
 extension CE {
 	
 	/// A datum source.
-	public enum Source : PartiallyIntCodable, Equatable {
+	public enum Source : PartiallyIntCodable, Element {
 		
 		/// The operand is given value.
 		case constant(Int)

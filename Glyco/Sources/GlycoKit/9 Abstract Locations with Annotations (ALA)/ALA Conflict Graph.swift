@@ -8,7 +8,7 @@ extension ALA {
 	/// A graph of locations where locations that may have different values in some execution paths are connected, i.e., they *conflict*.
 	///
 	/// Physical locations always conflict with all other physical locations. These conflicts are not explicitated in the graph but is encoded in `contains(_:_:)`.
-	public struct ConflictGraph : Equatable {
+	public struct ConflictGraph : Element {
 		
 		/// Creates a graph with given conflicts.
 		public init(_ conflicts: [Conflict]) {

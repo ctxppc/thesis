@@ -3,7 +3,7 @@
 extension CC {
 	
 	/// A value denoting the type of a value.
-	public enum ValueType : Equatable, Codable, SimplyLowerable {
+	public enum ValueType : SimplyLowerable, Element {
 		
 		/// An unsigned byte or 1-byte integer.
 		case u8

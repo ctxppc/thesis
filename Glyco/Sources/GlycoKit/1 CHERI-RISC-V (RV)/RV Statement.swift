@@ -3,7 +3,7 @@
 extension RV {
 	
 	/// A CHERI-RISC-V assembler statement.
-	public enum Statement : Codable, Equatable, SimplyLowerable {
+	public enum Statement : SimplyLowerable, Element {
 		
 		/// A machine instruction or pseudo-instruction.
 		case instruction(Instruction)

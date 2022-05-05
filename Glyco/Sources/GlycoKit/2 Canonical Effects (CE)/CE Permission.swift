@@ -4,7 +4,7 @@ import DepthKit
 
 extension CE {
 	
-	public enum Permission : String, Codable, CaseIterable {
+	public enum Permission : CaseIterable, Element {
 		
 		/// The capability can be stored using a capability with either `storeCapability` or `storeLocalCapability` permissions.
 		case global
