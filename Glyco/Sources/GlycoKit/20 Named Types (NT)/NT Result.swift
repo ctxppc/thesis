@@ -45,14 +45,14 @@ extension NT {
 			switch self {
 				
 				case .value(let value):
-				return try value.normalisedValueType(in: context)
+				return try value.assignedType(in: context).normalised
 				
 				case .evaluate(let function, let arguments):
-				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.normalisedValueType(in: context) else {
+				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.assignedType(in: context).normalised else {
 					throw TypingError.nonfunctionValue(function)
 				}
 				for (parameter, argument) in zip(parameters, arguments) {
-					let argumentType = try argument.normalisedValueType(in: context)
+					let argumentType = try argument.assignedType(in: context).normalised
 					if argumentType != parameter.type {	// parameter is already normalised in a normalised function type
 						throw TypingError.argumentTypeMismatch(argument, argumentType, parameter)
 					}
@@ -69,7 +69,7 @@ extension NT {
 				case .let(let definitions, in: let body):
 				var context = context
 				for definition in definitions {
-					context.valueTypesBySymbol[definition.name] = try definition.value.valueType(in: context)
+					context.assignedTypesBySymbol[definition.name] = try definition.value.assignedType(in: context)
 				}
 				return try body.normalisedValueType(in: context)
 				

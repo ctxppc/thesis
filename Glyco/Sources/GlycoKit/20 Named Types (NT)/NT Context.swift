@@ -29,8 +29,29 @@ extension NT {
 			types.reversed()[name]
 		}
 		
-		/// A mapping from symbols to value types.
-		var valueTypesBySymbol = [Symbol : ValueType]()
+		/// A mapping from symbols to assigned types.
+		var assignedTypesBySymbol = [Symbol : AssignedValueType]()
+		
+	}
+	
+	/// A type assigned to a value.
+	struct AssignedValueType {
+		
+		/// Determines the value type assigned to a value in some context.
+		init(from actual: ValueType, in context: TypingContext) throws {
+			self.actual = actual
+			self.normalised = try actual.normalised(in: context)
+			self.structural = try actual.structural(in: context)
+		}
+		
+		/// The value's actual type, without any type name resolution.
+		let actual: ValueType
+		
+		/// The value's normalised type.
+		let normalised: ValueType
+		
+		/// The value's structural type.
+		let structural: ValueType
 		
 	}
 	

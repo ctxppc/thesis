@@ -42,6 +42,8 @@ extension NT {
 		indirect case sealed(Value, with: Value)
 		
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
+		///
+		/// The operands may be of a nominal (numeric) type. If both operands are of a nominal type, the types must be equal.
 		indirect case binary(Value, BinaryOperator, Value)
 		
 		/// A value that evaluates to given function evaluated with given arguments.
@@ -131,76 +133,76 @@ extension NT {
 		}
 		
 		/// Determines the type of `self`.
-		func valueType(in context: TypingContext) throws -> ValueType {
+		func assignedType(in context: TypingContext) throws -> AssignedValueType {
 			switch self {
 				
 				case .constant:
-				return .s32
+				return try .init(from: .s32, in: context)
 					
 				case .named(let symbol):
-				guard let type = context.valueTypesBySymbol[symbol] else { throw TypingError.undefinedSymbol(symbol) }
+				guard let type = context.assignedTypesBySymbol[symbol] else { throw TypingError.undefinedSymbol(symbol) }
 				return type
 				
 				case .record(let type):
-				return .cap(.record(type, sealed: false))
+				return try .init(from: .cap(.record(type, sealed: false)), in: context)
 				
 				case .field(let fieldName, of: let record):
-				guard case .cap(.record(let recordType, sealed: false)) = try record.structuralValueType(in: context) else {
+				guard case .cap(.record(let recordType, sealed: false)) = try record.assignedType(in: context).structural else {
 					throw TypingError.notAnUnsealedRecord(record)
 				}
 				guard let field = recordType.fields[fieldName] else {
 					throw TypingError.unknownFieldName(fieldName, recordType, record)
 				}
-				return field.valueType
+				return try .init(from: field.valueType, in: context)
 				
 				case .vector(let elementType, count: _):
-				return .cap(.vector(of: elementType, sealed: false))
+				return try .init(from: .cap(.vector(of: elementType, sealed: false)), in: context)
 				
 				case .element(of: let vector, at: let index):
-				guard case .cap(.vector(of: let elementType, sealed: false)) = try vector.structuralValueType(in: context) else {
+				guard case .cap(.vector(of: let elementType, sealed: false)) = try vector.assignedType(in: context).structural else {
 					throw TypingError.notAnUnsealedVector(vector)
 				}
-				guard try index.normalisedValueType(in: context) == .s32 else { throw TypingError.nonnumericIndex(index, vector: vector) }
-				return elementType
+				guard try index.assignedType(in: context).normalised == .s32 else { throw TypingError.nonnumericIndex(index, vector: vector) }
+				return try .init(from: elementType, in: context)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let result):
 				let normalisedDeclaredResultType = try resultType.normalised(in: context)
 				var bodyContext = context
-				bodyContext.valueTypesBySymbol = .init(uniqueKeysWithValues: try parameters.map { parameter in
+				bodyContext.assignedTypesBySymbol = .init(uniqueKeysWithValues: try parameters.map { parameter in
 					if parameter.sealed {
 						guard case .cap(let capType) = parameter.type else { throw TypingError.noncapabilitySealedParameter(parameter) }
-						return (parameter.name, .cap(capType.sealed(false)))
+						return (parameter.name, try .init(from: .cap(capType.sealed(false)), in: context))
 					} else {
-						return (parameter.name, parameter.type)
+						return (parameter.name, try .init(from: parameter.type, in: context))
 					}
 				})
 				let normalisedActualResultType = try result.normalisedValueType(in: bodyContext)
 				guard normalisedActualResultType == normalisedDeclaredResultType else { throw TypingError.resultTypeMismatch(result, expected: normalisedDeclaredResultType, actual: normalisedActualResultType) }
-				return .cap(.function(takes: parameters, returns: resultType))
+				return try .init(from: .cap(.function(takes: parameters, returns: resultType)), in: context)
 				
 				case .function(let name):
 				guard let function = context.functions[name] else { throw TypingError.undefinedFunction(name) }
-				return .cap(.function(takes: function.parameters, returns: function.resultType))
+				return try .init(from: .cap(.function(takes: function.parameters, returns: function.resultType)), in: context)
 				
 				case .seal:
-				return .cap(.seal(sealed: false))
+				return try .init(from: .cap(.seal(sealed: false)), in: context)
 				
 				case .sealed(let cap, with: let seal):
-				guard case .cap(let capType) = try cap.normalisedValueType(in: context) else { throw TypingError.noncapabilityValue(cap) }
-				guard case .cap(.seal(sealed: false)) = try seal.normalisedValueType(in: context) else { throw TypingError.notAnUnsealedSealCapability(cap) }
+				guard case .cap(let capType) = try cap.assignedType(in: context).normalised else { throw TypingError.noncapabilityValue(cap) }
+				guard case .cap(.seal(sealed: false)) = try seal.assignedType(in: context).normalised else { throw TypingError.notAnUnsealedSealCapability(cap) }
 				switch capType {
 					
 					case .vector(of: let elementType, sealed: false):
-					return .cap(.vector(of: elementType, sealed: true))
+					return try .init(from: .cap(.vector(of: elementType, sealed: true)), in: context)
 					
 					case .record(let recordType, sealed: false):
-					return .cap(.record(recordType, sealed: true))
+					return try .init(from: .cap(.record(recordType, sealed: true)), in: context)
 					
 					case .function:
-					return .cap(capType)
+					return try .init(from: .cap(capType), in: context)
 					
 					case .seal(sealed: false):
-					return .cap(.seal(sealed: true))
+					return try .init(from: .cap(.seal(sealed: true)), in: context)
 					
 					case .vector(of: _, sealed: true), .record(_, sealed: true), .seal(sealed: true):
 					throw TypingError.sealedCapability(cap)
@@ -208,62 +210,68 @@ extension NT {
 				}
 				
 				case .binary(let lhs, _, let rhs):
-				guard try lhs.normalisedValueType(in: context) == .s32 else { throw TypingError.nonnumericOperand(lhs) }
-				guard try rhs.normalisedValueType(in: context) == .s32 else { throw TypingError.nonnumericOperand(rhs) }
-				return .s32
+				let lhsType = try lhs.assignedType(in: context)
+				let rhsType = try rhs.assignedType(in: context)
+				guard lhsType.structural == .s32 else { throw TypingError.nonnumericOperand(lhs) }
+				guard rhsType.structural == .s32 else { throw TypingError.nonnumericOperand(rhs) }
+				switch (lhsType.normalised, rhsType.normalised) {
+					
+					case (.named(let name), .named(let otherName)) where name == otherName:
+					return try .init(from: .named(name), in: context)
+					
+					case (.named(let name), .s32), (.s32, .named(let name)):
+					return try .init(from: .named(name), in: context)
+					
+					case (.s32, .s32):
+					return try .init(from: .s32, in: context)
+					
+					case (let lhsType, let rhsType):
+					throw TypingError.operandTypeMismatch(lhs, rhs, lhsType, rhsType)
+					
+				}
 				
 				case .evaluate(let function, let arguments):
-				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.normalisedValueType(in: context) else {
+				guard case .cap(.function(takes: let parameters, returns: let resultType)) = try function.assignedType(in: context).normalised else {
 					throw TypingError.nonfunctionValue(function)
 				}
 				for (parameter, argument) in zip(parameters, arguments) {
-					let argumentType = try argument.normalisedValueType(in: context)
+					let argumentType = try argument.assignedType(in: context).normalised
 					if argumentType != parameter.type {	// parameter is already normalised in a normalised function type
 						throw TypingError.argumentTypeMismatch(argument, argumentType, parameter)
 					}
 				}
-				return resultType	// result type is already normalised in a normalised function type
+				return try .init(from: resultType, in: context)
 				
 				case .cast(let value, as: let typeName):
-				let sourceType = try value.structuralValueType(in: context)
+				let sourceType = try value.assignedType(in: context).structural
 				let targetType = try ValueType.named(typeName).structural(in: context)
 				guard sourceType == targetType else { throw TypingError.incompatibleStructuralTypes(castedValue: value, sourceType: sourceType, targetType: targetType) }
-				return .named(typeName)
+				return try .init(from: .named(typeName), in: context)
 				
 				case .if(_, then: let affirmative, else: let negative):
 				// TODO: Type-check predicate?
-				let affirmativeType = try affirmative.normalisedValueType(in: context)
-				let negativeType = try negative.normalisedValueType(in: context)
+				let affirmativeType = try affirmative.assignedType(in: context).normalised
+				let negativeType = try negative.assignedType(in: context).normalised
 				guard affirmativeType == negativeType else { throw TypingError.branchTypeMismatch(affirmative: affirmativeType, negative: negativeType) }
-				return affirmativeType
+				return try .init(from: affirmativeType, in: context)
 				
 				case .let(let definitions, in: let body):
 				var context = context
 				for definition in definitions {
-					context.valueTypesBySymbol[definition.name] = try definition.value.valueType(in: context)
+					context.assignedTypesBySymbol[definition.name] = try definition.value.assignedType(in: context)
 				}
-				return try body.valueType(in: context)
+				return try body.assignedType(in: context)
 				
 				case .letType(let definitions, in: let body):
 				var context = context
 				context.types.append(contentsOf: definitions)
-				return try body.valueType(in: context)
+				return try body.assignedType(in: context)
 				
 				case .do(_, then: let value):
 				// TODO: Type-check effects?
-				return try value.valueType(in: context)
+				return try value.assignedType(in: context)
 				
 			}
-		}
-		
-		/// Determines the normalised type of `self`.
-		func normalisedValueType(in context: TypingContext) throws -> ValueType {
-			try valueType(in: context).normalised(in: context)
-		}
-		
-		/// Determines the structural type of `self`.
-		func structuralValueType(in context: TypingContext) throws -> ValueType {
-			try valueType(in: context).structural(in: context)
 		}
 		
 	}
@@ -302,6 +310,9 @@ extension NT {
 		
 		/// An error indicating that given value is not a number that can be used in a binary operation.
 		case nonnumericOperand(Value)
+		
+		/// An error indicating the operands do not have matching types.
+		case operandTypeMismatch(Value, Value, ValueType, ValueType)
 		
 		/// An error indicating that given value is not a function that can be evaluated.
 		case nonfunctionValue(Value)
@@ -354,6 +365,9 @@ extension NT {
 				
 				case .nonnumericOperand(let value):
 				return "\(value) is nonnumeric and thus cannot be used in a binary operation"
+				
+				case .operandTypeMismatch(let lhs, let rhs, let lhsType, let rhsType):
+				return "\(lhs) (of type \(lhsType)) and \(rhs) (of type \(rhsType)) are incompatible and thus cannot be used together in a binary operation"
 				
 				case .nonfunctionValue(let value):
 				return "\(value) is not a function"
