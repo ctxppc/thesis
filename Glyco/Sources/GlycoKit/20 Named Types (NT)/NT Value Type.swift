@@ -31,7 +31,7 @@ extension NT {
 			}
 		}
 		
-		/// Returns a copy of `self` that does not name a structural type.
+		/// Returns a copy of `self` that does not name an alias type.
 		///
 		/// The normalised types of two types *A* and *B* are equal iff *A* and *B* are interchangeable.
 		func normalised(in context: NTTypeContext, attemptedResolutions: OrderedSet<TypeName> = []) throws -> Self {
@@ -42,7 +42,7 @@ extension NT {
 				guard let typeDefinition = context.type(named: name) else { throw TypingError.undefinedType(name) }
 				switch typeDefinition {
 					
-					case .structural(_, let valueType):
+					case .alias(_, let valueType):
 					return try valueType.normalised(in: context, attemptedResolutions: attemptedResolutions.union([name]))
 					
 					case .nominal:

@@ -220,7 +220,7 @@ A language that introduces named structural and nominal types.
 </dl>
 <dl>
 	<dt><code>NT.TypeDefinition</code></dt>
-	<dd><code><strong>structural</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
 	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
 </dl>
 <dl>

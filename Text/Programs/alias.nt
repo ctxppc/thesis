@@ -1,6 +1,6 @@
 (
 	value(letType(
-		structural(Sequence, cap(vector(of: s32, sealed: false))), in:
+		alias(Sequence, cap(vector(of: s32, sealed: false))), in:
 		let(
 			(sumOfFirstAndSecond, λ(takes: (sequence, Sequence, sealed: false), returns: s32, in:
 				value(binary(element(of: sequence, at: 0), add, element(of: sequence, at: 1)))

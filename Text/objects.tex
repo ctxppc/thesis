@@ -17,22 +17,22 @@ The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} val
 \ilfile{Programs/sum.ex}
 
 \section{Named \& Nominal Types} \label{sct:named-ty}
-A second feature is the ability to name types, by either defining a nominal type or a structural type, in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
+A second feature is the ability to name types, by either defining a nominal type or a named structural type, in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
 \begin{itemize}[nosep]
 	\item an (8-bit) byte, a \iil/u8/;
 	\item a (32-bit) signed integer, an \iil/s32/;
 	\item a capability to a vector of \iil/T/s, a \iil/cap(vector(T, sealed: S))/;
-	\item a capability to a record, a \iil/cap(record((name, type) …, sealed: S))/;
+	\item a capability to a record, a \iil/cap(record((name, Type) …, sealed: S))/;
 	\item a capability to a function, a \iil/cap(function(takes: p …, returns: r))/;
 	\item a \g{sealcap}, a \iil/cap(seal(sealed: S))/; or
 	\item a value of a type named \iil/T/
 \end{itemize}
-where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise.
+where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise. A type can be defined using a \textbf{\texttt{letType} value} in one of two ways.
 
-Types can be named using a \texttt{letType} value in one of two ways. A \textbf{structural type definition} creates a \textbf{named structural type}, a type that is equivalent to the type it's defined as. A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself.
-
-For instance, the following NT program using structural types is valid and evaluates to 4.
+An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it's defined as. An alias type can have a shorter or semantically meaningful type name that the type it's defined as. For instance, the following NT program defines an alias type and evaluates to 4.
 \ilfile{Programs/structural.nt}
+
+A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is not equivalent to any other type than itself. A value of a nominal type cannot be used in an expression expecting a value of a structural type
 
 The following program using nominal types is also valid.
 % TODO: Add valid NT example program.

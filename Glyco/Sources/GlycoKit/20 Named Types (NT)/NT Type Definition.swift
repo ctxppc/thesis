@@ -6,7 +6,7 @@ extension NT {
 	public enum TypeDefinition : Named, Element {
 		
 		/// A definition of a type that is equivalent to (interchangeable with) its value type.
-		case structural(TypeName, ValueType)
+		case alias(TypeName, ValueType)
 		
 		/// A definition of a type that is not equivalent to (not interchangeable with) its value type.
 		case nominal(TypeName, ValueType)
@@ -14,7 +14,7 @@ extension NT {
 		// See protocol.
 		public var name: TypeName {
 			switch self {
-				case .structural(let name, _),
+				case .alias(let name, _),
 					.nominal(let name, _):
 				return name
 			}
@@ -23,7 +23,7 @@ extension NT {
 		/// The value type.
 		var valueType: ValueType {
 			switch self {
-				case .structural(_, let valueType),
+				case .alias(_, let valueType),
 					.nominal(_, let valueType):
 				return valueType
 			}

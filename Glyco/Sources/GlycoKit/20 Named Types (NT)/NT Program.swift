@@ -3,7 +3,7 @@
 import Foundation
 
 //sourcery: longname = Named Types
-//sourcery: description = "A language that introduces named structural and nominal types."
+//sourcery: description = "A language that introduces named alias and nominal types."
 public enum NT : Language {
 	
 	/// A program on an NT machine.
