@@ -6,10 +6,7 @@
 				state: ((value, s32)),
 				initialiser:
 					(takes: (initialValue, s32, sealed: false), in:
-						do(
-							setField(value, of: self, to: initialValue),
-							then: self
-						)
+						setField(value, of: self, to: initialValue)
 					),
 				methods:
 					(increase, takes:, returns: s32, in:

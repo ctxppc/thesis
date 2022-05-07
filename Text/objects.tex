@@ -61,26 +61,33 @@ However, the following program is not valid since the second invocation of \iil/
 \paragraph{From NT to Λ} The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 
 \section{Objects \& Methods} \label{sct:obj-meth}
-A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{methods}.
+A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{\gs{method}}.
 
-An object belongs to an \textbf{object type}, which determines the record type and methods of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of methods.
+An object belongs to an \textbf{object type}, which determines the record type and \gs{method} of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of \gs{method}.
 
-Object types can be defined using an \textbf{object type definition} in a \texttt{letType} value.
-
-The following OB program implements a \texttt{Counter} object type, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
-\ilfile{Programs/counter.ob}
-
-An object type consists of three parts:
-\begin{itemize}
-    \item A \textbf{name}, which is \iil/Counter/ in the previous example.
+Object types can be defined using an \textbf{object type definition} in a \texttt{letType} value. A definition consists of
+\begin{itemize}[nosep]
+	\item a name, like any other type definition;
+	\item a record type specifying the structure of each object's state;
+	\item an initialiser effect applied on all new objects accepting zero or more parameters; and
+	\item zero or more \gs{method}.
 \end{itemize}
 
-An object in Glyco is represented as a sealed capability to a record.
+An \textbf{\g{init}} is a pseudo-\g{method} automatically invoked on every new object immediately after its state is allocated that ensures that the object has the right initial state. An object can be created using an \texttt{object} value, which accepts a type name and arguments to the initialiser's parameters. \Gs{method} can only be defined when the object type is being defined. They can be invoked using a \texttt{message} value, which takes an object, \g{method} name, and arguments to the \g{method}'s parameters. Initialisers and \gs{method} alike get a capability to the object's state, i.e., the record composing it, through the \iil/self/ value.
 
-\subsection{Object Types are Objects}
-% TODO
+The following OB program implements the object type \iil/Counter/, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
+\ilfile{Programs/counter.ob}
 
-\section{Object State Encapsulation} \label{sct:obj-sec}
+\section{Object State Encapsulation \& Unique Seals} \label{sct:obj-sec}
+The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the initialiser or a method leaks a capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that an \g{init} or method \textbf{can only be invoked on an object of the type defining that \g{init} or \g{method}}.\footnote{This property similarly does not hold if a capability to the \g{init}'s or \g{method}'s code is leaked.}
+
+Both properties are achieved by \g{sealing} capabilities to objects, \gs{method}, and \gs{init} using unique \gs{sealcap} provided by a \g{rtrt}. \G{sealing} capabilities using a \g{sealcap} is a power which was originally bestowed upon the \g{rt} in the design and implementation of \g{ghscc} where an \g{scall} seals a return–frame capability pair before passing control to the callee.
+
+An \textbf{\g{objcap}} is a sealed capability to a record embodying an object. A \textbf{\g{methcap}} is a sealed code capability to a \g{method} or \g{init}. Due to their sealed nature, \gs{objcap} cannot be used in an \texttt{getField} value or \texttt{setField} effect and similarly \gs{init} and \gs{methcap} cannot be used in an \texttt{evaluate} value.\footnote{A \texttt{getField} value is eventually \lowered{} to a load instruction in the CHERI-RISC-V language. A \texttt{setField} effect is eventually \lowered{} to a store instruction. An \texttt{evaluate} value is eventually \lowered{} to a \texttt{CJALR} jump instruction and some other instructions surrounding it. Loading or storing using a sealed capability or jumping to a sealed code capability using \texttt{CJALR} results in a machine trap.}
+
+Object and method capabilities are sealed using the same \g{sealcap}; a \g{methcap} can therefore be invoked on an \g{objcap} using the \textbf{CInvoke} CHERI-RISC-V instruction. This immediately poses an issue in protecting the \g{sealcap} while at the same still allowing arbitrary clients to create new objects and thus derive new \gs{objcap}.
+
+\subsection{Object Types Are Objects}
 % TODO
 
 \section{Changes to Glyco} \label{sct:obj-changes}

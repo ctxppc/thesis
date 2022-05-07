@@ -128,4 +128,26 @@
 	description={a procedure call mediated by the s-call \g{rtrt} which seals the frame and return capabilities using a unique \g{sealcap}, thereby ensuring the callee cannot dereference either capability and requiring that the callee use \texttt{CInvoke} to return to the caller}
 }
 
+\newglossaryentry{init}{
+	name=initialiser,
+	description={a pseudo-\g{method} invoked on any new object of the type for which the initialiser is defined, ensuring that the new object has an appropriate initial state}
+}
+
+\newglossaryentry{method}{
+	name=method,
+	description={a function that can be invoked on an object and gets access to the object's state, if defined on the same type as the object}
+}
+
+\newglossaryentry{objcap}{
+	name=object capability,
+	plural=object capabilities,
+	description={a capability to a state record embodying a sealed object, sealed with a \g{sealcap} only used for objects and methods of the same object type}
+}
+
+\newglossaryentry{methcap}{
+	name=method capability,
+	plural=method capabilities,
+	description={a capability to a method's code, sealed with a \g{sealcap} only used for objects and methods of the same object type}
+}
+
 \makeglossaries
