@@ -26,9 +26,6 @@ extension Λ {
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
-		/// A value representing a globally defined function with given name.
-		case function(Label)
-		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
@@ -45,6 +42,8 @@ extension Λ {
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
 		/// A value that evaluates to given value after associating zero or more values with a name.
+		///
+		/// Definitions using a lambda value are immediately available in the lambda body and can be used for recursion.
 		indirect case `let`([Definition], in: Value)
 		
 		/// A value that evaluates to given value after performing given effects.
@@ -74,12 +73,9 @@ extension Λ {
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let result):
 				let name = context.labels.uniqueName(from: "anon")
-				context.anonymousFunctions.append(
+				context.lambdaFunctions.append(
 					.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 				)
-				return .function(name)
-				
-				case .function(let name):
 				return .function(name)
 				
 				case .seal:

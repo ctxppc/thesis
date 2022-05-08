@@ -34,9 +34,6 @@ extension NT {
 		/// If the result type is a nominal type and the result is of a structural type, it is implicitly converted.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
-		/// A value representing a globally defined function with given name.
-		case function(Label)
-		
 		/// A value that evaluates to a unique capability that can be used for sealing.
 		case seal
 		
@@ -98,9 +95,6 @@ extension NT {
 					returns:	resultType.lowered(in: &context),
 					in:			result.lowered(in: &context)
 				)
-				
-				case .function(let name):
-				return .function(name)
 				
 				case .seal:
 				return .seal
@@ -196,10 +190,6 @@ extension NT {
 					return .init(from: .cap(.function(takes: parameters, returns: resultType)), in: context)
 					
 				}
-				
-				case .function(let name):
-				guard let function = context.functions[name] else { throw TypingError.undefinedFunction(name) }
-				return .init(from: .cap(.function(takes: function.parameters, returns: function.resultType)), in: context)
 				
 				case .seal:
 				return .init(from: .cap(.seal(sealed: false)), in: context)

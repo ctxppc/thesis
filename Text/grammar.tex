@@ -11,7 +11,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 \begin{grammar}
 	\footnotesize
 				<OB.Program> ::=
-							"("<Result>, "functions:" <[Function]>")"
+							"("<Result>")"
 				\par
 				<OB.Predicate> ::=
 						<Bool> |
@@ -25,9 +25,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<OB.Initialiser> ::=
 							"(""takes:" <[Parameter]>, "in:" <Effect>")"
-				\par
-				<OB.Function> ::=
-							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
 				<OB.RecordType> ::=
 							"("<[Field]>")"
@@ -53,7 +50,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "object""("<TypeName>, <[Value]>")"
-						| "function""("<Label>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Value>, <[Value]>")"
 						| "message""("<Value>, <Method.Name>, <[Value]>")"
@@ -93,17 +89,17 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Symbol>, <Value>")"
 				\par
 				<OB.TypeDefinition> ::=
-						"structural""("<TypeName>, <ValueType>")"
+						"alias""("<TypeName>, <ValueType>")"
 						| "nominal""("<TypeName>, <ValueType>")"
 						| "object""("<ObjectType>")"
 				\par
 \end{grammar}
 \par
-\paragraph{ NT (Named Types) } A language that introduces named structural and nominal types.
+\paragraph{ NT (Named Types) } A language that introduces named alias and nominal types.
 \begin{grammar}
 	\footnotesize
 				<NT.Program> ::=
-							"("<Result>, "functions:" <[Function]>")"
+							"("<Result>")"
 				\par
 				<NT.Effect> ::=
 						"do""("<[Effect]>")"
@@ -138,12 +134,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
-						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Value>, <[Value]>")"
-						| "cast""("<Value>, "as:" <TypeName>")"
+						| "cast""("<Value>, "as:" <ValueType>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
@@ -160,9 +155,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<NT.TypeName> ::=
 						<String>
-				\par
-				<NT.Function> ::=
-							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
 				<NT.ValueType> ::=
 								<TypeName> |
@@ -183,11 +175,11 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 \end{grammar}
 \par
-\paragraph{ Λ (Lambdas) } A language that introduces anonymous functions and function values.
+\paragraph{ Λ (Lambdas) } A language that moves functions to value position.
 \begin{grammar}
 	\footnotesize
 				<Λ.Program> ::=
-							"("<Result>, "functions:" <[Function]>")"
+							"("<Result>")"
 				\par
 				<Λ.Value> ::=
 						<Int> |
@@ -199,7 +191,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "vector""("<ValueType>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
-						| "function""("<Label>")"
 						| "seal"
 						| "sealed""("<Value>, "with:" <Value>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
@@ -220,9 +211,6 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "let""("<[Definition]>, "in:" <Effect>")"
 						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
 						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
-				\par
-				<Λ.Function> ::=
-							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
 				<Λ.Result> ::=
 						"value""("<Value>")"

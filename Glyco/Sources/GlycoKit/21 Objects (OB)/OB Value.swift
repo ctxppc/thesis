@@ -36,9 +36,6 @@ extension OB {
 		/// A value that evaluates to a unique capability to an object constructed with given arguments.
 		case object(TypeName, [Value])
 		
-		/// A value representing a globally defined function with given name.
-		case function(Label)
-		
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
@@ -95,9 +92,6 @@ extension OB {
 					.named(Method.symbol(typeName: objectType.typeObjectTypeName, methodName: ObjectType.typeObjectCreateObjectMethod)),
 					try [.named(objectType.typeObjectName)] + arguments.lowered(in: &context)
 				)
-				
-				case .function(let name):
-				return .function(name)
 				
 				case .binary(let lhs, let op, let rhs):
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
@@ -215,10 +209,6 @@ extension OB {
 				
 				case .object(let typeName, _):
 				return .cap(.object(typeName))
-				
-				case .function(let name):
-				guard let function = context.functions[name] else { throw TypingError.undefinedFunction(name) }
-				return .cap(.function(takes: function.parameters, returns: function.resultType))
 				
 				case .binary:
 				return .s32

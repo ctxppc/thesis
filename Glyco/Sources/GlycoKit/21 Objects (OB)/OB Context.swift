@@ -5,9 +5,6 @@ extension OB {
 	/// A value used while lowering a program, function, or method.
 	struct Context {
 		
-		/// The globally defined functions.
-		let functions: [Function]
-		
 		/// The name of the object type being lowered, or `nil` if no method is being lowered.
 		var objectTypeName: TypeName?
 		

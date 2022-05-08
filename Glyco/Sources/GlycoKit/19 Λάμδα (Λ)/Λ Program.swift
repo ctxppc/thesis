@@ -1,22 +1,19 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Lambdas
-//sourcery: description = "A language that introduces anonymous functions and function values."
+//sourcery: description = "A language that moves functions to value position."
 public enum Λ : Language {
 	
 	/// A program on a Λ machine.
 	public struct Program : GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function]) {
+		/// Creates a program with given result.
+		public init(_ result: Result) {
 			self.result = result
-			self.functions = functions
 		}
 		
 		/// The program's result.
 		public var result: Result
-		
-		/// The program's functions.
-		public var functions: [Function]
 		
 		// See protocol.
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
@@ -27,10 +24,7 @@ public enum Λ : Language {
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
 			var context = Λ.Context()
-			return try .init(
-				result.lowered(in: &context),
-				functions: functions.lowered(in: &context) + context.anonymousFunctions
-			)
+			return try .init(result.lowered(in: &context), functions: context.lambdaFunctions)
 		}
 		
 	}

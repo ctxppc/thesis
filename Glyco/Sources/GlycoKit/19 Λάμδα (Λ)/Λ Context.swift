@@ -5,8 +5,8 @@ extension Λ {
 	/// A value used while lowering.
 	struct Context {
 		
-		/// The anonymous functions discovered while lowering values.
-		var anonymousFunctions = [Lower.Function]()
+		/// The functions discovered while lowering lambda values.
+		var lambdaFunctions = [Lower.Function]()
 		
 		/// A bag of labels.
 		var labels = Bag<Lower.Label>()

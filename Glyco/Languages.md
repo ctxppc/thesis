@@ -82,7 +82,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <code>TypeName</code>
 <dl>
 	<dt><code>OB.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dd><code>(Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Predicate</code></dt>
@@ -99,10 +99,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <dl>
 	<dt><code>OB.Initialiser</code></dt>
 	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Effect)</code></dd>
-</dl>
-<dl>
-	<dt><code>OB.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.RecordType</code></dt>
@@ -132,7 +128,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
-	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>
@@ -179,13 +174,13 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.TypeDefinition</code></dt>
-	<dd><code><strong>structural</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
 	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
 	<dd><code><strong>object</strong>(ObjectType)</code></dd>
 </dl>
 
 <h2 id="NT">Grammar for NT (Named Types)</h2>
-A language that introduces named structural and nominal types.
+A language that introduces named alias and nominal types.
 
 **Inherited from Λ:**
 <code>BinaryOperator</code>, 
@@ -194,7 +189,7 @@ A language that introduces named structural and nominal types.
 <code>Symbol</code>
 <dl>
 	<dt><code>NT.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dd><code>(Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.Effect</code></dt>
@@ -234,12 +229,11 @@ A language that introduces named structural and nominal types.
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
-	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
-	<dd><code><strong>cast</strong>(Value, <strong>as:</strong> TypeName)</code></dd>
+	<dd><code><strong>cast</strong>(Value, <strong>as:</strong> ValueType)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
@@ -260,10 +254,6 @@ A language that introduces named structural and nominal types.
 <dl>
 	<dt><code>NT.TypeName</code></dt>
 	<dd><code>String</code></dd>
-</dl>
-<dl>
-	<dt><code>NT.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>NT.ValueType</code></dt>
@@ -287,7 +277,7 @@ A language that introduces named structural and nominal types.
 </dl>
 
 <h2 id="Λ">Grammar for Λ (Lambdas)</h2>
-A language that introduces anonymous functions and function values.
+A language that moves functions to value position.
 
 **Inherited from EX:**
 <code>BinaryOperator</code>, 
@@ -301,7 +291,7 @@ A language that introduces anonymous functions and function values.
 <code>ValueType</code>
 <dl>
 	<dt><code>Λ.Program</code></dt>
-	<dd><code>(Result, <strong>functions:</strong> [Function])</code></dd>
+	<dd><code>(Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>Λ.Value</code></dt>
@@ -314,7 +304,6 @@ A language that introduces anonymous functions and function values.
 	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
-	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 	<dd><code><strong>sealed</strong>(Value, <strong>with:</strong> Value)</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
@@ -337,10 +326,6 @@ A language that introduces anonymous functions and function values.
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
 	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
-</dl>
-<dl>
-	<dt><code>Λ.Function</code></dt>
-	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 </dl>
 <dl>
 	<dt><code>Λ.Result</code></dt>

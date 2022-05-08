@@ -7,16 +7,13 @@ public enum OB : Language {
 	/// A program on an OB machine.
 	public struct Program : GlycoKit.Program {
 		
-		public init(_ result: Result, functions: [Function]) {
+		/// Creates a program with given result.
+		public init(_ result: Result) {
 			self.result = result
-			self.functions = functions
 		}
 		
 		/// The program's result.
 		public var result: Result
-		
-		/// The program's functions.
-		public var functions: [Function]
 		
 		// See protocol.
 		public func optimise(configuration: CompilationConfiguration) -> Bool { false }
@@ -26,8 +23,8 @@ public enum OB : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			var context = Context(functions: functions)
-			return try .init(result.lowered(in: &context), functions: functions.lowered(in: &context))
+			var context = Context()
+			return try .init(result.lowered(in: &context))
 		}
 		
 	}

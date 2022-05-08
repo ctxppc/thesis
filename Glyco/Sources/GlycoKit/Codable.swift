@@ -282,7 +282,6 @@ extension MM.Frame {
 extension NT.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
-		case functions = "functions"
 	}
 }
 
@@ -306,15 +305,6 @@ extension NT.Field {
 	}
 }
 
-extension NT.Function {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case parameters = "takes"
-		case resultType = "returns"
-		case result = "in"
-	}
-}
-
 extension NT.Parameter {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -326,7 +316,6 @@ extension NT.Parameter {
 extension OB.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
-		case functions = "functions"
 	}
 }
 
@@ -341,15 +330,6 @@ extension OB.Initialiser {
 	public enum CodingKeys : String, CodingKey {
 		case parameters = "takes"
 		case effect = "in"
-	}
-}
-
-extension OB.Function {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case parameters = "takes"
-		case resultType = "returns"
-		case result = "in"
 	}
 }
 
@@ -447,16 +427,6 @@ extension SV.Procedure {
 extension Λ.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
-		case functions = "functions"
-	}
-}
-
-extension Λ.Function {
-	public enum CodingKeys : String, CodingKey {
-		case name = "_0"
-		case parameters = "takes"
-		case resultType = "returns"
-		case result = "in"
 	}
 }
 

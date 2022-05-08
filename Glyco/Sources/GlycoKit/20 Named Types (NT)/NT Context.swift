@@ -18,9 +18,6 @@ extension NT {
 	/// A value used while typing.
 	struct TypingContext : NTTypeContext {
 		
-		/// The program's global functions.
-		let functions: [Function]
-		
 		/// The type definitions in the current scope, from oldest to newest.
 		var types = [TypeDefinition]()
 		
