@@ -16,7 +16,7 @@ A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, i
 The scope of a lambda definition extends beyond the \texttt{λ} value itself to the \texttt{let} value defining it, in a similar way to \texttt{letRec} values in some functional programming languages and unlike definitions of other kinds of values. This enables mutual recursion such as the following (inefficient) program determining the parity of 420.
 \ilfile{Programs/evenodd.l}
 
-Finally, since \texttt{λ} values with support for mutual recursion provide the same expressive power as programs with global functions, Λ removes support for global functions. The reader should bear in mind however that lambdas do not \emph{increase} the expressive power of programs but merely make it easier to define functions. Lambda values evaluate to code capabilities and do not carry an environment; lambdas in Λ aren't closures.
+Finally, since \texttt{λ} values with support for mutual recursion provide the same expressive power as programs with global functions, Λ removes support for global functions. The reader should bear in mind however that lambdas do not \emph{increase} the expressive power of programs but merely make it easier to define functions. Lambda values evaluate to code capabilities and do not carry an environment, i.e., lambdas in Λ aren't closures.
 
 \paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with either an auto-generated name or a name derived from the lambda definition) and replaces the \texttt{λ} values by code capabilities to those functions. The first program of this chapter is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
@@ -83,17 +83,51 @@ An \textbf{\g{init}} is a pseudo-\g{method} automatically invoked on every new o
 The following OB program implements the object type \iil/Counter/, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
 \ilfile{Programs/counter.ob}
 
-\section{Object State Encapsulation \& Unique Seals} \label{sct:obj-sec}
-The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the initialiser or a method leaks a capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that an \g{init} or method \textbf{can only be invoked on an object of the type defining that \g{init} or \g{method}}.\footnote{This property similarly does not hold if a capability to the \g{init}'s or \g{method}'s code is leaked.}
+\subsection{Object State Encapsulation \& Unique Seals} \label{sct:obj-sec}
+The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the \g{init} or a \g{method} leaks an unsealed capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that a \g{method} or \g{init} \textbf{can only be invoked on an object of the type defining that \g{method} or \g{init}}.\footnote{This property similarly does not hold if an unsealed code capability to the \g{method} is leaked.}
 
-Both properties are achieved by \g{sealing} capabilities to objects, \gs{method}, and \gs{init} using unique \gs{sealcap} provided by a \g{rtrt}. \G{sealing} capabilities using a \g{sealcap} is a power which was originally bestowed upon the \g{rt} in the design and implementation of \g{ghscc} where an \g{scall} seals a return–frame capability pair before passing control to the callee.
+Both properties are achieved by \g{sealing} capabilities to objects and \gs{method} using unique \gs{sealcap} provided by a \g{rtrt}. \G{sealing} capabilities using a \g{sealcap} is a power which was originally bestowed upon the \g{rt} in the design and implementation of \g{ghscc} where an \g{scall} seals a return–frame capability pair before passing control to the callee.
 
-An \textbf{\g{objcap}} is a sealed capability to a record embodying an object. A \textbf{\g{methcap}} is a sealed code capability to a \g{method} or \g{init}. Due to their sealed nature, \gs{objcap} cannot be used in an \texttt{getField} value or \texttt{setField} effect and similarly \gs{init} and \gs{methcap} cannot be used in an \texttt{evaluate} value.\footnote{A \texttt{getField} value is eventually \lowered{} to a load instruction in the CHERI-RISC-V language. A \texttt{setField} effect is eventually \lowered{} to a store instruction. An \texttt{evaluate} value is eventually \lowered{} to a \texttt{CJALR} jump instruction and some other instructions surrounding it. Loading or storing using a sealed capability or jumping to a sealed code capability using \texttt{CJALR} results in a machine trap.}
+An \textbf{\g{objcap}} is a sealed capability to a record embodying an object. A \textbf{\g{methcap}} is a sealed code capability to a \g{method}. Due to their sealed nature, \gs{objcap} cannot be used in an \texttt{getField} value or \texttt{setField} effect and similarly \gs{methcap} cannot be used in an \texttt{evaluate} value without a receiver of the right object type.\footnote{A \texttt{getField} value is eventually \lowered{} to a load instruction in the CHERI-RISC-V language. A \texttt{setField} effect is eventually \lowered{} to a store instruction. An \texttt{evaluate} value is eventually \lowered{} to either a \texttt{CJALR} or \texttt{CInvoke} instruction. Loading or storing using a sealed capability, jumping to a sealed code capability using \texttt{CJALR}, or invoking a mismatched code–data capability pair using \texttt{CInvoke} results in a machine trap.}
 
-Object and method capabilities are sealed using the same \g{sealcap}; a \g{methcap} can therefore be invoked on an \g{objcap} using the \texttt{CInvoke} CHERI-RISC-V instruction. This immediately poses an issue in protecting the \g{sealcap} while at the same still allowing arbitrary clients to create new objects and thus derive new \gs{objcap}.
+Object and method capabilities belonging to the same object type are sealed using the same \g{sealcap}; a \g{methcap} can therefore be invoked on an \g{objcap} using the \texttt{CInvoke} CHERI-RISC-V instruction. A \g{methcap} cannot be invoked on an \g{objcap} belonging to a different object type; the hardware ensures this invariant when the \texttt{CInvoke} instruction is executed, with a violation causing a machine trap.
 
 \subsection{Object Types Are Objects}
-% TODO
+When an object type is defined in a \texttt{letType} value, a unique \g{sealcap} is created and used for sealing the new type's \gs{methcap}. This capability must be protected from adversaries as it allows for additional methods to be defined. With access to the \g{sealcap}, the adversary merely needs to seal a \g{methcap} of its own and invoke the adversarial method on the sealed object to get access to the object's state, thereby breaking the encapsulation property.
+
+An object type's \g{sealcap} is also needed for sealing new \gs{objcap}, i.e., for creating new objects of the object type. To allow an adversary to create new objects of a type it doesn't own, Glyco introduces the concept of an \textbf{object type object}, an object representing an object type, and the notion of a \textbf{metatype}, the type of a type object. The metatype provides a \texttt{createObject} method with the same parameters as those of the type's \g{init} and which produces an \g{objcap}. The \g{sealcap} needed for \g{sealing} the capability to the initialised state of the new object is stored within the type object and only accessible from within the \texttt{createObject} method by relying on the security properties afforded by objects.
+
+Each object type has an associated type object and metatype. The metatype (the type object's type) doesn't define an \g{init}; instead, the singleton type object's state is statically allocated and initialised at the point of the object type definition and the metatype's \g{sealcap} is discarded after use.
+
+\subsection{\G{lowering} OB to NT}
+We'll work through the OB to NT \g{nanopass} by applying it on the \iil/Counter/ example at the beginning of this section.
+\ilfile[lastline=2]{Programs/counter.nt}
+
+An object type definition (in a \texttt{letType}) is \lowered{} to NT by
+\begin{enumerate}[nosep]
+	
+	\item defining a nominal type definition;
+	\ilfile[firstline=3, lastline=5]{Programs/counter.nt}
+	
+	\item creating unique \gs{sealcap} for the metatype and the new type;
+	\ilfile[firstline=6, lastline=7]{Programs/counter.nt}
+	
+	\item allocating and initialising a type object with the type's \g{sealcap};
+	\item sealing the capability to this object with the metatype's \g{sealcap};
+	\ilfile[firstline=8, lastline=17]{Programs/counter.nt}
+	
+	\item implementing the metatype's \texttt{createObject} method using a lambda that allocates a state record, executes the initialiser's effect, seals a capability to the state record using the \g{sealcap} stored in the type object, and returns this sealed capability to the method's caller;
+	\item sealing the capability for this method with the metatype's \g{sealcap};
+	\ilfile[firstline=18, lastline=40]{Programs/counter.nt}
+	
+	\item implementing each method of the type using a lambda that takes a sealed parameter \iil/ob.self/ representing the receiver (and which the \iil/self/ value maps to) plus any parameters defined on the method; and finally,
+	\item sealing the capability of each of the type's methods.
+	\ilfile[firstline=41, lastline=76]{Programs/counter.nt}
+	
+\end{enumerate}
+
+Each method invocation is \lowered{} by evaluating the \g{methcap} with the receiver as the first argument, followed by any provided arguments. Object construction in \texttt{object} values is implemented in NT by calling the metatype's \texttt{createObject} \g{methcap} on the type object.
+\ilfile[firstline=77]{Programs/counter.nt}
 
 \section{Changes to Glyco} \label{sct:obj-changes}
 % TODO
