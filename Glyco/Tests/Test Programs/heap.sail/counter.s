@@ -125,6 +125,10 @@ rv.main:		addi t0, zero, 288
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
+				cmove ca1, ct6
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
 				cmove ca2, ct6
 				addi t0, zero, 16
 				cllc ct1, mm.alloc_cap
@@ -134,11 +138,10 @@ rv.main:		addi t0, zero, 288
 				cmove cra, ca0
 				cmove cs1, ca2
 				csc cs1, 0(cra)
-				cmove cra, ca2
+				cmove cra, ca1
 				cseal ca0, ca0, cra
 				cllc cra, l.anon
-				cmove cs1, ca2
-				cseal ca1, cra, cs1
+				cseal ca1, cra, ca1
 				cllc cra, l.anon$1
 				cmove cs1, ca2
 				cseal ct4, cra, cs1

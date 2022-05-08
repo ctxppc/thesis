@@ -112,24 +112,27 @@ rv.main:		csc cfp, -16(csp)
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 				cmove ca2, ct6
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ca4, ct6
 				cincoffsetimm ca1, csp, -16
 				csetboundsimm ca1, ca1, 16
 				cgetaddr t0, ca1
 				csetaddr csp, csp, t0
 				cmove cra, ca1
-				cmove ca0, ca2
+				cmove ca0, ca4
 				csc ca0, 0(cra)
 				cmove cra, ca2
 				cseal ca1, ca1, cra
 				cllc cra, l.anon
-				cmove ca0, ca2
-				cseal ca3, cra, ca0
+				cseal ca3, cra, ca2
 				cllc cra, l.anon$1
-				cmove ca0, ca2
+				cmove ca0, ca4
 				cseal ct4, cra, ca0
 				csc ct4, -48(cfp)
 				cllc ca0, l.anon$2
-				cmove cra, ca2
+				cmove cra, ca4
 				cseal ct4, ca0, cra
 				csc ct4, -32(cfp)
 				cmove ca2, ca1

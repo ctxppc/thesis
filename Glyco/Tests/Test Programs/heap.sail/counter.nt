@@ -3,12 +3,13 @@
 		letType(
 			nominal(Counter, cap(record(((value, s32)), sealed: true))),
 			in: let(
-				(ob.seal, seal)
+				(ob.tseal, seal)
+				(ob.oseal, seal)
 				(
 					ob.Counter.type,
 					let(
 						(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
-						in: do(setField(seal, of: ob.typeobj, to: ob.seal), then: sealed(ob.typeobj, with: ob.seal))
+						in: do(setField(seal, of: ob.typeobj, to: ob.oseal), then: sealed(ob.typeobj, with: ob.tseal))
 					)
 				)
 				(
@@ -26,7 +27,7 @@
 								)
 							)
 						),
-						with: ob.seal
+						with: ob.tseal
 					)
 				)
 				(
@@ -40,7 +41,7 @@
 								in: do(setField(value, of: ob.self, to: newValue), then: value(newValue))
 							)
 						),
-						with: ob.seal
+						with: ob.oseal
 					)
 				)
 				(
@@ -51,7 +52,7 @@
 							returns: s32,
 							in: value(field(value, of: ob.self))
 						),
-						with: ob.seal
+						with: ob.oseal
 					)
 				),
 				in: let(

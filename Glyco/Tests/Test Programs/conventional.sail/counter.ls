@@ -1,28 +1,29 @@
 (
 	value(
 		let(
-			(ob.seal, seal)
+			(ob.tseal, seal)
+			(ob.oseal, seal)
 			(
 				ob.Counter.type,
 				let(
 					(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
 					in: do(
-						let((ex.rec, source(ob.typeobj)) (ex.val, source(ob.seal)), in: setField(seal, of: ex.rec, to: ex.val)),
-						then: let((ex.cap, source(ob.typeobj)) (ex.seal, source(ob.seal)), in: sealed(ex.cap, with: ex.seal))
+						let((ex.rec, source(ob.typeobj)) (ex.val, source(ob.oseal)), in: setField(seal, of: ex.rec, to: ex.val)),
+						then: let((ex.cap, source(ob.typeobj)) (ex.seal, source(ob.tseal)), in: sealed(ex.cap, with: ex.seal))
 					)
 				)
 			)
 			(
 				ob.ob.Counter.Type.createObject.m,
-				let((ex.cap$1, source(function(l.anon))) (ex.seal$1, source(ob.seal)), in: sealed(ex.cap$1, with: ex.seal$1))
+				let((ex.cap$1, source(function(l.anon))) (ex.seal$1, source(ob.tseal)), in: sealed(ex.cap$1, with: ex.seal$1))
 			)
 			(
 				ob.Counter.increase.m,
-				let((ex.cap$2, source(function(l.anon$1))) (ex.seal$2, source(ob.seal)), in: sealed(ex.cap$2, with: ex.seal$2))
+				let((ex.cap$2, source(function(l.anon$1))) (ex.seal$2, source(ob.oseal)), in: sealed(ex.cap$2, with: ex.seal$2))
 			)
 			(
 				ob.Counter.getCount.m,
-				let((ex.cap$3, source(function(l.anon$2))) (ex.seal$3, source(ob.seal)), in: sealed(ex.cap$3, with: ex.seal$3))
+				let((ex.cap$3, source(function(l.anon$2))) (ex.seal$3, source(ob.oseal)), in: sealed(ex.cap$3, with: ex.seal$3))
 			),
 			in: let(
 				(

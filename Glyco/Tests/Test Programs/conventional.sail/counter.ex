@@ -1,17 +1,18 @@
 (
 	value(
 		let(
-			(ob.seal, seal)
+			(ob.tseal, seal)
+			(ob.oseal, seal)
 			(
 				ob.Counter.type,
 				let(
 					(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
-					in: do(setField(seal, of: ob.typeobj, to: ob.seal), then: sealed(ob.typeobj, with: ob.seal))
+					in: do(setField(seal, of: ob.typeobj, to: ob.oseal), then: sealed(ob.typeobj, with: ob.tseal))
 				)
 			)
-			(ob.ob.Counter.Type.createObject.m, sealed(function(l.anon), with: ob.seal))
-			(ob.Counter.increase.m, sealed(function(l.anon$1), with: ob.seal))
-			(ob.Counter.getCount.m, sealed(function(l.anon$2), with: ob.seal)),
+			(ob.ob.Counter.Type.createObject.m, sealed(function(l.anon), with: ob.tseal))
+			(ob.Counter.increase.m, sealed(function(l.anon$1), with: ob.oseal))
+			(ob.Counter.getCount.m, sealed(function(l.anon$2), with: ob.oseal)),
 			in: let(
 				(counter, evaluate(ob.ob.Counter.Type.createObject.m, ob.Counter.type 32))
 				(ignored, evaluate(ob.Counter.increase.m, counter))

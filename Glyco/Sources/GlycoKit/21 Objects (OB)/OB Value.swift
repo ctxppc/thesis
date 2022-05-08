@@ -129,9 +129,13 @@ extension OB {
 					in: .let(.init {
 						for case .object(let objectType) in typeDefinitions {
 							
-							// A fresh seal for sealing the type object, the type object's createObject method, the type's objects, and the type's methods.
-							let sealName: Lower.Symbol = "ob.seal"
-							sealName ~ .seal
+							// A fresh seal for sealing the type object and its createObject method.
+							let typeSeal: Lower.Symbol = "ob.tseal"
+							typeSeal ~ .seal
+							
+							// A fresh seal for sealing the the type's objects and methods.
+							let objectSeal: Lower.Symbol = "ob.oseal"
+							objectSeal ~ .seal
 							
 							// The type object.
 							let unsealedTypeObject: Lower.Symbol = "ob.typeobj"
@@ -141,9 +145,9 @@ extension OB {
 									[.setField(
 										ObjectType.typeObjectSealFieldName,
 										of: .named(unsealedTypeObject),
-										to: .named(sealName)
+										to: .named(objectSeal)
 									)],
-									then: .sealed(.named(unsealedTypeObject), with: .named(sealName))
+									then: .sealed(.named(unsealedTypeObject), with: .named(typeSeal))
 								)
 							)
 							
@@ -153,14 +157,14 @@ extension OB {
 								methodName: ObjectType.typeObjectCreateObjectMethod
 							) ~ .sealed(
 								try objectType.initialiser.lowered(in: &context, type: objectType),
-								with: .named(sealName)
+								with: .named(typeSeal)
 							)
 							
 							// The type's methods.
 							for method in objectType.methods {
 								method.symbol(typeName: objectType.name) ~ .sealed(
 									try method.lowered(in: &context, type: objectType),
-									with: .named(sealName)
+									with: .named(objectSeal)
 								)
 							}
 							
