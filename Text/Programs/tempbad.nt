@@ -1,15 +1,12 @@
-(
-	value(letType(
-		nominal(Kelvin, s32) nominal(Celsius, s32), in:
-		let(
-			(toKelvin, λ(takes: (c, Celsius, sealed: false), returns: Kelvin, in:
-				value(cast(binary(c, add, 273), as: Kelvin))
-			))
-			(toCelsius, λ(takes: (k, Kelvin, sealed: false), returns: Celsius, in:
-				value(cast(binary(k, sub, 273), as: Celsius))
-			)),
-			in: evaluate(toCelsius, evaluate(toCelsius, 500))
-		)
-	)),
-	functions:
-)
+(value(letType(
+	nominal(Kelvin, s32) nominal(Celsius, s32), in:
+	let(
+		(toKelvin, λ(takes: (c, Celsius, sealed: false), returns: Kelvin, in:
+			value(cast(binary(c, add, 273), as: Kelvin))
+		))
+		(toCelsius, λ(takes: (k, Kelvin, sealed: false), returns: Celsius, in:
+			value(cast(binary(k, sub, 273), as: Celsius))
+		)),
+		in: evaluate(toCelsius, evaluate(toCelsius, 500))
+	)
+)))
