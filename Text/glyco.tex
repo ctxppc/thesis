@@ -19,7 +19,7 @@ In \cref{sct:cd} we go over CD, a structured imperative language with support fo
 
 This chapter discusses the feature set and languages of Glyco 0.1,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.1/}.} which allows us to focus in each chapter on one set of functionality. It also permits us to evaluate how the nanopass approach performs with extensions in future versions which we discuss in later chapters.
 
-Example programs in this chapter follow the grammar of the final version of the compiler, Glyco 1.0,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/1.0/}.} and are compiled using the default configuration. The syntax of a program in one compiler version does not significantly change in another version but for consistency we chose to express all programs in the latest compiler's syntax, skipping languages introduced after Glyco 0.1. A full language reference of this syntax can be found in \cref{ch:grammar}. 
+Example programs in this chapter follow the syntax of the final version of the compiler, Glyco 1.0,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/1.0/}.} and are compiled using the default configuration. The syntax of a program in one compiler version does not significantly change in another version but for consistency we chose to express all programs in the latest compiler's syntax, skipping languages introduced after Glyco 0.1. A full language reference of this syntax can be found in \cref{ch:grammar}. 
 
 \section{Background: Nanopass Compilers} \label{sct:nanopass}
 Glyco is built following a \emph{nanopass} compiler design, described in the context of compiler education by several authors such as \cite{educomp} and in the context of commercial compiler development by authors such as \cite{commcomp}. A nanopass compiler consists of numerous small passes, so-called \textbf{\glspl{nanopass}}, which translate programs written in one \textbf{\g{il}} to programs written in another. The input of a \g{nanopass} is a program in a higher-level language than the one of its output; we therefore call this translation process a \textbf{\g{lowering}}. A \g{nanopass} should be concise and perform a relatively self-contained transformation. There should be no data structures shared across \gs{nanopass} except for the program itself.
@@ -33,7 +33,7 @@ Glyco 0.1 defines 20 \gs{il}, with a general approach adapted from the student c
 \section{An Expression Language} \label{sct:ex}
 The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:
+The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:\footnote{The \iil/sealed: false/ attribute on parameters is introduced in the next chapter as part of Glyco 0.2 and can be ignored for now.}
 \ilfile{Programs/fib.ex}
 
 This program defines a function \iil/fib/ with three signed 32-bit integer parameters \iil/prev/, \iil/curr/, and \iil/iter/ which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \iil/fib/ where \iil/prev/ is 0, \iil/curr/ is 1, and \iil/iter/ is 30.
@@ -136,18 +136,18 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 	\label{fig:gcccstack}
 \end{figure}
 
-\hspace{0pt} \\
-CC (Calling Convention) introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program (with the call effect highlighted)
+\paragraph{From CC (Calling Convention) to SV} CC introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program (with the call effect highlighted)
 \ilfile[highlightlines={3}]{Programs/42.cc}
 is \lowered{} to the following SV program (with the call effect's \g{lowering} highlighted):
 \ilfile[highlightlines={5-8}, samepage=true]{Programs/42.sv}
 
-The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call. % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call.
+% TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
 
 \section{Structured Values} \label{sct:sv}
 The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of vectors and records. A \textbf{vector} in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A \textbf{record} is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability, thereby ensuring that no other buffer can occupy this extra space accessible by the first capability.}
 
-Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program (with alternating effects highlighted)
+\paragraph{From SV to ID} Structured values are implemented in the \g{lowerlang} ID by translating effects dealing with them into effects dealing with unstructured data buffers. For example, the SV program (with alternating effects highlighted)
 \ilfile[highlightlines={4-10, 12, 14, 16, 18, 20}]{Programs/sequences.sv}
 is \lowered{} to the following ID program (with the above highlighted effects' \gs{lowering} highlighted):
 \ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}]{Programs/sequences.id}
@@ -196,7 +196,7 @@ Since the liveness set and conflict graph at entry depend on the liveness set an
 \ilfile[highlightlines={6}]{Programs/coalescable.al}
 can be coalesced to get
 \ilfile{Programs/coalesced.al}
-thereby saving one \texttt{set} effect (highlighted) and making the liveness set and conflict graph smaller.
+thereby saving one \texttt{set} effect (highlighted in the pre-coalescing example) and making the liveness set and conflict graph smaller.
 
 The location coalescing optimisation algorithm works as follows:
 \begin{enumerate}
