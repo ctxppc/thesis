@@ -12,7 +12,7 @@ This chapter discusses the feature set and languages of Glyco 0.2,\footnote{The 
 \section{Background: Secure Calling Conventions} \label{sct:scc}
 A traditional \g{cc} such as \g{gccc} works with a single stack of call frames per thread, with each call frame holding a procedure call's ephemeral state, such as values assigned to local variables. When a procedure is called, a new call frame is pushed on the stack, the caller puts a return address in a designated register or location on the call frame, and passes control to the callee. When returning, the most recent call frame on the stack is popped and the callee jumps to the caller-provided return address. The exact details and distribution of responsibilities are mandated by the \g{cc} in use.
 
-A traditional \g{cc} however provides no security in the face of adversarial code that operates in the same address space. For one, adversarial code has access to the full call stack and thus to other call frames than its own. The adversarial code may be from an external dependency that hasn't been rigorously vetted, but it may also be first-party code containing an overflow vulnerability on a statically-allocated buffer that is exploited with specially crafted input, as illustrated in \cref{fig:buffoverflow}. \textbf{\Gls{lse}} is a security property that makes it impossible for a procedure to access the local state, i.e., call frame, of another procedure, or for a procedure in one compartment (such as a library) to access the local state of a procedure in another compartment.
+A traditional \g{cc} however provides no security in the face of adversarial code that operates in the same address space. For one, adversarial code has access to the full call stack and thus to other call frames than its own. The adversarial code may be from an external dependency that hasn't been rigorously vetted, but it may also be first-party code containing an overflow vulnerability on a statically-allocated buffer that is exploited with specially crafted input, as illustrated in \cref{fig:buffoverflow}. \textbf{\Gls{lse}} is a security property that makes it \textbf{impossible for a procedure to access the local state,} i.e., call frame, \textbf{of another procedure,} or for a procedure in one compartment (such as a library) to access the local state of a procedure in another compartment.
 
 \begin{figure}
 	\begin{center}
@@ -22,9 +22,9 @@ A traditional \g{cc} however provides no security in the face of adversarial cod
 	\label{fig:buffoverflow}
 \end{figure}
 
-A different but related problem is that adversarial code may ignore the \g{retcap} provided by the caller and instead return to a different location within the caller. They may, for instance, skip an authentication check by jumping straight into the execution path of a successful authentication. They may also store the provided \g{retcap} and jump to it more than once. In contrast when \textbf{\g{wbcf}} applies, a procedure can either call procedures, return to its caller, or diverge (e.g., get stuck in an infinite loop).
+A different but related problem is that adversarial code may ignore the \g{retcap} provided by the caller and instead return to a different location within the caller. They may, for instance, skip an authentication check by jumping straight into the execution path of a successful authentication. They may also store the provided \g{retcap} and jump to it more than once. In contrast when \textbf{\g{wbcf}} applies, \textbf{a procedure can only call procedures, return to its caller, or diverge} (e.g., get stuck in an infinite loop).
 
-A \g{cc} proposed by \cite[section~7.3]{cerise} provides \g{lse} by ensuring that call frames always occupy freshly allocated memory to which certainly no dangling capabilities point. However it does not provide \g{wbcf}. \g{ghscc} adapts a variant of this \g{cc} that provides both security properties.
+A \g{cc} proposed by \cite[section~7.3]{cerise} provides \g{lse} by ensuring that call frames always occupy freshly allocated memory to which certainly no dangling capabilities point. However it does not provide \g{wbcf}. \g{ghscc} adapts a variant of this \g{cc} that provides \g{lse} and a weaker variant of \g{wbcf}.
 
 \section{Secure Heap Allocation \& A Runtime} \label{sct:ghscc-rt}
 As the name suggests, \acrlong{ghscc} uses the heap instead of a call stack. A secure implementation of \g{ghscc} depends on a secure implementation of heap allocation as described in \cite[section~7.1]{cerise}: a region of memory belonging to a heap-allocated buffer must only be accessible to \gs{userp} via the capability provided by the allocator when that buffer is allocated.
@@ -43,7 +43,7 @@ To implement heap allocation and future functionality securely, Glyco is extende
 
 As Glyco is developed almost entirely in isolation, it cannot rely on an operating system or dynamic linker to provide these routines and therefore provides them itself. It is expected that a production compiler would be able to rely on an OS-provided standard library instead, thereby removing the need to trust the compiler and its \g{rt}.
 
-The first \g{rtrt} is a \textbf{heap allocation routine}, which accepts a byte size in \texttt{t0} and a \g{retcap} in \texttt{ct2} and returns a unique capability to an allocated buffer in \texttt{ct1}. The \g{heapcap}, providing access to the full heap and pointing to the next free location, is stored within the allocator's memory. This ensures that, at any point in time, only the allocator has access to unallocated memory and that memory associated with an allocated buffer is only ever accessible to the allocator and whoever holds the capability to that buffer returned by the allocator.
+The first \g{rtrt} is a \textbf{heap allocation routine}, which accepts a byte size in \texttt{t0} and a \g{retcap} in \texttt{ct2} and returns a unique capability to an allocated buffer in \texttt{ct1}. The \g{heapcap}, providing access to the full heap and pointing to the next free location in it, is stored within the allocator's memory. This ensures that, at any point in time, only the allocator has access to unallocated memory and that memory associated with an allocated buffer is only ever accessible to the allocator and whoever holds the capability to that buffer returned by the allocator.
 
 \section{Call Frame Encapsulation \& Secure Calling} \label{sct:ghscc}
 A procedure allocates a buffer for its call frame in its prologue by calling the heap allocation routine with an appropriate byte size, and uses the call frame just as it would with \g{gccc}. The heap allocation routine ensures that only it and the procedure have access to the buffer,\footnote{The \g{rt} is implicitly trusted in our threat model. In a realistic compiler and runtime environment with a heap allocation routine, the program would need to trust at least the dynamic linker and any linked runtime code.} thereby ensuring that \g{lse} holds at that point in time.
@@ -52,9 +52,9 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 
 \begin{enumerate}
 	
-	\item Just as with \g{gccc}, the caller puts the arguments for the callee in argument registers. However, if there are more parameters than there are argument registers, an arguments record is allocated on the heap (using the \g{rtrt} described above), a capability to it is put in the last argument register, and any arguments that don't fit in registers are stored in the arguments record. The callee never needs to access the caller's call frame to gain access to arguments that didn't fit in registers.
+	\item Just as with \g{gccc}, the caller puts the arguments for the callee in argument registers. However, if there are more parameters than there are argument registers, an arguments record is allocated on the heap (using the \g{rtrt} described above), a capability to it is put in the last argument register, and any arguments that don't fit in registers are stored in the arguments record. The callee never needs to access the caller's call frame to gain access to arguments that didn't fit in registers, nor does the caller need access to the callee's call frame to store supplementary arguments.
 	
-	\item \label{itm:returned-init} The caller initialises a value \texttt{returned} to 0 and stores it in its call frame.
+	\item \label{itm:returned-init} The caller initialises a value \texttt{returned} to 0 and stores it in its call frame. This value is later used to protect against multiple uses of the \g{retcap}.
 	
 	\item The caller clears all registers except those used for the \g{framecap} and for arguments. This ensures that the callee doesn't accidentally receive any authority beyond what is explicitly passed to it.
 	
@@ -64,11 +64,13 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 	
 	\item The routine clears any registers that it has used itself to ensure it doesn't accidentally leak new authority, then jumps to the target capability's address (the callee).
 	
-	\item The callee starts executing where it first allocates a call frame using the heap allocation routine and stores the caller's (sealed) \g{framecap} in it.
+	\item The callee allocates a call frame using the heap allocation routine. If the callee isn't a leaf procedure, i.e., if it itself calls other procedures, it stores the caller's (sealed) \g{framecap} in its new call frame.\footnote{This behaviour emerges from the fact that the register allocator spills the locations containing the caller's sealed frame and return capabilities when a procedure contains a call effect.}
+	
+	\item The callee executes its effect.
 	
 	\item When the callee is done, it clears all registers except those used for the result and the \g{retcap}. This ensures that the caller doesn't accidentally receive any authority beyond what is explicitly returned to it.
 	
-	\item The callee returns control to the caller with \hbox{\texttt{cinvoke cra, cfp}} where \texttt{cra} and \texttt{cfp} are the \g{retcap} resp. \g{framecap} provided to the callee by the \g{scall} routine. The machine unseals the two capabilities after checking that they have the same \g{otype}, then puts the second operand (\texttt{cfp}) in \texttt{ct6}, and finally jumps to the first operand's address (\texttt{cra}).
+	\item The callee returns control to the caller with \hbox{\texttt{cinvoke cra, cfp}} where \texttt{cra} and \texttt{cfp} are the return resp. frame capabilities provided to the callee by the \g{scall} routine. The machine unseals the two capabilities after checking that they have the same \g{otype} and that they comply with the instruction's preconditions,\footnote{Among these preconditions are: the first operand must be valid and executable and the second operand must be valid and nonexecutable.} then puts the second operand (\texttt{cfp}) in \texttt{ct6}, and finally jumps to the first operand's address (\texttt{cra}).
 	
 	\item The caller restores its \g{framecap} by moving the capability in \texttt{ct6} back to \texttt{cfp}.
 	
@@ -80,7 +82,17 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 
 As part of an \g{scall}, the callee receives arguments and a return–frame capability pair sealed with a unique \g{otype} for which the callee has no \g{unsealcap} and therefore cannot dereference. The callee thus cannot access the caller's local state, thereby preserving \g{lse}. The capabilities are only unsealed when control is returned to the caller using the atomic \texttt{CInvoke} instruction. Since the callee also doesn't have a \g{sealcap} for that \g{otype}, it cannot forge a call stack to manipulate the procedure's local state, nor can it forge a \g{retcap} to trick \texttt{CInvoke} into unsealing the sealed \g{framecap} before invoking adversarial code.
 
-Before invoking the \g{scall} routine, the caller initialises an indicator value to 0 and stores it in its call frame. When the callee returns control to the caller, the caller checks if the value is still 0 and crashes otherwise. It then sets the value to 1 to ensure that subsequent uses of the \g{retcap} result in a machine trap, thereby ensuring \g{wbcf}. Since \g{lse} protects the call frame from external access, it also protects the indicator value from the same.
+Before invoking the \g{scall} routine, the caller initialises an indicator value to 0 and stores it in its call frame. When the callee returns control to the caller, the caller checks if the value is still 0 and crashes otherwise. It then sets the value to 1 to ensure that subsequent uses of the \g{retcap} result in a machine trap, thereby ensuring that the \g{retcap} is only usable once. Since \g{lse} protects the call frame from external access, it also protects the indicator value from the same.
+
+The latter security property, which we call \textbf{unrepeatable return}, is a weaker variant of \g{wbcf} and can be stated as follows: \textbf{a \g{retcap} provided by a procedure supporting unrepeatable return can be used at most once}. Unlike \g{wbcf}, it does not disallow a callee to return to another procedure's caller, as illustrated in \cref{fig:no-wbcf}.
+
+\begin{figure}
+	\begin{center}
+		\includegraphics{Images/Semi-WBCF.pdf}
+	\end{center}
+	\caption{\G{ghscc} does not support \g{wbcf}. In this example, libCrypto sends the return–frame capability pair it receives from httpd to libevilHash, which uses it to return directly to httpd, thereby leaving libSHA (and libCrypto) waiting to be returned to.}
+	\label{fig:no-wbcf}
+\end{figure}
 
 \section{Changes to Glyco} \label{sct:ghscc-changes}
 We now present some significant changes to Glyco, going from low-level to high-level \gs{il}.
@@ -98,13 +110,13 @@ We now present some significant changes to Glyco, going from low-level to high-l
 % TODO
 
 \section{Evaluation} \label{sct:ghscc-eval}
-In this section we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler. We then evaluate the \g{ghscc} itself by benchmarking a few test programs against the previous \g{cc}.
+In this section we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We then evaluate \g{ghscc} itself by benchmarking a few test programs against the previous \g{cc}.
 
 \paragraph{Codebase growth} The implementation of \g{ghscc} introduces 2 new \gs{il} (RT and CC) bringing the total in Glyco 0.2 to 19 \gs{il}. Using cloc,\footnote{cloc is available at \url{https://github.com/AlDanial/cloc}.} we measured a growth in the codebase from $5941$ SLOC in Glyco 0.1 to $6921$ SLOC in Glyco 0.2, representing a net growth of $16\%$.\footnote{The source line of code metric (SLOC) excludes empty lines and comments but does not perform other normalisation. For instance, multiple statements on a single line still count as 1 SLOC.}
 
 \paragraph{Increased binary footprint} For measuring the binary footprint, we decided to measure the number of statements and instructions in the assembly of a few test programs as opposed to measuring the byte size of the executables themselves. The latter metric is less informative since the space taken up by ELF headers and structures dominates the space occupied by the code of interest.
 
-The test programs are compiled using a default configuration targeting the CHERI-RISC-V Sail emulator and using the \g{gccc} and \g{ghscc} \gs{cc}. The default configuration enables all optimisations provided by Glyco.
+The test programs are compiled in Glyco 0.2 using a default configuration targeting the CHERI-RISC-V Sail emulator and using the \g{gccc} and \g{ghscc} \gs{cc}. The default configuration enables all optimisations provided by Glyco.
 
 The minimalistic test program 42 immediately evaluates to the number 42. The fib test program computes the 30th number of the Fibonacci sequence using a recursive function with accumulator parameters to avoid redundant computations. As shown in \cref{tbl:ghscc-size}, a visible increase in binary footprint can be observed.
 
@@ -113,21 +125,21 @@ The minimalistic test program 42 immediately evaluates to the number 42. The fib
 		\begin{tabular}{c||c|c|c|c|c|c}
 					& \multicolumn{2}{c|}{\g{gccc}}	& \multicolumn{2}{c|}{\g{ghscc}}	& \multicolumn{2}{c}{$\Delta$}	\\
 			Program	& Size			& Time			& Size			& Time				& Size			& Time			\\
+			\hline \hline
+			Runtime	& 75 stat.		& —				& 110 stat.		& —					& $+47\%$		& —				\\
 			\hline
-			42		& 120 stat.		& 107 steps		& 176 stat.		& 207 steps			& $+47\%$		& $+93\%$		\\
-			fib		& 128 stat.		& 705 steps		& 224 stat.		& 2407 steps		& $+75\%$		& $+241\%$		\\
+			42		& 45 stat.		& 107 steps		& 66 stat.		& 207 steps			& $+47\%$		& $+93\%$		\\
+			fib		& 53 stat.		& 705 steps		& 114 stat.		& 2407 steps		& $+115\%$		& $+241\%$		\\
 		\end{tabular}
 	\end{center}
-	\caption{Benchmarking test programs in \g{gccc} and \g{ghscc}.}
+	\caption{Benchmarking test programs in \g{gccc} and \g{ghscc} in Glyco 0.2. The program size (in number of assembly statements) is split between the runtime and the rest of the program.}
 	\label{tbl:ghscc-size}
 \end{table}
 
-\paragraph{Increased runtime overhead} For measuring runtime overhead, the same test programs are executed in the CHERI-RISC-V Sail emulator and the number of steps to execution is counted. As shown in \cref{tbl:ghscc-size}, a significant degradation in performance can be observed when using \g{ghscc} in a function call-heavy program.
+\paragraph{Increased runtime overhead} For measuring runtime overhead, the same test programs are executed in the CHERI-RISC-V Sail emulator and the number of steps to completion is counted. As shown in \cref{tbl:ghscc-size}, a significant degradation in performance can be observed when using \g{ghscc} in a function call-heavy program.
 
-\todo{Evaluate an attack that works in GCCC but not GHSCC?}
-
-\section{Alternative Solutions} \label{sct:alt-scc}
-The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse} and \g{wbcf}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software.
+\section{Related Work: Alternative Secure Calling Conventions} \label{sct:alt-scc}
+The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software.
 
 To ensure \g{lse} with a stack-based \g{cc}, a caller can restrict the \g{stackcap} before calling a procedure so that the callee only gets access to the unused part of the stack. However, this approach requires a way for the caller to restore the previous (less restricted) \g{stackcap} without the callee being able to do the same. Additionally, as illustrated in \cref{fig:savedstackcap}, an adversary can save a copy of their (restricted) \g{stackcap} in a first call. If the adversary is called a second time when their \g{stackcap} is lower in the stack (due to the stack containing more call frames than during the first call), it can use the saved \g{stackcap} to gain access to memory used by other call frames.
 
