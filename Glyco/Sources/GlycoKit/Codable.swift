@@ -141,6 +141,26 @@ extension CE.Program {
 	}
 }
 
+extension CL.Program {
+	public enum CodingKeys : String, CodingKey {
+		case result = "_0"
+	}
+}
+
+extension CL.Definition {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
+extension CL.Initialiser {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case effect = "in"
+	}
+}
+
 extension CV.Program {
 	public enum CodingKeys : String, CodingKey {
 		case effect = "_0"

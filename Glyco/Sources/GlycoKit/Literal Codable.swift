@@ -82,6 +82,30 @@ extension CE.Target {
 	}
 }
 
+extension CL.Predicate {
+	public init(boolValue: Bool) { self = .constant(boolValue) }
+	public var boolValue: Bool? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
+extension CL.Value {
+	public init(stringValue: String) { self = .named(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .named(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+
+extension CL.Value {
+	public init(intValue: Int) { self = .constant(intValue) }
+	public var intValue: Int? {
+		guard case .constant(let value) = self else { return nil }
+		return value
+	}
+}
+
 extension CV.Predicate {
 	public init(boolValue: Bool) { self = .constant(boolValue) }
 	public var boolValue: Bool? {
