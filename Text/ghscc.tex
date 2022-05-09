@@ -5,9 +5,9 @@
 \chapter{Glyco Heap-based Secure Calling Convention}
 The previous chapter discussed the first milestone of the Glyco compiler, namely a nanopass compiler producing fairly traditional executables for CHERI-RISC-V targets, with almost no special considerations for capability machines, except for minor enhancements such as bounded heap-allocated buffers. This chapter discusses the first significant upgrade of the Glyco compiler, namely one where procedure calls are implemented using a secure \g{cc} named \textbf{\g{ghscc}} and adapted from the heap-based \g{cc} proposed by \cite{cerise}.
 
-We first describe in \cref{sct:scc} the desired security properties of a \enquote{secure} \g{cc}. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two \gs{rtrt} that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} and \cref{sct:ghscc-changes} the implementation of the \g{cc} itself. We then evaluate in \cref{sct:ghscc-eval} \g{ghscc} against \g{gccc} in terms of \g{lse}, changes to the compiler and its \gs{il}, generated codesize, and runtime performance. We finish in \cref{sct:alt-scc} by listing a few alternative secure \gs{cc}.
+We first describe in \cref{sct:scc} the desired security properties of a \enquote{secure} \g{cc}. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two \gs{rtrt} that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} and \cref{sct:ghscc-changes} the implementation of the \g{cc} itself and the changes to the compiler to realise it. We then evaluate in \cref{sct:ghscc-eval} \g{ghscc} against \g{gccc} in terms of \g{lse}, changes to the compiler and its \gs{il}, generated codesize, and runtime performance. We finish in \cref{sct:alt-scc} by listing a few alternative secure \gs{cc} that are either already implemented or didn't make it into Glyco.
 
-This chapter discusses the feature set and languages of Glyco 0.2,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.2/}.} however just like in the previous chapter, example programs in this chapter follow the grammar of the final version of the compiler, Glyco 1.0. A full language reference of this final compiler can be found in \cref{ch:grammar}.
+This chapter discusses the feature set and languages of Glyco 0.2,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.2/}.} however just like in the previous chapter, example programs in this chapter follow the syntax of the final version of the compiler, Glyco 1.0. A full language reference of this final compiler can be found in \cref{ch:grammar}.
 
 \section{Background: Secure Calling Conventions} \label{sct:scc}
 A traditional \g{cc} such as \g{gccc} works with a single stack of call frames per thread, with each call frame holding a procedure call's ephemeral state, such as values assigned to local variables. When a procedure is called, a new call frame is pushed on the stack, the caller puts a return address in a designated register or location on the call frame, and passes control to the callee. When returning, the most recent call frame on the stack is popped and the callee jumps to the caller-provided return address. The exact details and distribution of responsibilities are mandated by the \g{cc} in use.
@@ -95,7 +95,7 @@ The latter security property, which we call \textbf{unrepeatable return}, is a w
 \end{figure}
 
 \section{Changes to Glyco} \label{sct:ghscc-changes}
-We now present some significant changes to Glyco, going from low-level to high-level \gs{il}.
+We now present the most significant changes to Glyco, going from low-level to high-level \gs{il}.
 
 \paragraph{CHERI-RISC-V (RV)} The low-level language RV is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
 
@@ -112,7 +112,7 @@ We now present some significant changes to Glyco, going from low-level to high-l
 \section{Evaluation} \label{sct:ghscc-eval}
 In this section we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We then evaluate \g{ghscc} itself by benchmarking a few test programs against the previous \g{cc}.
 
-\paragraph{Codebase growth} The implementation of \g{ghscc} introduces 2 new \gs{il} (RT and CC) bringing the total in Glyco 0.2 to 19 \gs{il}. Using cloc,\footnote{cloc is available at \url{https://github.com/AlDanial/cloc}.} we measured a growth in the codebase from $5941$ SLOC in Glyco 0.1 to $6921$ SLOC in Glyco 0.2, representing a net growth of $16\%$.\footnote{The source line of code metric (SLOC) excludes empty lines and comments but does not perform other normalisation. For instance, multiple statements on a single line still count as 1 SLOC.}
+\paragraph{Codebase growth} The implementation of \g{ghscc} introduces 2 new \gs{il} (RT and CC) bringing the total in Glyco 0.2 to 19 \gs{il}. Using cloc,\footnote{cloc is available at \url{https://github.com/AlDanial/cloc}.} we measured a growth in the codebase from $5941$ SLOC in Glyco 0.1 to $6921$ SLOC in Glyco 0.2, representing a net growth of $+16\%$.\footnote{The source line of code metric (SLOC) excludes empty lines and comments but does not perform other normalisation. For instance, multiple statements on a single line still count as 1 SLOC.}
 
 \paragraph{Increased binary footprint} For measuring the binary footprint, we decided to measure the number of statements and instructions in the assembly of a few test programs as opposed to measuring the byte size of the executables themselves. The latter metric is less informative since the space taken up by ELF headers and structures dominates the space occupied by the code of interest.
 
@@ -138,10 +138,12 @@ The minimalistic test program 42 immediately evaluates to the number 42. The fib
 
 \paragraph{Increased runtime overhead} For measuring runtime overhead, the same test programs are executed in the CHERI-RISC-V Sail emulator and the number of steps to completion is counted. As shown in \cref{tbl:ghscc-size}, a significant degradation in performance can be observed when using \g{ghscc} in a function call-heavy program.
 
-\section{Related Work: Alternative Secure Calling Conventions} \label{sct:alt-scc}
-The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software.
+\todo{Add more programs.}
 
-To ensure \g{lse} with a stack-based \g{cc}, a caller can restrict the \g{stackcap} before calling a procedure so that the callee only gets access to the unused part of the stack. However, this approach requires a way for the caller to restore the previous (less restricted) \g{stackcap} without the callee being able to do the same. Additionally, as illustrated in \cref{fig:savedstackcap}, an adversary can save a copy of their (restricted) \g{stackcap} in a first call. If the adversary is called a second time when their \g{stackcap} is lower in the stack (due to the stack containing more call frames than during the first call), it can use the saved \g{stackcap} to gain access to memory used by other call frames.
+\section{Related Work: Alternative Secure Calling Conventions} \label{sct:alt-scc}
+The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software, some of which also provide \g{wbcf}.
+
+To ensure \g{lse} with a stack-based \g{cc}, a caller can restrict the \g{stackcap} before calling a procedure so that the callee only gets access to the unused part of the stack. However, this approach requires a way for the caller to restore the previous (less restricted) \g{stackcap} without the callee being able to do the same. Additionally, as illustrated in \cref{fig:savedstackcap}, an adversary can save a copy of their (restricted) \g{stackcap} in a first call. If the adversary is called a second time when their \g{stackcap} is lower in the stack (due to the stack containing more call frames than during the first call), it can use the saved \g{stackcap} to gain access to memory used by other call frames. They can similarly store the \g{retcap} and use it more than once, breaking \g{wbcf}.
 
 \begin{figure}
 	\begin{center}
@@ -167,7 +169,7 @@ In this \g{cc}, the restoration routine still restores the caller's \g{stackcap}
 
 A callee still needs to clear the stack memory occupied by their own call frame before returning to a potential adversary since the caller may have prepared a separate \g{stackcap} granting it access to the callee's call frame.\footnote{The caller still has a call frame where it can validly store any local capability.} However, the memory occupied by a single call frame is orders of magnitude smaller than the full unoccupied stack memory that needs to be otherwise cleared at every call or return.
 
-Similarly to the previous \g{cc}, it is rigorously proven for an abstract machine with local and uninitialised capabilities. Uninitialised capabilities are however as of writing not specified for CHERI-RISC-V.
+Similarly to the previous \g{cc}, it is rigorously proven for an abstract machine with local and uninitialised capabilities. Uninitialised capabilities are however as of writing not fully specified for CHERI-RISC-V in an authoritative document such as \cite{cheri}.
 
 \paragraph{Using linear capabilities to restrict copies of the \g{stackcap}} The \emph{StkTokens} \g{cc} by \cite{stktokens} relies on \textbf{linear capabilities}, a type of capability that can only be moved, not copied. Before calling a procedure, the caller performs a splitting operation which splits the \g{stackcap} into two disjoint capabilities. The \g{stackcap} over the caller's call frame as well as the callee's \g{retcap} are sealed together with a unique \g{sealcap}. The caller then hands the sealed pair as well as the second (still unsealed) \g{stackcap} over to the callee.
 
@@ -175,7 +177,7 @@ The callee returns control to the caller by passing the unsealed \g{stackcap} to
 
 \G{lse} is guaranteed by the \g{stackcap}'s linearity: the callee must yield its unsealed \g{stackcap} to the caller before the caller can reconstruct its previous \g{stackcap}. In addition, the callee only gets a sealed \g{stackcap} to the caller's call frame and thus is not granted access to the call frame, assuming the caller uses a unique \g{sealcap} that it doesn't hand to the callee. \G{wbcf} is guaranteed by the \g{retcap}'s linearity: the callee can only return to the caller by invoking the stack–return capability pair, losing access to both capabilities in the process.
 
-Although this \g{cc} is delightfully straightforward in its design, linear capabilities are as of writing not specified for CHERI-RISC-V.
+Although this \g{cc} is delightfully straightforward in its design, linear capabilities are as of writing not authoritatively specified for CHERI-RISC-V.
 
 \paragraph{Using one call stack per compartment} As described in \cite{compartment}, CheriBSD supports compartmentalising software components (such as libraries) whereby each component gets its own call stack, with the operating system managing a central stack per thread. This approach however requires one call stack per component per thread, one central stack per thread, and one syscall per security domain transition, i.e., when a compartment's procedure calls or returns into another compartment's procedure. Furthermore, it does not provide complete \g{lse} since it only protects components from other components; a vulnerability in a procedure within a library may compromise all call frames from that library in the same thread. Similarly, \g{wbcf} across components can be enforced by the system since returns across components are mediated by the OS, but the property does not apply within a single component.
 

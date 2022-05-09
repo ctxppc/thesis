@@ -40,8 +40,6 @@ This program defines a function \iil/fib/ with three signed 32-bit integer param
 
 EX is an \emph{intermediate} language and not necessarily a \emph{user-friendly} language; it contains little syntactical sugar. For example, the predicate $ \textit{iter} \le 1 $ is written as \iil/relation(iter, le, 1)/. A significant benefit is that the structure is easy to manipulate as the code goes through the compiler's \gs{nanopass}. One can however define a more user-friendly language and write a parser that emits EX.
 
-\todo{Define records, vectors, and let-bindings; show examples. It's late to introduce them in lower ILs since they're also part of EX's vocabulary and feature set.}
-
 \paragraph{From EX (Expressions) to LS} LS does not support subexpressions so the \g{nanopass} to LS binds all subexpressions to names (temporaries) and uses those names in place of the subexpressions. For instance, the EX value
 \begin{il}
 	evaluate(function(fib), ... binary(prev, add, curr) ...)
@@ -152,8 +150,6 @@ The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstracti
 is \lowered{} to the following ID program (with the above highlighted effects' \gs{lowering} highlighted):
 \ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}]{Programs/sequences.id}
 
-The results of the \iil/sll/ (logical left shift) operations in this program are statically computed as part of an optimisation pass in a lower \g{il}.
-
 \section{Abstract Locations} \label{sct:id}
 All programs until now have been able to bind values to names in one form or another, be it by using new named locations in effects or binding values to names with \texttt{let}. These names refer to physical locations where data can be stored, but without the programmer explicitly specifying the physical location itself, and are therefore referred to as \textbf{abstract locations}. The compiler is responsible for assigning each abstract location a \textbf{physical location} like a register or location in the call frame.
 
@@ -227,7 +223,6 @@ In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, an
 \ilfile[highlightlines={3-5, 9-10, 12-15}]{Programs/ifproc.cd}
 is \lowered{} to the PR program
 \ilfile[highlightlines={2-6, 8-12, 14-18}, tabsize=1]{Programs/ifproc.pr}
-\todo{Maybe add a flow diagram for extra clarification?}
 
 \paragraph{From PR (Predicates) to BB} The next \g{il} BB does not support predicates so the \g{nanopass} maps predicates to appropriate continuations. For example, the above program is \lowered{} to the BB program
 \ilfile{Programs/ifproc.bb}
