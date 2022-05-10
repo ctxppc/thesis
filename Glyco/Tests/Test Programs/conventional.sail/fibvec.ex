@@ -2,7 +2,7 @@
 	evaluate(function(fib), 0 1),
 	functions:
 		(fib, takes: (first, s32, sealed: false) (second, s32, sealed: false), returns: s32,
-			in: evaluate(function(recFib), 2 29 vector(s32, count: 30))
+			in: evaluate(function(recFib), 2 29 vector(0, count: 30))
 		)
 		
 		(recFib, 

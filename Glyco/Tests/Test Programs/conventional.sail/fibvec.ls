@@ -5,8 +5,8 @@
 		takes: (first, s32, sealed: false) (second, s32, sealed: false),
 		returns: s32,
 		in: let(
-			(ex.arg$2, source(2)) (ex.arg$3, source(29)) (ex.arg$4, vector(s32, count: 30)),
-			in: evaluate(function(recFib), ex.arg$2 ex.arg$3 ex.arg$4)
+			(ex.arg, source(2)) (ex.arg$1, source(29)) (ex.arg$2, vector(s32, count: 30)),
+			in: evaluate(function(recFib), ex.arg ex.arg$1 ex.arg$2)
 		)
 	)
 	(
@@ -53,10 +53,10 @@
 					in: setElement(of: ex.vec$1, at: ex.idx$1, to: ex.elem)
 				),
 				then: let(
-					(ex.arg$5, let((ex.lhs$4, source(index)) (ex.rhs$4, source(1)), in: binary(ex.lhs$4, add, ex.rhs$4)))
-					(ex.arg$6, source(lastIndex))
-					(ex.arg$7, source(nums)),
-					in: evaluate(function(recFib), ex.arg$5 ex.arg$6 ex.arg$7)
+					(ex.arg, let((ex.lhs$4, source(index)) (ex.rhs$4, source(1)), in: binary(ex.lhs$4, add, ex.rhs$4)))
+					(ex.arg$1, source(lastIndex))
+					(ex.arg$2, source(nums)),
+					in: evaluate(function(recFib), ex.arg ex.arg$1 ex.arg$2)
 				)
 			)
 		)
