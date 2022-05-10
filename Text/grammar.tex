@@ -14,7 +14,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Result>")"
 				\par
 				<CL.ObjectType> ::=
-							"("<TypeName>, "state:" <RecordType>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
+							"("<TypeName>, "initialState:" <[RecordEntry]>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
 				\par
 				<CL.Effect> ::=
 						"do""("<[Effect]>")"
@@ -35,6 +35,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "let""("<[Definition]>, "in:" <Result>")"
 						| "do""("<[Effect]>, "then:" <Result>")"
 				\par
+				<CL.RecordEntry> ::=
+							"("<Field.Name>, <Value>")"
+				\par
 				<CL.Predicate> ::=
 						<Bool> |
 						"constant""("<Bool>")"
@@ -51,9 +54,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						"self"
 						| "constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "record""("<RecordType>")"
+						| "record""("<[RecordEntry]>")"
 						| "field""("<Field.Name>, "of:" <Value>")"
-						| "vector""("<ValueType>, "count:" <Int>")"
+						| "vector""("<Value>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "object""("<TypeName>, <[Value]>")"
@@ -104,9 +107,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						"self"
 						| "constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "record""("<RecordType>")"
+						| "record""("<[RecordEntry]>")"
 						| "field""("<Field.Name>, "of:" <Value>")"
-						| "vector""("<ValueType>, "count:" <Int>")"
+						| "vector""("<Value>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "object""("<TypeName>, <[Value]>")"
@@ -119,7 +122,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<OB.ObjectType> ::=
-							"("<TypeName>, "state:" <RecordType>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
+							"("<TypeName>, "initialState:" <[RecordEntry]>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
 				\par
 				<OB.Result> ::=
 						"value""("<Value>")"
@@ -145,6 +148,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.Method> ::=
 							"("<Symbol>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 				\par
+				<OB.RecordEntry> ::=
+							"("<Field.Name>, <Value>")"
+				\par
 				<OB.Definition> ::=
 							"("<Symbol>, <Value>")"
 				\par
@@ -166,6 +172,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "let""("<[Definition]>, "in:" <Effect>")"
 						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
 						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<NT.RecordEntry> ::=
+							"("<Field.Name>, <Value>")"
 				\par
 				<NT.CapabilityType> ::=
 						"vector""(""of:" <ValueType>, "sealed:" <Bool>")"
@@ -189,9 +198,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "record""("<RecordType>")"
+						| "record""("<[RecordEntry]>")"
 						| "field""("<Field.Name>, "of:" <Value>")"
-						| "vector""("<ValueType>, "count:" <Int>")"
+						| "vector""("<Value>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "seal"
@@ -246,9 +255,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "record""("<RecordType>")"
+						| "record""("<[RecordEntry]>")"
 						| "field""("<Field.Name>, "of:" <Value>")"
-						| "vector""("<ValueType>, "count:" <Int>")"
+						| "vector""("<Value>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
 						| "seal"
@@ -258,6 +267,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<Λ.RecordEntry> ::=
+							"("<Field.Name>, <Value>")"
 				\par
 				<Λ.Predicate> ::=
 						<Bool> |
@@ -295,9 +307,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 								<Symbol> |
 						"constant""("<Int>")"
 						| "named""("<Symbol>")"
-						| "record""("<RecordType>")"
+						| "record""("<[RecordEntry]>")"
 						| "field""("<Field.Name>, "of:" <Value>")"
-						| "vector""("<ValueType>, "count:" <Int>")"
+						| "vector""("<Value>, "count:" <Int>")"
 						| "element""(""of:" <Value>, "at:" <Value>")"
 						| "function""("<Label>")"
 						| "seal"
@@ -320,6 +332,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				\par
 				<EX.Function> ::=
 							"("<Label>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<EX.RecordEntry> ::=
+							"("<Field.Name>, <Value>")"
 				\par
 				<EX.Effect> ::=
 						"do""("<[Effect]>")"

@@ -5,25 +5,32 @@ extension OB {
 	/// A value denoting the type of an object.
 	public struct ObjectType : Named, Element {
 		
-		/// Creates an object type with given name, initialiser, methods, and state record type.
-		public init(_ name: TypeName, state: RecordType, initialiser: Initialiser, methods: [Method]) {
+		/// Creates an object type with given name, initial state, initialiser, and methods.
+		public init(_ name: TypeName, initialState: [RecordEntry], initialiser: Initialiser, methods: [Method]) {
 			self.name = name
+			self.initialState = initialState
 			self.initialiser = initialiser
 			self.methods = methods
-			self.state = state
 		}
 		
 		// See protocol.
 		public var name: TypeName
 		
-		/// The record type for objects of this type.
-		public var state: RecordType
+		/// The initial state of objects of this type, before the initialiser is executed.
+		public var initialState: [RecordEntry]
 		
 		/// The initialiser for objects of this type.
 		public var initialiser: Initialiser
 		
 		/// The methods for objects of this type.
 		public var methods: [Method]
+		
+		/// Determines the record type of the state of objects of this type.
+		func stateRecordType(in context: Context) throws -> RecordType {
+			.init(try initialState.map { entry in
+				.init(entry.name, try entry.value.type(in: context))
+			})
+		}
 		
 		/// The name of the type object representing `self`, as defined by a `letType` value.
 		var typeObjectName: Lower.Symbol {

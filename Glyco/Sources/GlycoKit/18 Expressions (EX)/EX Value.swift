@@ -1,5 +1,6 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Foundation
 import Sisp
 
 extension EX {
@@ -12,14 +13,14 @@ extension EX {
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		
-		/// A value that evaluates to a unique capability to an uninitialised record of given type.
-		case record(RecordType)
+		/// A value that evaluates to a unique capability to a record with given entries.
+		indirect case record([RecordEntry])
 		
 		/// A value that evaluates to the field with given name in the record `of`.
 		indirect case field(Field.Name, of: Value)
 		
-		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(ValueType, count: Int)
+		/// A value that evaluates to a unique capability to a vector of `count` copies of given value.
+		indirect case vector(Value, count: Int)
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
@@ -58,8 +59,8 @@ extension EX {
 				case .named(let symbol):
 				return .source(.named(symbol))
 				
-				case .record(let type):
-				return .record(type)
+				case .record(let entries):
+				return .record(.init(try entries.map { .init($0.name, try $0.value.type(in: context)) }))	// TODO: set fields
 				
 				case .field(let fieldName, of: let record):
 				let rec = context.symbols.uniqueName(from: "rec")
@@ -67,8 +68,8 @@ extension EX {
 					.init(rec, record.lowered(in: &context)),
 				], in: .field(fieldName, of: rec))
 				
-				case .vector(let valueType, count: let count):
-				return .vector(valueType, count: count)
+				case .vector(let repeatedElement, count: let count):
+				return .vector(try repeatedElement.type(in: context), count: count)	// TODO: initialise elements
 				
 				case .element(of: let vector, at: let index):
 				let vec = context.symbols.uniqueName(from: "vec")
@@ -124,6 +125,147 @@ extension EX {
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
+				
+			}
+		}
+		
+		/// Determines the type of `self`.
+		func type(in context: Context) throws -> ValueType {
+			switch self {
+				
+				case .constant:
+				return .s32
+					
+				case .named(let symbol):
+				guard let type = context.valueTypesBySymbol[symbol] else { throw TypingError.undefinedSymbol(symbol) }
+				return type
+				
+				case .record(let entries):
+				return .cap(.record(.init(try entries.map { try .init($0.name, $0.value.type(in: context)) }), sealed: false))
+				
+				case .field(let fieldName, of: let record):
+				guard case .cap(.record(let recordType, sealed: false)) = try record.type(in: context) else { throw TypingError.notAnUnsealedRecord(record) }
+				guard let fieldType = recordType.fields[fieldName]?.valueType else { throw TypingError.unknownFieldName(fieldName, recordType, record) }
+				return fieldType
+				
+				case .vector(let repeatedElement, count: _):
+				return .cap(.vector(of: try repeatedElement.type(in: context), sealed: false))
+				
+				case .element(of: let vector, at: _):
+				guard case .cap(.vector(of: let elementType, sealed: false)) = try vector.type(in: context) else { throw TypingError.notAnUnsealedRecord(vector) }
+				return elementType
+				
+				case .function(let name):
+				guard let function = context.functions[name] else { throw TypingError.undefinedFunction(name) }
+				return .cap(.function(takes: function.parameters, returns: function.resultType))
+				
+				case .seal:
+				return .cap(.seal(sealed: false))
+				
+				case .sealed(let cap, with: let seal):
+				guard case .cap(let capType) = try cap.type(in: context) else { throw TypingError.noncapabilityValue(cap) }
+				guard case .cap(.seal(sealed: false)) = try seal.type(in: context) else { throw TypingError.notAnUnsealedSealCapability(cap) }
+				switch capType {
+					
+					case .vector(of: let elementType, sealed: false):
+					return .cap(.vector(of: elementType, sealed: true))
+					
+					case .record(let recordType, sealed: false):
+					return .cap(.record(recordType, sealed: true))
+					
+					case .function:
+					return .cap(capType)
+					
+					case .seal(sealed: false):
+					return .cap(.seal(sealed: true))
+					
+					case .vector(of: _, sealed: true),
+						.record(_, sealed: true),
+						.seal(sealed: true):
+					throw TypingError.sealedCapability(cap)
+					
+				}
+				
+				case .binary:
+				return .s32
+				
+				case .evaluate(let function, _):
+				guard case .cap(.function(takes: _, returns: let resultType)) = try function.type(in: context) else {
+					throw TypingError.nonfunctionValue(function)
+				}
+				return resultType
+				
+				case .if(_, then: let affirmative, else: _):
+				return try affirmative.type(in: context)
+				
+				case .let(let definitions, in: let body):
+				var context = context
+				for definition in definitions {
+					context.valueTypesBySymbol[definition.name] = try definition.value.type(in: context)
+				}
+				return try body.type(in: context)
+				
+				case .do(_, then: let value):
+				return try value.type(in: context)
+				
+			}
+		}
+		
+	}
+	
+	enum TypingError : LocalizedError {
+		
+		/// An error indicating that given symbol is not defined.
+		case undefinedSymbol(Symbol)
+		
+		/// An error indicating that given value is not an unsealed record capability.
+		case notAnUnsealedRecord(Value)
+		
+		/// An error indicating that given field name is not part of given record type.
+		case unknownFieldName(Field.Name, RecordType, Value)
+		
+		/// An error indicating that a function with given name is not defined.
+		case undefinedFunction(Label)
+		
+		/// An error indicating that given value is not an unsealed capability.
+		case noncapabilityValue(Value)
+		
+		/// An error indicating that given value is not an unsealed seal capability.
+		case notAnUnsealedSealCapability(Value)
+		
+		/// An error indicating that given value is a sealed capability.
+		case sealedCapability(Value)
+		
+		/// An error indicating that given value is not a function that can be evaluated.
+		case nonfunctionValue(Value)
+		
+		// See protocol.
+		var errorDescription: String? {
+			switch self {
+				
+				case .undefinedSymbol(let name):
+				return "“\(name)” is not defined"
+				
+				case .notAnUnsealedRecord(let value):
+				return "\(value) is not an unsealed record"
+				
+				case .unknownFieldName(let fieldName, let recordType, let record):
+				return "“\(fieldName)” is not a field of \(record) (\(recordType))"
+				
+				case .undefinedFunction(let name):
+				return "“\(name)” is not a defined function"
+				
+				case .noncapabilityValue(let value):
+				return "\(value) is not a capability"
+				
+				case .notAnUnsealedSealCapability(let value):
+				return "\(value) is not an unsealed seal capability"
+				
+				case .sealedCapability(let value):
+				return "\(value) is an (already) sealed capability"
+				
+				case .nonfunctionValue(let value):
+				return "\(value) is not a function"
 				
 			}
 		}

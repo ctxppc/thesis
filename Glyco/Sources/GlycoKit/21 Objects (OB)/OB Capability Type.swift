@@ -44,7 +44,7 @@ extension OB {
 				case .object(let typeName):
 				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
 				guard case .object(let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
-				return .record(try objectType.state.lowered(in: &context), sealed: true)
+				return .record(try objectType.stateRecordType(in: context).lowered(in: &context), sealed: true)
 				
 				case .seal:
 				return .seal(sealed: false)

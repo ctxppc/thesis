@@ -150,7 +150,7 @@ extension CL.Program {
 extension CL.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case state = "state"
+		case initialState = "initialState"
 		case initialiser = "initialiser"
 		case methods = "methods"
 	}
@@ -167,6 +167,13 @@ extension CL.Initialiser {
 	public enum CodingKeys : String, CodingKey {
 		case parameters = "takes"
 		case effect = "in"
+	}
+}
+
+extension CL.RecordEntry {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 
@@ -238,6 +245,13 @@ extension EX.Function {
 		case parameters = "takes"
 		case resultType = "returns"
 		case result = "in"
+	}
+}
+
+extension EX.RecordEntry {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 
@@ -323,6 +337,13 @@ extension NT.Program {
 	}
 }
 
+extension NT.RecordEntry {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
+	}
+}
+
 extension NT.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -387,7 +408,7 @@ extension OB.Field {
 extension OB.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case state = "state"
+		case initialState = "initialState"
 		case initialiser = "initialiser"
 		case methods = "methods"
 	}
@@ -399,6 +420,13 @@ extension OB.Method {
 		case parameters = "takes"
 		case resultType = "returns"
 		case result = "in"
+	}
+}
+
+extension OB.RecordEntry {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 
@@ -465,6 +493,13 @@ extension SV.Procedure {
 extension Λ.Program {
 	public enum CodingKeys : String, CodingKey {
 		case result = "_0"
+	}
+}
+
+extension Λ.RecordEntry {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case value = "_1"
 	}
 }
 

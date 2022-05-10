@@ -45,7 +45,9 @@ extension OB {
 		/// - Parameter type: The object type defining `self`.
 		/// - Parameter context: The lowering context.
 		func lowered(in context: inout Context, type: ObjectType) throws -> Lower.Value {
-			let receiverType = Lower.ValueType.cap(.record(try type.state.lowered(in: &context), sealed: true))
+			let receiverType = Lower.ValueType.cap(
+				.record(try type.stateRecordType(in: context).lowered(in: &context), sealed: true)
+			)
 			return try .λ(
 				takes:		[.init(Self.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
 				returns:	resultType.lowered(in: &context),

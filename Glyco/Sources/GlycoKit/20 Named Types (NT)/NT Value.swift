@@ -13,16 +13,16 @@ extension NT {
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		
-		/// A value that evaluates to a unique capability to an uninitialised record of given type.
-		case record(RecordType)
+		/// A value that evaluates to a unique capability to a record with given entries.
+		indirect case record([RecordEntry])
 		
 		/// A value that evaluates to the field with given name in the record `of`.
 		///
 		/// The record may be of a nominal type.
 		indirect case field(Field.Name, of: Value)
 		
-		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(ValueType, count: Int)
+		/// A value that evaluates to a unique capability to a vector of `count` copies of given value.
+		indirect case vector(Value, count: Int)
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
 		///
@@ -79,14 +79,14 @@ extension NT {
 				case .named(let symbol):
 				return .named(symbol)
 				
-				case .record(let type):
-				return .record(try type.lowered(in: &context))
+				case .record(let entries):
+				return .record(try entries.lowered(in: &context))
 				
 				case .field(let fieldName, of: let record):
 				return .field(fieldName, of: try record.lowered(in: &context))
 				
-				case .vector(let valueType, count: let count):
-				return .vector(try valueType.lowered(in: &context), count: count)
+				case .vector(let repeatedElement, count: let count):
+				return .vector(try repeatedElement.lowered(in: &context), count: count)
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
@@ -145,8 +145,14 @@ extension NT {
 				guard let type = context.assignedTypesBySymbol[symbol] else { throw TypingError.undefinedSymbol(symbol) }
 				return type
 				
-				case .record(let type):
-				return .init(from: .cap(.record(type, sealed: false)), in: context)
+				case .record(let entries):
+				return .init(
+					from:	.cap(.record(
+						.init(try entries.map { .init($0.name, try $0.value.assignedType(in: context).actual) }),
+						sealed: false
+					)),
+					in:		context
+				)
 				
 				case .field(let fieldName, of: let record):
 				guard case .cap(.record(let recordType, sealed: false)) = try record.assignedType(in: context).structural(recursively: false) else {
@@ -157,8 +163,11 @@ extension NT {
 				}
 				return .init(from: field.valueType, in: context)
 				
-				case .vector(let elementType, count: _):
-				return .init(from: .cap(.vector(of: elementType, sealed: false)), in: context)
+				case .vector(let repeatedElement, count: _):
+				return .init(
+					from:	.cap(.vector(of: try repeatedElement.assignedType(in: context).actual, sealed: false)),
+					in:		context
+				)
 				
 				case .element(of: let vector, at: let index):
 				guard case .cap(.vector(of: let elementType, sealed: false)) = try vector.assignedType(in: context).structural(recursively: false) else {
@@ -319,9 +328,6 @@ extension NT {
 		/// An error indicating that given result does not conform to the declared result type.
 		case resultTypeMismatch(Result, expected: ValueType, actual: ValueType)
 		
-		/// An error indicating that a function with given name is not defined.
-		case undefinedFunction(Label)
-		
 		/// An error indicating that given value is not an unsealed capability.
 		case noncapabilityValue(Value)
 		
@@ -373,9 +379,6 @@ extension NT {
 				
 				case .resultTypeMismatch(let result, expected: let expected, actual: let actual):
 				return "\(result) evaluates to a value of type \(actual) but it's declared to return a value of type \(expected)"
-				
-				case .undefinedFunction(let name):
-				return "“\(name)” is not a defined function"
 				
 				case .noncapabilityValue(let value):
 				return "\(value) is not a capability"

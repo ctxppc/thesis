@@ -11,14 +11,14 @@ extension Λ {
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		
-		/// A value that evaluates to a unique capability to an uninitialised record of given type.
-		case record(RecordType)
+		/// A value that evaluates to a unique capability to a record with given entries.
+		indirect case record([RecordEntry])
 		
 		/// A value that evaluates to the field with given name in the record `of`.
 		indirect case field(Field.Name, of: Value)
 		
-		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(ValueType, count: Int)
+		/// A value that evaluates to a unique capability to a vector of `count` copies of given value.
+		indirect case vector(Value, count: Int)
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
@@ -61,14 +61,14 @@ extension Λ {
 				case .named(let symbol):
 				return .named(symbol)
 				
-				case .record(let type):
-				return .record(type)
+				case .record(let entries):
+				return .record(try entries.lowered(in: &context))
 				
 				case .field(let fieldName, of: let record):
 				return try .field(fieldName, of: record.lowered(in: &context))
 				
-				case .vector(let valueType, count: let count):
-				return .vector(valueType, count: count)
+				case .vector(let repeatedElement, count: let count):
+				return .vector(try repeatedElement.lowered(in: &context), count: count)
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))

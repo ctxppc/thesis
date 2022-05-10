@@ -3,7 +3,7 @@
 extension EX {
 	
 	/// A program element that, given some arguments, evaluates to a result value.
-	public struct Function : SimplyLowerable, Element {
+	public struct Function : Named, SimplyLowerable, Element {
 		
 		/// Creates a function with given name, parameters, result type, and result.
 		public init(_ name: Label, takes parameters: [Parameter], returns resultType: ValueType, in result: Result) {
@@ -27,7 +27,11 @@ extension EX {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Function {
-			.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
+			var context = Context(functions: context.functions)
+			for parameter in parameters {
+				context.valueTypesBySymbol[parameter.name] = parameter.type
+			}
+			return .init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 		}
 		
 	}

@@ -39,7 +39,10 @@ extension OB {
 				return .nominal(typeName, try valueType.lowered(in: &context))
 				
 				case .object(let objectType):
-				return .nominal(objectType.name, .cap(.record(try objectType.state.lowered(in: &context), sealed: true)))
+				return .nominal(
+					objectType.name,
+					.cap(.record(try objectType.stateRecordType(in: context).lowered(in: &context), sealed: true))
+				)
 				
 			}
 		}

@@ -28,11 +28,11 @@ extension OB {
 			let sealName: Lower.Symbol = "ob.seal"
 			return try .λ(
 				takes:		[.init(Method.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
-				returns:	.cap(.record(type.state.lowered(in: &context), sealed: true)),
+				returns:	.cap(.record(type.stateRecordType(in: context).lowered(in: &context), sealed: false)),
 				in:			.let(
 					[
 						sealName ~ .field(ObjectType.typeObjectSealFieldName, of: .named(Method.selfName)),
-						Method.selfName ~ .record(type.state.lowered(in: &context)),
+						Method.selfName ~ .record(type.initialState.lowered(in: &context)),
 					],
 					in: .do(
 						[effect.lowered(in: &context)],

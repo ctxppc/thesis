@@ -92,7 +92,7 @@ A language that introduces closures, i.e., anononymous functions with an environ
 </dl>
 <dl>
 	<dt><code>CL.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>state:</strong> RecordType, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialState:</strong> [RecordEntry], <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Effect</code></dt>
@@ -118,6 +118,10 @@ A language that introduces closures, i.e., anononymous functions with an environ
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
 </dl>
 <dl>
+	<dt><code>CL.RecordEntry</code></dt>
+	<dd><code>(Field.Name, Value)</code></dd>
+</dl>
+<dl>
 	<dt><code>CL.Predicate</code></dt>
 						<dd><code>Bool</code></dd>
 	<dd><code><strong>constant</strong>(Bool)</code></dd>
@@ -136,9 +140,9 @@ A language that introduces closures, i.e., anononymous functions with an environ
 	<dd><code><strong>self</strong></code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>record</strong>([RecordEntry])</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(Value, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
@@ -202,9 +206,9 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>self</strong></code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>record</strong>([RecordEntry])</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(Value, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
@@ -218,7 +222,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>state:</strong> RecordType, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialState:</strong> [RecordEntry], <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -247,6 +251,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 <dl>
 	<dt><code>OB.Method</code></dt>
 	<dd><code>(Symbol, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>OB.RecordEntry</code></dt>
+	<dd><code>(Field.Name, Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Definition</code></dt>
@@ -279,6 +287,10 @@ A language that introduces named alias and nominal types.
 	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
 </dl>
 <dl>
+	<dt><code>NT.RecordEntry</code></dt>
+	<dd><code>(Field.Name, Value)</code></dd>
+</dl>
+<dl>
 	<dt><code>NT.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType, <strong>sealed:</strong> Bool)</code></dd>
 	<dd><code><strong>record</strong>(RecordType, <strong>sealed:</strong> Bool)</code></dd>
@@ -304,9 +316,9 @@ A language that introduces named alias and nominal types.
 	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>record</strong>([RecordEntry])</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(Value, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -379,9 +391,9 @@ A language that moves functions to value position.
 	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>record</strong>([RecordEntry])</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(Value, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -391,6 +403,10 @@ A language that moves functions to value position.
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>Λ.RecordEntry</code></dt>
+	<dd><code>(Field.Name, Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>Λ.Predicate</code></dt>
@@ -443,9 +459,9 @@ A language that introduces expression semantics for values, thereby abstracting 
 	<dd><code>Symbol</code></dd>
 	<dd><code><strong>constant</strong>(Int)</code></dd>
 	<dd><code><strong>named</strong>(Symbol)</code></dd>
-	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>record</strong>([RecordEntry])</code></dd>
 	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
-	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>vector</strong>(Value, <strong>count:</strong> Int)</code></dd>
 	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
 	<dd><code><strong>function</strong>(Label)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
@@ -471,6 +487,10 @@ A language that introduces expression semantics for values, thereby abstracting 
 <dl>
 	<dt><code>EX.Function</code></dt>
 	<dd><code>(Label, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>EX.RecordEntry</code></dt>
+	<dd><code>(Field.Name, Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>EX.Effect</code></dt>

@@ -18,16 +18,20 @@ extension OB {
 		/// A value that evaluates to the named value associated with given name in the environment.
 		case named(Symbol)
 		
-		/// A value that evaluates to a unique capability to an uninitialised record of given type.
-		case record(RecordType)
+		/// A value that evaluates to a unique capability to a record with given entries.
+		indirect case record([RecordEntry])
 		
 		/// A value that evaluates to the field with given name in the record `of`.
+		///
+		/// The record may be of a nominal type.
 		indirect case field(Field.Name, of: Value)
 		
-		/// A value that evaluates to a unique capability to an uninitialised vector of `count` elements of given data type.
-		case vector(ValueType, count: Int)
+		/// A value that evaluates to a unique capability to a vector of `count` copies of given value.
+		indirect case vector(Value, count: Int)
 		
 		/// A value that evaluates to the `at`th element of the list `of`.
+		///
+		/// The vector may be of a nominal type.
 		indirect case element(of: Value, at: Value)
 		
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
@@ -72,14 +76,14 @@ extension OB {
 				case .named(let symbol):
 				return .named(symbol)
 				
-				case .record(let type):
-				return .record(try type.lowered(in: &context))
+				case .record(let entries):
+				return .record(try entries.lowered(in: &context))
 				
 				case .field(let fieldName, of: let record):
 				return .field(fieldName, of: try record.lowered(in: &context))
 				
-				case .vector(let elementType, count: let count):
-				return .vector(try elementType.lowered(in: &context), count: count)
+				case .vector(let repeatedElement, count: let count):
+				return .vector(try repeatedElement.lowered(in: &context), count: count)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let body):
 				return try .λ(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: body.lowered(in: &context))
@@ -142,15 +146,8 @@ extension OB {
 							// The type object.
 							let unsealedTypeObject: Lower.Symbol = "ob.typeobj"
 							objectType.typeObjectName ~ .let(
-								[unsealedTypeObject ~ .record(try ObjectType.typeObjectState.lowered(in: &context))],
-								in: .do(
-									[.setField(
-										ObjectType.typeObjectSealFieldName,
-										of: .named(unsealedTypeObject),
-										to: .named(objectSeal)
-									)],
-									then: .sealed(.named(unsealedTypeObject), with: .named(typeSeal))
-								)
+								[unsealedTypeObject ~ .record([.init(ObjectType.typeObjectSealFieldName, .named(objectSeal))])],
+								in: .sealed(.named(unsealedTypeObject), with: .named(typeSeal))
 							)
 							
 							// The type object's createObject method.
@@ -181,7 +178,7 @@ extension OB {
 		}
 		
 		/// Determines the type of `self`.
-		private func type(in context: Context) throws -> ValueType {
+		func type(in context: Context) throws -> ValueType {
 			switch self {
 				
 				case .self:
@@ -195,16 +192,16 @@ extension OB {
 				guard let type = context.valueType(of: symbol) else { throw TypingError.undefinedSymbol(symbol) }
 				return type
 				
-				case .record(let type):
-				return .cap(.record(type))
+				case .record(let entries):
+				return .cap(.record(.init(try entries.map { try .init($0.name, $0.value.type(in: context)) })))
 				
 				case .field(let fieldName, of: let record):
 				guard case .cap(.record(let recordType)) = try record.type(in: context) else { throw TypingError.subscriptingNonrecord(record, fieldName: fieldName) }
 				guard let field = recordType.fields[fieldName] else { throw TypingError.undefinedField(fieldName, record, recordType) }
 				return field.valueType
 				
-				case .vector(let elementType, count: _):
-				return .cap(.vector(of: elementType))
+				case .vector(let repeatedElement, count: _):
+				return .cap(.vector(of: try repeatedElement.type(in: context)))
 				
 				case .element(of: let vector, at: let index):
 				guard case .cap(.vector(of: let elementType)) = try vector.type(in: context) else { throw TypingError.indexingNonvector(vector, index: index) }
@@ -260,9 +257,6 @@ extension OB {
 			/// An error indicating that given symbol is not defined.
 			case undefinedSymbol(Symbol)
 			
-			/// An error indicating that no function with given name is defined.
-			case undefinedFunction(Label)
-			
 			/// An error indicating that a nonrecord is being subscripted.
 			case subscriptingNonrecord(Value, fieldName: Field.Name)
 			
@@ -296,9 +290,6 @@ extension OB {
 					
 					case .undefinedSymbol(let symbol):
 					return "“\(symbol)” is not defined"
-					
-					case .undefinedFunction(let label):
-					return "No function “\(label)” defined"
 					
 					case .subscriptingNonrecord(let record, fieldName: let fieldName):
 					return "\(record) is not a record and thus cannot be subscripted with “\(fieldName)”"
