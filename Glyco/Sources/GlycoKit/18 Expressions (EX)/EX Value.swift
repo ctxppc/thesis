@@ -60,7 +60,19 @@ extension EX {
 				return .source(.named(symbol))
 				
 				case .record(let entries):
-				return .record(.init(try entries.map { .init($0.name, try $0.value.type(in: context)) }))	// TODO: set fields
+				let rec: Lower.Symbol = "ex.rec"
+				let valueBindings: [(Field.Name, Lower.Symbol, Lower.Value)] = try entries.compactMap { entry in
+					guard entry.value != .constant(0) else { return nil }
+					return (entry.name, "ex.field.\(entry.name)", try entry.value.lowered(in: &context))
+				}
+				return .let(
+					[.init(rec, .record(.init(try entries.map { .init($0.name, try $0.value.type(in: context)) })))]
+						+ valueBindings.map { .init($0.1, $0.2) },
+					in: .do(
+						valueBindings.map { .setField($0.0, of: rec, to: .named($0.1)) },
+						then: .source(.named(rec))
+					)
+				)
 				
 				case .field(let fieldName, of: let record):
 				let rec = context.symbols.uniqueName(from: "rec")
@@ -68,15 +80,28 @@ extension EX {
 					.init(rec, record.lowered(in: &context)),
 				], in: .field(fieldName, of: rec))
 				
+				case .vector(.constant(0), count: let count):
+				return .vector(.s32, count: count)
+				
 				case .vector(let repeatedElement, count: let count):
-				return .vector(try repeatedElement.type(in: context), count: count)	// TODO: initialise elements
+				let vec: Lower.Symbol = "ex.vec"
+				let elem: Lower.Symbol = "ex.elem"
+				return try .let(
+					[
+						.init(vec, .vector(repeatedElement.type(in: context), count: count)),
+						.init(elem, repeatedElement.lowered(in: &context)),
+					], in: .do(
+						(0..<count).map { index in .setElement(of: vec, at: .constant(index), to: .named(elem)) },
+						then: .source(.named(vec))
+					)
+				)
 				
 				case .element(of: let vector, at: let index):
 				let vec = context.symbols.uniqueName(from: "vec")
 				let idx = context.symbols.uniqueName(from: "idx")
 				return try .let([
 					.init(vec, vector.lowered(in: &context)),
-					.init(idx, index.lowered(in: &context))
+					.init(idx, index.lowered(in: &context)),
 				], in: .element(of: vec, at: .named(idx)))
 				
 				case .function(let name):
@@ -90,7 +115,7 @@ extension EX {
 				let s = context.symbols.uniqueName(from: "seal")
 				return try .let([
 					.init(c, cap.lowered(in: &context)),
-					.init(s, seal.lowered(in: &context))
+					.init(s, seal.lowered(in: &context)),
 				], in: .sealed(c, with: s))
 				
 				case .binary(let lhs, let op, let rhs):
@@ -98,7 +123,7 @@ extension EX {
 				let r = context.symbols.uniqueName(from: "rhs")
 				return try .let([
 					.init(l, lhs.lowered(in: &context)),
-					.init(r, rhs.lowered(in: &context))
+					.init(r, rhs.lowered(in: &context)),
 				], in: .binary(.named(l), op, .named(r)))
 				
 				case .evaluate(.function(let name), let arguments):
@@ -121,7 +146,11 @@ extension EX {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let body):
-				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				let loweredValue = try Lowered.let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				for definition in definitions {	// doesn't matter in which order
+					context.undeclare(definition.name)
+				}
+				return loweredValue
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
@@ -137,7 +166,7 @@ extension EX {
 				return .s32
 					
 				case .named(let symbol):
-				guard let type = context.valueTypesBySymbol[symbol] else { throw TypingError.undefinedSymbol(symbol) }
+				guard let type = context.type(of: symbol) else { throw TypingError.undefinedSymbol(symbol) }
 				return type
 				
 				case .record(let entries):
@@ -201,7 +230,7 @@ extension EX {
 				case .let(let definitions, in: let body):
 				var context = context
 				for definition in definitions {
-					context.valueTypesBySymbol[definition.name] = try definition.value.type(in: context)
+					context.declare(definition.name, try definition.value.type(in: context))
 				}
 				return try body.type(in: context)
 				

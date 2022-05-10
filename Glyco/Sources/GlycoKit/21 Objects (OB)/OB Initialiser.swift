@@ -28,7 +28,7 @@ extension OB {
 			let sealName: Lower.Symbol = "ob.seal"
 			return try .λ(
 				takes:		[.init(Method.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
-				returns:	.cap(.record(type.stateRecordType(in: context).lowered(in: &context), sealed: false)),
+				returns:	.cap(.record(type.stateRecordType(in: context).lowered(in: &context), sealed: true)),
 				in:			.let(
 					[
 						sealName ~ .field(ObjectType.typeObjectSealFieldName, of: .named(Method.selfName)),

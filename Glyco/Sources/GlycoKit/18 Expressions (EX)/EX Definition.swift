@@ -19,7 +19,9 @@ extension EX {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Definition {
-			.init(name, try value.lowered(in: &context))
+			let loweredValue = try value.lowered(in: &context)	// Lower the value in the previous scope.
+			context.declare(name, try value.type(in: context))	// Enlarge scope.
+			return .init(name, loweredValue)
 		}
 		
 	}

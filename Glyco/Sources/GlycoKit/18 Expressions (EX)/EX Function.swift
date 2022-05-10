@@ -29,7 +29,7 @@ extension EX {
 		func lowered(in context: inout Context) throws -> Lower.Function {
 			var context = Context(functions: context.functions)
 			for parameter in parameters {
-				context.valueTypesBySymbol[parameter.name] = parameter.type
+				context.declare(parameter.name, parameter.type)
 			}
 			return .init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 		}
