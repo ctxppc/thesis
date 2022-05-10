@@ -29,7 +29,12 @@ extension EX {
 		func lowered(in context: inout Context) throws -> Lower.Function {
 			var context = Context(functions: context.functions)
 			for parameter in parameters {
-				context.declare(parameter.name, parameter.type)
+				if parameter.sealed {
+					guard case .cap(let capType) = parameter.type else { throw TypingError.noncapabilitySealedParameter(parameter) }
+					context.declare(parameter.name, .cap(capType.unsealed()))
+				} else {
+					context.declare(parameter.name, parameter.type)
+				}
 			}
 			return .init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
 		}

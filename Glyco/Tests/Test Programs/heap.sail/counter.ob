@@ -2,7 +2,7 @@
 	letType(
 		object((
 			Counter,
-			state: ((value, s32)),
+			initialState: (value, 0),
 			initialiser:
 				(takes: (initialValue, s32, sealed: false), in:
 					setField(value, of: self, to: initialValue)

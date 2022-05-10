@@ -125,7 +125,7 @@ rv.main:		addi t0, zero, 288
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
-				cmove ca1, ct6
+				cmove ca0, ct6
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
@@ -134,14 +134,13 @@ rv.main:		addi t0, zero, 288
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
-				cmove ca0, ct0
+				cmove cs1, ct0
+				cmove cra, ca2
+				csc cra, 0(cs1)
 				cmove cra, ca0
-				cmove cs1, ca2
-				csc cs1, 0(cra)
-				cmove cra, ca1
-				cseal ca0, ca0, cra
+				cseal ca1, cs1, cra
 				cllc cra, l.anon
-				cseal ca1, cra, ca1
+				cseal ca0, cra, ca0
 				cllc cra, l.anon$1
 				cmove cs1, ca2
 				cseal ct4, cra, cs1
@@ -149,9 +148,9 @@ rv.main:		addi t0, zero, 288
 				cllc cra, l.anon$2
 				cseal ct4, cra, ca2
 				csc ct4, 256(cfp)
-				csc ca0, 208(cfp)
+				csc ca1, 208(cfp)
 				addi ra, zero, 32
-				csc ca1, 160(cfp)
+				csc ca0, 160(cfp)
 				mv a0, ra
 				addi t4, zero, 0
 				csw t4, 64(cfp)
@@ -338,15 +337,15 @@ l.anon:			addi t0, zero, 16
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				clc ca1, 0(ct6)
+				clc ca2, 0(ct6)
 				addi t0, zero, 4
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
-				cmove ca2, ct0
-				cmove cs1, ca2
-				csw a0, 0(cs1)
-				cseal ca0, ca2, ca1
+				cmove cs1, ct0
+				cmove ca1, cs1
+				csw a0, 0(ca1)
+				cseal ca0, cs1, ca2
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

@@ -43,6 +43,16 @@ extension LS {
 			}
 		}
 		
+		/// Returns a copy of `self` that is unsealed.
+		func unsealed() -> Self {
+			switch self {
+				case .vector(of: let elementType, sealed: _):	return .vector(of: elementType, sealed: false)
+				case .record(let recordType, sealed: _):		return .record(recordType, sealed: false)
+				case .function:									return self
+				case .seal(sealed: _):							return .seal(sealed: false)
+			}
+		}
+		
 	}
 	
 }

@@ -6,11 +6,14 @@
 			(
 				ob.Counter.type,
 				let(
-					(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
-					in: do(
-						let((ex.rec, source(ob.typeobj)) (ex.val, source(ob.oseal)), in: setField(seal, of: ex.rec, to: ex.val)),
-						then: let((ex.cap, source(ob.typeobj)) (ex.seal, source(ob.tseal)), in: sealed(ex.cap, with: ex.seal))
-					)
+					(
+						ob.typeobj,
+						let(
+							(ex.rec, record(((seal, cap(seal(sealed: false)))))) (ex.field.seal, source(ob.oseal)),
+							in: do(setField(seal, of: ex.rec, to: ex.field.seal), then: source(ex.rec))
+						)
+					),
+					in: let((ex.cap, source(ob.typeobj)) (ex.seal, source(ob.tseal)), in: sealed(ex.cap, with: ex.seal))
 				)
 			)
 			(
@@ -46,10 +49,11 @@
 		(initialValue, s32, sealed: false),
 		returns: cap(record(((value, s32)), sealed: true)),
 		in: let(
-			(ob.seal, let((ex.rec$1, source(ob.self)), in: field(seal, of: ex.rec$1))) (ob.self, record(((value, s32)))),
+			(ob.seal, let((ex.rec, source(ob.self)), in: field(seal, of: ex.rec)))
+			(ob.self, let((ex.rec, record(((value, s32)))), in: do(, then: source(ex.rec)))),
 			in: do(
-				let((ex.rec$2, source(ob.self)) (ex.val$1, source(initialValue)), in: setField(value, of: ex.rec$2, to: ex.val$1)),
-				then: value(let((ex.cap$4, source(ob.self)) (ex.seal$4, source(ob.seal)), in: sealed(ex.cap$4, with: ex.seal$4)))
+				let((ex.rec$1, source(ob.self)) (ex.val, source(initialValue)), in: setField(value, of: ex.rec$1, to: ex.val)),
+				then: value(let((ex.cap, source(ob.self)) (ex.seal, source(ob.seal)), in: sealed(ex.cap, with: ex.seal)))
 			)
 		)
 	)
@@ -61,12 +65,12 @@
 			(
 				newValue,
 				let(
-					(ex.lhs, let((ex.rec$3, source(ob.self)), in: field(value, of: ex.rec$3))) (ex.rhs, source(1)),
+					(ex.lhs, let((ex.rec, source(ob.self)), in: field(value, of: ex.rec))) (ex.rhs, source(1)),
 					in: binary(ex.lhs, add, ex.rhs)
 				)
 			),
 			in: do(
-				let((ex.rec$4, source(ob.self)) (ex.val$2, source(newValue)), in: setField(value, of: ex.rec$4, to: ex.val$2)),
+				let((ex.rec$1, source(ob.self)) (ex.val, source(newValue)), in: setField(value, of: ex.rec$1, to: ex.val)),
 				then: value(source(newValue))
 			)
 		)
@@ -75,6 +79,6 @@
 		l.anon$2,
 		takes: (ob.self, cap(record(((value, s32)), sealed: true)), sealed: true),
 		returns: s32,
-		in: value(let((ex.rec$5, source(ob.self)), in: field(value, of: ex.rec$5)))
+		in: value(let((ex.rec, source(ob.self)), in: field(value, of: ex.rec)))
 	)
 )

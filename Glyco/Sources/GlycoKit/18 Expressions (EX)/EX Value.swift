@@ -268,6 +268,9 @@ extension EX {
 		/// An error indicating that given value is not a function that can be evaluated.
 		case nonfunctionValue(Value)
 		
+		/// An error indicating that given sealed parameter has a noncapability value type.
+		case noncapabilitySealedParameter(Parameter)
+		
 		// See protocol.
 		var errorDescription: String? {
 			switch self {
@@ -295,6 +298,9 @@ extension EX {
 				
 				case .nonfunctionValue(let value):
 				return "\(value) is not a function"
+				
+				case .noncapabilitySealedParameter(let parameter):
+				return "\(parameter) is sealed but doesn't take capabilities"
 				
 			}
 		}
