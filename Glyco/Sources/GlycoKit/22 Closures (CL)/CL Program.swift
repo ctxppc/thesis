@@ -40,7 +40,6 @@ public enum CL : Language {
 	public typealias RecordType = Lower.RecordType
 	public typealias Symbol = Lower.Symbol
 	public typealias TypeName = Lower.TypeName
-	public typealias TypeDefinition = Lower.TypeDefinition
 	public typealias ValueType = Lower.ValueType
 	
 }

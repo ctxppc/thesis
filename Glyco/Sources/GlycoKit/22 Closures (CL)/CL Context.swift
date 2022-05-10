@@ -11,6 +11,9 @@ extension CL {
 		/// Symbols captured by the closure body.
 		var capturedNames = Set<Symbol>()
 		
+		/// A bag of type names.
+		var typeNames = Bag<TypeName>()
+		
 	}
 	
 }

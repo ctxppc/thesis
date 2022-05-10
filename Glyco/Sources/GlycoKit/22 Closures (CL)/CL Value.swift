@@ -89,10 +89,32 @@ extension CL {
 				case .λ(takes: let parameters, returns: let resultType, in: let body):
 				var deeperContext = Context()
 				let loweredBody = try body.lowered(in: &deeperContext)
-				if deeperContext.capturedNames.isEmpty {
+				let capturedNames = deeperContext.capturedNames
+				if capturedNames.isEmpty {
 					return .λ(takes: parameters, returns: resultType, in: loweredBody)
 				} else {
-					TODO.unimplemented
+					return .letType([
+						.object(.init(
+							context.typeNames.uniqueName(from: "Closure"),
+							initialState:	capturedNames.map { name in
+								.init(.init(rawValue: name.rawValue), .named(name))
+							},
+							initialiser:	.init(takes: [], in: .do([])),
+							methods:		[
+								.init(
+									Self.closureInvokeMethodName,
+									takes:		parameters,
+									returns:	resultType,
+									in:			.let(
+										deeperContext.capturedNames.map { name in
+											.init(name, .field(.init(rawValue: name.rawValue), of: .self))
+										},
+										in: try body.lowered(in: &context)
+									)
+								)
+							]
+						))
+					], in: .constant(0))	// TODO
 				}
 				
 				case .element(of: let vector, at: let index):
@@ -117,13 +139,16 @@ extension CL {
 				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .letType(let typeDefinitions, in: let body):
-				return try .letType(typeDefinitions, in: body.lowered(in: &context))
+				return try .letType(typeDefinitions.lowered(in: &context), in: body.lowered(in: &context))
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))
 				
 			}
 		}
+		
+		/// The name of the invoke method on closures.
+		private static let closureInvokeMethodName: Method.Name = "invoke"
 		
 	}
 }
