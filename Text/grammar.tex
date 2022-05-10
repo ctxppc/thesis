@@ -7,6 +7,66 @@
 \label{ch:grammar}
 This chapter presents all \gs{il} in the final version of Glyco, from high-level to low-level languages. The Swift source files for these \gs{il} can be found under \url{https://tsarouhas.eu/glyco/ils/}.
 
+\paragraph{ CL (Closures) } A language that introduces closures, i.e., anononymous functions with an environment.
+\begin{grammar}
+	\footnotesize
+				<CL.Program> ::=
+							"("<Result>")"
+				\par
+				<CL.ObjectType> ::=
+							"("<TypeName>, "state:" <RecordType>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
+				\par
+				<CL.Effect> ::=
+						"do""("<[Effect]>")"
+						| "let""("<[Definition]>, "in:" <Effect>")"
+						| "setField""("<Field.Name>, "of:" <Value>, "to:" <Value>")"
+						| "setElement""(""of:" <Value>, "at:" <Value>, "to:" <Value>")"
+				\par
+				<CL.Definition> ::=
+							"("<Symbol>, <Value>")"
+				\par
+				<CL.Initialiser> ::=
+							"(""takes:" <[Parameter]>, "in:" <Effect>")"
+				\par
+				<CL.Result> ::=
+						"value""("<Value>")"
+						| "evaluate""("<Value>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Result>, "else:" <Result>")"
+						| "let""("<[Definition]>, "in:" <Result>")"
+						| "do""("<[Effect]>, "then:" <Result>")"
+				\par
+				<CL.Predicate> ::=
+						<Bool> |
+						"constant""("<Bool>")"
+						| "relation""("<Value>, <BranchRelation>, <Value>")"
+						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
+						| "let""("<[Definition]>, "in:" <Predicate>")"
+				\par
+				<CL.Method> ::=
+							"("<Symbol>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<CL.Value> ::=
+						<Int> |
+								<Symbol> |
+						"self"
+						| "constant""("<Int>")"
+						| "named""("<Symbol>")"
+						| "record""("<RecordType>")"
+						| "field""("<Field.Name>, "of:" <Value>")"
+						| "vector""("<ValueType>, "count:" <Int>")"
+						| "element""(""of:" <Value>, "at:" <Value>")"
+						| "λ""(""takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+						| "object""("<TypeName>, <[Value]>")"
+						| "binary""("<Value>, <BinaryOperator>, <Value>")"
+						| "evaluate""("<Value>, <[Value]>")"
+						| "message""("<Value>, <Method.Name>, <[Value]>")"
+						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
+						| "let""("<[Definition]>, "in:" <Value>")"
+						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
+						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+\end{grammar}
+\par
 \paragraph{ OB (Objects) } A language that introduces objects, i.e., encapsulated values with methods.
 \begin{grammar}
 	\footnotesize

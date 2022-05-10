@@ -2,7 +2,7 @@
 
 extension NT {
 	
-	/// A value used while lowering.
+	/// A value used while lowering a program.
 	struct LoweringContext : NTTypeContext {
 		
 		// See protocol.

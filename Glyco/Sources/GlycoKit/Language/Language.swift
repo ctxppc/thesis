@@ -5,7 +5,7 @@ import Foundation
 /// The highest intermediate language supported by GlycoKit.
 ///
 /// Update this typealias whenever a higher language is added.
-public typealias HighestSupportedLanguage = OB
+public typealias HighestSupportedLanguage = CL
 
 public protocol Language {
 	

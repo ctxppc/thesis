@@ -19,7 +19,9 @@ extension CL {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Definition {
-			.init(name, try value.lowered(in: &context))
+			let loweredValue = try value.lowered(in: &context)	// first capture all names in the value,
+			context.definedNames.insert(name)					// then define the new name
+			return .init(name, loweredValue)
 		}
 		
 	}

@@ -32,6 +32,8 @@ extension NT {
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
 		///
 		/// If the result type is a nominal type and the result is of a structural type, it is implicitly converted.
+		///
+		/// Enclosing definitions are not available within the lambda body.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
 		/// A value that evaluates to a unique capability that can be used for sealing.

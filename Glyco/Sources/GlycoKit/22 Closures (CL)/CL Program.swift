@@ -23,7 +23,8 @@ public enum CL : Language {
 		
 		// See protocol.
 		public func lowered(configuration: CompilationConfiguration) throws -> Lower.Program {
-			try .init(result.lowered())
+			var context = Context()
+			return try .init(result.lowered(in: &context))
 		}
 		
 	}
@@ -31,14 +32,10 @@ public enum CL : Language {
 	// See protocol.
 	public typealias Lower = OB
 	
-	typealias Context = ()
-	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
 	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
-	public typealias Method = Lower.Method
-	public typealias ObjectType = Lower.ObjectType
 	public typealias Parameter = Lower.Parameter
 	public typealias RecordType = Lower.RecordType
 	public typealias Symbol = Lower.Symbol

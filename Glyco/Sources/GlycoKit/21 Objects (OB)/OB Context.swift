@@ -2,7 +2,7 @@
 
 extension OB {
 	
-	/// A value used while lowering a program, function, or method.
+	/// A value used while lowering a program.
 	struct Context {
 		
 		/// The name of the object type being lowered, or `nil` if no method is being lowered.

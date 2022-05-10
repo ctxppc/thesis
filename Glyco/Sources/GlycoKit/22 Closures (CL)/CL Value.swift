@@ -30,7 +30,9 @@ extension CL {
 		/// A value that evaluates to the `at`th element of the list `of`.
 		indirect case element(of: Value, at: Value)
 		
-		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
+		/// A value that evaluates to a closure with given parameters, result type, and result.
+		///
+		/// Enclosing definitions are captured when used in the closure body.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
 		/// A value that evaluates to a unique capability to an object constructed with given arguments.
@@ -68,6 +70,9 @@ extension CL {
 				return .constant(value)
 				
 				case .named(let symbol):
+				if !context.definedNames.contains(symbol) {
+					context.capturedNames.insert(symbol)
+				}
 				return .named(symbol)
 				
 				case .record(let type):
@@ -80,7 +85,13 @@ extension CL {
 				return .vector(elementType, count: count)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let body):
-				return try .λ(takes: parameters, returns: resultType, in: body.lowered(in: &context))
+				var deeperContext = Context()
+				let loweredBody = try body.lowered(in: &deeperContext)
+				if deeperContext.capturedNames.isEmpty {
+					return .λ(takes: parameters, returns: resultType, in: loweredBody)
+				} else {
+					TODO.unimplemented
+				}
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))

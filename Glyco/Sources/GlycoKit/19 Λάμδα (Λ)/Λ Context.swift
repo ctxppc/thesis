@@ -2,7 +2,7 @@
 
 extension Λ {
 	
-	/// A value used while lowering.
+	/// A value used while lowering a program.
 	struct Context {
 		
 		/// The functions discovered while lowering lambda values.

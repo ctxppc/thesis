@@ -31,6 +31,8 @@ extension OB {
 		indirect case element(of: Value, at: Value)
 		
 		/// A value that evaluates to an anonymous function with given parameters, result type, and result.
+		///
+		/// Enclosing definitions are not available within the lambda body.
 		indirect case λ(takes: [Parameter], returns: ValueType, in: Result)
 		
 		/// A value that evaluates to a unique capability to an object constructed with given arguments.

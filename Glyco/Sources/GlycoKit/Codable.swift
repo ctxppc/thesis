@@ -147,6 +147,15 @@ extension CL.Program {
 	}
 }
 
+extension CL.ObjectType {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case state = "state"
+		case initialiser = "initialiser"
+		case methods = "methods"
+	}
+}
+
 extension CL.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -158,6 +167,15 @@ extension CL.Initialiser {
 	public enum CodingKeys : String, CodingKey {
 		case parameters = "takes"
 		case effect = "in"
+	}
+}
+
+extension CL.Method {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case parameters = "takes"
+		case resultType = "returns"
+		case result = "in"
 	}
 }
 

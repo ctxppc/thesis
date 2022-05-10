@@ -3,6 +3,7 @@
 **Glyco** is a nanopass compiler, so-called because it consists of numerous intermediate languages and small passes.
 
 The pipeline, from high-level to low-level is:
+[`CL`](#CL) →
 [`OB`](#OB) →
 [`NT`](#NT) →
 [`Λ`](#Λ) →
@@ -70,6 +71,85 @@ A program written in some language `XY` should be stored in a file with extensio
 	<dd><kbd>%</kbd></dd>
 </dl>
 
+
+<h2 id="CL">Grammar for CL (Closures)</h2>
+A language that introduces closures, i.e., anononymous functions with an environment.
+
+**Inherited from OB:**
+<code>BinaryOperator</code>, 
+<code>BranchRelation</code>, 
+<code>Field</code>, 
+<code>Label</code>, 
+<code>Parameter</code>, 
+<code>RecordType</code>, 
+<code>Symbol</code>, 
+<code>TypeDefinition</code>, 
+<code>TypeName</code>, 
+<code>ValueType</code>
+<dl>
+	<dt><code>CL.Program</code></dt>
+	<dd><code>(Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.ObjectType</code></dt>
+	<dd><code>(TypeName, <strong>state:</strong> RecordType, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Effect</code></dt>
+	<dd><code><strong>do</strong>([Effect])</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Effect)</code></dd>
+	<dd><code><strong>setField</strong>(Field.Name, <strong>of:</strong> Value, <strong>to:</strong> Value)</code></dd>
+	<dd><code><strong>setElement</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value, <strong>to:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Definition</code></dt>
+	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Effect)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Result</code></dt>
+	<dd><code><strong>value</strong>(Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Result, <strong>else:</strong> Result)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Predicate</code></dt>
+						<dd><code>Bool</code></dd>
+	<dd><code><strong>constant</strong>(Bool)</code></dd>
+	<dd><code><strong>relation</strong>(Value, BranchRelation, Value)</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Predicate, <strong>else:</strong> Predicate)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Method</code></dt>
+	<dd><code>(Symbol, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Value</code></dt>
+	<dd><code>Int</code></dd>
+	<dd><code>Symbol</code></dd>
+	<dd><code><strong>self</strong></code></dd>
+	<dd><code><strong>constant</strong>(Int)</code></dd>
+	<dd><code><strong>named</strong>(Symbol)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>field</strong>(Field.Name, <strong>of:</strong> Value)</code></dd>
+	<dd><code><strong>vector</strong>(ValueType, <strong>count:</strong> Int)</code></dd>
+	<dd><code><strong>element</strong>(<strong>of:</strong> Value, <strong>at:</strong> Value)</code></dd>
+	<dd><code><strong>λ</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
+	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
+	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
+	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>
+	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
+	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
+	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
 
 <h2 id="OB">Grammar for OB (Objects)</h2>
 A language that introduces objects, i.e., encapsulated values with methods.
