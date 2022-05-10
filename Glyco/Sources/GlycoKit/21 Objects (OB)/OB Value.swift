@@ -51,6 +51,9 @@ extension OB {
 		/// A value that messages the object with given object capability, method name, and arguments.
 		indirect case message(Value, Method.Name, [Value])
 		
+		/// A value that evaluates to a bound method with given object capability and method name.
+		indirect case sendableMessage(Value, Method.Name)
+		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
@@ -103,7 +106,16 @@ extension OB {
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
 				case .evaluate(let function, let arguments):
-				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
+				if case .cap(.boundMethod) = try function.type(in: context) {
+					return try .evaluate(
+						.field(ObjectType.boundMethodFieldForMethod, of: function.lowered(in: &context)),
+						[
+							// TODO
+						] + arguments.lowered(in: &context)
+					)
+				} else {
+					return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
+				}
 				
 				case .message(let receiver, let methodName, let arguments):
 				let receiverType = try receiver.type(in: context)
@@ -112,6 +124,17 @@ extension OB {
 				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
 				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
 				return .evaluate(.named(method.symbol(typeName: typeName)), try [receiver.lowered(in: &context)] + arguments.lowered(in: &context))
+				
+				case .sendableMessage(let receiver, let methodName):
+				let receiverType = try receiver.type(in: context)
+				guard case .cap(.object(let typeName)) = receiverType else { throw TypingError.messagingNonobject(receiver, actualType: receiverType) }
+				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
+				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
+				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
+				return .record([
+					.init(ObjectType.boundMethodFieldForReceiver, try receiver.lowered(in: &context)),
+					.init(ObjectType.boundMethodFieldForMethod, .named(method.symbol(typeName: typeName))),
+				])
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
@@ -227,6 +250,14 @@ extension OB {
 				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
 				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
 				return method.resultType
+				
+				case .sendableMessage(let receiver, let methodName):
+				let receiverType = try receiver.type(in: context)
+				guard case .cap(.object(let typeName)) = receiverType else { throw TypingError.messagingNonobject(receiver, actualType: receiverType) }
+				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
+				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
+				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
+				return .cap(.boundMethod(takes: method.parameters, returns: method.resultType))
 				
 				case .if(_, then: let affirmative, else: _):
 				return try affirmative.type(in: context)

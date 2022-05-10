@@ -25,6 +25,9 @@ extension OB {
 		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type. Note that the type of `self` in a method is not an object capability but a capability to the object's state record.
 		case object(TypeName)
 		
+		/// A capability to an object–method pair.
+		indirect case boundMethod(takes: [Parameter], returns: ValueType)
+		
 		/// A capability that can be used to seal other capabilities.
 		case seal
 		
@@ -45,6 +48,17 @@ extension OB {
 				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
 				guard case .object(let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
 				return .record(try objectType.stateRecordType(in: context).lowered(in: &context), sealed: true)
+				
+				case .boundMethod(takes: let parameters, returns: let resultType):
+				return .record(.init([
+					.init(
+						ObjectType.boundMethodFieldForMethod,
+						try .cap(.function(
+							takes:		[.init(Method.selfName, .cap(.vector(of: .u8, sealed: true)), sealed: true)] + parameters.lowered(in: &context),	// type-erased receiver
+							returns:	resultType.lowered(in: &context)
+						))
+					),
+				]), sealed: false)
 				
 				case .seal:
 				return .seal(sealed: false)

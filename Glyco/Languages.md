@@ -83,7 +83,6 @@ A language that introduces closures, i.e., anononymous functions with an environ
 <code>Parameter</code>, 
 <code>RecordType</code>, 
 <code>Symbol</code>, 
-<code>TypeDefinition</code>, 
 <code>TypeName</code>, 
 <code>ValueType</code>
 <dl>
@@ -132,6 +131,12 @@ A language that introduces closures, i.e., anononymous functions with an environ
 <dl>
 	<dt><code>CL.Method</code></dt>
 	<dd><code>(Symbol, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.TypeDefinition</code></dt>
+	<dd><code><strong>alias</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>nominal</strong>(TypeName, ValueType)</code></dd>
+	<dd><code><strong>object</strong>(ObjectType)</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Value</code></dt>
@@ -215,6 +220,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>
+	<dd><code><strong>sendableMessage</strong>(Value, Method.Name)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
@@ -246,6 +252,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
+	<dd><code><strong>boundMethod</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 </dl>
 <dl>
@@ -326,6 +333,7 @@ A language that introduces named alias and nominal types.
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>cast</strong>(Value, <strong>as:</strong> ValueType)</code></dd>
+	<dd><code><strong>coerce</strong>(Value, <strong>as:</strong> ValueType)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>

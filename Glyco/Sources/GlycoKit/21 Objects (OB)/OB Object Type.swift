@@ -55,6 +55,12 @@ extension OB {
 		/// The name of the type object field containing the seal capability used for sealing objects of that type.
 		static let typeObjectSealFieldName: Field.Name = "seal"
 		
+		/// The name of the receiver field in a bound method pair.
+		static let boundMethodFieldForReceiver: Field.Name = "receiver"
+		
+		/// The name of the method field in a bound method pair.
+		static let boundMethodFieldForMethod: Field.Name = "method"
+		
 	}
 	
 }
