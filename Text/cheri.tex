@@ -2,7 +2,7 @@
 \begin{document}
 \onlyinsubfile{\mainmatter{}}
 
-\chapter{Background: Ensuring Memory Safety using Capabilities}
+\chapter{Background: Ensuring Memory Safety using Capabilities} \label{ch:cheri}
 Most security bugs classified as \enquote{serious} in large projects such as the Chromium browser engine \cite{chromium} are memory safety bugs — bugs such as out-of-bounds array or call stack accesses that arise from the use of \enquote{memory-unsafe} programming languages like C, the use of memory safety opt-outs (such as Rust’s \texttt{unsafe}) in \enquote{memory-safe} programming languages, bugs in the compiler, bugs in the standard library implementation of a memory-safe programming language, or bugs in the runtime environment such as the Java VM or an ECMAScript interpreter.
 
 Common approaches to mitigating attacks or restricting the attack vector that such a bug can cause include reintroducing compiler-inserted array bounds checks in memory-unsafe programming languages and enforcing page-level permissions in the virtual memory system of the operating system. However, runtime checks introduce a runtime cost, and virtual memory protection doesn’t protect against a compromised or vulnerable library such as Apache Log4j accessing potentially sensitive data in the process’ address space such as TLS session keys stored in an in-process OpenSSL data structure.
