@@ -158,8 +158,10 @@ The \texttt{call} effect is updated to accept any kind of source, not just label
 \paragraph{Lambdas (Λ) through Objects (OB)} These new \gs{il} are described in the preceding sections.
 
 \section{Evaluation} \label{sct:obj-eval}
-% TODO
+Analogously to \cref{sct:ghscc-eval}, we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth.
 
-% \biblio{} TODO: Uncomment after adding a citation in chapter.
+The implementation of lambdas, named types, and sealed objects introduces 3 new \gs{il} (Λ, NT, and OB) bringing the total in Glyco 0.3 to 22 \gs{il}. Using cloc again, we measured a growth in the codebase from 6921 SLOC in Glyco 0.2 to 9360 SLOC in Glyco 0.3, representing a net growth of $+35\%$.
+\todo{Add similarity metric to show much boilerplate there is to all these new \gs{il}?}
+
 \onlyinsubfile{\glsaddall\printglossaries}
 \end{document}
