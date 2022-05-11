@@ -8,7 +8,6 @@ default:
 stages:
   - build
   - test
-  - text
 
 build: &build
   stage: build
@@ -20,17 +19,6 @@ build: &build
   artifacts:
     paths:
       - Glyco_release_Ubuntu20.04
-
-text:
-  stage: text
-  needs: []
-  image: texlive/texlive:latest
-  script:
-      - cd Text
-      - latexmk -shell-escape -pdf -pdflatex main.tex
-  artifacts:
-    paths:
-      - Text/main.pdf
 
 test: &test
   stage: test
