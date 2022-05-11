@@ -3,6 +3,16 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Introduction}
+Sir Charles Antony Richard Hoare introduced null references in ALGOL in 1965 as a simple solution to implementing trees using pointers, something he reflected on almost half a century later in \cite{null}:
+\begin{quote}
+	\enquote{That led me to suggest that the null pointer was a possible value of every reference variable […] and it may be perhaps a billion-dollar mistake.}
+\end{quote}
+
+Null pointers are obviously not the only pointer-related problem. A whole class of memory safety issues are caused by incorrect handling of pointers. Buffer overflow attacks are possible when code doesn't properly check if a pointer points to memory appropriately allocated for the purpose. Some types of arbitrary code execution are possible when pointers are used to write executable code to memory which is later executed as part of normal program execution or another attack, like a shellcode attack.
+
+A capability is, in the context of this thesis, a pointer that grants authority for a set of operations over a specific range of memory such as an array or object. Capability machines are processors that implement support for capabilities and efficiently enforce the invariants provided by them. They have long been studied academically, e.g., a design for \emph{guarded pointers} to be implemented in hardware in \cite{guardedptrs}, but renewed interest has recently emerged in the form of a modern capability machine by \cite{intro2cheri}, Capability Hardware Enhanced RISC Instructions or \textbf{CHERI} for short, and the opportunities it presents for security features in high-level software abstractions.
+
+This thesis explores a few of these high-level security features and provides an implementation for them on CHERI-RISC-V, an extension of the RISC-V instruction set architecture with support for CHERI capabilities.
 
 % TODO
 
