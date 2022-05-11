@@ -21,6 +21,9 @@ Finally, since \texttt{λ} values with support for mutual recursion provide the 
 \paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with either an auto-generated name or a name derived from the lambda definition) and replaces the \texttt{λ} values by code capabilities to those functions. The first program of this chapter is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
+The \g{nanopass} injects lambda definitions, i.e., λ values in a \texttt{let} value, in the lambda body to enable (mutual) recursion. The parity program above is thus \lowered{} as
+\ilfile{Programs/evenodd.ex}
+
 \section{Alias \& Nominal Types} \label{sct:named-ty}
 A second new feature is support for defining new (named) types in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
 \begin{itemize}[nosep]
@@ -84,7 +87,7 @@ The following OB program implements the object type \iil/Counter/, creates a cou
 \ilfile{Programs/counter.ob}
 
 \subsection{Object State Encapsulation \& Unique Seals} \label{sct:obj-sec}
-The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the \g{init} or a \g{method} leaks an unsealed capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that a \g{method} or \g{init} \textbf{can only be invoked on an object of the type defining that \g{method} or \g{init}}.\footnote{This property similarly does not hold if an unsealed code capability to the \g{method} is leaked.}
+The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the \g{init} or a \g{method} leaks an unsealed capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that a \g{method} or \g{init} \textbf{can only be invoked on an object of the type defining that \g{method} or \g{init}}.\footnote{This property similarly does not hold if an unsealed code capability to the \g{method} is leaked by the type owner.}
 
 Both properties are achieved by \g{sealing} capabilities to objects and \gs{method} using unique \gs{sealcap} provided by a \g{rtrt}. \G{sealing} capabilities using a \g{sealcap} is a power which was originally bestowed upon the \g{rt} in the design and implementation of \g{ghscc} where an \g{scall} seals a return–frame capability pair before passing control to the callee.
 
