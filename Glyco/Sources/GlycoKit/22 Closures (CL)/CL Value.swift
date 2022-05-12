@@ -93,16 +93,18 @@ extension CL {
 				if capturedNames.isEmpty {
 					return try .λ(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: loweredBody)
 				} else {
+					let closureTypeName = context.typeNames.uniqueName(from: "Closure")
+					let closureInvokeMethodName: Method.Name = "invoke"
 					return .letType([
 						.object(.init(
-							context.typeNames.uniqueName(from: "Closure"),
+							closureTypeName,
 							initialState:	capturedNames.map { name in
 								.init(.init(rawValue: name.rawValue), .named(name))
 							},
 							initialiser:	.init(takes: [], in: .do([])),
 							methods:		[
 								try .init(
-									Self.closureInvokeMethodName,
+									closureInvokeMethodName,
 									takes:		parameters.lowered(in: &context),
 									returns:	resultType.lowered(in: &context),
 									in:			.let(
@@ -114,7 +116,7 @@ extension CL {
 								)
 							]
 						))
-					], in: .constant(0))	// TODO
+					], in: .message(.object(closureTypeName, []), closureInvokeMethodName))
 				}
 				
 				case .element(of: let vector, at: let index):
@@ -146,9 +148,6 @@ extension CL {
 				
 			}
 		}
-		
-		/// The name of the invoke method on closures.
-		private static let closureInvokeMethodName: Method.Name = "invoke"
 		
 	}
 }

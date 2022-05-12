@@ -36,11 +36,8 @@ extension CL {
 				case .record(let recordType):
 				return .record(try recordType.lowered(in: &context))
 				
-				case .function(takes: let parameters, returns: let resultType, closure: false):
-				return try .function(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
-				
-				case .function(takes: let parameters, returns: let resultType, closure: true):
-				return try .message(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
+				case .function(takes: let parameters, returns: let resultType, closure: let closure):
+				return try (closure ? Lowered.message : Lowered.function)(parameters.lowered(in: &context), resultType.lowered(in: &context))
 				
 				case .object(let typeName):
 				return .object(typeName)
