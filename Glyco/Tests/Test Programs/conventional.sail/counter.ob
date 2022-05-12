@@ -22,10 +22,10 @@
 		)), in:
 		let(
 			(counter, object(Counter, 32))
-			(ignored, message(counter, increase,))
-			(ignored, message(counter, increase,))
-			(ignored, message(counter, increase,)), in:
-			message(counter, getCount,)
+			(ignored, evaluate(message(counter, increase),))
+			(ignored, evaluate(message(counter, increase),))
+			(ignored, evaluate(message(counter, increase),)), in:
+			evaluate(message(counter, getCount),)
 		)
 	)
 ))

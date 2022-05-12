@@ -43,11 +43,11 @@ extension CL {
 		/// A value that evaluates to *x* *op* *y* where *x* and *y* are given sources and *op* is given operator.
 		indirect case binary(Value, BinaryOperator, Value)
 		
-		/// A value that evaluates to given function evaluated with given arguments.
+		/// A value that evaluates to given function or message evaluated with given arguments.
 		indirect case evaluate(Value, [Value])
 		
-		/// A value that messages the object with given object capability, method name, and arguments.
-		indirect case message(Value, Method.Name, [Value])
+		/// A value that evaluates to a message, i.e., a method bound to an object.
+		indirect case message(Value, Method.Name)
 		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
@@ -91,7 +91,7 @@ extension CL {
 				let loweredBody = try body.lowered(in: &deeperContext)
 				let capturedNames = deeperContext.capturedNames
 				if capturedNames.isEmpty {
-					return .λ(takes: parameters, returns: resultType, in: loweredBody)
+					return try .λ(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: loweredBody)
 				} else {
 					return .letType([
 						.object(.init(
@@ -101,15 +101,15 @@ extension CL {
 							},
 							initialiser:	.init(takes: [], in: .do([])),
 							methods:		[
-								.init(
+								try .init(
 									Self.closureInvokeMethodName,
-									takes:		parameters,
-									returns:	resultType,
+									takes:		parameters.lowered(in: &context),
+									returns:	resultType.lowered(in: &context),
 									in:			.let(
 										deeperContext.capturedNames.map { name in
 											.init(name, .field(.init(rawValue: name.rawValue), of: .self))
 										},
-										in: try body.lowered(in: &context)
+										in: body.lowered(in: &context)
 									)
 								)
 							]
@@ -126,11 +126,11 @@ extension CL {
 				case .binary(let lhs, let op, let rhs):
 				return try .binary(lhs.lowered(in: &context), op, rhs.lowered(in: &context))
 				
-				case .evaluate(let function, let arguments):
-				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
+				case .evaluate(let target, let arguments):
+				return try .evaluate(target.lowered(in: &context), arguments.lowered(in: &context))
 				
-				case .message(let receiver, let methodName, let arguments):
-				return try .message(receiver.lowered(in: &context), methodName, arguments.lowered(in: &context))
+				case .message(let receiver, let methodName):
+				return try .message(receiver.lowered(in: &context), methodName)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

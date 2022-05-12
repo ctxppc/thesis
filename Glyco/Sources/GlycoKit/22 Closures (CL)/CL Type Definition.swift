@@ -31,8 +31,8 @@ extension CL {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.TypeDefinition {
 			switch self {
-				case .alias(let name, let type):	return .alias(name, type)
-				case .nominal(let name, let type):	return .nominal(name, type)
+				case .alias(let name, let type):	return .alias(name, try type.lowered(in: &context))
+				case .nominal(let name, let type):	return .nominal(name, try type.lowered(in: &context))
 				case .object(let type):				return .object(try type.lowered(in: &context))
 			}
 		}

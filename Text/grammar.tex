@@ -13,6 +13,12 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<CL.Program> ::=
 							"("<Result>")"
 				\par
+				<CL.RecordType> ::=
+							"("<[Field]>")"
+				\par
+				<CL.Field> ::=
+							"("<Name>, <ValueType>")"
+				\par
 				<CL.ObjectType> ::=
 							"("<TypeName>, "initialState:" <[RecordEntry]>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
 				\par
@@ -45,8 +51,18 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "if""("<Predicate>, "then:" <Predicate>, "else:" <Predicate>")"
 						| "let""("<[Definition]>, "in:" <Predicate>")"
 				\par
+				<CL.Parameter> ::=
+							"("<Symbol>, <ValueType>")"
+				\par
 				<CL.Method> ::=
 							"("<Symbol>, "takes:" <[Parameter]>, "returns:" <ValueType>, "in:" <Result>")"
+				\par
+				<CL.CapabilityType> ::=
+						"vector""(""of:" <ValueType>")"
+						| "record""("<RecordType>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>, "closure:" <Bool>")"
+						| "object""("<TypeName>")"
+						| "seal"
 				\par
 				<CL.TypeDefinition> ::=
 						"alias""("<TypeName>, <ValueType>")"
@@ -67,11 +83,18 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "object""("<TypeName>, <[Value]>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Value>, <[Value]>")"
-						| "message""("<Value>, <Method.Name>, <[Value]>")"
+						| "message""("<Value>, <Method.Name>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
 						| "do""("<[Effect]>, "then:" <Value>")"
+				\par
+				<CL.ValueType> ::=
+								<TypeName> |
+						"named""("<TypeName>")"
+						| "u8"
+						| "s32"
+						| "cap""("<CapabilityType>")"
 				\par
 \end{grammar}
 \par
@@ -120,8 +143,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "object""("<TypeName>, <[Value]>")"
 						| "binary""("<Value>, <BinaryOperator>, <Value>")"
 						| "evaluate""("<Value>, <[Value]>")"
-						| "message""("<Value>, <Method.Name>, <[Value]>")"
-						| "sendableMessage""("<Value>, <Method.Name>")"
+						| "message""("<Value>, <Method.Name>")"
 						| "if""("<Predicate>, "then:" <Value>, "else:" <Value>")"
 						| "let""("<[Definition]>, "in:" <Value>")"
 						| "letType""("<[TypeDefinition]>, "in:" <Value>")"
@@ -149,7 +171,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "record""("<RecordType>")"
 						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "object""("<TypeName>")"
-						| "boundMethod""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
+						| "message""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal"
 				\par
 				<OB.Method> ::=

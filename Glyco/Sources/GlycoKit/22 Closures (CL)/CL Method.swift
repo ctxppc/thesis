@@ -27,7 +27,7 @@ extension CL {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Method {
-			.init(name, takes: parameters, returns: resultType, in: try result.lowered(in: &context))
+			try .init(name, takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: result.lowered(in: &context))
 		}
 		
 	}

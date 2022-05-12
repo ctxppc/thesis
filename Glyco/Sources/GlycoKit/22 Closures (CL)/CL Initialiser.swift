@@ -19,7 +19,7 @@ extension CL {
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Initialiser {
-			.init(takes: parameters, in: try effect.lowered(in: &context))
+			try .init(takes: parameters.lowered(in: &context), in: effect.lowered(in: &context))
 		}
 		
 	}

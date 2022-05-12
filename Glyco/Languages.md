@@ -78,16 +78,20 @@ A language that introduces closures, i.e., anononymous functions with an environ
 **Inherited from OB:**
 <code>BinaryOperator</code>, 
 <code>BranchRelation</code>, 
-<code>Field</code>, 
 <code>Label</code>, 
-<code>Parameter</code>, 
-<code>RecordType</code>, 
 <code>Symbol</code>, 
-<code>TypeName</code>, 
-<code>ValueType</code>
+<code>TypeName</code>
 <dl>
 	<dt><code>CL.Program</code></dt>
 	<dd><code>(Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.RecordType</code></dt>
+	<dd><code>([Field])</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Field</code></dt>
+	<dd><code>(Name, ValueType)</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.ObjectType</code></dt>
@@ -129,8 +133,20 @@ A language that introduces closures, i.e., anononymous functions with an environ
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Predicate)</code></dd>
 </dl>
 <dl>
+	<dt><code>CL.Parameter</code></dt>
+	<dd><code>(Symbol, ValueType)</code></dd>
+</dl>
+<dl>
 	<dt><code>CL.Method</code></dt>
 	<dd><code>(Symbol, <strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>in:</strong> Result)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.CapabilityType</code></dt>
+	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
+	<dd><code><strong>record</strong>(RecordType)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>closure:</strong> Bool)</code></dd>
+	<dd><code><strong>object</strong>(TypeName)</code></dd>
+	<dd><code><strong>seal</strong></code></dd>
 </dl>
 <dl>
 	<dt><code>CL.TypeDefinition</code></dt>
@@ -153,11 +169,19 @@ A language that introduces closures, i.e., anononymous functions with an environ
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
-	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>
+	<dd><code><strong>message</strong>(Value, Method.Name)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>do</strong>([Effect], <strong>then:</strong> Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.ValueType</code></dt>
+	<dd><code>TypeName</code></dd>
+	<dd><code><strong>named</strong>(TypeName)</code></dd>
+	<dd><code><strong>u8</strong></code></dd>
+	<dd><code><strong>s32</strong></code></dd>
+	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
 </dl>
 
 <h2 id="OB">Grammar for OB (Objects)</h2>
@@ -219,8 +243,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>object</strong>(TypeName, [Value])</code></dd>
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
-	<dd><code><strong>message</strong>(Value, Method.Name, [Value])</code></dd>
-	<dd><code><strong>sendableMessage</strong>(Value, Method.Name)</code></dd>
+	<dd><code><strong>message</strong>(Value, Method.Name)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>
@@ -252,7 +275,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
 	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
-	<dd><code><strong>boundMethod</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
+	<dd><code><strong>message</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 </dl>
 <dl>

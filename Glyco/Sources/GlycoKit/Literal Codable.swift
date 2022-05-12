@@ -106,6 +106,14 @@ extension CL.Value {
 	}
 }
 
+extension CL.ValueType {
+	public init(stringValue: String) { self = .named(.init(rawValue: stringValue)) }
+	public var stringValue: String? {
+		guard case .named(let value) = self else { return nil }
+		return value.rawValue
+	}
+}
+
 extension CV.Predicate {
 	public init(boolValue: Bool) { self = .constant(boolValue) }
 	public var boolValue: Bool? {

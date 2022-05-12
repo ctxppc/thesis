@@ -147,6 +147,19 @@ extension CL.Program {
 	}
 }
 
+extension CL.RecordType {
+	public enum CodingKeys : String, CodingKey {
+		case fields = "_0"
+	}
+}
+
+extension CL.Field {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case valueType = "_1"
+	}
+}
+
 extension CL.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
@@ -174,6 +187,13 @@ extension CL.RecordEntry {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case value = "_1"
+	}
+}
+
+extension CL.Parameter {
+	public enum CodingKeys : String, CodingKey {
+		case name = "_0"
+		case type = "_1"
 	}
 }
 

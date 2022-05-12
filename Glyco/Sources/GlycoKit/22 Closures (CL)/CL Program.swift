@@ -34,12 +34,8 @@ public enum CL : Language {
 	
 	public typealias BinaryOperator = Lower.BinaryOperator
 	public typealias BranchRelation = Lower.BranchRelation
-	public typealias Field = Lower.Field
 	public typealias Label = Lower.Label
-	public typealias Parameter = Lower.Parameter
-	public typealias RecordType = Lower.RecordType
 	public typealias Symbol = Lower.Symbol
 	public typealias TypeName = Lower.TypeName
-	public typealias ValueType = Lower.ValueType
 	
 }
