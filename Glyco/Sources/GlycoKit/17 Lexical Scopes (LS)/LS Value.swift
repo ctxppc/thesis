@@ -76,8 +76,9 @@ extension LS {
 				
 				case .let(let definitions, in: let body):
 				// Definition lowering starts scope
-				defer { context.popScope(for: definitions.lazy.map(\.name)) }
-				return try .let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				let loweredResult = try Lowered.let(definitions.lowered(in: &context), in: body.lowered(in: &context))
+				context.popScope(for: definitions.lazy.map(\.name))
+				return loweredResult
 				
 				case .do(let effects, then: let value):
 				return try .do(effects.lowered(in: &context), then: value.lowered(in: &context))

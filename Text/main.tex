@@ -2,7 +2,7 @@
 \documentclass[master=cws, oneside, english, extralanguage=dutch]{kulemt}	% TODO: twoside for print
 \setup{
 	masteroption=vs,
-	title={A CHERI-RISC-V nanopass compiler for iterating quickly on security features},
+	title={Glyco: A CHERI-RISC-V nanopass compiler for iterating quickly on capability-based security features},
 	author={Constantino Tsarouhas},
 	promotor={Prof. dr. Dominique Devriese},
 	assistant={Ir. Sander Huyghebaert\and{}Dr. Steven Keuchel},
@@ -13,7 +13,9 @@
 
 \usepackage{amsmath}							% Math support
 \usepackage{babel}								% Language support
+\usepackage{booktabs}							% Prettier table rules
 \usepackage[margin=10pt, font=small]{caption}	% Customised captions to distinguish them from main text
+\usepackage{changepage}							% Adjust margins — used for figures/tables wider than text width
 \usepackage[autostyle]{csquotes}				% Curly quotes
 \usepackage{enumitem}							% Compact list items
 
@@ -36,7 +38,7 @@
 \hypersetup{
     colorlinks=true,		% false: boxed links; true: coloured links
     linkcolor=Blue,			% colour of internal links
-    citecolor=OliveGreen,	% colour of links to bibliography
+    citecolor=OliveGreen,	% colour of reference links
     filecolor=cyan,			% colour of file links
     urlcolor=magenta		% colour of external links
 }
@@ -91,14 +93,10 @@
 \tableofcontents*
 
 \begin{abstract}
-	\lipsum[5]
-	\todo{Write something serious here}
+	This thesis explores a design \& implementation of a \g{nanopass} compiler producing CHERI-RISC-V executables that use a secure \g{cc} guaranteeing \g{lse} and a variation of \g{wbcf} called \emph{unrepeatable return}. The secure \g{cc} is then compared in terms of runtime and memory overhead against a more traditional \g{cc} using a few test programs. The thesis also proposes and implements a design for machine-enforced object encapsulation in a feature we call \emph{sealed objects}. Finally, the \g{nanopass} approach itself is evaluated by assessing the impact that each new security feature has on the compiler's codebase and pipeline.
 \end{abstract}
 
-\begin{abstract*}
-	\lipsum[5]
-	\todo{5 pagina's goud hier a.u.b.}
-\end{abstract*}
+\subfile{summary}
 
 \mainmatter
 \subfile{intro}
