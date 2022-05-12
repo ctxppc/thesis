@@ -32,6 +32,14 @@ extension OB {
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))
 				
 				case .let(let definitions, in: let result):
+				for definition in definitions {
+					context.declare(definition.name, try definition.value.type(in: context))
+				}
+				defer {
+					for definition in definitions.reversed() {
+						context.undeclare(definition.name)
+					}
+				}
 				return try .let(definitions.lowered(in: &context), in: result.lowered(in: &context))
 				
 				case .do(let effects, then: let result):

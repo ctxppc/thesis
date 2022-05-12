@@ -1,0 +1,25 @@
+(
+	let(
+		(one, 1)
+		(
+			plusOne,
+			letType(
+				object(
+					(
+						cl.Closure,
+						initialState: (one, one),
+						initialiser: (takes: , in: do()),
+						methods: (
+							invoke,
+							takes: (term, s32),
+							returns: s32,
+							in: let((one, field(one, of: self)), in: value(binary(one, add, term)))
+						)
+					)
+				),
+				in: message(object(cl.Closure, ), invoke)
+			)
+		),
+		in: evaluate(plusOne, 2)
+	)
+)

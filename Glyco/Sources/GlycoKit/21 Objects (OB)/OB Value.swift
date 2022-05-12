@@ -153,6 +153,9 @@ extension OB {
 					in: .let(.init {
 						for case .object(let objectType) in typeDefinitions {
 							
+							let previousObjectTypeName = context.objectTypeName
+							context.objectTypeName = objectType.name
+							
 							// A fresh seal for sealing the type object and its createObject method.
 							let typeSeal: Lower.Symbol = "ob.tseal"
 							typeSeal ~ .seal
@@ -184,6 +187,8 @@ extension OB {
 									with: .named(objectSeal)
 								)
 							}
+							
+							context.objectTypeName = previousObjectTypeName
 							
 						}
 					}, in: body.lowered(in: &context))

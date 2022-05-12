@@ -87,7 +87,7 @@ extension CL {
 				return .vector(try repeatedElement.lowered(in: &context), count: count)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let body):
-				var deeperContext = Context()
+				var deeperContext = Context(definedNames: .init(parameters.map(\.name)))
 				let loweredBody = try body.lowered(in: &deeperContext)
 				let capturedNames = deeperContext.capturedNames
 				if capturedNames.isEmpty {
