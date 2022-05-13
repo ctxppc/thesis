@@ -3,7 +3,7 @@
 		set(ls.one, to: 1)
 		createSeal(in: ls.tseal)
 		createSeal(in: ls.oseal)
-		createRecord(((seal, cap(seal(sealed: false)))), capability: ls.rec, scoped: true)
+		createRecord(((seal, cap(seal(sealed: false)))), capability: ls.rec, scoped: false)
 		set(ls.field.seal, to: ls.oseal)
 		setField(seal, of: ls.rec, to: ls.field.seal)
 		set(ls.typeobj, to: ls.rec)
@@ -31,7 +31,7 @@
 				)
 			),
 			capability: ls.rec$1,
-			scoped: true
+			scoped: false
 		)
 		set(ls.arg, to: ls.cl.Closure.type)
 		set(ls.f, to: ls.ob.cl.Closure.Type.createObject.m)
@@ -57,7 +57,7 @@
 		in: do(
 			set(ls.rec, to: ls.self)
 			getField(seal, of: ls.rec, to: ls.seal)
-			createRecord(((one, s32) (term, s32)), capability: ls.rec$1, scoped: true)
+			createRecord(((one, s32) (term, s32)), capability: ls.rec$1, scoped: false)
 			set(ls.field.one, to: ls.one)
 			set(ls.field.term, to: ls.term)
 			setField(one, of: ls.rec$1, to: ls.field.one)
