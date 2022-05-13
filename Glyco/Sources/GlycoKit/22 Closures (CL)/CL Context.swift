@@ -60,7 +60,7 @@ extension CL {
 			let innerCaptures = capturedSymbols
 			(localSymbols, capturedSymbols) = (outerLocals, outerCaptures)
 			
-			return (result, try innerCaptures.map { ($0, try use($0)) })
+			return (result, try innerCaptures.sorted().map { ($0, try use($0)) })	// sort for deterministic ordering
 			
 		}
 		

@@ -2,7 +2,7 @@
 
 import Sisp
 
-public protocol Name : RawCodable, Hashable, ExpressibleByStringInterpolation, CustomStringConvertible where RawValue == String {
+public protocol Name : RawCodable, Hashable, Comparable, ExpressibleByStringInterpolation, CustomStringConvertible where RawValue == String {
 	init(rawValue: RawValue)
 }
 
@@ -14,6 +14,10 @@ extension Name {
 	
 	public var description: String {
 		rawValue
+	}
+	
+	public static func < (first: Self, later: Self) -> Bool {
+		first.rawValue < later.rawValue
 	}
 	
 }

@@ -21,9 +21,3 @@ extension ALA {
 	}
 	
 }
-
-extension ALA.AbstractLocation : Comparable {
-	public static func <(earlier: Self, later: Self) -> Bool {
-		earlier.rawValue < later.rawValue
-	}
-}

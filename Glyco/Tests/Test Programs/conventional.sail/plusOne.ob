@@ -7,13 +7,13 @@
 				object(
 					(
 						cl.Closure,
-						initialiser: (takes: (term, s32) (one, s32), in: record((term, term) (one, one))),
+						constructor: (takes: (one, s32) (term, s32), in: record((one, one) (term, term))),
 						methods: (
 							invoke,
 							takes: (term, s32),
 							returns: s32,
 							in: let(
-								(term, field(term, of: self)) (one, field(one, of: self)),
+								(one, field(one, of: self)) (term, field(term, of: self)),
 								in: value(binary(one, add, term))
 							)
 						)
