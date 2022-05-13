@@ -219,7 +219,21 @@ extension OB {
 				return .cap(.record(.init(try entries.map { try .init($0.name, $0.value.type(in: context)) })))
 				
 				case .field(let fieldName, of: let record):
-				guard case .cap(.record(let recordType)) = try record.type(in: context) else { throw TypingError.subscriptingNonrecord(record, fieldName: fieldName) }
+				let recordType: RecordType = try {
+					switch try record.type(in: context) {
+						
+						case .cap(.record(let recordType)):
+						return recordType
+						
+						case .cap(.object(let typeName)):
+						guard case .object(let objectType) = context.types[typeName] else { throw TypingError.unknownObjectType(typeName) }
+						return try objectType.stateRecordType(in: context)
+						
+						default:
+						throw TypingError.subscriptingNonrecord(record, fieldName: fieldName)
+						
+					}
+				}()
 				guard let field = recordType.fields[fieldName] else { throw TypingError.undefinedField(fieldName, record, recordType) }
 				return field.valueType
 				

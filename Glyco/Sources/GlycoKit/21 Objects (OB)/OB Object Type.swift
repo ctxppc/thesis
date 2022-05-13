@@ -17,6 +17,8 @@ extension OB {
 		public var name: TypeName
 		
 		/// The initial state of objects of this type, before the initialiser is executed.
+		///
+		/// The values in the initial state are evaluated within the initialiser's scope; the type definition's scope is *not* captured.
 		public var initialState: [RecordEntry]
 		
 		/// The initialiser for objects of this type.
