@@ -2,7 +2,7 @@
 	letType(
 		object((
 			Counter,
-			initialiser:
+			constructor:
 				(takes: (initialValue, s32, sealed: false), in:
 					record((value, initialValue))
 				),

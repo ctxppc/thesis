@@ -94,7 +94,7 @@ extension CL {
 					return .letType([
 						try .object(.init(
 							closureTypeName,
-							initialiser:	.init(
+							constructor:	.init(
 								takes:	capturedNamesAndTypes.map { (name, type) in
 									.init(name, try type.lowered(in: &context))
 								},
@@ -289,8 +289,8 @@ extension CL {
 		/// An error indicating that given receiver of given object type does not defined a method with given name.
 		case undefinedMethod(receiver: Value, objectType: ObjectType, methodName: Method.Name)
 		
-		/// An error indicating the initialiser of the object type with given name doesn't produce a record capability value.
-		case nonrecordInitialiser(TypeName, Value)
+		/// An error indicating the constructor of the object type with given name doesn't produce a record capability value.
+		case nonrecordConstructor(TypeName, Value)
 		
 		// See protocol.
 		var errorDescription: String? {
@@ -326,8 +326,8 @@ extension CL {
 				case .undefinedMethod(receiver: let receiver, objectType: let objectType, methodName: let methodName):
 				return "\(receiver) (of type \(objectType)) does not define a method “\(methodName)”"
 				
-				case .nonrecordInitialiser(let typeName, let result):
-				return "\(typeName)‘s initialiser produces \(result), which isn‘t a record capability"
+				case .nonrecordConstructor(let typeName, let result):
+				return "\(typeName)‘s constructor produces \(result), which isn‘t a record capability"
 				
 			}
 		}

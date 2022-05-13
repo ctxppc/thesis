@@ -163,7 +163,7 @@ extension CL.Field {
 extension CL.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case initialiser = "initialiser"
+		case constructor = "constructor"
 		case methods = "methods"
 	}
 }
@@ -172,13 +172,6 @@ extension CL.Definition {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
 		case value = "_1"
-	}
-}
-
-extension CL.Initialiser {
-	public enum CodingKeys : String, CodingKey {
-		case parameters = "takes"
-		case result = "in"
 	}
 }
 
@@ -201,6 +194,13 @@ extension CL.Method {
 		case name = "_0"
 		case parameters = "takes"
 		case resultType = "returns"
+		case result = "in"
+	}
+}
+
+extension CL.Constructor {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
 		case result = "in"
 	}
 }
@@ -404,13 +404,6 @@ extension OB.Parameter {
 	}
 }
 
-extension OB.Initialiser {
-	public enum CodingKeys : String, CodingKey {
-		case parameters = "takes"
-		case result = "in"
-	}
-}
-
 extension OB.RecordType {
 	public enum CodingKeys : String, CodingKey {
 		case fields = "_0"
@@ -427,8 +420,15 @@ extension OB.Field {
 extension OB.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case initialiser = "initialiser"
+		case constructor = "constructor"
 		case methods = "methods"
+	}
+}
+
+extension OB.Constructor {
+	public enum CodingKeys : String, CodingKey {
+		case parameters = "takes"
+		case result = "in"
 	}
 }
 
