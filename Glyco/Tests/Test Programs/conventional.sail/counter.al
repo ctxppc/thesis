@@ -97,15 +97,13 @@
 		abstract(cc.savedS9, cap)
 		abstract(df.result$1, cap)
 		abstract(ls.cap, cap)
+		abstract(ls.field.value, s32)
 		abstract(ls.initialValue, s32)
 		abstract(ls.rec, cap)
 		abstract(ls.rec$1, cap)
-		abstract(ls.rec$3, cap)
 		abstract(ls.seal, cap)
 		abstract(ls.seal$1, cap)
-		abstract(ls.self, cap)
-		abstract(ls.self$1, cap)
-		abstract(ls.val$1, s32),
+		abstract(ls.self, cap),
 		in: do(
 			pushScope
 			set(abstract(cc.savedS1), to: register(s1, cap))
@@ -125,11 +123,9 @@
 			set(abstract(ls.rec), to: ls.self)
 			getElement(cap, of: abstract(ls.rec), offset: 0, to: abstract(ls.seal))
 			createBuffer(bytes: 4, capability: abstract(ls.rec$1), scoped: true)
-			set(abstract(ls.self$1), to: ls.rec$1)
-			set(abstract(ls.rec$3), to: ls.self$1)
-			set(abstract(ls.val$1), to: ls.initialValue)
-			setElement(s32, of: abstract(ls.rec$3), offset: 0, to: ls.val$1)
-			set(abstract(ls.cap), to: ls.self$1)
+			set(abstract(ls.field.value), to: ls.initialValue)
+			setElement(s32, of: abstract(ls.rec$1), offset: 0, to: ls.field.value)
+			set(abstract(ls.cap), to: ls.rec$1)
 			set(abstract(ls.seal$1), to: ls.seal)
 			seal(into: abstract(df.result$1), source: abstract(ls.cap), seal: abstract(ls.seal$1))
 			set(register(a0), to: df.result$1)

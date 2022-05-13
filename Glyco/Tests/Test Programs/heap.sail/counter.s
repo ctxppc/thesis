@@ -337,15 +337,14 @@ l.anon:			addi t0, zero, 16
 				cjalr ct1, ct1
 				csc cfp, 0(ct0)
 				cmove cfp, ct0
-				clc ca2, 0(ct6)
+				clc ca1, 0(ct6)
 				addi t0, zero, 4
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				cmove cs1, ct0
-				cmove ca1, cs1
-				csw a0, 0(ca1)
-				cseal ca0, cs1, ca2
+				csw a0, 0(cs1)
+				cseal ca0, cs1, ca1
 				.4byte 4276322523 # cclear 0, 225
 				.4byte 4276587867 # cclear 1, 250
 				.4byte 4276850651 # cclear 2, 255

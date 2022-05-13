@@ -21,10 +21,7 @@
 		takes: (ob.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true)
 		(initialValue, s32, sealed: false),
 		returns: cap(record(((value, s32)), sealed: true)),
-		in: let(
-			(ob.seal, field(seal, of: ob.self)) (ob.self, record((value, 0))),
-			in: do(setField(value, of: ob.self, to: initialValue), then: value(sealed(ob.self, with: ob.seal)))
-		)
+		in: let((ob.seal, field(seal, of: ob.self)), in: value(sealed(record((value, initialValue)), with: ob.seal)))
 	)
 	(
 		l.anon$1,

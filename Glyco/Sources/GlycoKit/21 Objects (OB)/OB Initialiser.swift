@@ -17,6 +17,14 @@ extension OB {
 		/// The initialiser's result, which must evaluate to a (usually freshly allocated) record capability.
 		public var result: Value
 		
+		/// Returns the type of `result`.
+		func resultType(in context: Context) throws -> ValueType {
+			try result.type(in: .init(
+				types:				context.types,
+				valueTypesBySymbol:	.init(uniqueKeysWithValues: parameters.lazy.map { ($0.name, [$0.type]) })
+			))
+		}
+		
 		/// Returns an *unsealed* lambda representing the `createObject` method on the type object representing `type`.
 		///
 		/// The lambda's parameters consists of one sealed parameter for the method's receiver, i.e. the type object, followed by `parameters`, and returns a sealed capability to the created object.

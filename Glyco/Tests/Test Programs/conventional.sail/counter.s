@@ -162,26 +162,27 @@ cd.ret$4:		clc cra, -64(cfp)
 l.anon:			csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-				cmove ca3, cs1
-				cmove ca6, cs2
-				cmove ca7, cs3
-cd.then$7:		cmove ca4, cs10
-				cmove ca5, cs11
-				cmove ca2, cra
-				clc ca1, 0(ct6)
+				cmove ca2, cs1
+				cmove ca5, cs2
+				cmove ca6, cs3
+				cmove ca7, cs4
+cd.then$6:		cmove ca3, cs10
+				cmove ca4, cs11
+				cmove ca1, cra
+				clc cs1, 0(ct6)
 				cincoffsetimm cra, csp, -16
 				csetboundsimm cra, cra, 16
 				cgetaddr t0, cra
 				csetaddr csp, csp, t0
-				cmove cs1, cra
-				csw a0, 0(cs1)
-				cseal ca0, cra, ca1
-				cmove cs1, ca3
-				cmove cs2, ca6
-				cmove cs3, ca7
-cd.then$13:		cmove cs10, ca4
-				cmove cs11, ca5
-				cmove cra, ca2
+				csw a0, 0(cra)
+				cseal ca0, cra, cs1
+				cmove cs1, ca2
+				cmove cs2, ca5
+				cmove cs3, ca6
+				cmove cs4, ca7
+cd.then$11:		cmove cs10, ca3
+				cmove cs11, ca4
+				cmove cra, ca1
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
@@ -192,7 +193,7 @@ l.anon$1:		csc cfp, -16(csp)
 				cmove ca5, cs2
 				cmove ca6, cs3
 				cmove ca7, cs4
-cd.then$18:		cmove ca3, cs10
+cd.then$16:		cmove ca3, cs10
 				cmove ca4, cs11
 				cmove ca1, cra
 				cmove cra, ct6
@@ -205,7 +206,7 @@ cd.then$18:		cmove ca3, cs10
 				cmove cs2, ca5
 				cmove cs3, ca6
 				cmove cs4, ca7
-cd.then$23:		cmove cs10, ca3
+cd.then$21:		cmove cs10, ca3
 				cmove cs11, ca4
 				cmove cra, ca1
 				cincoffsetimm csp, cfp, 16
@@ -214,22 +215,22 @@ cd.then$23:		cmove cs10, ca3
 l.anon$2:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-cd.then$24:		cmove ca3, cs2
+cd.then$22:		cmove ca3, cs2
 				cmove ca4, cs3
 				cmove ca5, cs4
 				cmove ca6, cs5
 				cmove ca7, cs6
-cd.then$27:		cmove ca1, cs10
+cd.then$25:		cmove ca1, cs10
 				cmove ca2, cs11
-cd.then$28:		clw a0, 0(ct6)
-cd.then$29:		cmove cs2, ca3
+cd.then$26:		clw a0, 0(ct6)
+cd.then$27:		cmove cs2, ca3
 				cmove cs3, ca4
 				cmove cs4, ca5
 				cmove cs5, ca6
 				cmove cs6, ca7
-cd.then$32:		cmove cs10, ca1
+cd.then$30:		cmove cs10, ca1
 				cmove cs11, ca2
-cd.then$33:		cincoffsetimm csp, cfp, 16
+cd.then$31:		cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 				.balign 16

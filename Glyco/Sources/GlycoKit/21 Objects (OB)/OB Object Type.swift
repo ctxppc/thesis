@@ -23,7 +23,7 @@ extension OB {
 		
 		/// Determines the record type of the state of objects of this type.
 		func stateRecordType(in context: Context) throws -> RecordType {
-			guard case .cap(.record(let recordType)) = try initialiser.result.type(in: context) else {
+			guard case .cap(.record(let recordType)) = try initialiser.resultType(in: context) else {
 				throw TypingError.nonrecordInitialiser(name, initialiser.result)
 			}
 			return recordType

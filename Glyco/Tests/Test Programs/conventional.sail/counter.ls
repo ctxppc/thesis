@@ -49,11 +49,19 @@
 		(initialValue, s32, sealed: false),
 		returns: cap(record(((value, s32)), sealed: true)),
 		in: let(
-			(ob.seal, let((ex.rec, source(ob.self)), in: field(seal, of: ex.rec)))
-			(ob.self, let((ex.rec, record(((value, s32)))), in: do(, then: source(ex.rec)))),
-			in: do(
-				let((ex.rec$1, source(ob.self)) (ex.val, source(initialValue)), in: setField(value, of: ex.rec$1, to: ex.val)),
-				then: value(let((ex.cap, source(ob.self)) (ex.seal, source(ob.seal)), in: sealed(ex.cap, with: ex.seal)))
+			(ob.seal, let((ex.rec, source(ob.self)), in: field(seal, of: ex.rec))),
+			in: value(
+				let(
+					(
+						ex.cap,
+						let(
+							(ex.rec, record(((value, s32)))) (ex.field.value, source(initialValue)),
+							in: do(setField(value, of: ex.rec, to: ex.field.value), then: source(ex.rec))
+						)
+					)
+					(ex.seal, source(ob.seal)),
+					in: sealed(ex.cap, with: ex.seal)
+				)
 			)
 		)
 	)
