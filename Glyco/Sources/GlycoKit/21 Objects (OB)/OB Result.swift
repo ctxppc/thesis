@@ -25,8 +25,23 @@ extension OB {
 				case .value(let value):
 				return .value(try value.lowered(in: &context))
 				
-				case .evaluate(let function, let arguments):
-				return try .evaluate(function.lowered(in: &context), try arguments.lowered(in: &context))
+				case .evaluate(.message(let receiver, let methodName), let arguments):	// Optimisation: avoid allocating a pair by inlining the message.
+				let receiverType = try receiver.type(in: context)
+				guard case .cap(.object(let typeName)) = receiverType else { throw TypingError.messagingNonobject(receiver, actualType: receiverType) }
+				guard let typeDefinition = context.type(named: typeName) else { throw TypingError.unknownObjectType(typeName) }
+				guard case .object(let objectType) = typeDefinition else { throw TypingError.notAnObjectTypeDefinition(typeName, actual: typeDefinition) }
+				guard let method = objectType.methods[methodName] else { throw TypingError.undefinedMethod(receiver: receiver, objectType: objectType, methodName: methodName) }
+				return .evaluate(.named(method.symbol(typeName: typeName)), try [receiver.lowered(in: &context)] + arguments.lowered(in: &context))
+				
+				case .evaluate(let target, let arguments):
+				if case .cap(.message) = try target.type(in: context) {
+					return try .evaluate(
+						.field(ObjectType.boundMethodFieldForMethod, of: target.lowered(in: &context)),
+						[.field(ObjectType.boundMethodFieldForReceiver, of: target.lowered(in: &context))] + arguments.lowered(in: &context)
+					)
+				} else {
+					return try .evaluate(target.lowered(in: &context), arguments.lowered(in: &context))
+				}
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
 				return try .if(predicate.lowered(in: &context), then: affirmative.lowered(in: &context), else: negative.lowered(in: &context))

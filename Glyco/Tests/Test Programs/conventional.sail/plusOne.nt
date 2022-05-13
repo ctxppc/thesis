@@ -44,6 +44,6 @@
 				)
 			)
 		),
-		in: evaluate(plusOne, 2)
+		in: evaluate(field(method, of: plusOne), field(receiver, of: plusOne) 2)
 	)
 )
