@@ -35,6 +35,8 @@ extension LS {
 				return .record(try recordType.lowered(in: &context), sealed: sealed)
 				
 				case .function(takes: let parameters, returns: let resultType):
+				context.pushScope(for: parameters.lazy.map(\.name))
+				defer { context.popScope(for: parameters.lazy.map(\.name)) }
 				return try .procedure(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .seal(sealed: let sealed):
