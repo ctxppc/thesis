@@ -2,10 +2,9 @@
 	letType(
 		object((
 			Counter,
-			initialState: (value, 0),
 			initialiser:
 				(takes: (initialValue, s32, sealed: false), in:
-					setField(value, of: self, to: initialValue)
+					record((value, initialValue))
 				),
 			methods:
 				(increase, takes:, returns: s32, in:

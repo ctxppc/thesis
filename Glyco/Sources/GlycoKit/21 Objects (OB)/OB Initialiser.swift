@@ -5,17 +5,17 @@ extension OB {
 	/// A function that initialises an object's state.
 	public struct Initialiser : Element {
 		
-		/// Creates a constructor with given parameters and effect.
-		public init(takes parameters: [Parameter], in effect: Effect) {
+		/// Creates a constructor with given parameters and result.
+		public init(takes parameters: [Parameter], in result: Value) {
 			self.parameters = parameters
-			self.effect = effect
+			self.result = result
 		}
 		
 		/// The constructor's parameters.
 		public var parameters: [Parameter]
 		
-		/// The initialiser's effect, in terms of `self` and its parameters.
-		public var effect: Effect
+		/// The initialiser's result, which must evaluate to a (usually freshly allocated) record capability.
+		public var result: Value
 		
 		/// Returns an *unsealed* lambda representing the `createObject` method on the type object representing `type`.
 		///
@@ -30,14 +30,8 @@ extension OB {
 				takes:		[.init(Method.selfName, receiverType, sealed: true)] + parameters.lowered(in: &context),
 				returns:	.cap(.record(type.stateRecordType(in: context).lowered(in: &context), sealed: true)),
 				in:			.let(
-					[
-						sealName ~ .field(ObjectType.typeObjectSealFieldName, of: .named(Method.selfName)),
-						Method.selfName ~ .record(type.initialState.lowered(in: &context)),
-					],
-					in: .do(
-						[effect.lowered(in: &context)],
-						then: .value(.sealed(.named(Method.selfName), with: .named(sealName)))
-					)
+					[sealName ~ .field(ObjectType.typeObjectSealFieldName, of: .named(Method.selfName))],
+					in: .value(.sealed(result.lowered(in: &context), with: .named(sealName)))
 				)
 			)
 		}

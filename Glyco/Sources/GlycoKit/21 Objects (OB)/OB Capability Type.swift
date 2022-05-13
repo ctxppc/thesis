@@ -15,15 +15,15 @@ extension OB {
 		/// A capability to a record of given type.
 		case record(RecordType)
 		
-		/// A (possibly sealed) capability to a function with given parameters and result type.
-		///
-		/// A function capability may be either unsealed or a sentry capability.
-		indirect case function(takes: [Parameter], returns: ValueType)
-		
 		/// A capability to an object of given type.
 		///
 		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type. Note that the type of `self` in a method is not an object capability but a capability to the object's state record.
 		case object(TypeName)
+		
+		/// A (possibly sealed) capability to a function with given parameters and result type.
+		///
+		/// A function capability may be either unsealed or a sentry capability.
+		indirect case function(takes: [Parameter], returns: ValueType)
 		
 		/// A capability to a method with given parameters and result type bound to an object.
 		indirect case message(takes: [Parameter], returns: ValueType)
@@ -41,13 +41,13 @@ extension OB {
 				case .record(let recordType):
 				return .record(try recordType.lowered(in: &context), sealed: false)
 				
-				case .function(takes: let parameters, returns: let resultType):
-				return try .function(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
-				
 				case .object(let typeName):
 				guard let definition = context.type(named: typeName) else { throw LoweringError.unknownObjectType(typeName) }
 				guard case .object(let objectType) = definition else { throw LoweringError.notAnObjectTypeDefinition(typeName, actual: definition) }
 				return .record(try objectType.stateRecordType(in: context).lowered(in: &context), sealed: true)
+				
+				case .function(takes: let parameters, returns: let resultType):
+				return try .function(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .message(takes: let parameters, returns: let resultType):
 				return .record(.init([

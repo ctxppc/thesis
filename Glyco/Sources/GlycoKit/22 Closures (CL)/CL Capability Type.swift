@@ -15,13 +15,16 @@ extension CL {
 		/// A capability to a record of given type.
 		case record(RecordType)
 		
-		/// A (possibly sealed) capability to a function or closure with given parameters and result type.
-		indirect case function(takes: [Parameter], returns: ValueType, closure: Bool)
-		
 		/// A capability to an object of given type.
 		///
 		/// An object capability is a sealed capability to an encapsulated value that can only be accessed through methods defined on that object's type. Note that the type of `self` in a method is not an object capability but a capability to the object's state record.
 		case object(TypeName)
+		
+		/// A (possibly sealed) capability to a function or closure with given parameters and result type.
+		indirect case function(takes: [Parameter], returns: ValueType, closure: Bool)
+		
+		/// A capability to a method with given parameters and result type bound to an object.
+		indirect case message(takes: [Parameter], returns: ValueType)
 		
 		/// A capability that can be used to seal other capabilities.
 		case seal
@@ -36,11 +39,14 @@ extension CL {
 				case .record(let recordType):
 				return .record(try recordType.lowered(in: &context))
 				
+				case .object(let typeName):
+				return .object(typeName)
+				
 				case .function(takes: let parameters, returns: let resultType, closure: let closure):
 				return try (closure ? Lowered.message : Lowered.function)(parameters.lowered(in: &context), resultType.lowered(in: &context))
 				
-				case .object(let typeName):
-				return .object(typeName)
+				case .message(takes: let parameters, returns: let resultType):
+				return try .message(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context))
 				
 				case .seal:
 				return .seal

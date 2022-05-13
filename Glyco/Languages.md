@@ -73,7 +73,7 @@ A program written in some language `XY` should be stored in a file with extensio
 
 
 <h2 id="CL">Grammar for CL (Closures)</h2>
-A language that introduces closures, i.e., anononymous functions with an environment.
+A language that introduces closures, i.e., anonymous functions with an environment.
 
 **Inherited from OB:**
 <code>BinaryOperator</code>, 
@@ -95,7 +95,7 @@ A language that introduces closures, i.e., anononymous functions with an environ
 </dl>
 <dl>
 	<dt><code>CL.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>initialState:</strong> [RecordEntry], <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Effect</code></dt>
@@ -110,7 +110,7 @@ A language that introduces closures, i.e., anononymous functions with an environ
 </dl>
 <dl>
 	<dt><code>CL.Initialiser</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Result</code></dt>
@@ -144,8 +144,9 @@ A language that introduces closures, i.e., anononymous functions with an environ
 	<dt><code>CL.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>closure:</strong> Bool)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>closure:</strong> Bool)</code></dd>
+	<dd><code><strong>message</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 </dl>
 <dl>
@@ -211,7 +212,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.Initialiser</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Effect)</code></dd>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.RecordType</code></dt>
@@ -251,7 +252,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>initialState:</strong> [RecordEntry], <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -273,8 +274,8 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dt><code>OB.CapabilityType</code></dt>
 	<dd><code><strong>vector</strong>(<strong>of:</strong> ValueType)</code></dd>
 	<dd><code><strong>record</strong>(RecordType)</code></dd>
-	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>object</strong>(TypeName)</code></dd>
+	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>message</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
 </dl>

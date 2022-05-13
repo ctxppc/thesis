@@ -86,7 +86,11 @@ extension OB {
 				return .vector(try repeatedElement.lowered(in: &context), count: count)
 				
 				case .λ(takes: let parameters, returns: let resultType, in: let body):
-				return try .λ(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: body.lowered(in: &context))
+				var deeperContext = Context(
+					types:				context.types,
+					valueTypesBySymbol:	.init(uniqueKeysWithValues: parameters.lazy.map { ($0.name, [$0.type]) })
+				)
+				return try .λ(takes: parameters.lowered(in: &context), returns: resultType.lowered(in: &context), in: body.lowered(in: &deeperContext))
 				
 				case .element(of: let vector, at: let index):
 				return try .element(of: vector.lowered(in: &context), at: index.lowered(in: &context))
@@ -294,76 +298,83 @@ extension OB {
 			}
 		}
 		
-		enum TypingError : LocalizedError {
-			
-			/// An error indicating that `self` is used outside of a method.
-			case selfOutsideMethod
-			
-			/// An error indicating that given symbol is not defined.
-			case undefinedSymbol(Symbol)
-			
-			/// An error indicating that a nonrecord is being subscripted.
-			case subscriptingNonrecord(Value, fieldName: Field.Name)
-			
-			/// An error indicating that given field is not defined on given record.
-			case undefinedField(Field.Name, Value, RecordType)
-			
-			/// An error indicating that a nonvector is being indexed.
-			case indexingNonvector(Value, index: Value)
-			
-			/// An error indicating that a nonfunction is being evaluated.
-			case evaluatingNonfunction(Value, [Value])
-			
-			/// An error indicating that the receiver of a message is not an object.
-			case messagingNonobject(Value, actualType: ValueType)
-			
-			/// An error indicating that no object type is known by given name.
-			case unknownObjectType(TypeName)
-			
-			/// An error indicating the type defined with given name is not an object type.
-			case notAnObjectTypeDefinition(TypeName, actual: TypeDefinition)
-			
-			/// An error indicating that given receiver of given object type does not defined a method with given name.
-			case undefinedMethod(receiver: Value, objectType: ObjectType, methodName: Method.Name)
-			
-			// See protocol.
-			var errorDescription: String? {
-				switch self {
-					
-					case .selfOutsideMethod:
-					return "Use of self outside a method"
-					
-					case .undefinedSymbol(let symbol):
-					return "“\(symbol)” is not defined"
-					
-					case .subscriptingNonrecord(let record, fieldName: let fieldName):
-					return "\(record) is not a record and thus cannot be subscripted with “\(fieldName)”"
-					
-					case .undefinedField(let fieldName, let record, let recordType):
-					return "\(record) (\(recordType)) does not have a field “\(fieldName)”"
-					
-					case .indexingNonvector(let vector, index: let index):
-					return "\(vector) is not a vector and thus cannot be indexed with \(index)"
-					
-					case .evaluatingNonfunction(let function, let arguments):
-					return "\(function) is not a function and thus cannot be evaluated with \(arguments)"
-					
-					case .messagingNonobject(let receiver, actualType: let actualType):
-					return "\(receiver) is not an object but a(n) \(actualType)"
-					
-					case .unknownObjectType(let typeName):
-					return "“\(typeName)” is not a known object type"
-					
-					case .notAnObjectTypeDefinition(let typeName, actual: let actual):
-					return "“\(typeName)” is defined as \(actual) and thus not an object type"
-					
-					case .undefinedMethod(receiver: let receiver, objectType: let objectType, methodName: let methodName):
-					return "\(receiver) (of type \(objectType)) does not define a method “\(methodName)”"
-					
-				}
+	}
+	
+	enum TypingError : LocalizedError {
+		
+		/// An error indicating that `self` is used outside of a method.
+		case selfOutsideMethod
+		
+		/// An error indicating that given symbol is not defined.
+		case undefinedSymbol(Symbol)
+		
+		/// An error indicating that a nonrecord is being subscripted.
+		case subscriptingNonrecord(Value, fieldName: Field.Name)
+		
+		/// An error indicating that given field is not defined on given record.
+		case undefinedField(Field.Name, Value, RecordType)
+		
+		/// An error indicating that a nonvector is being indexed.
+		case indexingNonvector(Value, index: Value)
+		
+		/// An error indicating that a nonfunction is being evaluated.
+		case evaluatingNonfunction(Value, [Value])
+		
+		/// An error indicating that the receiver of a message is not an object.
+		case messagingNonobject(Value, actualType: ValueType)
+		
+		/// An error indicating that no object type is known by given name.
+		case unknownObjectType(TypeName)
+		
+		/// An error indicating the type defined with given name is not an object type.
+		case notAnObjectTypeDefinition(TypeName, actual: TypeDefinition)
+		
+		/// An error indicating that given receiver of given object type does not defined a method with given name.
+		case undefinedMethod(receiver: Value, objectType: ObjectType, methodName: Method.Name)
+		
+		/// An error indicating the initialiser of the object type with given name doesn't produce a record capability value.
+		case nonrecordInitialiser(TypeName, Value)
+		
+		// See protocol.
+		var errorDescription: String? {
+			switch self {
+				
+				case .selfOutsideMethod:
+				return "Use of self outside a method"
+				
+				case .undefinedSymbol(let symbol):
+				return "“\(symbol)” is not defined"
+				
+				case .subscriptingNonrecord(let record, fieldName: let fieldName):
+				return "\(record) is not a record and thus cannot be subscripted with “\(fieldName)”"
+				
+				case .undefinedField(let fieldName, let record, let recordType):
+				return "\(record) (\(recordType)) does not have a field “\(fieldName)”"
+				
+				case .indexingNonvector(let vector, index: let index):
+				return "\(vector) is not a vector and thus cannot be indexed with \(index)"
+				
+				case .evaluatingNonfunction(let function, let arguments):
+				return "\(function) is not a function and thus cannot be evaluated with \(arguments)"
+				
+				case .messagingNonobject(let receiver, actualType: let actualType):
+				return "\(receiver) is not an object but a(n) \(actualType)"
+				
+				case .unknownObjectType(let typeName):
+				return "“\(typeName)” is not a known object type"
+				
+				case .notAnObjectTypeDefinition(let typeName, actual: let actual):
+				return "“\(typeName)” is defined as \(actual) and thus not an object type"
+				
+				case .undefinedMethod(receiver: let receiver, objectType: let objectType, methodName: let methodName):
+				return "\(receiver) (of type \(objectType)) does not define a method “\(methodName)”"
+				
+				case .nonrecordInitialiser(let typeName, let result):
+				return "\(typeName)‘s initialiser produces \(result), which isn‘t a record capability"
+				
 			}
-			
 		}
 		
 	}
+	
 }

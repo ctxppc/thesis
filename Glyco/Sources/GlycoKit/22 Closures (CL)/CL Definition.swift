@@ -20,7 +20,7 @@ extension CL {
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Definition {
 			let loweredValue = try value.lowered(in: &context)	// first capture all names in the value,
-			context.definedNames.insert(name)					// then define the new name
+			context.declare(name, try value.type(in: context))	// then define the new name
 			return .init(name, loweredValue)
 		}
 		

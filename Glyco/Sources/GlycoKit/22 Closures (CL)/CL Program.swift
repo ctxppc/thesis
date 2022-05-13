@@ -1,7 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 //sourcery: longname = Closures
-//sourcery: description = "A language that introduces closures, i.e., anononymous functions with an environment."
+//sourcery: description = "A language that introduces closures, i.e., anonymous functions with an environment."
 public enum CL : Language {
 	
 	/// A program on a CL machine.

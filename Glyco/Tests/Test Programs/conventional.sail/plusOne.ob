@@ -7,13 +7,15 @@
 				object(
 					(
 						cl.Closure,
-						initialState: (one, one),
-						initialiser: (takes: , in: do()),
+						initialiser: (takes: (term, s32) (one, s32), in: record((term, term) (one, one))),
 						methods: (
 							invoke,
 							takes: (term, s32),
 							returns: s32,
-							in: let((one, field(one, of: self)), in: value(binary(one, add, term)))
+							in: let(
+								(term, field(term, of: self)) (one, field(one, of: self)),
+								in: value(binary(one, add, term))
+							)
 						)
 					)
 				),

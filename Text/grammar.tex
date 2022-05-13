@@ -7,7 +7,7 @@
 \label{ch:grammar}
 This chapter presents all \gs{il} in the final version of Glyco, from high-level to low-level languages. The Swift source files for these \gs{il} can be found under \url{https://tsarouhas.eu/glyco/ils/}.
 
-\paragraph{ CL (Closures) } A language that introduces closures, i.e., anononymous functions with an environment.
+\paragraph{ CL (Closures) } A language that introduces closures, i.e., anonymous functions with an environment.
 \begin{grammar}
 	\footnotesize
 				<CL.Program> ::=
@@ -20,7 +20,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Name>, <ValueType>")"
 				\par
 				<CL.ObjectType> ::=
-							"("<TypeName>, "initialState:" <[RecordEntry]>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
+							"("<TypeName>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
 				\par
 				<CL.Effect> ::=
 						"do""("<[Effect]>")"
@@ -32,7 +32,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Symbol>, <Value>")"
 				\par
 				<CL.Initialiser> ::=
-							"(""takes:" <[Parameter]>, "in:" <Effect>")"
+							"(""takes:" <[Parameter]>, "in:" <Value>")"
 				\par
 				<CL.Result> ::=
 						"value""("<Value>")"
@@ -60,8 +60,9 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<CL.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
-						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>, "closure:" <Bool>")"
 						| "object""("<TypeName>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>, "closure:" <Bool>")"
+						| "message""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal"
 				\par
 				<CL.TypeDefinition> ::=
@@ -115,7 +116,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 							"("<Symbol>, <ValueType>")"
 				\par
 				<OB.Initialiser> ::=
-							"(""takes:" <[Parameter]>, "in:" <Effect>")"
+							"(""takes:" <[Parameter]>, "in:" <Value>")"
 				\par
 				<OB.RecordType> ::=
 							"("<[Field]>")"
@@ -150,7 +151,7 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 						| "do""("<[Effect]>, "then:" <Value>")"
 				\par
 				<OB.ObjectType> ::=
-							"("<TypeName>, "initialState:" <[RecordEntry]>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
+							"("<TypeName>, "initialiser:" <Initialiser>, "methods:" <[Method]>")"
 				\par
 				<OB.Result> ::=
 						"value""("<Value>")"
@@ -169,8 +170,8 @@ This chapter presents all \gs{il} in the final version of Glyco, from high-level
 				<OB.CapabilityType> ::=
 						"vector""(""of:" <ValueType>")"
 						| "record""("<RecordType>")"
-						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "object""("<TypeName>")"
+						| "function""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "message""(""takes:" <[Parameter]>, "returns:" <ValueType>")"
 						| "seal"
 				\par

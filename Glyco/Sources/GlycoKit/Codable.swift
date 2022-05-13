@@ -163,7 +163,6 @@ extension CL.Field {
 extension CL.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case initialState = "initialState"
 		case initialiser = "initialiser"
 		case methods = "methods"
 	}
@@ -179,7 +178,7 @@ extension CL.Definition {
 extension CL.Initialiser {
 	public enum CodingKeys : String, CodingKey {
 		case parameters = "takes"
-		case effect = "in"
+		case result = "in"
 	}
 }
 
@@ -408,7 +407,7 @@ extension OB.Parameter {
 extension OB.Initialiser {
 	public enum CodingKeys : String, CodingKey {
 		case parameters = "takes"
-		case effect = "in"
+		case result = "in"
 	}
 }
 
@@ -428,7 +427,6 @@ extension OB.Field {
 extension OB.ObjectType {
 	public enum CodingKeys : String, CodingKey {
 		case name = "_0"
-		case initialState = "initialState"
 		case initialiser = "initialiser"
 		case methods = "methods"
 	}
