@@ -33,7 +33,7 @@
 			set(abstract(ls.second), to: register(a1, s32))
 			set(abstract(ls.arg), to: 2)
 			set(abstract(ls.arg$1), to: 29)
-			createVector(s32, count: 30, capability: abstract(ls.arg$2), scoped: true)
+			createVector(s32, count: 30, capability: abstract(ls.arg$2), scoped: false)
 			set(register(a0), to: ls.arg)
 			set(register(a1), to: ls.arg$1)
 			set(register(a2), to: ls.arg$2)

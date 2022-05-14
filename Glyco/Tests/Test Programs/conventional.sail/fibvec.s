@@ -121,10 +121,11 @@ fib:			csc cfp, -16(csp)
 cd.then$10:		csc cra, -16(cfp)
 				addi a0, zero, 2
 				addi a1, zero, 29
-				cincoffsetimm ca2, csp, -128
-				csetboundsimm ca2, ca2, 128
-				cgetaddr t0, ca2
-				csetaddr csp, csp, t0
+				addi t0, zero, 120
+				cllc ct1, mm.alloc_cap
+				clc ct1, 0(ct1)
+				cjalr ct1, ct1
+				cmove ca2, ct0
 				cjal cra, recFib
 cd.then$21:		clc cra, -16(cfp)
 				cincoffsetimm csp, cfp, 16

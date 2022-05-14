@@ -7,7 +7,7 @@
 		in: do(
 			set(ls.arg, to: 2)
 			set(ls.arg$1, to: 29)
-			createVector(s32, count: 30, capability: ls.arg$2, scoped: true)
+			createVector(s32, count: 30, capability: ls.arg$2, scoped: false)
 			call(procedure(recFib), ls.arg ls.arg$1 ls.arg$2, result: df.result$1)
 			return(df.result$1)
 		)

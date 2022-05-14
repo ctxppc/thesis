@@ -27,7 +27,7 @@
 			set(cap, frame((offset: -16)), to: register(ra))
 			set(s32, register(a0), to: 2)
 			set(s32, register(a1), to: 29)
-			createBuffer(bytes: 120, capability: register(a2), onFrame: true)
+			createBuffer(bytes: 120, capability: register(a2), onFrame: false)
 			call(capability(to: recFib))
 			do()
 			do()

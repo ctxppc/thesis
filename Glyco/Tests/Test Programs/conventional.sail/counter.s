@@ -116,10 +116,11 @@ rv.main:		csc cfp, -16(csp)
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 				cmove ca3, ct6
-				cincoffsetimm ca0, csp, -16
-				csetboundsimm ca0, ca0, 16
-				cgetaddr t0, ca0
-				csetaddr csp, csp, t0
+				addi t0, zero, 16
+				cllc ct1, mm.alloc_cap
+				clc ct1, 0(ct1)
+				cjalr ct1, ct1
+				cmove ca0, ct0
 				cmove cra, ca3
 				csc cra, 0(ca0)
 				cmove cra, ca1
@@ -170,10 +171,11 @@ cd.then$6:		cmove ca3, cs10
 				cmove ca4, cs11
 				cmove ca1, cra
 				clc cs1, 0(ct6)
-				cincoffsetimm cra, csp, -16
-				csetboundsimm cra, cra, 16
-				cgetaddr t0, cra
-				csetaddr csp, csp, t0
+				addi t0, zero, 4
+				cllc ct1, mm.alloc_cap
+				clc ct1, 0(ct1)
+				cjalr ct1, ct1
+				cmove cra, ct0
 				csw a0, 0(cra)
 				cseal ca0, cra, cs1
 				cmove cs1, ca2
