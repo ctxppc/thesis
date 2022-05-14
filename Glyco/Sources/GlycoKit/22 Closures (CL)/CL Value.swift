@@ -116,7 +116,7 @@ extension CL {
 								)
 							]
 						))
-					], in: .message(.object(closureTypeName, []), closureInvokeMethodName))
+					], in: .message(.object(closureTypeName, capturedNamesAndTypes.map { .named($0.0) }), closureInvokeMethodName))
 				}
 				
 				case .element(of: let vector, at: let index):

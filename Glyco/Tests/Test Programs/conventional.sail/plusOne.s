@@ -108,29 +108,29 @@ rv.main:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -64
 				csc cra, -48(cfp)
-				addi ra, zero, 1
+				addi a4, zero, 1
+				cllc ct0, mm.cseal_cap
+				clc ct0, 0(ct0)
+				cjalr ct0, ct0
+				cmove ca1, ct6
 				cllc ct0, mm.cseal_cap
 				clc ct0, 0(ct0)
 				cjalr ct0, ct0
 				cmove ca3, ct6
-				cllc ct0, mm.cseal_cap
-				clc ct0, 0(ct0)
-				cjalr ct0, ct0
-				cmove ca6, ct6
 				addi t0, zero, 16
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
-				cmove ca2, ct0
-				cmove cra, ca6
-				csc cra, 0(ca2)
+				cmove ca0, ct0
 				cmove cra, ca3
-				cseal ca5, ca2, cra
+				csc cra, 0(ca0)
+				cmove cra, ca1
+				cseal ca2, ca0, cra
 				cllc cra, l.anon
-				cseal ca4, cra, ca3
-				cllc ca2, l.anon$1
-				cmove cra, ca6
-				cseal ct4, ca2, cra
+				cseal ca1, cra, ca1
+				cllc ca0, l.anon$1
+				cmove cra, ca3
+				cseal ct4, ca0, cra
 				csc ct4, -16(cfp)
 				addi t0, zero, 32
 				cllc ct1, mm.alloc_cap
@@ -138,76 +138,72 @@ rv.main:		csc cfp, -16(csp)
 				cjalr ct1, ct1
 				cmove ct4, ct0
 				csc ct4, -32(cfp)
-				cmove ca3, ca5
-				cmove ca2, ca4
-				cllc cra, cd.then
-				cinvoke ca2, ca3
-cd.then:		clc cra, -16(cfp)
+cd.then:		mv ra, a4
+cd.then$1:		mv a0, ra
+				cllc cra, cd.ret
+				cinvoke ca1, ca2
+cd.ret:			clc cra, -16(cfp)
 				clc ct4, -32(cfp)
 				csc ca0, 0(ct4)
 				clc ct4, -32(cfp)
 				csc cra, 16(ct4)
-				clc ca0, -32(cfp)
-				cmove cra, ca0
+				clc ca1, -32(cfp)
+				cmove cra, ca1
 				clc ca2, 0(cra)
-				addi ra, zero, 2
-				clc ca1, 16(ca0)
-				mv a0, ra
+				addi a0, zero, 2
+				clc ca1, 16(ca1)
 				cllc cra, cd.ret$1
 				cinvoke ca1, ca2
-cd.ret$1:		mv ra, a0
-				mv a0, ra
-				clc cra, -48(cfp)
+cd.ret$1:		clc cra, -48(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 l.anon:			csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-				cmove ca3, cs1
-				cmove ca6, cs2
-				cmove ca7, cs3
-cd.then$6:		cmove ca4, cs10
-				cmove ca5, cs11
-				cmove ca2, cra
+				cmove ca2, cs1
+				cmove ca5, cs2
+				cmove ca6, cs3
+				cmove ca7, cs4
+cd.then$6:		cmove ca3, cs10
+				cmove ca4, cs11
+				cmove ca1, cra
 				clc cs1, 0(ct6)
-				addi t0, zero, 8
+				addi t0, zero, 4
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				cmove cra, ct0
 				csw a0, 0(cra)
-				csw a1, 4(cra)
 				cseal ca0, cra, cs1
-				cmove cs1, ca3
-				cmove cs2, ca6
-				cmove cs3, ca7
-cd.then$12:		cmove cs10, ca4
-				cmove cs11, ca5
-				cmove cra, ca2
+				cmove cs1, ca2
+				cmove cs2, ca5
+				cmove cs3, ca6
+				cmove cs4, ca7
+cd.then$11:		cmove cs10, ca3
+				cmove cs11, ca4
+				cmove cra, ca1
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
 l.anon$1:		csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -16
-				cmove ca2, cs1
-				cmove ca5, cs2
-				cmove ca6, cs3
-				cmove ca7, cs4
-cd.then$17:		cmove ca3, cs10
-				cmove ca4, cs11
+cd.then$12:		cmove ca4, cs2
+				cmove ca5, cs3
+				cmove ca6, cs4
+				cmove ca7, cs5
+cd.then$16:		cmove ca2, cs10
+				cmove ca3, cs11
 				cmove ca1, cra
-				cmove cra, ct6
-				clw s1, 0(cra)
-				clw ra, 4(ct6)
-				add a0, s1, ra
-				cmove cs1, ca2
-				cmove cs2, ca5
-				cmove cs3, ca6
-				cmove cs4, ca7
-cd.then$22:		cmove cs10, ca3
-				cmove cs11, ca4
+				clw ra, 0(ct6)
+				add a0, ra, a0
+cd.then$17:		cmove cs2, ca4
+				cmove cs3, ca5
+				cmove cs4, ca6
+				cmove cs5, ca7
+cd.then$21:		cmove cs10, ca2
+				cmove cs11, ca3
 				cmove cra, ca1
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)

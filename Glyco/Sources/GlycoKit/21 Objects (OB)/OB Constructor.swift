@@ -16,7 +16,7 @@ extension OB {
 		/// The constructor's parameters.
 		public var parameters: [Parameter]
 		
-		/// The constructor's result, which must evaluate to a capability to a (usually freshly allocated) record.
+		/// The constructor's result, in terms of the constructor's parameters, evaluating to a capability to a (usually freshly allocated) record.
 		public var result: Value
 		
 		/// Returns the type of `result`.

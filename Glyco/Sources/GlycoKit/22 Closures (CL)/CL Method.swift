@@ -23,7 +23,7 @@ extension CL {
 		public var resultType: ValueType
 		
 		/// The method's result, in terms of its `self` value and parameters.
-		public var result: Result
+		public var result: Result	// TODO: Allow captures?
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Method {

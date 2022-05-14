@@ -7,19 +7,16 @@
 				object(
 					(
 						cl.Closure,
-						constructor: (takes: (one, s32) (term, s32), in: record((one, one) (term, term))),
+						constructor: (takes: (one, s32), in: record((one, one))),
 						methods: (
 							invoke,
 							takes: (term, s32),
 							returns: s32,
-							in: let(
-								(one, field(one, of: self)) (term, field(term, of: self)),
-								in: value(binary(one, add, term))
-							)
+							in: let((one, field(one, of: self)), in: value(binary(one, add, term)))
 						)
 					)
 				),
-				in: message(object(cl.Closure, ), invoke)
+				in: message(object(cl.Closure, one), invoke)
 			)
 		),
 		in: evaluate(plusOne, 2)
