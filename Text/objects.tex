@@ -69,11 +69,12 @@ However, the following program is not valid since the second invocation of \iil/
 \paragraph{From NT to Λ} The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 
 \section{Objects \& Methods} \label{sct:obj-meth}
+\todo{Present the problem \emph{before} presenting the solution, instead of \emph{after}?}
 A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{\gs{method}}.
 
 An object belongs to an \textbf{object type}, which determines the record type and \gs{method} of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of \gs{method}.
 
-Object types can be defined using an \textbf{object type definition} in a \texttt{letType} value. A definition consists of
+Object types can be defined in a new \g{il} above NT called \textbf{OB} (Objects) using an \textbf{object type definition} in a \texttt{letType} value. A definition consists of
 \begin{itemize}[nosep]
 	\item a name, like any other type definition;
 	\item a record type specifying the structure of each object's state;

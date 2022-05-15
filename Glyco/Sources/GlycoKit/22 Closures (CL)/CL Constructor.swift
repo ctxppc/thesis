@@ -17,7 +17,9 @@ extension CL {
 		public var parameters: [Parameter]
 		
 		/// The constructor's result, in terms of the constructor's parameters, evaluating to a capability to a (usually freshly allocated) record.
-		public var result: Value	// TODO: Allow captures?
+		///
+		/// The constructor does not capture any names from the object type definition's scope.
+		public var result: Value
 		
 		// See protocol.
 		func lowered(in context: inout Context) throws -> Lower.Constructor {

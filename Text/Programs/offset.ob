@@ -1,0 +1,27 @@
+(
+	let(
+		(offset, 5)
+		(
+			closure,
+			letType(
+				object(
+					(
+						cl.Closure,
+						constructor: (takes: (offset, s32), in: record((offset, offset))),
+						methods: (
+							invoke,
+							takes: (n, s32),
+							returns: s32,
+							in: let(
+								(offset, field(offset, of: self)),
+								in: value(binary(n, add, offset))
+							)
+						)
+					)
+				),
+				in: message(object(cl.Closure, offset), invoke)
+			)
+		),
+		in: evaluate(closure, 600)
+	)
+)

@@ -1,0 +1,16 @@
+(
+	let(
+		(offset, 5)
+		(closure, record(
+			(function, 
+				λ(
+					takes: (n, s32) (env, cap(record(((offset, s32))))),
+					returns: s32,
+					in: value(binary(n, add, field(offset, of: env)))
+				)
+			)
+			(env, record((offset, offset)))
+		)), in:
+		evaluate(field(function, of: closure), 600 field(env, of: closure))
+	)
+)
