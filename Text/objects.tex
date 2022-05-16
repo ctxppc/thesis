@@ -7,7 +7,7 @@ The previous chapter discussed a first extension of the Glyco compiler, namely a
 
 Sealed objects depend on two new features; we begin hence by describing lambdas in \cref{sct:lambda} and named \& nominal types in \cref{sct:named-ty} before defining the semantics of objects and methods in \cref{sct:obj-meth}. We then list in \cref{sct:obj-sec} a few security properties afforded by sealed objects. We finish this chapter by outlining the changes to the compiler in \cref{sct:obj-changes} and evaluating sealed objects in \cref{sct:obj-eval}.
 
-This chapter discusses the feature set and languages of Glyco 1.0.\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/1.0/}.} A full language reference can be found in \cref{ch:grammar}.
+This chapter discusses the feature set and languages of Glyco 0.3.\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.3/}.} A full language reference can be found in \cref{ch:grammar}.
 
 \section{Lambdas} \label{sct:lambda}
 A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
