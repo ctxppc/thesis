@@ -30,7 +30,7 @@ public enum Sisp : Hashable {
 	///
 	/// A structure is serialised as:
 	///
-	///     type ( label_1: child_1 , label_2: child_2 … , label_n: child_n )
+	///     type(label_1: child_1, label_2: child_2 …, label_n: child_n)
 	///
 	/// for each `label_i`–`child_i` pair in `children`. Each `label_i:` is either omitted (if `.numbered`), a label (if representable), or a quoted label (otherwise). For example:
 	///

@@ -33,7 +33,7 @@ Glyco 0.1 defines 20 \gs{il}, with a general approach adapted from the student c
 \section{An Expression Language} \label{sct:ex}
 The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:\footnote{The \iil/sealed: false/ attribute on parameters is introduced in the next chapter as part of Glyco 0.2 and can be ignored for now.}
+The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:\footnote{The \iil/sealed: false/ attribute on parameters is introduced in the next chapter as part of Glyco 0.2 and can be ignored for now.}\footnote{EX and all other \gs{il} conform to the Sisp format, where a list is written as the list's elements separated by whitespace. Sisp is briefly documented in \cref{ch:sisp}.}
 \ilfile{Programs/fib.ex}
 
 This program defines a function \iil/fib/ with three signed 32-bit integer parameters \iil/prev/, \iil/curr/, and \iil/iter/ which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \iil/fib/ where \iil/prev/ is 0, \iil/curr/ is 1, and \iil/iter/ is 30.

@@ -11,12 +11,12 @@ The preceding chapter introduces sealed objects, objects whose state can only be
 A \textbf{closure} is a function that can use the environment\footnote{An environment, and more specifically a \emph{value environment}, can be seen as a mapping from names to values — each definition adds or updates entries in it and the environment is consulted whenever a name is mentioned in the program. That is of course not what happens in an ahead-of-time compiler such as Glyco where the environment consists of registers and memory locations, and the mapping is mostly implemented by the register allocator, but it remains a useful software model nevertheless.} wherein the closure is defined during its operation, i.e., names (variables) valid at the point of the closure definition can also be used in the closure body. The closure is said to \textbf{capture} or \textbf{save} the environment or to \textbf{capture} variables from the \textbf{outer scope}.
 
 The following Swift program uses a closure to print all numbers between 1 and 100, increased by \texttt{offset}.
-\begin{minted}[style=xcode]{Swift}
+\begin{swift}
 	let offset = 5
 	let numbers = (1...100)
 		.map { number in number + offset }
 	print(numbers)		// 6, 7, 8, 9, 10, …
-\end{minted}
+\end{swift}
 The closure takes one parameter \texttt{number} and captures the constant \texttt{offset} from the outer scope. The \texttt{map} method invokes the closure for every number between 1 and 100 inclusive, binding each number to the \texttt{number} parameter. The closure also gets access to \texttt{offset} even though \texttt{map} isn't even aware of it.
 
 Closures are usually implemented by pairing a function with an environment. When the pair is invoked, the function is invoked with the environment as a (hidden) parameter. For instance, the following OB program implements a closure \texttt{closure} that takes a single parameter \texttt{n} and captures an environment with a single captured name \texttt{offset}.

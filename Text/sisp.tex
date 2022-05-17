@@ -1,0 +1,54 @@
+\documentclass[main.tex]{subfiles}
+\begin{document}
+\onlyinsubfile{\mainmatter{}\appendix{}}
+
+\chapter{Sisp} \label{ch:sisp}
+\textbf{Sisp} (from \enquote{Swifty Lisp}) is a data interchange format developed as part of the Glyco compiler and used for representing programs in \gs{il}. It draws inspiration from both the Swift programming language (in which Glyco is developed) and the S-expression syntax from the Lisp family of programming languages. It attempts to be concise by removing syntactical elements where they're seldom needed such as list delimiters or quotes around strings, but at the same time improve clarity with features such as labelled attributes.
+
+This chapter briefly introduces the Sisp format and its mapping to Swift types. The language reference presented in \cref{ch:grammar} is sufficient to read and write Glyco programs; knowledge of Sisp is only relevant for understanding and modifying the implementation of the compiler itself. This chapter assumes some working knowledge in Swift and the \texttt{Encoder} and \texttt{Decoder} family of protocols provided by the language, as documented in \cite{swiftcoding}.
+
+\section*{Sisp value}
+A Sisp value is one of the following:
+\begin{itemize}
+	
+	\item A positive or negative integer, e.g., \iil/-13/, \iil/5/, and \iil/+5/. The sign is optional for positive integers.
+	
+	\item A string value, e.g., \iil/large/ or \iil/"my text"/. The string doesn't need to be quoted when
+	\begin{itemize}[nosep]
+		\item it is nonempty;
+		\item it contains only alphanumerical characters (Unicode General Category L*, M*, and N*), \texttt{_}, \texttt{\$}, \texttt{.}, and \texttt{\%}; and
+		\item it begins with a letter (Unicode General Category L* or M*), \texttt{_}, \texttt{\$}, \texttt{.}, or \texttt{\%}.
+	\end{itemize}
+	Quotation characters within a quoted string can be escaped by doubling them, e.g., \iil/"this is ""quoted"" string"/.
+	
+	\item A list of values, written consecutively and separated by whitespace, e.g., \iil/1 2 3 5 8 13/.
+	
+	\item An untyped structure containing comma-separated unlabelled and labelled attributes, written as \iil/("John", age: 50, "favourite colour": black)/. A labelled attribute is a key–value pair where the key is a string value. An unlabelled attribute is simply a value and must appear in the same position in the attribute list, counting both unlabelled and labelled attributes.
+	
+	\item A typed structure of some type \texttt{type} and containing comma-separated attributes, written as \iil/type("John", age: 50, "favourite colour": black)/.
+	
+\end{itemize}
+
+\section*{Encoding Swift values as Sisp values}
+A Sisp encoder and decoder are provided with the Glyco compiler with the following mapping rules between Swift and Sisp values:
+\begin{itemize}
+	
+	\item \texttt{String}s and integers as well as string- or integer-representable values are encoded as string resp. integer Sisp values. This also applies to \texttt{PartiallyIntCodable} and \texttt{PartiallyStringCodable} values whose integer resp. string value is non-\texttt{nil}.
+	
+	\item \texttt{Bool} values and \texttt{PartiallyBoolCodable} values with a non-\texttt{nil} Boolean value are encoded as the string value \iil/false/ or \iil/true/.
+	
+	\item \texttt{Collection}s including arrays are encoded as lists of Sisp values.
+	
+	\item A value of an \texttt{enum} type with no associated values is encoded as a string value containing the name of the \texttt{case}.
+	
+	\item A value of an \texttt{enum} type with associated values is encoded as a structure typed with the name of the \texttt{case}. Each labelled resp. unlabelled associated value is encoded as a labelled resp. unlabelled attribute.
+	
+	\item A value of a \texttt{struct} (or \texttt{class}) type is encoded as an untyped structure. Each property is encoded as a labelled attribute.
+	
+\end{itemize}
+
+The above mapping rules assume an encoding and decoding implementation synthesised by the Swift compiler. They can be adjusted by providing a custom implementation. In particular, coding keys are used for the labels of attributes; a value encoded using a coding key whose string value consists of an underscore and an integer is encoded as an unlabelled attribute, with the number indicating the zero-based position within the attribute list of the Sisp structure.
+
+\biblio{}
+\onlyinsubfile{\glsaddall\printglossaries}
+\end{document}
