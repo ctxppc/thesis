@@ -133,8 +133,8 @@ An object type definition (in a \texttt{letType}) is \lowered{} to NT by
 Each method invocation is \lowered{} by evaluating the \g{methcap} with the receiver as the first argument, followed by any provided arguments. Object construction in \texttt{object} values is implemented in NT by calling the metatype's \texttt{createObject} \g{methcap} on the type object.
 \ilfile[firstline=77]{Programs/counter.nt}
 
-\section{Changes to Glyco} \label{sct:obj-changes}
-Similarly to what we did in \cref{sct:ghscc-changes}, we present the most significant changes to Glyco for introducing lambdas, named types, and sealed objects. We present these changes going from low-level to high-level \gs{il}.
+\section{Evaluation: Impact on the Codebase} \label{sct:obj-eval}
+Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco.
 
 \paragraph{Managed Memory (MM)} The \g{scall} \g{rtrt} is generalised to a seal allocation routine, given that both \g{scall} and object type definition only need a \g{rtrt} to securely provide a unique \g{sealcap} for next invocation resp. object type definition. The language now provides new \texttt{createSeal} and \texttt{seal} effects. The \texttt{call} effect's \g{lowering} under \g{ghscc} is modified to invoke the seal allocation routine and use the returned \g{sealcap} to seal the return–frame capability pair.
 
@@ -158,11 +158,8 @@ The \texttt{call} effect is updated to accept any kind of source, not just label
 
 \paragraph{Lambdas (Λ) through Objects (OB)} These new \gs{il} are described in the preceding sections.
 
-\section{Evaluation} \label{sct:obj-eval}
-Analogously to \cref{sct:ghscc-eval}, we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth.
-
-The implementation of lambdas, named types, and sealed objects introduces 3 new \gs{il} (Λ, NT, and OB) bringing the total in Glyco 0.3 to 22 \gs{il}. Using cloc again, we measured a growth in the codebase from 6921 SLOC in Glyco 0.2 to 9360 SLOC in Glyco 0.3, representing a net growth of $+35\%$.
-\todo{Add similarity metric to show much boilerplate there is to all these new \gs{il}?}
+\paragraph{Codebase growth} The implementation of lambdas, named types, and sealed objects introduces 3 new \gs{il} (Λ, NT, and OB) bringing the total in Glyco 0.3 to 22 \gs{il}. Using cloc again, we measured a growth in the codebase from 6921 SLOC in Glyco 0.2 to 9360 SLOC in Glyco 0.3, representing a net growth of $+35\%$.
+\todo{Quantify number of added or modified syntax elements as well as the number of non-trivial \gs{lowering}.}
 
 \onlyinsubfile{\glsaddall\printglossaries}
 \end{document}
