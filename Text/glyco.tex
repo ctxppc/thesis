@@ -127,9 +127,8 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 \Cref{fig:gcccstack} shows a simple two-frame call stack example with zero registers available for arguments and local variables, to force Glyco to store them in call frames.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/GCCC Stack.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/GCCC Stack.pdf}
 	\caption{A call stack containing two call frames in a configuration of GCCC where no registers are available for storing parameters and local variables. The first call frame belongs to the initial procedure \texttt{main} which is called by the runtime, a dynamic linker, or the operating system and takes no parameters. Its call frame contains a \emph{previous frame pointer} capability that points to an unspecified location (possibly \texttt{null}) as well as two local variables \texttt{discount} and \texttt{price}. \texttt{main} invokes the 2-parameter \texttt{computeUnitPrice} procedure, binding the value \texttt{0.2} to the \texttt{discount} parameter and \texttt{cherry} to the \texttt{product} parameter. The latter procedure's call frame contains a \emph{previous frame pointer} capability that points to the location of the \emph{previous frame pointer} capability in the previous call frame, as well as a local variable \texttt{demand}. This call frame is at the top of the stack and so the \texttt{cfp} register's capability points to the \emph{previous frame pointer} capability in \texttt{computeUnitPrice}'s call frame. The \texttt{csp} register's capability always points to the last datum pushed on the stack, which is \texttt{demand} in this example. Note that the stack grows downward.}
 	\label{fig:gcccstack}
 \end{figure}

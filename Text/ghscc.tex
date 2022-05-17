@@ -5,7 +5,7 @@
 \chapter{Glyco Heap-based Secure Calling Convention} \label{ch:ghscc}
 The previous chapter discusses the first milestone of the Glyco compiler, namely a nanopass compiler producing fairly traditional executables for CHERI-RISC-V targets, with almost no special considerations for capability machines, except for minor enhancements such as bounded heap-allocated buffers. This chapter explores the first significant upgrade of the Glyco compiler, namely one where procedure calls are implemented using a secure \g{cc} named \textbf{\g{ghscc}} and adapted from the heap-based \g{cc} proposed by \cite{cerise}.
 
-We first describe in \cref{sct:scc} the desired security properties of a \enquote{secure} \g{cc}. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two \gs{rtrt} that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} and \cref{sct:ghscc-changes} the implementation of the \g{cc} itself and the changes to the compiler to realise it. We then evaluate in \cref{sct:ghscc-eval} \g{ghscc} against \g{gccc} in terms of \g{lse}, changes to the compiler and its \gs{il}, generated codesize, and runtime performance. We finish in \cref{sct:alt-scc} by listing a few alternative secure \gs{cc} that are either already implemented or didn't make it into Glyco.
+We first describe in \cref{sct:scc} the desired security properties of a \enquote{secure} \g{cc}. We then detail in \cref{sct:ghscc-rt} the low-level implementation of two \gs{rtrt} that form the basis of \g{ghscc}. After that, we explore in \cref{sct:ghscc} the implementation of the \g{cc} itself. We then evaluate in \cref{sct:ghscc-eval} \g{ghscc} against \g{gccc} in terms of changes to the compiler and its \gs{il}, generated codesize, and runtime performance. We finish in \cref{sct:alt-scc} by listing a few alternative secure \gs{cc} that are either already implemented or didn't make it into Glyco.
 
 This chapter discusses the feature set and languages of Glyco 0.2,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.2/}.} however just like in the previous chapter, example programs in this chapter follow the syntax of the final version of the compiler, Glyco 1.0. A full language reference of this final compiler can be found in \cref{ch:grammar}.
 
@@ -34,9 +34,8 @@ Glyco implements a simple \emph{bump-pointer} allocator where an allocation is p
 To implement heap allocation and future functionality securely, Glyco is extended with support for \gs{rtrt}, which are procedures provided by the language \g{rt}, with capabilities not afforded to normal procedures, and possibly using a different (often more basic) \g{cc} than ordinary procedures. Each \g{rtrt} is stored in memory not directly accessible to \gs{userp} except via a \g{sentry} to the routine's entry point, as can be seen in \cref{fig:procmem}.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/GHSCC Process Memory.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/GHSCC Process Memory.pdf}
 	\caption{The process memory layout of a program compiled with \g{ghscc}. The allocation routine contains a \g{heapcap} that grants access to the heap and points to the next allocatable location in it. The secure calling routine embeds a \g{sealcap} which it uses to seal the \texttt{cra}–\texttt{cfp} pair for callees. Both routines are accessible to the \g{userp} only via a \g{sentry}.}
 	\label{fig:procmem}
 \end{figure}
@@ -87,15 +86,15 @@ Before invoking the \g{scall} routine, the caller initialises an indicator value
 The latter security property, which we call \textbf{unrepeatable return}, is a weaker variant of \g{wbcf} and can be stated as follows: \textbf{a \g{retcap} provided by a procedure supporting unrepeatable return can be used at most once}. Unlike \g{wbcf}, it does not disallow a callee to return to another procedure's caller, as illustrated in \cref{fig:no-wbcf}.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/Semi-WBCF.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/Semi-WBCF.pdf}
 	\caption{\G{ghscc} does not support \g{wbcf}. In this example, libCrypto sends the return–frame capability pair it receives from httpd to libevilHash, which uses it to return directly to httpd, thereby leaving libSHA (and libCrypto) waiting to be returned to.}
 	\label{fig:no-wbcf}
 \end{figure}
 
-\section{Changes to Glyco} \label{sct:ghscc-changes}
-We now present the most significant changes to Glyco, going from low-level to high-level \gs{il}.
+\section{Evaluation} \label{sct:ghscc-eval}
+\subsection{Impact on the Codebase}
+We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We first compare the codebase's growth present the most significant changes to Glyco's languages, going from low-level to high-level \gs{il}, then quantify the changes.
 
 \paragraph{CHERI-RISC-V (RV)} The low-level language RV is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
 
@@ -107,12 +106,11 @@ We now present the most significant changes to Glyco, going from low-level to hi
 
 \paragraph{Calling Convention (CC)} The call effect in CC is updated to allocate an arguments record for arguments that don't fit in the available argument registers, and to clear registers before calling the procedure.
 
-% TODO
-
-\section{Evaluation} \label{sct:ghscc-eval}
-In this section we evaluate the implementation of \g{ghscc} in terms of (relative) language and codebase growth which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We then evaluate \g{ghscc} itself by benchmarking a few test programs against the previous \g{cc}.
-
 \paragraph{Codebase growth} The implementation of \g{ghscc} introduces 2 new \gs{il} (RT and CC) bringing the total in Glyco 0.2 to 19 \gs{il}. Using cloc,\footnote{cloc is available at \url{https://github.com/AlDanial/cloc}.} we measured a growth in the codebase from 5941 SLOC in Glyco 0.1 to 6921 SLOC in Glyco 0.2, representing a net growth of $+16\%$.\footnote{The source line of code metric (SLOC) excludes empty lines and comments but does not perform other normalisation. For instance, multiple statements on a single line still count as 1 SLOC.}
+\todo{Quantify number of added or modified syntax elements as well as the number of non-trivial \gs{lowering}.}
+
+\subsection{Impact on Build Products}
+We now evaluate \g{ghscc} itself by benchmarking a few test programs against the previous \g{cc}.
 
 \paragraph{Increased binary footprint} For measuring the binary footprint, we decided to measure the number of statements and instructions in the assembly of a few test programs as opposed to measuring the byte size of the executables themselves. The latter metric is less informative since the space taken up by ELF headers and structures dominates the space occupied by the code of interest.
 
@@ -147,15 +145,16 @@ The minimalistic test program 42 immediately evaluates to the number 42. The fib
 
 \paragraph{Increased runtime and memory overhead} For measuring runtime overhead, the same test programs are executed in the CHERI-RISC-V Sail emulator and the number of steps to completion is counted. For memory overhead, the distance between the highest and lowest address of the \g{stackcap} and \g{heapcap} (after runtime initialisation) is determined. As shown in \cref{tbl:ghscc-size}, a significant degradation in performance can be observed when using \g{ghscc} in a function call-heavy program.
 
+\todo{Add test program that always allocates something on the heap.}
+
 \section{Related Work: Alternative Secure Calling Conventions} \label{sct:alt-scc}
 The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software, some of which also provide \g{wbcf}.
 
 To ensure \g{lse} with a stack-based \g{cc}, a caller can restrict the \g{stackcap} before calling a procedure so that the callee only gets access to the unused part of the stack. However, this approach requires a way for the caller to restore the previous (less restricted) \g{stackcap} without the callee being able to do the same. Additionally, as illustrated in \cref{fig:savedstackcap}, an adversary can save a copy of their (restricted) \g{stackcap} in a first call. If the adversary is called a second time when their \g{stackcap} is lower in the stack (due to the stack containing more call frames than during the first call), it can use the saved \g{stackcap} to gain access to memory used by other call frames. They can similarly store the \g{retcap} and use it more than once, breaking \g{wbcf}.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/Saved Stack Cap.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/Saved Stack Cap.pdf}
 	\caption{The call stack in a first invocation (left) and a second invocation (right) of the adversary, where the second invocation's call frame is at a lower address than the first invocation's call frame. During the first invocation, the adversary saves their \g{stackcap} for use during a later invocation. Even though the \g{stackcap} in the second invocation provides authority over a smaller part of the call stack, the previously saved \g{stackcap} continues to provide the adversary with authority over the larger region, which now includes memory occupied by other call frames. Note that the stack grows downward.}
 	\label{fig:savedstackcap}
 \end{figure}

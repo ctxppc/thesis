@@ -17,9 +17,8 @@ In 64-bit CHERI-RISC-V, the CHERI extension of the 64-bit RISC-V ISA, 64-bit poi
 CHERI-RISC-V defines several capability-aware instructions that can validly modify capability within specified constraints. For instance, \texttt{CAndPerm} removes permissions from a given capability by performing a bitwise conjunction with a given permissions mask whereas \texttt{CIncOffset} adds an offset to a given capability's address. These limitations are in place to ensure 4 important safety properties of capability machines and CHERI architectures in particular, briefly summarised here below.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/CHERI Concentrate Layout.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/CHERI Concentrate Layout.pdf}
 	\caption{A simplified layout of a 256-bit CHERI capability compressed into 128 bits using the CHERI Concentrate encoding. CHERI-RISC-V defines one flag bit and reserves the other two bits for future use. The validity tag bit is stored out-of-band, usually in tagged memory not directly accessible by user programs.}
 	\label{fig:chericoncentrate}
 \end{figure}
@@ -33,9 +32,8 @@ CHERI-RISC-V defines several capability-aware instructions that can validly modi
 \paragraph{Monotonicity} A capability cannot have more authority than the capability it's derived from: permissions can only be removed and bounds can only be shrunk. At CPU reset, the hardware provides root capabilities to the bootloader or firmware, which can be iteratively restricted in higher levels of abstraction, as illustrated in \cref{fig:derivingauth}.
 
 \begin{figure}
-	\begin{center}
-		\includegraphics{Images/Deriving Authority.pdf}
-	\end{center}
+	\centering
+	\includegraphics{Images/Deriving Authority.pdf}
 	\caption{Provenance and monotonicity in action in protecting process memory, the call stack, and a call frame. The size of the depicted memory regions are not to scale. Similar illustrations can be made about a process' heap and heap-allocated memory.}
 	\label{fig:derivingauth}
 \end{figure}
