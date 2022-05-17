@@ -95,7 +95,7 @@ A language that introduces closures, i.e., anonymous functions with an environme
 </dl>
 <dl>
 	<dt><code>CL.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>constructor:</strong> Constructor, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Effect</code></dt>
@@ -107,6 +107,10 @@ A language that introduces closures, i.e., anonymous functions with an environme
 <dl>
 	<dt><code>CL.Definition</code></dt>
 	<dd><code>(Symbol, Value)</code></dd>
+</dl>
+<dl>
+	<dt><code>CL.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.Result</code></dt>
@@ -144,10 +148,6 @@ A language that introduces closures, i.e., anonymous functions with an environme
 	<dd><code><strong>function</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType, <strong>closure:</strong> Bool)</code></dd>
 	<dd><code><strong>message</strong>(<strong>takes:</strong> [Parameter], <strong>returns:</strong> ValueType)</code></dd>
 	<dd><code><strong>seal</strong></code></dd>
-</dl>
-<dl>
-	<dt><code>CL.Constructor</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>CL.TypeDefinition</code></dt>
@@ -211,6 +211,10 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code>(Symbol, ValueType)</code></dd>
 </dl>
 <dl>
+	<dt><code>OB.Initialiser</code></dt>
+	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
+</dl>
+<dl>
 	<dt><code>OB.RecordType</code></dt>
 	<dd><code>([Field])</code></dd>
 </dl>
@@ -248,7 +252,7 @@ A language that introduces objects, i.e., encapsulated values with methods.
 </dl>
 <dl>
 	<dt><code>OB.ObjectType</code></dt>
-	<dd><code>(TypeName, <strong>constructor:</strong> Constructor, <strong>methods:</strong> [Method])</code></dd>
+	<dd><code>(TypeName, <strong>initialiser:</strong> Initialiser, <strong>methods:</strong> [Method])</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.Result</code></dt>
@@ -265,10 +269,6 @@ A language that introduces objects, i.e., encapsulated values with methods.
 	<dd><code><strong>u8</strong></code></dd>
 	<dd><code><strong>s32</strong></code></dd>
 	<dd><code><strong>cap</strong>(CapabilityType)</code></dd>
-</dl>
-<dl>
-	<dt><code>OB.Constructor</code></dt>
-	<dd><code>(<strong>takes:</strong> [Parameter], <strong>in:</strong> Value)</code></dd>
 </dl>
 <dl>
 	<dt><code>OB.CapabilityType</code></dt>

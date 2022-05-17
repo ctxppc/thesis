@@ -4,19 +4,19 @@ extension OB {
 	
 	/// A function that creates (or determines) an object's state.
 	///
-	/// A constructor is run as part of an invocation of the `createObject` method on the object type object and evaluates to a capability to a (usually freshly allocated) record.
-	public struct Constructor : Element {
+	/// An initialiser is run as part of an invocation of the `createObject` method on the object type object and evaluates to a capability to a (usually freshly allocated) record.
+	public struct Initialiser : Element {
 		
-		/// Creates a constructor with given parameters and result.
+		/// Creates an initialiser with given parameters and result.
 		public init(takes parameters: [Parameter], in result: Value) {
 			self.parameters = parameters
 			self.result = result
 		}
 		
-		/// The constructor's parameters.
+		/// The initialiser's parameters.
 		public var parameters: [Parameter]
 		
-		/// The constructor's result, in terms of the constructor's parameters, evaluating to a capability to a (usually freshly allocated) record.
+		/// The initialiser's result, in terms of the initialiser's parameters, evaluating to a capability to a (usually freshly allocated) record.
 		public var result: Value
 		
 		/// Returns the type of `result`.
