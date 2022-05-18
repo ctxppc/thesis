@@ -33,7 +33,7 @@ Glyco 0.1 defines 20 \gs{il}, with a general approach adapted from the student c
 \section{An Expression Language} \label{sct:ex}
 The highest \g{il} in the first version of Glyco is called \textbf{EX} (Expressions), a language with basic support for arithmetic operations, functions, conditionals (\texttt{if}-\texttt{then}-\texttt{else}), definitions (\texttt{let}-bindings), vectors (fixed-size arrays), and records (collections of key-value pairs).
 
-The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:\footnote{The \iil/sealed: false/ attribute on parameters is introduced in the next chapter as part of Glyco 0.2 and can be ignored for now.}\footnote{EX and all other \gs{il} conform to the Sisp format, where a list is written as the list's elements separated by whitespace. Sisp is briefly documented in \cref{ch:sisp}.}
+The following EX program computes the 30th number in the Fibonacci sequence starting with 0 and 1:\footnote{EX and all other \gs{il} conform to the Sisp format, where a list is written as the list's elements separated by whitespace and where attributes are separated by commas. Sisp is briefly documented in \cref{ch:sisp}.}
 \ilfile{Programs/fib.ex}
 
 This program defines a function \iil/fib/ with three signed 32-bit integer parameters \iil/prev/, \iil/curr/, and \iil/iter/ which returns a signed 32-bit integer. The function recursively adds the \enquote{previous} and \enquote{current} sums until the number of iterations drops to 0, then returns the \enquote{current} sum. The program itself is defined as the result of \iil/fib/ where \iil/prev/ is 0, \iil/curr/ is 1, and \iil/iter/ is 30.
@@ -51,7 +51,7 @@ is transformed into the equivalent LS value
 			(ex.lhs, source(prev)) (ex.rhs, source(curr)),
 			in: binary(ex.lhs, add, ex.rhs)
 		)) (arg2, ...),
-		in: evaluate(fib, arg0 arg1 arg2)
+		in: evaluate(function(fib), arg0 arg1 arg2)
 	)
 \end{il*}
 
@@ -85,7 +85,7 @@ is transformed to a CA \texttt{do} effect
 	)
 \end{il}
 
-\paragraph{From CA (Canonical Assignments) to CC} The final purely structural transformation lowers \texttt{set} effects in CA using equivalent effects in CC, only keeping the \texttt{set} effects with a constant or location source. For example, the CA program
+\paragraph{From CA (Canonical Assignments) to CC} CA programs perform assignments using \texttt{set} effects, whereas CC only supports \texttt{set} effects with a constant or location source, and provides other effects that perform more complicated tasks such as allocating records. The final purely structural transformation lowers \texttt{set} effects in CA using equivalent effects in CC. For example, the CA program
 \ilfile{Programs/values.ca}
 is \lowered{} to the CC program
 \ilfile{Programs/values.cc}
@@ -136,7 +136,7 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 \paragraph{From CC (Calling Convention) to SV} CC introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program (with the call effect highlighted)
 \ilfile[highlightlines={3}]{Programs/42.cc}
 is \lowered{} to the following SV program (with the call effect's \g{lowering} highlighted):
-\ilfile[highlightlines={5-8}, samepage=true]{Programs/42.sv}
+\ilfile[highlightlines={5-8}]{Programs/42.sv}
 
 The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call.
 % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.

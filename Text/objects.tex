@@ -13,15 +13,19 @@ This chapter discusses the feature set and languages of Glyco 0.3.\footnote{The 
 A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
 \ilfile{Programs/sum.l}
 
-The scope of a lambda definition extends beyond the \texttt{λ} value itself to the \texttt{let} value defining it, in a similar way to \texttt{letRec} values in some functional programming languages and unlike definitions of other kinds of values. This enables mutual recursion such as the following (inefficient) program determining the parity of 420.
-\ilfile{Programs/evenodd.l}
+The scope of a lambda definition extends beyond the \texttt{λ} value itself to the \texttt{let} value defining it, in a similar way to \texttt{letRec} values in some functional programming languages and unlike definitions of other kinds of values. This enables mutual recursion such as the (inefficient) program in \cref{lst:mutrec} determining the parity of 420.
+\begin{listing}[ht]
+	\ilfile{Programs/evenodd.l}
+	\caption{A Λ program featuring mutual recursion.}
+	\label{lst:mutrec}
+\end{listing}
 
-Finally, since \texttt{λ} values with support for mutual recursion provide the same expressive power as programs with global functions, Λ removes support for global functions. The reader should bear in mind however that lambdas do not \emph{increase} the expressive power of programs but merely make it easier to define functions. Lambda values evaluate to code capabilities and do not carry an environment, i.e., lambdas in Λ aren't closures.
+Finally, since \texttt{λ} values with support for mutual recursion provide the same expressive power as programs with global functions, Λ removes support for global functions. The reader should bear in mind however that lambdas do not \emph{increase} the expressive power of programs but merely make it easier to define functions. Lambda values evaluate to code capabilities and do not carry an environment, i.e., lambdas in Λ aren't closures.\footnote{Spoiler alert: \Cref{ch:cls} introduces true closures.}
 
 \paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with either an auto-generated name or a name derived from the lambda definition) and replaces the \texttt{λ} values by code capabilities to those functions. The first program of this chapter is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
-The \g{nanopass} injects lambda definitions, i.e., λ values in a \texttt{let} value, in the lambda body to enable (mutual) recursion. The parity program above is thus \lowered{} as
+The \g{nanopass} also injects all λ values in the same \texttt{let} value in the lambda body to enable (mutual) recursion. The parity program from \cref{lst:mutrec} is thus \lowered{} as
 \ilfile{Programs/evenodd.ex}
 
 \section{Alias \& Nominal Types} \label{sct:named-ty}
@@ -84,11 +88,15 @@ Object types can be defined in a new \g{il} above NT called \textbf{OB} (Objects
 
 An \textbf{\g{init}} is a pseudo-\g{method} automatically invoked on every new object immediately after its state is allocated that ensures that the object has the right initial state. An object can be created using an \texttt{object} value, which accepts a type name and arguments to the initialiser's parameters. \Gs{method} can only be defined when the object type is being defined. They can be invoked using a \texttt{message} value, which takes an object, \g{method} name, and arguments to the \g{method}'s parameters. Initialisers and \gs{method} alike get a capability to the object's state, i.e., the record composing it, through the \iil/self/ value.
 
-The following OB program implements the object type \iil/Counter/, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35):
-\ilfile{Programs/counter.ob}
+The OB program in \cref{lst:counter} implements the object type \iil/Counter/, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35).
+\begin{listing}[ht]
+	\ilfile{Programs/counter.ob}
+	\caption{An OB program implementing a counter and counting from 32 to 35. The \iil/evaluate(message(counter, increase),)/ syntax is valid in Glyco 1.0 and is introduced in the next chapter. The equivalent syntax in this chapter's version (Glyco 0.3) is \iil/message(counter, increase,)/. Additionally, initialisers in Glyco 0.3 receive a pre-allocated record in \iil/self/ while initialisers in the final version (shown here) allocate themselves a record.}
+	\label{lst:counter}
+\end{listing}
 
 \subsection{Object State Encapsulation \& Unique Seals} \label{sct:obj-sec}
-The first important security property afforded by sealed objects is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the \g{init} or a \g{method} leaks an unsealed capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that a \g{method} or \g{init} \textbf{can only be invoked on an object of the type defining that \g{method} or \g{init}}.\footnote{This property similarly does not hold if an unsealed code capability to the \g{method} is leaked by the type owner.}
+The first important security property afforded by sealed objects, the \textbf{encapsulation property}, is that an object's state is \textbf{only accessible within the \g{init} or a \g{method} defined during object type definition} in \texttt{letType}.\footnote{This property does not hold if the \g{init} or a \g{method} leaks an unsealed capability to the state record. Our threat model assumes trust in an object type's implementation.} A second security property is that a \g{method} or \g{init} \textbf{can only be invoked on an object of the type defining that \g{method} or \g{init}}.\footnote{This property similarly does not hold if an unsealed code capability to the \g{method} is leaked by the type owner.}
 
 Both properties are achieved by \g{sealing} capabilities to objects and \gs{method} using unique \gs{sealcap} provided by a \g{rtrt}. \G{sealing} capabilities using a \g{sealcap} is a power which was originally bestowed upon the \g{rt} in the design and implementation of \g{ghscc} where an \g{scall} seals a return–frame capability pair before passing control to the callee.
 
@@ -104,7 +112,7 @@ An object type's \g{sealcap} is also needed for sealing new \gs{objcap}, i.e., f
 Each object type has an associated type object and metatype. The metatype (the type object's type) doesn't define an \g{init}; instead, the singleton type object's state is statically allocated and initialised at the point of the object type definition and the metatype's \g{sealcap} is discarded after use.
 
 \subsection{\G{lowering} OB to NT}
-We'll work through the OB to NT \g{nanopass} by applying it on the \iil/Counter/ example at the beginning of this section.
+We'll work through the OB to NT \g{nanopass} by applying it on the \iil/Counter/ example in \cref{lst:counter}.
 \ilfile[lastline=2]{Programs/counter.nt}
 
 An object type definition (in a \texttt{letType}) is \lowered{} to NT by
@@ -118,20 +126,20 @@ An object type definition (in a \texttt{letType}) is \lowered{} to NT by
 	
 	\item allocating and initialising a type object with the type's \g{sealcap};
 	\item sealing the capability to this object with the metatype's \g{sealcap};
-	\ilfile[firstline=8, lastline=17]{Programs/counter.nt}
+	\ilfile[firstline=8, lastline=14]{Programs/counter.nt}
 	
 	\item implementing the metatype's \texttt{createObject} method using a lambda that allocates a state record, executes the initialiser's effect, seals a capability to the state record using the \g{sealcap} stored in the type object, and returns this sealed capability to the method's caller;
 	\item sealing the capability for this method with the metatype's \g{sealcap};
-	\ilfile[firstline=18, lastline=40]{Programs/counter.nt}
+	\ilfile[firstline=15, lastline=34]{Programs/counter.nt}
 	
 	\item implementing each method of the type using a lambda that takes a sealed parameter \iil/ob.self/ representing the receiver (and which the \iil/self/ value maps to) plus any parameters defined on the method; and finally,
 	\item sealing the capability of each of the type's methods.
-	\ilfile[firstline=41, lastline=76]{Programs/counter.nt}
+	\ilfile[firstline=35, lastline=76]{Programs/counter.nt}
 	
 \end{enumerate}
 
 Each method invocation is \lowered{} by evaluating the \g{methcap} with the receiver as the first argument, followed by any provided arguments. Object construction in \texttt{object} values is implemented in NT by calling the metatype's \texttt{createObject} \g{methcap} on the type object.
-\ilfile[firstline=77]{Programs/counter.nt}
+\ilfile[firstline=70]{Programs/counter.nt}
 
 \section{Evaluation: Impact on the Codebase} \label{sct:obj-eval}
 Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco.
@@ -158,8 +166,7 @@ The \texttt{call} effect is updated to accept any kind of source, not just label
 
 \paragraph{Lambdas (Λ) through Objects (OB)} These new \gs{il} are described in the preceding sections.
 
-\paragraph{Codebase growth} The implementation of lambdas, named types, and sealed objects introduces 3 new \gs{il} (Λ, NT, and OB) bringing the total in Glyco 0.3 to 22 \gs{il}. Using cloc again, we measured a growth in the codebase from 6921 SLOC in Glyco 0.2 to 9360 SLOC in Glyco 0.3, representing a net growth of $+35\%$.
-\todo{Quantify number of added or modified syntax elements as well as the number of non-trivial \gs{lowering}.}
+\paragraph{Codebase growth} The implementation of lambdas, named types, and sealed objects introduces 3 new \gs{il} (Λ, NT, and OB) bringing the total in Glyco 0.3 to 22 \gs{il}. Using cloc again, we measured a growth in the codebase from 6921 SLOC in Glyco 0.2 to 9360 SLOC in Glyco 0.3, representing a net growth of $+35\%$. However, as noted in \cref{sct:ghscc-eval}, a significant part of this growth is due to code duplication.
 
 \onlyinsubfile{\glsaddall\printglossaries}
 \end{document}

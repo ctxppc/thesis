@@ -5,7 +5,7 @@
 \chapter{Sealed Closures} \label{ch:cls}
 The preceding chapter introduces sealed objects, objects whose state can only be accessed via dedicated methods. This chapter presents an application of sealed objects, a new feature we call \emph{sealed closures}.
 
-\Cref{sct:cls-trad} sets out how closures are usually implemented and what problems these methods suffer from. \Cref{sct:cls-sealed} then presents a sealed object-based solution and a new \g{il}. Finally, \cref{sct:cls-changes} lists the changes in the compiler and we evaluate the nanopass approach's impact on the codebase in \cref{sct:cls-eval}.
+\Cref{sct:cls-trad} sets out how closures are usually implemented and what problems these methods suffer from. \Cref{sct:cls-sealed} then presents a sealed object-based solution and a new \g{il}. Finally, \cref{sct:cls-changes} lists the changes in the compiler and evaluates the nanopass approach's impact on the codebase.
 
 \section{Traditional Closures} \label{sct:cls-trad}
 A \textbf{closure} is a function that can use the environment\footnote{An environment, and more specifically a \emph{value environment}, can be seen as a mapping from names to values — each definition adds or updates entries in it and the environment is consulted whenever a name is mentioned in the program. That is of course not what happens in an ahead-of-time compiler such as Glyco where the environment consists of registers and memory locations, and the mapping is mostly implemented by the register allocator, but it remains a useful software model nevertheless.} wherein the closure is defined during its operation, i.e., names (variables) valid at the point of the closure definition can also be used in the closure body. The closure is said to \textbf{capture} or \textbf{save} the environment or to \textbf{capture} variables from the \textbf{outer scope}.
@@ -29,16 +29,13 @@ The contents of a closure's saved environment are established at the point of cl
 In this OB example, it's almost trivially simple to change the value of the \iil/offset/ field, e.g., by writing \iil/do(setField(offset, of: env, to: 10), then: evaluate(…))/.
 
 \section{Sealed Closures} \label{sct:cls-sealed}
-The encapsulation problem presented in the previous section is solved in \textbf{sealed closures}, which are closures whose \textbf{captured environment cannot be changed}, except from within the closure. Sealed closures are presented in a new \g{il} \textbf{CL} (Closures) which is built on top of OB. CL does not provide any new syntax but instead increases the expressive power provided by λ values, which can now mention names defined outside of the lambda definition. The OB closure example above can now be expressed more elegantly as
+The encapsulation problem presented in the previous section is solved in \textbf{sealed closures}, which are closures whose \textbf{captured environment cannot be changed}, except from within the closure. Sealed closures are presented in a new \g{il} \textbf{CL} (Closures), built on top of OB. CL does not provide any new syntax but instead increases the expressive power provided by λ values, which can now mention names defined outside of the lambda definition. The OB closure example above can now be expressed more elegantly as
 \ilfile{Programs/offset.cl}
 
 \paragraph{From CL to OB} The CL to OB \g{nanopass} defines a unique object type for each closure definition and instantiates a single object of that new type. The closure object's state consists of one record entry per captured name. The object is defined with a single method \iil/invoke/ that binds the captured names to the corresponding values in \iil/self/ and then performs the closure body. The above CL program is thus \lowered{} to the OB program
 \ilfile{Programs/offset.ob}
 
-\section{Changes to Glyco} \label{sct:cls-changes}
-% TODO
-
-\section{Evaluation} \label{sct:cls-eval}
+\section{Evaluation: Impact on the Codebase} \label{sct:cls-eval}
 % TODO
 
 \onlyinsubfile{\glsaddall\printglossaries}
