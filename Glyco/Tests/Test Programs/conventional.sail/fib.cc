@@ -8,7 +8,7 @@
 	),
 	procedures: (
 		fib,
-		takes: (ls.prev, s32, sealed: false) (ls.curr, s32, sealed: false) (ls.iter, s32, sealed: false),
+		takes: (ls.prev, s32) (ls.curr, s32) (ls.iter, s32),
 		returns: s32,
 		in: if(
 			do(set(ls.lhs, to: ls.iter) set(ls.rhs, to: 1), then: relation(ls.lhs, le, ls.rhs)),

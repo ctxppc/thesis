@@ -1,6 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
 import Foundation
+import Sisp
 
 //sourcery: longname = Conditionals
 //sourcery: description = "A language that introduces conditionals in effects and predicates, thereby abstracting over blocks (and jumps)."
@@ -18,6 +19,7 @@ public enum CD : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

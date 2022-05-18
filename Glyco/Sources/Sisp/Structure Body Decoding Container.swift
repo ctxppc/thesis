@@ -140,10 +140,8 @@ struct StructureBodyDecodingContainer<Key : CodingKey> : KeyedDecodingContainerP
 	private func child(forKey key: Key) throws -> Sisp {
 		if let child = children[.init(rawValue: key.stringValue)] {
 			return child
-		} else if key.stringValue == labelBeyondLast.rawValue {
-			return .list([])
 		} else {
-			throw DecodingError.keyNotFound(key, .init(codingPath: codingPath, debugDescription: "No child labelled “\(key.stringValue)”", underlyingError: nil))
+			return .list([])
 		}
 	}
 	

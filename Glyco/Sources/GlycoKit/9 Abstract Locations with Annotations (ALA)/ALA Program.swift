@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = "Abstract Locations, Analysed"
 //sourcery: description = "A language that introduces abstract locations, annotated with liveness and conflict information."
 public enum ALA : Language {
@@ -20,6 +22,7 @@ public enum ALA : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

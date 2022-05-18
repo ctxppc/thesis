@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Structured Values
 //sourcery: description = "A language that introduces structured values, i.e., vectors and records."
 public enum SV : Language {
@@ -16,6 +18,7 @@ public enum SV : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

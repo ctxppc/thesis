@@ -16,14 +16,13 @@
 	),
 	functions: (
 		l.anon,
-		takes: (ob.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true)
-		(one, s32, sealed: false),
+		takes: (ob.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true) (one, s32),
 		returns: cap(record(((one, s32)), sealed: true)),
 		in: let((ob.seal, field(seal, of: ob.self)), in: value(sealed(record((one, one)), with: ob.seal)))
 	)
 	(
 		l.anon$1,
-		takes: (ob.self, cap(record(((one, s32)), sealed: true)), sealed: true) (term, s32, sealed: false),
+		takes: (ob.self, cap(record(((one, s32)), sealed: true)), sealed: true) (term, s32),
 		returns: s32,
 		in: let((one, field(one, of: ob.self)), in: value(binary(one, add, term)))
 	)

@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Canonical Assignments
 //sourcery: description = A language that groups all effects that write to a location under one canonical assignment effect.
 public enum CA : Language {
@@ -16,6 +18,7 @@ public enum CA : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Lexical Scopes
 //sourcery: description = "A language that introduces lexical scopes of definitions, thereby removing name clashes."
 public enum LS : Language {
@@ -17,6 +19,7 @@ public enum LS : Language {
 		public var result: Result
 		
 		/// The program's functions.
+		@Defaulted<Empty>
 		public var functions: [Function]
 		
 		// See protocol.

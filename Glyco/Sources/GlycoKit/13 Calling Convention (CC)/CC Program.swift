@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Calling Convention
 //sourcery: description = A language that introduces parameters & result values in procedures via the low-level Glyco calling convention.
 public enum CC : Language {
@@ -16,6 +18,7 @@ public enum CC : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

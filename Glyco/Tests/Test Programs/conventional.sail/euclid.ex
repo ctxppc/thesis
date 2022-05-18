@@ -2,7 +2,7 @@
 	evaluate(function(gcd), 20 50),
 	functions: (
 		gcd,
-		takes: (a, s32, sealed: false) (b, s32, sealed: false),
+		takes: (a, s32) (b, s32),
 		returns: s32,
 		in: if(
 			relation(a, eq, b),

@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Computed Values
 //sourcery: description = A language that allows a computation to be attached to a value.
 public enum CV : Language {
@@ -16,6 +18,7 @@ public enum CV : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

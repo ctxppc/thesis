@@ -45,8 +45,7 @@
 	),
 	functions: (
 		l.anon,
-		takes: (ob.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true)
-		(initialValue, s32, sealed: false),
+		takes: (ob.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true) (initialValue, s32),
 		returns: cap(record(((value, s32)), sealed: true)),
 		in: let(
 			(ob.seal, let((ex.rec, source(ob.self)), in: field(seal, of: ex.rec))),

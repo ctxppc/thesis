@@ -38,8 +38,7 @@
 	),
 	procedures: (
 		l.anon,
-		takes: (ls.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true)
-		(ls.initialValue, s32, sealed: false),
+		takes: (ls.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true) (ls.initialValue, s32),
 		returns: cap(record(((value, s32)), sealed: true)),
 		in: do(
 			set(ls.rec, to: ls.self)

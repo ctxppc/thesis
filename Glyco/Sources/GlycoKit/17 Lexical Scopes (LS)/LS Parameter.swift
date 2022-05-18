@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension LS {
 	public struct Parameter : SimplyLowerable, Element {
 		
@@ -19,6 +21,7 @@ extension LS {
 		/// A Boolean value indicating whether an argument to `self` is sealed, to be unsealed by the sealed call.
 		///
 		/// At most one parameter in a procedure can be marked as sealed.
+		@Defaulted<False>
 		public var sealed: Bool
 		
 		// See protocol.

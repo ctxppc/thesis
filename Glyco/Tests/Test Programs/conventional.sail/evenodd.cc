@@ -9,7 +9,7 @@
 	),
 	procedures: (
 		l.even,
-		takes: (ls.n, s32, sealed: false),
+		takes: (ls.n, s32),
 		returns: s32,
 		in: do(
 			set(ls.even, to: procedure(l.even))
@@ -30,7 +30,7 @@
 	)
 	(
 		l.odd,
-		takes: (ls.n, s32, sealed: false),
+		takes: (ls.n, s32),
 		returns: s32,
 		in: do(
 			set(ls.even, to: procedure(l.even))

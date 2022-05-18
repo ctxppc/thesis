@@ -2,7 +2,7 @@
 	let((ex.arg, source(0)) (ex.arg$1, source(1)) (ex.arg$2, source(30)), in: evaluate(function(fib), ex.arg ex.arg$1 ex.arg$2)),
 	functions: (
 		fib,
-		takes: (prev, s32, sealed: false) (curr, s32, sealed: false) (iter, s32, sealed: false),
+		takes: (prev, s32) (curr, s32) (iter, s32),
 		returns: s32,
 		in: if(
 			let((ex.lhs, source(iter)) (ex.rhs, source(1)), in: relation(ex.lhs, le, ex.rhs)),

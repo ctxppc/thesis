@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 extension CC {
 	public struct Parameter : Element {
 		
@@ -21,6 +23,7 @@ extension CC {
 		/// A Boolean value indicating whether an argument to `self` is sealed, to be unsealed by the sealed call.
 		///
 		/// At most one parameter in a procedure can be marked as sealed.
+		@Defaulted<False>
 		public var sealed: Bool
 		
 		/// An assignment of parameters to physical locations.

@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Abstract Locations
 //sourcery: description = "A language that introduces abstract locations, i.e., locations whose physical locations are not specified by the programmer."
 public enum AL : Language {
@@ -20,6 +22,7 @@ public enum AL : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.

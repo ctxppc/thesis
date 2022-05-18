@@ -23,8 +23,7 @@
 					method,
 					cap(
 						procedure(
-							takes: (ls.self, cap(record(((one, s32)), sealed: true)), sealed: true)
-							(ls.term, s32, sealed: false),
+							takes: (ls.self, cap(record(((one, s32)), sealed: true)), sealed: true) (ls.term, s32),
 							returns: s32
 						)
 					)
@@ -51,8 +50,7 @@
 	),
 	procedures: (
 		l.anon,
-		takes: (ls.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true)
-		(ls.one, s32, sealed: false),
+		takes: (ls.self, cap(record(((seal, cap(seal(sealed: false)))), sealed: true)), sealed: true) (ls.one, s32),
 		returns: cap(record(((one, s32)), sealed: true)),
 		in: do(
 			set(ls.rec, to: ls.self)
@@ -68,7 +66,7 @@
 	)
 	(
 		l.anon$1,
-		takes: (ls.self, cap(record(((one, s32)), sealed: true)), sealed: true) (ls.term, s32, sealed: false),
+		takes: (ls.self, cap(record(((one, s32)), sealed: true)), sealed: true) (ls.term, s32),
 		returns: s32,
 		in: do(
 			set(ls.rec, to: ls.self)

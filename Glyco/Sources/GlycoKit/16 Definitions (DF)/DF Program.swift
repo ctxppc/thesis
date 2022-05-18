@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Definitions
 //sourcery: description = A language that introduces definitions with function-wide namespacing.
 public enum DF : Language {
@@ -16,6 +18,7 @@ public enum DF : Language {
 		public var result: Result
 		
 		/// The program's functions.
+		@Defaulted<Empty>
 		public var functions: [Function]
 		
 		// See protocol.

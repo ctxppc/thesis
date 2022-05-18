@@ -1,5 +1,7 @@
 // Glyco © 2021–2022 Constantino Tsarouhas
 
+import Sisp
+
 //sourcery: longname = Inferred Declarations
 //sourcery: description = "A language that infers declarations from definitions."
 public enum ID : Language {
@@ -16,6 +18,7 @@ public enum ID : Language {
 		public var effect: Effect
 		
 		/// The program's procedures.
+		@Defaulted<Empty>
 		public var procedures: [Procedure]
 		
 		// See protocol.
