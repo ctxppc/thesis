@@ -94,7 +94,7 @@ The latter security property, which we call \textbf{unrepeatable return}, is a w
 
 \section{Evaluation} \label{sct:ghscc-eval}
 \subsection{Impact on the Codebase}
-We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We first compare the codebase's growth present the most significant changes to Glyco's languages, going from low-level to high-level \gs{il}, then quantify the changes.
+We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We first present the most significant changes to Glyco's languages, going from low-level to high-level \gs{il}, then quantify the codebase's growth.
 
 \paragraph{CHERI-RISC-V (RV)} The low-level language RV is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
 
@@ -107,6 +107,9 @@ We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can
 \paragraph{Calling Convention (CC)} The call effect in CC is updated to allocate an arguments record for arguments that don't fit in the available argument registers, and to clear registers before calling the procedure.
 
 \paragraph{Codebase growth} The implementation of \g{ghscc} introduces 2 new \gs{il} (RT and CC) bringing the total in Glyco 0.2 to 19 \gs{il}. Using cloc,\footnote{cloc is available at \url{https://github.com/AlDanial/cloc}.} we measured a growth in the codebase from 5941 SLOC in Glyco 0.1 to 6921 SLOC in Glyco 0.2, representing a net growth of $+16\%$.\footnote{The source line of code metric (SLOC) excludes empty lines and comments but does not perform other normalisation. For instance, multiple statements on a single line still count as 1 SLOC.}
+
+The compiler's implementation does not rely on a framework such as one described by \cite{commcomp} that provides a compact syntax for deriving a new \g{il} given an existing \g{il}.\footnote{On the other hand, the Swift compiler assists the developer with its type checker, pattern exhaustiveness checker (for ensuring all syntax patterns are handled in \gs{nanopass}), and automatic conformance to protocols such as \texttt{Equatable} or \texttt{Codable} which are used for testing and representing programs as Sisp values.} New \gs{il} are instead derived by duplicating parts of the \g{lowerlang}'s source files and adapting them for the new \g{il}.
+
 \todo{Quantify number of added or modified syntax elements as well as the number of non-trivial \gs{lowering}.}
 
 \subsection{Impact on Build Products}
