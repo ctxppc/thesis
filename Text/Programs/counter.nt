@@ -8,11 +8,8 @@
 				(
 					ob.Counter.type,
 					let(
-						(ob.typeobj, record(((seal, cap(seal(sealed: false)))))),
-						in: do(
-							setField(seal, of: ob.typeobj, to: ob.oseal),
-							then: sealed(ob.typeobj, with: ob.tseal)
-						)
+						(ob.typeobj, record((seal, ob.oseal))),
+						in: sealed(ob.typeobj, with: ob.tseal)
 					)
 				)
 				(
@@ -27,12 +24,8 @@
 							(initialValue, s32, sealed: false),
 							returns: cap(record(((value, s32)), sealed: true)),
 							in: let(
-								(ob.seal, field(seal, of: ob.self))
-								(ob.self, record(((value, s32)))),
-								in: do(
-									setField(value, of: ob.self, to: initialValue),
-									then: value(sealed(ob.self, with: ob.seal))
-								)
+								(ob.seal, field(seal, of: ob.self)),
+								in: value(sealed(record((value, initialValue)), with: ob.seal))
 							)
 						),
 						with: ob.tseal

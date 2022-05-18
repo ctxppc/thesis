@@ -7,7 +7,7 @@
 				object(
 					(
 						cl.Closure,
-						constructor: (takes: (offset, s32), in: record((offset, offset))),
+						initialiser: (takes: (offset, s32), in: record((offset, offset))),
 						methods: (
 							invoke,
 							takes: (n, s32),

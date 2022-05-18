@@ -2,10 +2,9 @@
 	letType(
 		object((
 			Counter,
-			state: ((value, s32)),
 			initialiser:
 				(takes: (initialValue, s32, sealed: false), in:
-					setField(value, of: self, to: initialValue)
+					record((value, initialValue))
 				),
 			methods:
 				(increase, takes:, returns: s32, in:
@@ -22,10 +21,10 @@
 		)), in:
 		let(
 			(counter, object(Counter, 32))
-			(ignored, message(counter, increase,))
-			(ignored, message(counter, increase,))
-			(ignored, message(counter, increase,)), in:
-			message(counter, getCount,)
+			(ignored, evaluate(message(counter, increase),))
+			(ignored, evaluate(message(counter, increase),))
+			(ignored, evaluate(message(counter, increase),)), in:
+			evaluate(message(counter, getCount),)
 		)
 	)
 ))
