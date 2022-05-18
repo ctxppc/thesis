@@ -357,7 +357,6 @@ A language that introduces named alias and nominal types.
 	<dd><code><strong>binary</strong>(Value, BinaryOperator, Value)</code></dd>
 	<dd><code><strong>evaluate</strong>(Value, [Value])</code></dd>
 	<dd><code><strong>cast</strong>(Value, <strong>as:</strong> ValueType)</code></dd>
-	<dd><code><strong>coerce</strong>(Value, <strong>as:</strong> ValueType)</code></dd>
 	<dd><code><strong>if</strong>(Predicate, <strong>then:</strong> Value, <strong>else:</strong> Value)</code></dd>
 	<dd><code><strong>let</strong>([Definition], <strong>in:</strong> Value)</code></dd>
 	<dd><code><strong>letType</strong>([TypeDefinition], <strong>in:</strong> Value)</code></dd>

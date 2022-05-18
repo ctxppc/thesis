@@ -57,11 +57,6 @@ extension NT {
 		/// A value that evaluates to given value but is typed as given type, ignoring nominal typing rules only.
 		indirect case cast(Value, as: ValueType)
 		
-		/// A value that evaluates to given value but is typed as given type, ignoring all typing rules.
-		///
-		/// Coercions effectively disable the type checker during type conversion. Structurally incompatible conversions are undefined behaviour.
-		indirect case coerce(Value, as: ValueType)
-		
 		/// A value that evaluates to the value of `then` if the predicate holds, or to the value of `else` otherwise.
 		indirect case `if`(Predicate, then: Value, else: Value)
 		
@@ -115,8 +110,7 @@ extension NT {
 				case .evaluate(let function, let arguments):
 				return try .evaluate(function.lowered(in: &context), arguments.lowered(in: &context))
 				
-				case .cast(let value, as: _),
-					.coerce(let value, as: _):
+				case .cast(let value, as: _):
 				return try value.lowered(in: &context)
 				
 				case .if(let predicate, then: let affirmative, else: let negative):
@@ -285,10 +279,6 @@ extension NT {
 					throw TypingError.incompatibleStructuralTypes(castedValue: value, sourceType: sourceType.actual, targetType: targetType.actual)
 				}
 				return targetType
-				
-				case .coerce(let value, as: let type):
-				_ = try value.assignedType(in: context)	// type-check within value but ignore resulting type
-				return .init(from: type, in: context)
 				
 				case .if(_, then: let affirmative, else: let negative):
 				// TODO: Type-check predicate?
