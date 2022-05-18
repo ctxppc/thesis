@@ -12,6 +12,5 @@
 		createVector(s32, count: 100, capability: f, scoped: false)
 		getElement(of: f, index: 50, to: g)
 		return(g)
-	),
-	procedures: 
+	)
 )

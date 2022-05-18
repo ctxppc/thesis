@@ -20,6 +20,5 @@
 		getElement(s32, of: abstract(pi), offset: sv.offset$5, to: register(a0))
 		popScope
 		return(to: register(ra, cap))
-	),
-	procedures: 
+	)
 )

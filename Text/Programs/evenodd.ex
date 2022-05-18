@@ -2,7 +2,7 @@
 	let((even, function(l.even)) (odd, function(l.odd)), in: evaluate(even, 420)),
 	functions: (
 		l.even,
-		takes: (n, s32, sealed: false),
+		takes: (n, s32),
 		returns: s32,
 		in: let(
 			(even, function(l.even)) (odd, function(l.odd)),
@@ -11,7 +11,7 @@
 	)
 	(
 		l.odd,
-		takes: (n, s32, sealed: false),
+		takes: (n, s32),
 		returns: s32,
 		in: let(
 			(even, function(l.even)) (odd, function(l.odd)),

@@ -7,6 +7,5 @@
 		/* use number */
 		popScope
 		return(to: register(ra, cap))
-	),
-	procedures: 
+	)
 )

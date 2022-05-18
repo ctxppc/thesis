@@ -13,6 +13,5 @@
 		set(f, to: vector(s32, count: 100))
 		set(g, to: element(of: f, at: 50))
 		return(g)
-	),
-	procedures:
+	)
 )

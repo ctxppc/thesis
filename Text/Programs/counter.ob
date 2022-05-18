@@ -3,7 +3,7 @@
 		object((
 			Counter,
 			initialiser:
-				(takes: (initialValue, s32, sealed: false), in:
+				(takes: (initialValue, s32), in:
 					record((value, initialValue))
 				),
 			methods:

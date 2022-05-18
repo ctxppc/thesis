@@ -1,7 +1,7 @@
 (value(letType(
 	alias(Sequence, cap(vector(of: s32, sealed: false))), in:
 	let(
-		(sumOfFirstAndSecond, λ(takes: (sequence, Sequence, sealed: false), returns: s32, in:
+		(sumOfFirstAndSecond, λ(takes: (sequence, Sequence), returns: s32, in:
 			value(binary(element(of: sequence, at: 0), add, element(of: sequence, at: 1)))
 		))
 		(pi, vector(0, count: 3)),

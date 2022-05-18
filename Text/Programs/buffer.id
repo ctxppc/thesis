@@ -7,6 +7,5 @@
 		set(register(a0), to: abstract(number))
 		popScope
 		return(to: register(ra, cap))
-	),
-	procedures: 
+	)
 )

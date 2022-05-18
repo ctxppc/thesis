@@ -8,6 +8,5 @@
 		set(register(a0), to: number)
 		popScope
 		return(to: register(ra, cap))
-	),
-	procedures: 
+	)
 )

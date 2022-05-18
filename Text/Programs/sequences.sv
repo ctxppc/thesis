@@ -20,6 +20,5 @@
 		getElement(of: abstract(pi), index: 2, to: register(a0, s32))
 		popScope
 		return(to: register(ra, cap(code)))
-	),
-	procedures:
+	)
 )

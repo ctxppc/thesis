@@ -4,7 +4,7 @@
 		return(the_sum)
 	),
 	procedures:
-		(sum, takes: (first, s32, sealed: false) (second, s32, sealed: false), returns: s32, in:
+		(sum, takes: (first, s32) (second, s32), returns: s32, in:
 			do(
 				compute(the_result, first, add, second)
 				return(the_result)
