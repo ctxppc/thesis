@@ -140,13 +140,33 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 	\label{fig:gcccstack}
 \end{figure}
 
-\paragraph{From CC (Calling Convention) to SV} CC introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. For example, the CC program (with the call effect highlighted)
-\ilfile[highlightlines={3}]{Programs/42.cc}
-is \lowered{} to the following SV program (with the call effect's \g{lowering} highlighted):
-\ilfile[highlightlines={5-8}]{Programs/42.sv}
+\paragraph{From CC (Calling Convention) to SV} CC introduces procedures with parameters and results. It is \lowered{} to its \g{lowerlang} SV by imposing the \g{cc} described above. We'll work through the CC to SV \g{nanopass} by applying it to the following CC program.
+\ilfile{Programs/42.cc}
 
-The CC to SV \g{nanopass} implements \g{cersaved} preservation by binding the registers' contents to temporary names before the call, and restores those registers' contents after the call. The register allocator down the compiler pipeline ensures that these temporaries are preserved across the call.
+The main program begins by pushing a new scope, which is essentially the same as pushing a new call frame to the call stack.\footnote{The term \emph{(location) scope} abstracts from the call frame. \Gs{il} above AL do not support accessing the call frame directly but do provide a way of creating and restoring sets of abstract locations, hence the term.}
+\ilfile[lastline=3]{Programs/42.sv}
+
+The program receives a \g{retcap} in \texttt{cra}, which it can use to return to the \g{rt} (or operating system). To free up this register for other uses, it binds its value to an abstract location.\footnote{\texttt{call} effects redefine the register. The register allocator will notice a conflict and thus assign the saved \g{retcap} to a location on the call frame. For leaf procedures, no such conflict occurs and the register allocator optimises away the binding to \texttt{cc.retcap}.}
+\ilfile[firstline=4, lastline=4]{Programs/42.sv}
+
+The \texttt{call} effect is \lowered{} by copying the arguments to the appropriate registers (or newly allocated locations on the call stack), passing control to the callee, and finally (when control is returned) copying the result from \texttt{a0} to the result location. The register allocator (discussed in \cref{sct:id}) needs to know what registers are used for passing arguments and are thus live across the call; the \texttt{call} effect is therefore annotated with a list of used arguments registers.
+\ilfile[firstline=5, lastline=8]{Programs/42.sv}
+
+The program finishes by restoring the \g{retcap} (which it can only do while the current scope is valid), popping the current scope, then returning to the program's caller.
+\ilfile[firstline=9, lastline=13]{Programs/42.sv}
+
+The procedure begins analogously to the program by pushing a new scope and binding the caller's \g{retcap} to an abstract location. It does the same for all \gs{ceesaved}, since their contents must be preserved by a procedure before it can use them.
 % TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+\ilfile[firstline=14, lastline=21]{Programs/42.sv}
+
+It then binds each received argument to a location with its corresponding parameter's name, making those arguments available to the rest of the procedure which expects arguments in those locations. This operation also frees the argument registers for other uses, such as for calls within the procedure.
+\ilfile[firstline=22, lastline=23]{Programs/42.sv}
+
+The rest of the procedure is left as-is.
+\ilfile[firstline=24, lastline=24]{Programs/42.sv}
+
+The \texttt{return} effect is \lowered{} by copying the result to the result register \texttt{a0}, restoring the contents of \gs{ceesaved} and the \g{retcap}, popping the current scope, and returning control back to the caller.
+\ilfile[firstline=25]{Programs/42.sv}
 
 \section{Structured Values} \label{sct:sv}
 The next \g{il}, \textbf{SV} (Structured Values) provides a structured abstraction over unstructured buffers in the form of vectors and records. A \textbf{vector} in SV is a homogeneous\footnote{All elements are of the same data type.} fixed-size\footnote{The number of elements is determined at creation and can only be changed by creating a new vector of the desired size and moving all elements to it.} array and is represented with a capability that points to the vector's first element, similarly to an array in the C programming language. A \textbf{record} is a heterogeneous\footnote{Values are not necessarily of the same data type.} key-value map with fixed keys and is similar to a C \texttt{struct}. However, unlike C \texttt{struct}s and like SV vectors, a record is represented with a capability that points to the record's first value. Vectors and records in SV are always passed by reference and never implicitly copied. Vector and record capabilities are automatically bounded to the region of memory they occupy; indexing a vector with an index that exceeds the vector's length causes a machine trap.\footnote{Due to CHERI-RISC-V bounds compression, a buffer capability may grant a larger region of memory than requested during allocation, meaning that some \enquote{out of bounds} indices near the end index may actually be valid and not cause a trap. Glyco compensates for this by allocating the extra memory granted by the buffer capability, thereby ensuring that no other buffer can occupy this extra space accessible by the first capability.}
@@ -262,9 +282,10 @@ The MM to RV \g{nanopass} translates call frame operations such as \texttt{pushF
 
 Buffer allocation is implemented using a dedicated heap capability register \texttt{ctp}. The heap capability points to the next free location on the heap and allocation increases the heap capability address — deallocation is not supported.
 
-\paragraph{From RV (CHERI-RISC-V) to S (CHERI-RISC-V Assembly)} An RV program consists of CHERI-RISC-V instructions. The RV to S \g{nanopass} serialises these instructions. For example, \iil/copyWord(destination: a0, source: a1)/ instruction is serialised as \irv/mv a0, a1/.
+\paragraph{From RV (CHERI-RISC-V) to S (CHERI-RISC-V Assembly)} An RV program consists of CHERI-RISC-V instructions. The RV to S \g{nanopass} serialises these instructions. For example, the \iil/copyWord(destination: a0, source: a1)/ instruction is serialised as \hbox{\texttt{mv a0, a1}}.
 
 \paragraph{From S to ELF} The final step of the compiler pipeline is assembling and linking. These two steps are delegated to Clang from the CHERI-LLVM compiler toolchain.\footnote{This last step is unrelated to the research problem, hence this dependency on LLVM.} The result is an ELF file that, depending on the compilation target, can be executed in either the Sail-based CHERI-RISC-V emulator or in CheriBSD.
+% TODO: Remove reference to CheriBSD if needed.
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}
