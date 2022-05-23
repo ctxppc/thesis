@@ -26,6 +26,7 @@
 
 \usepackage{lipsum}								% Fake lorem ipsum text — TODO: Remove when done
 \usepackage{minted}								% Source code
+\usepackage{natbib}								% Better citations
 \usepackage{subfiles}							% Modular documents
 \usepackage{syntax}								% Grammar
 \usepackage{todonotes}							% Marks TODOs — TODO: Remove when done
@@ -36,6 +37,8 @@
 \DeclareUnicodeCharacter{039B}{$\Lambda$}
 \DeclareUnicodeCharacter{03BB}{$\lambda$}
 \DeclareUnicodeCharacter{2026}{$\dots$}
+
+\bibliographystyle{plainnat}
 
 \hypersetup{
     colorlinks=true,		% false: boxed links; true: coloured links
@@ -78,7 +81,7 @@
 	\newacronym[see={{gls-#3}},#2]{#3}{#4}{#5\glsadd{gls-#3}}
 }
 
-\def\biblio{\bibliographystyle{apalike}\bibliography{References}}
+\newcommand{\biblio}{\bibliography{References}}
 
 \input{glossary.tex}
 
@@ -116,7 +119,6 @@
 \setglossarystyle{list}
 \printglossaries
 
-\bibliographystyle{apalike}
 \bibliography{References}
 
 \end{document}

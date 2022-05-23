@@ -5,7 +5,7 @@
 \chapter{Sisp} \label{ch:sisp}
 \textbf{Sisp} (from \enquote{Swifty Lisp}) is a data interchange format (comparable to JSON) developed as part of the Glyco compiler and used for textually representing programs. It draws inspiration from both the Swift programming language (in which Glyco is developed) and the S-expression syntax from the Lisp family of programming languages. It attempts to be concise by removing where possible syntactical elements such as list delimiters or quotes around strings, but at the same time improve clarity with features such as labelled attributes.
 
-This chapter briefly introduces the Sisp format and its mapping to Swift types. The language reference presented in \cref{ch:grammar} is sufficient to read and write Glyco programs; knowledge of Sisp is only relevant for understanding and modifying the implementation of the compiler itself. This chapter assumes some working knowledge in Swift and the \texttt{Encoder} and \texttt{Decoder} protocols provided by the standard library, as documented in \cite{swiftcoding}.
+This chapter briefly introduces the Sisp format and its mapping to Swift types. The language reference presented in \cref{ch:grammar} is sufficient to read and write Glyco programs; knowledge of Sisp is only relevant for understanding and modifying the implementation of the compiler itself. This chapter assumes some working knowledge in Swift and the \texttt{Encoder} and \texttt{Decoder} protocols provided by the standard library, as documented by \citet{swiftcoding}.
 
 \section*{Sisp value}
 A Sisp value is one of the following:
