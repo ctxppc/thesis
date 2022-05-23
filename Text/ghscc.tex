@@ -93,7 +93,14 @@ The latter security property, which we call \textbf{unrepeatable return}, is a w
 
 \section{Evaluation} \label{sct:ghscc-eval}
 \subsection{Impact on the Codebase}
-We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We first present the most significant changes to Glyco's languages, going from low-level to high-level \gs{il}, then quantify the codebase's growth.
+We now evaluate the impact of the implementation of \g{ghscc} in Glyco which can serve as an indicator to the development effort required for adding a new \g{cc} to an existing \g{nanopass} compiler with a similar design. We first present the most significant changes to Glyco's languages, going from low-level to high-level \gs{il}, then quantify the codebase's growth. The changes to the compiler pipeline are also summarised in \cref{fig:pipeline02}.
+
+\begin{figure}
+	\centering
+	\includegraphics{Images/Pipeline v0.2.pdf}
+	\caption{The Glyco 0.1 (left) and 0.2 (right) pipelines and the main differences between them.}
+	\label{fig:pipeline02}
+\end{figure}
 
 \paragraph{CHERI-RISC-V (RV)} The low-level language RV is extended with additional grammar for statements such as \texttt{padding} and \texttt{bssSection}, which can be \glslink{lowering}{lowered} trivially to their CHERI-RISC-V assembly counterparts. Instructions are now merely one kind of statement, and programs are redefined as a list of statements. This additional grammar is required by MM which now explicitly manages regions of memory for use by the call stack, the heap, or \gs{rtrt}.
 
