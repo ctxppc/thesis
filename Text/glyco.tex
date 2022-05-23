@@ -171,6 +171,15 @@ Glyco's register allocator is spread over three \gs{nanopass} which perform the 
 	Prioritise abstract locations with few conflicts when assigning registers as they're likely to maximise the number of abstract locations that can be assigned to a register.
 \end{enumerate}
 
+A liveness example is shown in \cref{fig:liveness}.
+
+\begin{SCfigure}
+	\centering
+	\includegraphics{Images/Liveness.pdf}
+	\caption{A liveness example where $a$ and $b$ have overlapping liveness intervals and thus cannot be assigned to the same register. The conflict graph contains an edge between $a$ and $b$.}
+	\label{fig:liveness}
+\end{SCfigure}
+
 \paragraph{From ID (Inferred Declarations) to AL} An ID program is \lowered{} to an AL program by inferring a declaration for each abstract location used in the program and each of the program's procedures. Each declaration associates an abstract location with a data type. For example, the ID program
 \ilfile{Programs/buffer.id}
 is \lowered{} to the following AL program (declarations highlighted):

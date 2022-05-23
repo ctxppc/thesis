@@ -14,13 +14,12 @@ A traditional \g{cc} such as \g{gccc} works with a single stack of call frames p
 
 A traditional \g{cc} however provides no security in the face of adversarial code that operates in the same address space. For one, adversarial code has access to the full call stack and thus to other call frames than its own. The adversarial code may be from an external dependency that hasn't been rigorously vetted, but it may also be first-party code containing an overflow vulnerability on a statically-allocated buffer that is exploited with specially crafted input, as illustrated in \cref{fig:buffoverflow}. \textbf{\Gls{lse}} is a security property that makes it \textbf{impossible for a procedure to access the local state,} i.e., call frame, \textbf{of another procedure,} or for a procedure in one compartment (such as a library) to access the local state of a procedure in another compartment.
 
-\begin{figure}
-	\begin{center}
-		\includegraphics{Images/Buffer Overflow.pdf}
-	\end{center}
+\begin{SCfigure}
+	\centering
+	\includegraphics{Images/Buffer Overflow.pdf}
 	\caption{A vulnerability in a (trusted) libWeakZIP procedure may allow an attacker to overflow the stack-allocated buffer. In this example, the return address is stored at the end of the caller's call frame and is thus overwritten by the attack. Note that the stack grows downward.}
 	\label{fig:buffoverflow}
-\end{figure}
+\end{SCfigure}
 
 A different but related problem is that adversarial code may ignore the \g{retcap} provided by the caller and instead return to a different location, within or outside the caller. They may, for instance, skip an authentication check by jumping straight into the execution path of a successful authentication, or they might return to the caller's caller. They may also store the provided \g{retcap} and jump to it more than once. In contrast when \textbf{\g{wbcf}} applies, \textbf{a procedure can only call procedures, return to its caller, or diverge} (e.g., get stuck in an infinite loop).
 
