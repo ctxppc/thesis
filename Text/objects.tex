@@ -130,11 +130,11 @@ An object type definition (in a \texttt{letType}) is \lowered{} to NT by
 	
 	\item implementing the metatype's \texttt{createObject} method using a lambda that allocates a state record, executes the initialiser's effect, seals a capability to the state record using the \g{sealcap} stored in the type object, and returns this sealed capability to the method's caller;
 	\item sealing the capability for this method with the metatype's \g{sealcap};
-	\ilfile[firstline=15, lastline=34]{Programs/counter.nt}
+	\ilfile[firstline=15, lastline=33]{Programs/counter.nt}
 	
 	\item implementing each method of the type using a lambda that takes a sealed parameter \iil/ob.self/ representing the receiver (and which the \iil/self/ value maps to) plus any parameters defined on the method; and finally,
 	\item sealing the capability of each of the type's methods.
-	\ilfile[firstline=35, lastline=76]{Programs/counter.nt}
+	\ilfile[firstline=34, lastline=69]{Programs/counter.nt}
 	
 \end{enumerate}
 
@@ -142,7 +142,14 @@ Each method invocation is \lowered{} by evaluating the \g{methcap} with the rece
 \ilfile[firstline=70]{Programs/counter.nt}
 
 \section{Evaluation: Impact on the Codebase} \label{sct:obj-eval}
-Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco.
+Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco. The changes to the compiler pipeline are also summarised in \cref{fig:pipeline03}.
+
+\begin{figure}
+	\centering
+	\includegraphics{Images/Pipeline v0.3.pdf}
+	\caption{The Glyco 0.2 (left) and 0.3 (right) pipelines and the main differences between them.}
+	\label{fig:pipeline03}
+\end{figure}
 
 \paragraph{Managed Memory (MM)} The \g{scall} \g{rtrt} is generalised to a seal allocation routine, given that both \g{scall} and object type definition only need a \g{rtrt} to securely provide a unique \g{sealcap} for next invocation resp. object type definition. The language now provides new \texttt{createSeal} and \texttt{seal} effects. The \texttt{call} effect's \g{lowering} under \g{ghscc} is modified to invoke the seal allocation routine and use the returned \g{sealcap} to seal the return–frame capability pair.
 

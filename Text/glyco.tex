@@ -125,7 +125,7 @@ All of Glyco's supported data types in Glyco fit in a register. Vectors and reco
 
 \paragraph{Results} A procedure can return a single value via the \texttt{a0} register. Vectors and records are returned by reference as capabilities.
 
-\paragraph{Available registers} The set of \gs{cersaved} and \gs{ceesaved} registers is customisable via command-line options. The default \gs{cersaved} are \texttt{s1}, \texttt{s2}, \texttt{s3}, \texttt{s4}, \texttt{s5}, \texttt{s6}, \texttt{s7}, \texttt{s8}, \texttt{s9}, \texttt{s10}, and \texttt{s11}; the default \gs{ceesaved} are the remaining 9 registers available in CC.
+\paragraph{Available registers} The set of \glslink{cersaved}{caller-saved} and \gs{ceesaved} is customisable via command-line options. The default \gs{cersaved} are \texttt{s1}, \texttt{s2}, \texttt{s3}, \texttt{s4}, \texttt{s5}, \texttt{s6}, \texttt{s7}, \texttt{s8}, \texttt{s9}, \texttt{s10}, and \texttt{s11}; the default \gs{ceesaved} are the remaining 9 registers available in CC.
 
 \paragraph{Local state} A procedure call's local state comprises saved register data (cf. supra), data for which no register is available, and stack-allocated buffers. These reside at lower addresses than the call's \g{framecap}; the procedure can therefore access them using negative offsets of the \g{framecap}.
 
