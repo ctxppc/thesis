@@ -36,7 +36,14 @@ The encapsulation problem presented in the previous section is solved in \textbf
 \ilfile{Programs/offset.ob}
 
 \section{Evaluation: Impact on the Codebase} \label{sct:cls-eval}
-Similarly to what we did in \cref{sct:ghscc-eval,sct:obj-eval}, we evaluate the impact of the implementation of sealed closures in Glyco by describing the new \gs{il} and changes to existing \gs{il} before quantifying the codebase's growth.
+Similarly to what we did in \cref{sct:ghscc-eval,sct:obj-eval}, we evaluate the impact of the implementation of sealed closures in Glyco by describing the new \gs{il} and changes to existing \gs{il} before quantifying the codebase's growth. The changes to the compiler pipeline are also summarised in \cref{fig:pipeline10}.
+
+\begin{figure}
+	\centering
+	\includegraphics{Images/Pipeline v1.0.pdf}
+	\caption{The Glyco 0.3 (left) and 1.0 (right) pipelines and the main differences between them.}
+	\label{fig:pipeline10}
+\end{figure}
 
 \paragraph{Expressions (EX) through Objects (OB)} The \texttt{record} value is redesigned to accept record entries instead of a record type. The EX to LS \g{nanopass} is updated to initialise the record besides only allocating it, thereby reducing the amount of code needed to create records in higher \gs{il} like OB and CL.
 
