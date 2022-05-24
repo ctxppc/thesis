@@ -17,7 +17,7 @@ The following Swift program uses a closure to print all numbers between 1 and 10
 		.map { number in number + offset }
 	print(numbers)		// 6, 7, 8, 9, 10, …
 \end{swift}
-The closure takes one parameter \texttt{number} and captures the constant \texttt{offset} from the outer scope. The \texttt{map} method invokes the closure for every number between 1 and 100 inclusive, binding each number to the \texttt{number} parameter. The closure also gets access to \texttt{offset} even though \texttt{map} isn't even aware of it.
+The closure takes one parameter \texttt{number} and captures the constant \texttt{offset} from the outer scope. The \texttt{map} method invokes the closure for every number between 1 and 100 inclusive, binding each number to the \texttt{number} parameter. The closure also gets access to \texttt{offset} even though \texttt{map} is not even aware of it.
 
 Closures are usually implemented by pairing a function with an environment. When the pair is invoked, the function is invoked with the environment as a (hidden) parameter. For instance, the following OB program implements a closure \texttt{closure} that takes a single parameter \texttt{n} and captures an environment with a single captured name \texttt{offset}.
 \ilfile{Programs/fakecls.ob}
