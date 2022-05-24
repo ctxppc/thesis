@@ -21,7 +21,14 @@ A traditional \g{cc} however provides no security in the face of adversarial cod
 	\label{fig:buffoverflow}
 \end{SCfigure}
 
-A different but related problem is that adversarial code may ignore the \g{retcap} provided by the caller and instead return to a different location, within or outside the caller. They may, for instance, skip an authentication check by jumping straight into the execution path of a successful authentication, or they might return to the caller's caller. They may also store the provided \g{retcap} and jump to it more than once. In contrast when \textbf{\g{wbcf}} applies, \textbf{a procedure can only call procedures, return to its caller, or diverge} (e.g., get stuck in an infinite loop).
+A different but related problem is that adversarial code may ignore the \g{retcap} provided by the caller and instead return to a different location, within or outside the caller. They may, for instance, skip an authentication check by jumping straight into the execution path of a successful authentication, or they might return to the caller's caller as illustrated in \cref{fig:no-wbcf}. They may also store the provided \g{retcap} and jump to it more than once. In contrast when \textbf{\g{wbcf}} applies, \textbf{a procedure can only call procedures, return to its caller, or diverge} (e.g., get stuck in an infinite loop).
+
+\begin{SCfigure}[][ht]
+	\centering
+	\includegraphics{Images/No WBCF.pdf}
+	\caption{An example demonstrating one kind of attack when \g{wbcf} is not guaranteed. libevilSHA returns one caller deeper, skipping libCrypto and leaving it waiting to be returned to.}
+	\label{fig:no-wbcf}
+\end{SCfigure}
 
 A \g{cc} proposed by \citet[section~7.3]{cerise} provides \g{lse} by ensuring that call frames always occupy freshly allocated memory to which certainly no dangling capabilities point. However it does not provide \g{wbcf}. \g{ghscc} adapts a variant of this \g{cc} that provides \g{lse} and a weaker variant of \g{wbcf}.
 
@@ -82,13 +89,13 @@ As part of an \g{scall}, the callee receives arguments and a return–frame capa
 
 Before invoking the \g{scall} routine, the caller initialises an indicator value to 0 and stores it in its call frame. When the callee returns control to the caller, the caller checks if the value is still 0 and crashes otherwise. It then sets the value to 1 to ensure that subsequent uses of the \g{retcap} result in a machine trap, thereby ensuring that the \g{retcap} is only usable once. Since \g{lse} protects the call frame from external access, it also protects the indicator value from the same.
 
-The latter security property, which we call \textbf{unrepeatable return}, is a weaker variant of \g{wbcf} and can be stated as follows: \textbf{a \g{retcap} provided by a procedure supporting unrepeatable return can be used at most once}. Unlike \g{wbcf}, it does not disallow a callee to return to another procedure's caller, as illustrated in \cref{fig:no-wbcf}.
+The latter security property, which we call \textbf{unrepeatable return}, is a weaker variant of \g{wbcf} and can be stated as follows: \textbf{a \g{retcap} provided by a procedure supporting unrepeatable return can be used at most once}. Unlike \g{wbcf}, it does not disallow a callee to return to another procedure's caller, as illustrated in \cref{fig:semi-wbcf}.
 
 \begin{figure}
 	\centering
 	\includegraphics{Images/Semi-WBCF.pdf}
 	\caption{\G{ghscc} does not support \g{wbcf}. In this example, libCrypto sends the return–frame capability pair it receives from httpd to libevilHash, which uses it to return directly to httpd, thereby leaving libSHA (and libCrypto) waiting to be returned to.}
-	\label{fig:no-wbcf}
+	\label{fig:semi-wbcf}
 \end{figure}
 
 \section{Evaluation} \label{sct:ghscc-eval}
