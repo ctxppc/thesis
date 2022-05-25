@@ -10,8 +10,12 @@ Sealed objects depend on two new features; we begin hence by describing lambdas 
 This chapter discusses the feature set and languages of Glyco 0.3.\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.3/}.} A full language reference can be found in \cref{ch:grammar}.
 
 \section{Lambdas} \label{sct:lambda}
-A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the following Λ program defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
-\ilfile{Programs/sum.l}
+A first addition to Glyco is the \textbf{lambda}, i.e., an anonymous function, in a new \g{il} called \textbf{Λ} (Lambdas) above EX. Lambdas allow the programmer to define functions (\texttt{λ} values) at the point of use and to pass them around as values. For example, the Λ program in \cref{lst:sum} defines a lambda that computes the sum of its two parameters and immediately applies it on $1080$ and $-80$.
+\begin{listing}[ht]
+	\ilfile{Programs/sum.l}
+	\caption{A Λ program evaluating to 1000.}
+	\label{lst:sum}
+\end{listing}
 
 The scope of a lambda definition extends beyond the \texttt{λ} value itself to the \texttt{let} value defining it, in a similar way to \texttt{letRec} values in some functional programming languages and unlike definitions of other kinds of values. This enables mutual recursion such as the (inefficient) program in \cref{lst:mutrec} determining the parity of 420.
 \begin{listing}[ht]
@@ -22,14 +26,14 @@ The scope of a lambda definition extends beyond the \texttt{λ} value itself to 
 
 Finally, since \texttt{λ} values with support for mutual recursion provide the same expressive power as programs with global functions, Λ removes support for global functions. The reader should bear in mind however that lambdas do not \emph{increase} the (practical) expressive power of programs but merely make it easier to define functions. Lambda values evaluate to code capabilities and do not carry an environment, i.e., lambdas in Λ are not closures.\footnote{Spoiler alert: \Cref{ch:cls} introduces closures.}
 
-\paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with either an auto-generated name or a name derived from the lambda definition) and replaces the \texttt{λ} values by code capabilities to those functions. The first program of this chapter is thus \lowered{} to the EX program
+\paragraph{From Λ to EX} The \g{nanopass} from Λ to EX extracts the functions defined by \texttt{λ} values into the global scope (with either an auto-generated name or a name derived from the lambda definition) and replaces the \texttt{λ} values by code capabilities to those functions. The program in \cref{lst:sum} is thus \lowered{} to the EX program
 \ilfile{Programs/sum.ex}
 
-The \g{nanopass} also injects all λ values in the same \texttt{let} value in the lambda body to enable (mutual) recursion. The parity program from \cref{lst:mutrec} is thus \lowered{} as
+The \g{nanopass} also injects all λ values in the same \texttt{let} value in the lambda body to enable (mutual) recursion. The parity program in \cref{lst:mutrec} is thus \lowered{} as
 \ilfile{Programs/evenodd.ex}
 
 \section{Alias \& Nominal Types} \label{sct:named-ty}
-A second new feature is support for defining new (named) types in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
+A second new feature is support for defining new (\textbf{named}) \textbf{types} in a new \g{il} \textbf{NT} (Named Types) above Λ. A value in NT can be
 \begin{itemize}[nosep]
 	\item an (8-bit) byte, a \iil/u8/;
 	\item a (32-bit) signed integer, an \iil/s32/;
@@ -43,20 +47,20 @@ where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwis
 
 \paragraph{Alias types} An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it's defined as. An alias type can have a shorter or semantically meaningful type name that the type it's defined as.
 
-For instance, the following NT program defines an alias type named \iil/Sequence/ and uses it in a simple computation that evaluates to 4. The value \iil/pi/ created by \iil/vector(s32, count: 3)/ is typed \iil/cap(vector(s32, sealed: false))/ but is accepted by the function which takes an argument typed \iil/Sequence/.
+For instance, the following NT program defines an alias type named \iil/Sequence/ and uses it in a simple computation that evaluates to 4. The value \iil/pi/ created by \iil/vector(0, count: 3)/ is typed \iil/cap(vector(s32, sealed: false))/ but is accepted by the function which takes an argument typed \iil/Sequence/.
 \ilfile{Programs/alias.nt}
 
-\paragraph{Nominal types} A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is only equivalent to itself. A nominal type is effectively a new type by itself and can be used to ensure that two representationally identical but semantically different types of values cannot accidentally be mixed. However, a value can be explicitly \texttt{cast}ed to a value of a different type that has the same representation.
+\paragraph{Nominal types} A \textbf{nominal type definition} creates a \textbf{nominal type}, a type which is only equivalent to itself. A nominal type is effectively a new type by itself and can be used to ensure that values of two representationally identical but semantically different types cannot accidentally be mixed. However, a value can be explicitly \texttt{cast}ed to a value of a different type that has the same representation.
 
 For example, the following NT program defines two nominal types \iil/Kelvin/ and \iil/Celsius/ and uses them to convert 500 °C to K and back to °C.
 \ilfile{Programs/temp.nt}
 
-However, the following program is not valid since the second invocation of \iil/toCelsius/, which excepts a value in \iil/Kelvin/, is given a value in \iil/Celsius/. Nominal type rules prevent the accidental conversion from \iil/Kelvin/ to \iil/Celsius/, even though both types are represented by \iil/s32/.
+However, the following program is not valid since the second invocation of \iil/toCelsius/, which expects a value in \iil/Kelvin/, is given a value in \iil/Celsius/. Nominal type rules prevent the accidental conversion from \iil/Kelvin/ to \iil/Celsius/, even though both types are represented by \iil/s32/.
 \ilfile{Programs/tempbad.nt}
 
 \begin{quote}
 	\ttfamily\footnotesize
-	Error: \iil/evaluate(toCelsius, 500)/ is of type \iil/named(Celsius)/ and thus cannot be used for \iil/(k, Kelvin, sealed: false)/
+	Error: \iil/evaluate(toCelsius, 500)/ is of type \iil/named(Celsius)/ and thus cannot be used for \iil/(k, Kelvin)/
 \end{quote}
 
 \paragraph{Implicit type casts} With some exceptions, the type checker rejects any uses of values of a structural type such as \iil/s32/ in contexts where a nominal type is expected and vice versa. This restriction can be bypassed using a \texttt{cast}. For ergonomic reasons, the type-checker performs an implicit cast on
@@ -65,7 +69,7 @@ However, the following program is not valid since the second invocation of \iil/
 	\item a record value of nominal type in a \texttt{field} value;
 	\item a vector value of nominal type in an \texttt{element} value;
 	\item a seal value of nominal type in a \texttt{sealed} value;
-	\item an operand of structural type in a \texttt{binary} value when the other operand is of nominal type — the result of the \texttt{binary} value is of nominal type;
+	\item an operand of structural type in a \texttt{binary} value when the other operand is of nominal type — the result of the \texttt{binary} value is in that case of nominal type;
 	\item a lambda's result value of structural type when the result type is nominal; and
 	\item a program's result value of nominal type (to \iil/s32/), like the result in \iil/Celsius/ above.
 \end{itemize}
@@ -73,10 +77,16 @@ However, the following program is not valid since the second invocation of \iil/
 \paragraph{From NT to Λ} The \g{nanopass} from NT to Λ replaces named types by their Λ equivalents and checks if the nominal typing rules hold.
 
 \section{Objects \& Methods} \label{sct:obj-meth}
-\todo{Present the problem \emph{before} presenting the solution, instead of \emph{after}?}
-A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record on which a predefined set of functions can operate. These functions are the object's \textbf{\gs{method}}.
+Objects in object-oriented programming languages are constructs that consist of state and behaviour. An object owns a region of memory where it holds its state while its behaviour manifests through its methods, which are functions that access and modify the object's state as part of their operation.
 
-An object belongs to an \textbf{object type}, which determines the record type and \gs{method} of all objects of that type. Sealed objects in Glyco are in this respect similar to objects in object-oriented programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of \gs{method}.
+Objects usually provide encapsulation, a technique that discourages or prohibits code outside of an object's method from accessing or modifying the object's state, thereby promoting the decoupling of disparate parts of a codebase. For instance, the following NT program implements a \iil/Counter/ type, which is a record consisting of a single integer value, and two lambdas that return resp. increase the counter's value. It then creates a \iil/Counter/ with an initial value of 32 which it then increases three times.
+\ilfile{Programs/unsealedcounter.nt}
+
+In this NT program, \iil/counter/ is an \enquote{object} and \iil/increaseCounter/ and \iil/getCounterValue/ are the \enquote{methods} which access or modify the \iil/counter/'s state. However, nothing prevents from external code from directly accessing the \iil/value/ field, for example to \emph{decrease} it — \iil/Counter/ objects are not encapsulated.
+
+\paragraph{Sealed objects \& methods} A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record (the object's \textbf{state}) on which a predetermined set of methods can be invoked. A \textbf{method} is a function that (among other parameters) takes a capability to an object's state. We refer to the object on which a method is called as the method's \textbf{receiver}.
+
+\paragraph{Object types \& initialisers} An object belongs to an \textbf{object type}, which determines the record type and \gs{method} of all objects of that type. Object types in Glyco are in this respect similar to classes in programming languages such as Java. Object types however do not support inheritance and record fields cannot be made visible outside of \gs{method}.
 
 Object types can be defined in a new \g{il} above NT called \textbf{OB} (Objects) using an \textbf{object type definition} in a \texttt{letType} value. A definition consists of
 \begin{itemize}[nosep]
@@ -88,7 +98,7 @@ Object types can be defined in a new \g{il} above NT called \textbf{OB} (Objects
 
 An \textbf{\g{init}} is a pseudo-\g{method} automatically invoked on every new object immediately after its state is allocated that ensures that the object has the right initial state. An object can be created using an \texttt{object} value, which accepts a type name and arguments to the initialiser's parameters. \Gs{method} can only be defined when the object type is being defined. They can be invoked using a \texttt{message} value, which takes an object, \g{method} name, and arguments to the \g{method}'s parameters. Initialisers and \gs{method} alike get a capability to the object's state, i.e., the record composing it, through the \iil/self/ value.
 
-The OB program in \cref{lst:counter} implements the object type \iil/Counter/, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35).
+The OB program in \cref{lst:counter} reimplements the \iil/Counter/ type as an object type, creates a counter with an initial value of 32, increases the count three times, and evaluates to the counter's final value (35).
 \begin{listing}[ht]
 	\ilfile{Programs/counter.ob}
 	\caption{An OB program implementing a counter and counting from 32 to 35. The \iil/evaluate(message(counter, increase),)/ syntax is valid in Glyco 1.0 and is introduced in the next chapter. The equivalent syntax in this chapter's version (Glyco 0.3) is \iil/message(counter, increase,)/. Additionally, initialisers in Glyco 0.3 receive a pre-allocated record in \iil/self/ while initialisers in the final version (shown here) allocate themselves a record.}

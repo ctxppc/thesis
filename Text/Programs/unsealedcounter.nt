@@ -1,0 +1,24 @@
+(
+	value(
+		letType(nominal(Counter, cap(record(((value, s32)), sealed: false))),
+			in: let(
+				(increaseCounter, λ(takes: (counter, Counter), returns: s32, in:
+					let((newValue, binary(field(value, of: counter), add, 1)),
+						in: do(
+							setField(value, of: counter, to: newValue),
+							then: value(newValue)
+						)
+					)
+				))
+				(getCounterValue, λ(takes: (counter, Counter), returns: s32, in:
+					value(field(value, of: counter))
+				))
+				(counter, record((value, 32)))
+				(ignored, evaluate(increaseCounter, counter))
+				(ignored, evaluate(increaseCounter, counter))
+				(ignored, evaluate(increaseCounter, counter)),
+				in: evaluate(getCounterValue, counter)
+			)
+		)
+	)
+)
