@@ -79,10 +79,12 @@ However, the following program is not valid since the second invocation of \iil/
 \section{Objects \& Methods} \label{sct:obj-meth}
 Objects in object-oriented programming languages are constructs that consist of state and behaviour. An object owns a region of memory where it holds its state while its behaviour manifests through its methods, which are functions that access and modify the object's state as part of their operation.
 
-Objects usually provide encapsulation, a technique that discourages or prohibits code outside of an object's method from accessing or modifying the object's state, thereby promoting the decoupling of disparate parts of a codebase. For instance, the following NT program implements a \iil/Counter/ type, which is a record consisting of a single integer value, and two lambdas that return resp. increase the counter's value. It then creates a \iil/Counter/ with an initial value of 32 which it then increases three times.
+Objects usually provide encapsulation, a technique that discourages or prohibits code outside of an object's method from accessing or modifying the object's state, thereby promoting the decoupling of disparate parts of a codebase. To illustrate this, consider the following NT program.
 \ilfile{Programs/unsealedcounter.nt}
 
-In this NT program, \iil/counter/ is an \enquote{object} and \iil/increaseCounter/ and \iil/getCounterValue/ are the \enquote{methods} which access or modify the \iil/counter/'s state. However, nothing prevents from external code from directly accessing the \iil/value/ field, for example to \emph{decrease} it — \iil/Counter/ objects are not encapsulated.
+This program implements a \iil/Counter/ type, which is a record consisting of a single integer value, and two lambdas that return resp. increase the counter's value. It then creates a \iil/Counter/ with an initial value of 32 and increases it three times.
+
+\iil/counter/ is here an \enquote{object} and \iil/increaseCounter/ and \iil/getCounterValue/ are the \enquote{methods} which access or modify the \iil/counter/'s state. However, nothing prevents from external code from directly accessing the \iil/value/ field, for example to \emph{decrease} it — \iil/Counter/ objects are not encapsulated.
 
 \paragraph{Sealed objects \& methods} A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record (the object's \textbf{state}) on which a predetermined set of methods can be invoked. A \textbf{method} is a function that (among other parameters) takes a capability to an object's state. We refer to the object on which a method is called as the method's \textbf{receiver}.
 
