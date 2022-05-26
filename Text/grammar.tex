@@ -7,6 +7,30 @@
 \label{ch:grammar}
 This chapter presents all \gs{il} in the final version of Glyco, from high-level to low-level languages. The Swift source files for these \gs{il} can be found under \url{https://tsarouhas.eu/glyco/ils/}.
 
+\paragraph{Common grammar} The following grammar applies to all \gs{il}. For any \syntax{<N>}:
+\begin{grammar}
+	\footnotesize
+	<[$N$]> := $\epsilon$ | <N> <[N]>
+	\par
+	<Bool> := "false" | "\"false\"" | "true" | "\"true\""
+	\par
+	<Int> := <digits> | "-" <digits>
+	\par
+	<digits> := <digit> | <digit> <digits>
+	\par
+	<digit> := "0" | "1" | "2" | "3" | "4" | "5" | "6" | "7" | "8" | "9"
+	\par
+	<String> := <id> | zero or more printable characters enclosed in double-quotes, with every double-quote character in the string content doubled
+	\par
+	<id> := <idstart> | <idstart> <idtail>
+	\par
+	<idstart> := a letter from Unicode General Category L* or M* | "_" | "$" | "\%" | "."
+	\par
+	<idtail> := <idchar> | <idchar> <idtail>
+	\par
+	<idchar> := an alphanumeric character from Unicode General Category L*, M*, or N* | "_" | "$" | "\%" | "."
+\end{grammar}
+
 \paragraph{ CL (Closures) } A language that introduces closures, i.e., anonymous functions with an environment.
 \begin{grammar}
 	\footnotesize
