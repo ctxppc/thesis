@@ -31,6 +31,7 @@
 \usepackage{subfiles}							% Modular documents
 \usepackage{syntax}								% Grammar
 \usepackage{todonotes}							% Marks TODOs — TODO: Remove when done
+\usepackage{wrapfig}							% Text wrapping around figures
 \usepackage{xparse}								% Advanced command parsing — used in newdualentry
 
 \newcommand{\shb}[1]{\todo[color=orange!40, author=Sander, inline]{#1}}
@@ -74,6 +75,13 @@
 \newcommand{\G}[1]{\Gls{#1}}
 \newcommand{\gs}[1]{\glspl{#1}}
 \newcommand{\Gs}[1]{\Glspl{#1}}
+
+\newcommand{\plfig}[2][]{
+	\begin{wrapfigure}[#1]{r}{0.3\textwidth}
+		\centering
+		\includegraphics{Images/Pipeline #2.pdf}
+	\end{wrapfigure}
+}
 
 \DeclareDocumentCommand{\newdualentry}{ O{} O{} m m m m } {
 	\newglossaryentry{gls-#3}{name={#5}, text={#5\glsadd{#3}}, description={#6}, #1}

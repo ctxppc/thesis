@@ -49,11 +49,12 @@ To implement heap allocation and future functionality securely, Glyco is extende
 As Glyco is developed almost entirely in isolation, it cannot rely on an operating system or dynamic linker to provide these routines and therefore provides them itself. It is expected that a production compiler would be able to rely on an OS-provided standard library instead, thereby removing the need to trust the compiler and its \g{rt}.
 
 The first \g{rtrt} is a \textbf{heap allocation routine}, which accepts a byte size in \texttt{t0} and a \g{retcap} in \texttt{ct2} and returns a unique capability to an allocated buffer in \texttt{ct1}. The \g{heapcap}, providing access to the full heap and pointing to the next free location in it, is stored within the allocator's memory. This ensures that, at any point in time, only the allocator has access to unallocated memory and that memory associated with an allocated buffer is only ever accessible to the allocator and whoever holds the capability to that buffer returned by the allocator.
+\todo{Add assembly excerpt of heap allocation routine.}
 
 \section{Call Frame Encapsulation \& Secure Calling} \label{sct:ghscc}
 A procedure allocates a buffer for its call frame in its prologue by calling the heap allocation routine with an appropriate byte size, and uses the call frame just as it would with \g{gccc}. The heap allocation routine ensures that only it and the procedure have access to the buffer,\footnote{The \g{rt} is implicitly trusted in our threat model. In a realistic compiler and runtime environment with a heap allocation routine, the program would need to trust at least the dynamic linker and any linked runtime code.} thereby ensuring that \g{lse} holds at that point in time.
 
-A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call) routine} and is therefore referred to as an \textbf{\g{scall}}. This \g{rtrt} expects a target capability in \texttt{ct6}, a \g{retcap} in \texttt{cra}, and a \g{framecap} in \texttt{cfp}. When invoked, the routine generates a unique \g{sealcap}, seals the frame and return capabilities, and jumps to the target capability's address. Similar to how the heap capability in the allocation routine grants the latter access to the heap and points to the next free location, the \g{scall} routine contains a \g{sealcap} that grants it \g{sealing} power for all \gs{otype} and whose address is the next available \g{otype}. An \g{scall} looks as follows:
+A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call) routine} and is therefore referred to as an \textbf{\g{scall}}. This \g{rtrt} expects a target capability in \texttt{ct6}, a \g{retcap} in \texttt{cra}, and a \g{framecap} in \texttt{cfp}. When invoked, the routine generates a unique \g{sealcap}, seals the frame and return capabilities, and jumps to the target capability's address. Similar to how the heap capability in the allocation routine grants the latter access to the heap and points to the next free location, the \g{scall} routine contains a \g{sealcap} that grants it \g{sealing} power for all \gs{otype} and whose address is the next available \g{otype}. \todo{Add assembly excerpt of \g{scall} routine.} An \g{scall} looks as follows:
 
 \begin{enumerate}
 	
@@ -84,6 +85,7 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 	\item The caller resumes execution.
 	
 \end{enumerate}
+\todo{Add \g{nanopass} example.}
 
 As part of an \g{scall}, the callee receives arguments and a return–frame capability pair sealed with a unique \g{otype} for which the callee has no \g{unsealcap} and therefore cannot dereference. The callee thus cannot access the caller's local state, thereby preserving \g{lse}. The capabilities are only unsealed when control is returned to the caller using the atomic \texttt{CInvoke} instruction. Since the callee also does not have a \g{sealcap} for that \g{otype}, it cannot forge a call stack to manipulate the procedure's local state, nor can it forge a \g{retcap} to trick \texttt{CInvoke} into unsealing the sealed \g{framecap} before invoking adversarial code.
 

@@ -84,7 +84,7 @@ Objects usually provide encapsulation, a technique that discourages or prohibits
 
 This program implements a \iil/Counter/ type, which is a record consisting of a single integer value, and two lambdas that return resp. increase the counter's value. It then creates a \iil/Counter/ with an initial value of 32 and increases it three times.
 
-\iil/counter/ is here an \enquote{object} and \iil/increaseCounter/ and \iil/getCounterValue/ are the \enquote{methods} which access or modify the \iil/counter/'s state. However, nothing prevents from external code from directly accessing the \iil/value/ field, for example to \emph{decrease} it — \iil/Counter/ objects are not encapsulated.
+\iil/counter/ is here an \enquote{object} and \iil/increaseCounter/ and \iil/getCounterValue/ are the \enquote{methods} which access or modify the \iil/counter/'s state. However, nothing prevents from external code from directly accessing the \iil/value/ field, for example to set it to zero by doing \iil/setField(value, of: counter, to: 0)/ anywhere where \iil/counter/ is accessible. That is, \iil/Counter/ \enquote{objects} in the example above are not encapsulated.
 
 \paragraph{Sealed objects \& methods} A \textbf{sealed object} (or simply \textbf{object} in this chapter) is an encapsulated record (the object's \textbf{state}) on which a predetermined set of methods can be invoked. A \textbf{method} is a function that (among other parameters) takes a capability to an object's state. We refer to the object on which a method is called as the method's \textbf{receiver}.
 
@@ -152,6 +152,8 @@ An object type definition (in a \texttt{letType}) is \lowered{} to NT by
 
 Each method invocation is \lowered{} by evaluating the \g{methcap} with the receiver as the first argument, followed by any provided arguments. Object construction in \texttt{object} values is implemented in NT by calling the metatype's \texttt{createObject} \g{methcap} on the type object.
 \ilfile[firstline=70]{Programs/counter.nt}
+
+\todo{Add short discussion and assembly excerpt of create seal routine.}
 
 \section{Evaluation: Impact on the Codebase} \label{sct:obj-eval}
 Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco. The changes to the compiler pipeline are also summarised in \cref{fig:pipeline03}.
