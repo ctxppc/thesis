@@ -35,7 +35,7 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \g{il} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-Glyco 0.1 defines 17 \gs{il}, a majority of which is adapted from the student compiler by \citet{compcourse} for x86 targets. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
+Glyco 0.1 defines 17 \gs{il},\footnote{We don't consider ELF to be an \g{il} in this thesis.} a majority of which is adapted from the student compiler by \citet{compcourse} for x86 targets. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
 
 \newpage
 
@@ -178,7 +178,15 @@ The rest of the procedure is left as-is.
 The \texttt{return} effect is \lowered{} by copying the result to the result register \texttt{a0}, restoring the contents of \gs{ceesaved} and the \g{retcap}, popping the current scope, and returning control back to the caller.
 \ilfile[firstline=25]{Programs/42.sv}
 
-\todo{Add assembly excerpt of example (if informative).}
+\Cref{lst:42s} shows this program after a \g{lowering} to CHERI-RISC-V assembly (S), although the association between SV and S code may be unclear as there are many \gs{nanopass} between these \gs{il}.
+
+\begin{listing}[ht]
+	\asmfile[firstline=107, lastline=136]{Programs/42.s}
+	\caption{An assembly excerpt of the 42 program, with the \texttt{sum} procedure starting from line 118. The current version of Glyco is unable to delete some redundant moves such as the ones in lines 121–126.}
+	\label{lst:42s}
+\end{listing}
+
+\newpage
 
 \section{Structured Values} \label{sct:sv}
 \plfig[4]{v0.1 SV}
@@ -193,7 +201,7 @@ is \lowered{} to the following ID program (with the above highlighted effects' \
 \ilfile[highlightlines={4, 6, 8, 11-12, 15-16, 19-20}]{Programs/sequences.id}
 
 \section{Abstract Locations} \label{sct:id}
-\plfig[7]{v0.1 ID}
+\plfig[9]{v0.1 ID}
 
 This section sets out the difference between abstract and physical locations, register allocation, and the ID, AL, and ALA languages.
 
@@ -270,9 +278,9 @@ Register assignment is a graph colouring problem on the conflict graph where the
 Unlike most algorithms in the compiler's \gs{nanopass}, this algorithm runs in $O(nm)$ time for $n$ locations and $m$ assignable registers,\footnote{Assuming that conflict graph queries are done in amortised constant time, as in Glyco.} which underlines the importance of minimising the number of abstract locations via optimisations such as location coalescing.
 
 \section{Structured Jumps \& Branches} \label{sct:cd}
-\plfig[8]{v0.1 CD}
-
 This section deals with the final major abstractions over straight-line programs: conditionals (\texttt{if}-\texttt{then}-\texttt{else} effects), sequences (\texttt{do} effects), and procedures. The \gs{nanopass} from the CD to BB languages linearise programs.
+
+\plfig[8]{v0.1 CD}
 
 In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to the procedure's code. These three features make CD a block-structured programming language which the upcoming \gs{nanopass} remove to get to a form that can be readily translated into assembly.
 
@@ -281,7 +289,13 @@ In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, an
 is \lowered{} to the PR program
 \ilfile[highlightlines={2-6, 8-12, 14-18}, tabsize=1]{Programs/ifproc.pr}
 
-\todo{Add CFG of example.}
+This program can be presented as a control-flow graph like in \cref{fig:cfg} where the edges are transitions specified by continuations and vertices are either basic blocks or (implied) callers. The graph contains one connected subgraph for the main program and for each procedure. Control jumps from one subgraph to another via \texttt{call} and \texttt{return} continuations. Each \texttt{branch} continuation specifies two outgoing edges.
+\begin{SCfigure}[][ht]
+	\centering
+	\includegraphics{Images/Basic Blocks.pdf}
+	\caption{A control-flow graph of the PR program. The connected graph on the left represents the main program whereas the one on the right represents the \texttt{abs} procedure.}
+	\label{fig:cfg}
+\end{SCfigure}
 
 \paragraph{From PR to BB} The next \g{il}, BB (Basic Blocks), does not support predicates so the PR to BB \g{nanopass} maps predicates to appropriate continuations. For example, the above program is \lowered{} to the BB program
 \ilfile{Programs/ifproc.bb}
@@ -290,8 +304,12 @@ is \lowered{} to the PR program
 
 The \g{nanopass} attempts to get an optimal placement of \gs{bblock}, i.e., an optimal trace, by juxtaposing successive blocks where possible. Unconditional jumps between juxtaposed blocks can be elided thereby avoiding the cost associated with jumps such as redundant instructions and pipeline stalls.
 
-The above BB program becomes the following FO program:
-\ilfile{Programs/ifproc.fo}
+The above BB program becomes the FO program in \cref{lst:ifproc-fo}.
+\begin{listing}[ht]
+	\ilfile{Programs/ifproc.fo}
+	\caption{An FO program.}
+	\label{lst:ifproc-fo}
+\end{listing}
 
 \section{Basic Abstractions over Assembly} \label{sct:fo}
 \plfig[14]{v0.1 FO}
@@ -308,12 +326,18 @@ The MM to RV (CHERI-RISC-V) \g{nanopass} translates call frame operations such a
 
 Buffer allocation is implemented using a dedicated heap capability register \texttt{ctp}. The heap capability points to the next free location on the heap and allocation increases the heap capability address — deallocation is not supported.
 
-\paragraph{From RV to S} An RV program consists of CHERI-RISC-V instructions. The RV to S (CHERI-RISC-V Assembly) \g{nanopass} serialises these instructions. For example, the \iil/copyWord(destination: a0, source: a1)/ instruction is serialised as \hbox{\texttt{mv a0, a1}}.
+\paragraph{From RV to S} An RV program consists of CHERI-RISC-V instructions. The RV to S (CHERI-RISC-V Assembly) \g{nanopass} serialises these instructions. For example, the \iil/copyWord(destination: a0, source: a1)/ instruction is serialised as \iasm/mv a0, a1/.
+
+\Cref{lst:ifproc-s} shows an S program derived from the FO program in \cref{lst:ifproc-fo}.
+
+\begin{listing}[ht]
+	\asmfile[firstline=107, lastline=119]{Programs/ifproc.s}
+	\caption{The S program from the FO program in \cref{lst:ifproc-fo}, excluding runtime code.}
+	\label{lst:ifproc-s}
+\end{listing}
 
 \paragraph{From S to ELF} The final step of the compiler pipeline is assembling and linking. These two steps are delegated to the assembler from the CHERI LLVM compiler toolchain.\footnote{This last step is unrelated to the research problem, hence this dependency on LLVM.} The result is an ELF file that, depending on the compilation target, can be executed in either the Sail-based CHERI-RISC-V emulator or in CheriBSD.
 % TODO: Remove reference to CheriBSD if needed.
-
-\todo{Add example, including \g{lowering} to assembly.}
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}
