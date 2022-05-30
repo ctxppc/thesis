@@ -66,7 +66,6 @@ A procedure call in \g{ghscc} is realised using a \textbf{secure calling (s-call
 \end{listing}
 
 An \g{scall} looks as follows:
-
 \begin{enumerate}
 	
 	\item Just as with \g{gccc}, the caller puts the arguments for the callee in argument registers. However, if there are more parameters than there are argument registers, an arguments record is allocated on the heap (using the \g{rtrt} described above), a capability to it is put in the last argument register, and any arguments that do not fit in registers are stored in the arguments record. The callee never needs to access the caller's call frame to gain access to arguments that did not fit in registers, nor does the caller need access to the callee's call frame to store supplementary arguments.
@@ -98,6 +97,23 @@ An \g{scall} looks as follows:
 \end{enumerate}
 \todo{Add \g{nanopass} example.}
 
+\subsection{Lowering CC to SV with the \g{ghscc} Configuration}
+To demonstrate the changes in the CC to SV \g{nanopass}, let us consider once again the CC program from the previous chapter:
+\ilfile{Programs/42.cc}
+
+As before, the main program begins (in SV) by pushing a new scope and binding the caller's (operating system's or \g{rt}'s) \g{retcap} to a temporary name.
+\ilfile[lastline=4]{Programs/42heap.sv}
+
+The \texttt{call} effect is \lowered{} by first passing arguments via registers (as before) and the rest via an argument records (which this example doesn't require). An indicator \texttt{returned} value is set to 0 which is used for enforcing the unrepeatable return property. Finally, all registers except used argument registers are cleared and control is passed to the callee.
+\ilfile[firstline=5, lastline=9]{Programs/42heap.sv}
+
+Upon returning, the program checks whether the indicator value is still 0. If it is, it sets the value to 1 and continues. If it is not, it raises a machine trap by dereferencing a capability to a 0-sized vector.
+\ilfile[firstline=10, lastline=17]{Programs/42heap.sv}
+
+The rest of the program and the \texttt{sum} procedure are \lowered{} as before, except that all registers except the ones used for the result value and for the \g{retcap} are cleared before returning.
+\ilfile[firstline=18]{Programs/42heap.sv}
+
+\subsection{Local State Encapsulation \& Unrepeatable Return}
 As part of an \g{scall}, the callee receives arguments and a return–frame capability pair sealed with a unique \g{otype} for which the callee has no \g{unsealcap} and therefore cannot dereference. The callee thus cannot access the caller's local state, thereby preserving \g{lse}. The capabilities are only unsealed when control is returned to the caller using the atomic \texttt{CInvoke} instruction. Since the callee also does not have a \g{sealcap} for that \g{otype}, it cannot forge a call stack to manipulate the procedure's local state, nor can it forge a \g{retcap} to trick \texttt{CInvoke} into unsealing the sealed \g{framecap} before invoking adversarial code.
 
 Before invoking the \g{scall} routine, the caller initialises an indicator value to 0 and stores it in its call frame. When the callee returns control to the caller, the caller checks if the value is still 0 and crashes otherwise. It then sets the value to 1 to ensure that subsequent uses of the \g{retcap} result in a machine trap, thereby ensuring that the \g{retcap} is only usable once. Since \g{lse} protects the call frame from external access, it also protects the indicator value from the same.
@@ -145,7 +161,7 @@ The test programs are compiled in Glyco 0.2 using a default configuration target
 
 The minimalistic test program 42 immediately evaluates to the number 42. The fib test program computes the 30th or 300th number of the Fibonacci sequence using a recursive function with accumulator parameters to avoid redundant computations. The Euclid test program computes the greatest common divisor of 20 and 50 or of 441 and 520 using a simple subtraction algorithm. As shown in \cref{tbl:ghscc-size}, a visible increase in binary footprint can be observed.
 
-\begin{table}[h]
+\begin{table}[ht]
 	\medskip	% fixes glitch where heading seems vertically compressed
 	\begin{adjustwidth}{-1in}{-1in}
 		\centering
