@@ -49,7 +49,13 @@ To implement heap allocation and future functionality securely, Glyco is extende
 As Glyco is developed almost entirely in isolation, it cannot rely on an operating system or dynamic linker to provide these routines and therefore provides them itself. It is expected that a production compiler would be able to rely on an OS-provided standard library instead, thereby removing the need to trust the compiler and its \g{rt}.
 
 The first \g{rtrt} is a \textbf{heap allocation routine}, which accepts a byte size in \texttt{t0} and a \g{retcap} in \texttt{ct2} and returns a unique capability to an allocated buffer in \texttt{ct1}. The \g{heapcap}, providing access to the full heap and pointing to the next free location in it, is stored within the allocator's memory. This ensures that, at any point in time, only the allocator has access to unallocated memory and that memory associated with an allocated buffer is only ever accessible to the allocator and whoever holds the capability to that buffer returned by the allocator.
-\todo{Add assembly excerpt of heap allocation routine.}
+
+\Cref{lst:alloc} shows the assembly code of the heap allocation routine as of Glyco 1.0.
+\begin{listing}
+	\asmfile[firstline=89, lastline=105]{Programs/42heap.s}
+	\caption{Assembly code of the heap allocation routine as inserted in each program. The CHERI LLVM assembler did not support the \iasm/cclear/ instruction at the time of development so it's encoded directly by Glyco instead. The \g{heapcap} is stored at \texttt{mm.heap_cap} and is initialised by the initialisation routine (which is part of the \g{rt}).}
+	\label{lst:alloc}
+\end{listing}
 
 \section{Call Frame Encapsulation \& Secure Calling} \label{sct:ghscc}
 A procedure allocates a buffer for its call frame in its prologue by calling the heap allocation routine with an appropriate byte size, and uses the call frame just as it would with \g{gccc}. The heap allocation routine ensures that only it and the procedure have access to the buffer,\footnote{The \g{rt} is implicitly trusted in our threat model. In a realistic compiler and runtime environment with a heap allocation routine, the program would need to trust at least the dynamic linker and any linked runtime code.} thereby ensuring that \g{lse} holds at that point in time.
