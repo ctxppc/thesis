@@ -153,7 +153,15 @@ An object type definition (in a \texttt{letType}) is \lowered{} to NT by
 Each method invocation is \lowered{} by evaluating the \g{methcap} with the receiver as the first argument, followed by any provided arguments. Object construction in \texttt{object} values is implemented in NT by calling the metatype's \texttt{createObject} \g{methcap} on the type object.
 \ilfile[firstline=70]{Programs/counter.nt}
 
-\todo{Add short discussion and assembly excerpt of create seal routine.}
+\subsection{Seal Creation Routine}
+Glyco 0.3 generalises the \g{scall} \g{rtrt} introduced in \cref{ch:ghscc} (cf. \cref{lst:scall}) to a \textbf{\g{sealcap} creation routine}, which is invoked by the \texttt{seal} effect. Procedure calls in the \g{ghscc} configuration now create a unique seal, seal the frame–return capability pair, and pass control directly to the callee, instead of delegating these tasks to an \g{scall} routine. The two security properties provided by \g{ghscc} (\g{lse} and unrepeatable return) are unaffected by this change since the \g{sealcap} created by the seal creation routine is kept (or can be kept) private by the caller.
+
+An assembly excerpt of the seal creation routine is given in \cref{lst:cseal}.
+\begin{listing}[ht]
+	\asmfile[firstline=107, lastline=116]{Programs/42heap.s}
+	\caption{Assembly code of the seal creation routine as inserted in each program. The CHERI LLVM assembler did not support the \iasm/cclear/ instruction at the time of development so it's encoded directly by Glyco instead. The \g{sealcap} is stored at \texttt{mm.cseal_seal_cap} and is initialised by the initialisation routine (which is part of the \g{rt}).}
+	\label{lst:cseal}
+\end{listing}
 
 \section{Evaluation: Impact on the Codebase} \label{sct:obj-eval}
 Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the implementation of sealed objects in Glyco. The changes to the compiler pipeline are also summarised in \cref{fig:pipeline03}.
