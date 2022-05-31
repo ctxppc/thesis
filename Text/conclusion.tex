@@ -3,8 +3,28 @@
 \onlyinsubfile{\mainmatter{}}
 
 \chapter{Conclusion}
+The primary goal of this thesis is to explore a design and implementation of a compiler using a \g{nanopass} approach for experimenting with security features built on CHERI-RISC-V capabilities. A second goal is to evaluate the approach itself in terms of how well it lends itself to experimentation with (radically) new ideas. This second goal motivates the structure of the thesis text: \crefrange{ch:glyco}{ch:cls} each present a milestone of the compiler.
 
-% TODO
+The text begins in \cref{ch:cheri} with a brief introduction to capability machines and the CHERI-RISC-V architecture.
+
+\Cref{ch:glyco} then explores the basic version of a \g{nanopass} compiler, which we named \emph{Glyco}. The design of this first version of the compiler is adapted from an existing x86 student compiler by \citet{compcourse}. The basic version of the compiler provides almost no features specifically enabled by capability support in hardware and is intended as a baseline for extensions. The compiler implements procedure calls using a \g{cc} named \g{gccc} that looks like most traditional \gs{cc} used in the field.
+
+The first upgrade of Glyco is the addition of a secure \g{cc} named \emph{\g{ghscc}}, a variant of a \g{cc} proposed by \citet{cerise}, which is discussed in \cref{ch:ghscc}. Unlike \g{gccc}, \g{ghscc} organises call frames in a linked list in heap-allocated memory. As part of this extension, we also improve the heap allocator by implementing it as a \g{rtrt} and encapsulating the \g{heapcap} in it, ensuring that user programs cannot derive capabilities to arbitrary regions of the heap while still allowing them to get access to heap memory allocated by them. \G{ghscc} provides \g{lse} as described by \citet[Section~1]{stktokens}, a security property guaranteeing that the local state of a procedure call cannot be accessed from other procedures/calls. Additionally, \g{ghscc} provides a security property we call \emph{unrepeatable return} which guarantees that a \g{retcap} can be used at most once, a weaker variant of the \g{wbcf} security property also described by \citet[Section~1]{stktokens}. These properties continue to hold even if a Glyco-built program were to interoperate with untrusted code written in assembly.
+
+The second addition to Glyco is a feature we call \emph{sealed objects}, which are similar to objects in object-oriented languages but whose state is inaccessible outside methods defined during type definition. This form of encapsulation is enforced using sealed capabilities, meaning that such code could securely interoperate with code written in assembly.
+
+The third and final addition to Glyco is an application of sealed objects, \emph{sealed closures}, which are closures whose captured environment cannot be accessed outside of the closure body, even if the closure is passed to untrusted code.
+
+\section{Nanopass Approach}
+\todo[inline]{Discuss benefits of \& challenges with the \g{nanopass} approach. Rant about basic blocks, register allocator, and program tails in \citet{compcourse}.}
+
+\section{Implementation}
+\todo[inline]{Discuss benefits of \& challenges with implementation. Compare with a possible implementation using the Nanopass Framework.}
+
+\section{Future Directions}
+\todo[inline]{Discuss potential future work.}
+
+% TODO: Closing remarks?
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}
