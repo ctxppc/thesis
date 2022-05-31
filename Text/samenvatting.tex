@@ -2,9 +2,12 @@
 \begin{document}
 
 \begin{abstract*}
-	\lipsum[5]
-	\todo{Abstract van 1–3 pagina's}
+	CHERI-RISC-V breidt de RISC-V-processorarchitectuur uit met ondersteuning voor \emph{capability's}, een soort pointer die een bepaalde verzameling van machtigingen (zoals lezen of schrijven) voor een geheugengebied draagt. Met capability's kan software geheugenbescherming op kleinschalig niveau aanbieden en geheugen compartmentaliseren. Capability's liggen ook ten grondslag van veilige \gs{cc}, functieoproepafspraken die veiligheidseigenschappen zoals \emph{\g{lse}} en \emph{\g{wbcf}} garanderen. \G{lse} garandeert dat de interne toestand van een oproep enkel toegankelijk is binnen de functie. \G{wbcf} verzekert dat functies enkel naar hun oproeper kunnen terugkeren.
+	
+	Onderzoekers hebben de LLVM-compilersuite zorgvuldig aan de CHERI-RISC-V-architectuur aangepast maar hebben moeite ondervonden om met capability's en veiligheidsfuncties gebouwd op capability's te experimenteren. LLVM bestaat namelijk uit een aanzienlijke hoeveelheid broncode en is ontworpen voor een brede reeks aan computerarchitecturen. Dit eindwerk onderzoekt daarom het ontwerp en implementatie van een nieuwe \g{nanopass}compiler voor CHERI-RISC-V-systemen die we \emph{Glyco} noemen. Een \g{nanopass} is een programmatransformatie (of vertaling) van één taal naar een andere; een \g{nanopass}compiler transformeert (vertaalt) een programma van een brontaal via een reeks talen naar een doeltaal, CHERI-RISC-V in het geval van Glyco.
+	
+	Deze verhandeling begint met een basisontwerp en -implementatie van Glyco met quasi geen veiligheidsfuncties gebaseerd op capability's en breidt dit ontwerp dan geleidelijk uit met nieuwe veiligheidsfuncties. De eerste functie is een variatie op een veilige \g{cc} voorgesteld in de literatuur die we \emph{\acrshort{ghscc}} noemen. Deze \g{cc} biedt \g{lse} en een variatie op \g{wbcf} genaamd \emph{eenmalige terugkeer} (\emph{unrepeatable return}). Deze laatste eigenschap verzekert een oproeper dat een opgeroepen (of andere) functie hoogstens één keer kan terugkeren naar de oproeper. We vergelijken vervolgens de nieuwe \g{cc} met een traditionele in termen van uitvoeringstijd en geheugengebruik. Vervolgens voegen we twee functies aan de compiler toe die we \emph{verzegelde objecten} (\emph{sealed objects}) en \emph{verzegelde closures} (\emph{sealed closures}) noemen. De interne toestand van een verzegeld object is enkel toegankelijk in methoden van het object, terwijl de opgeslagen omgeving van een verzegelde closure enkel bereikbaar is in het lichaam van de closure. Tot slot evalueren we de \g{nanopass}methodologie door de impact van elke nieuwe functie op de broncode te meten.
 \end{abstract*}
 
-\onlyinsubfile{\glsaddall\printglossaries}
+\onlyinsubfile{\mainmatter{}\glsaddall\printglossaries}
 \end{document}
