@@ -165,8 +165,7 @@ The \texttt{call} effect is \lowered{} by copying the arguments to the appropria
 The program finishes by restoring the \g{retcap} (which it can only do while the current scope is valid), popping the current scope, then returning to the program's caller.
 \ilfile[firstline=9, lastline=13]{Programs/42.sv}
 
-The procedure begins analogously to the program by pushing a new scope and binding the caller's \g{retcap} to an abstract location. It does the same for all \gs{ceesaved}, since their contents must be preserved by a procedure before it can use them.
-% TODO: Remove those dead moves so that we can claim here that ALA will clean those redundant sets.
+The procedure begins analogously to the program by pushing a new scope and binding the caller's \g{retcap} to an abstract location. It does the same for all \gs{ceesaved}, since their contents must be preserved by a procedure before it can use them. The register allocator in a later \g{nanopass} cleans up (some) redundant moves.
 \ilfile[firstline=14, lastline=21]{Programs/42.sv}
 
 It then binds each received argument to a location with its corresponding parameter's name, making those arguments available to the rest of the procedure which expects arguments in those locations. This operation also frees the argument registers for other uses, such as for calls within the procedure.
