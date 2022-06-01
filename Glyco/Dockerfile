@@ -7,9 +7,20 @@ FROM swift:5.5.3-focal as build
 RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true \
     && apt-get -q update \
     && apt-get -q dist-upgrade -y \
-    && rm -rf /var/lib/apt/lists/*
+	&& apt install -qy opam zlib1g-dev pkg-config libgmp-dev z3 \
+    && rm -rf /var/lib/apt/lists/* \
+	&& opam init --disable-sandboxing -y \
+	&& opam install -y sail
 
-# Set up a build area.
+# Retrieve the emulator.
+WORKDIR /
+RUN git clone --recurse-submodules https://github.com/CTSRD-CHERI/sail-cheri-riscv
+
+# Build the emulator.
+WORKDIR /sail-cheri-riscv
+RUN eval $(opam env) && make c_emulator/cheri_riscv_sim_RV64
+
+# Set up a build area for Glyco.
 WORKDIR /build
 
 # Resolve dependencies.
@@ -23,11 +34,12 @@ COPY . .
 # Build everything.
 RUN swift build -c release -Xswiftc -static-executable
 
-# Switch to the staging area.
-WORKDIR /staging
+# Prepare staging area.
+RUN mkdir /staging
 
 # Copy products to staging area.
-RUN cp "$(swift build --package-path /build -c release --show-bin-path)/Glyco" ./
+RUN cp /sail-cheri-riscv/c_emulator/cheri_riscv_sim_RV64 /staging/cheri_riscv_sim_RV64
+RUN cp "$(swift build -c release --show-bin-path)/glyco" /staging/glyco
 
 # ================================
 # Run image
@@ -45,11 +57,14 @@ RUN useradd --user-group --create-home --system --skel /dev/null --home-dir /gly
 # Switch to the new home directory.
 WORKDIR /glyco
 
-# Copy built executable from builder.
+# Copy products from builder.
 COPY --from=build --chown=glyco:glyco /staging /glyco
 
 # Ensure all further commands run as the glyco user.
 USER glyco:glyco
 
+# Define environment.
+ENV SIMULATOR="/glyco/cheri_riscv_sim_RV64"
+
 # Define entrypoint.
-ENTRYPOINT ["./Glyco"]
+ENTRYPOINT ["/glyco/glyco"]
