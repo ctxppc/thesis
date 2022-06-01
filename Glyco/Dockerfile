@@ -28,7 +28,7 @@ WORKDIR /build
 COPY ./Package.* ./
 RUN swift package resolve
 
-# Copy entire repo into container.
+# Copy repository into container.
 COPY . .
 
 # Build everything.
@@ -42,7 +42,7 @@ RUN cp /sail-cheri-riscv/c_emulator/cheri_riscv_sim_RV64 /staging/cheri_riscv_si
 RUN cp "$(swift build -c release --show-bin-path)/glyco" /staging/glyco
 
 # ================================
-# Run image
+# Run & test image
 # ================================
 FROM swift:5.5.3-focal
 
@@ -51,17 +51,14 @@ RUN export DEBIAN_FRONTEND=noninteractive DEBCONF_NONINTERACTIVE_SEEN=true && \
     apt-get -q update && apt-get -q dist-upgrade -y \
     && rm -rf /var/lib/apt/lists/*
 
-# Create a glyco user and group with /glyco as its home directory.
-RUN useradd --user-group --create-home --system --skel /dev/null --home-dir /glyco glyco
-
 # Switch to the new home directory.
 WORKDIR /glyco
 
-# Copy products from builder.
-COPY --from=build --chown=glyco:glyco /staging /glyco
+# Copy repository into container (to enable testing).
+COPY . .
 
-# Ensure all further commands run as the glyco user.
-USER glyco:glyco
+# Copy products from build image.
+COPY --from=build /staging /glyco
 
 # Define environment.
 ENV SIMULATOR="/glyco/cheri_riscv_sim_RV64"
