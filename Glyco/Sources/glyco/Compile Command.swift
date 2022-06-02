@@ -26,10 +26,10 @@ struct CompileCommand : ParsableCommand {
 	When targeting a Sail emulator target and the --stdout and -l options are not specified, the -s flag can be specified to simulate the program in the Sail emulator specified through the “SIMULATOR” environment variable. The full trace is written to a file derived from the source file and ending with .log.
 	"""
 	
-	@Argument(help: "A Gly or intermediate file, relative to the current directory. The file‘s extension must be .gly or the name of an intermediate language: .s, .rv, .fl, etc.")
+	@Argument(help: "A source file, relative to the current directory. The file‘s extension must be the name of an intermediate language: .s, .rv, .cc, .ex, etc.")
 	var source: URL
 	
-	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The intermediate languages (S, FL, FO, etc.) to emit. (Omit to build an executable ELF file.)")
+	@Option(name: .shortAndLong, parsing: .upToNextOption, help: "The intermediate languages (S, RV, CC, EX, etc.) to emit. (Omit to build an executable ELF file.)")
 	var languages: [String] = []
 	
 	@Option(name: .shortAndLong, help: "The target to build for. Choose between \(CompilationConfiguration.Target.sail) and \(CompilationConfiguration.Target.cheriBSD).")
