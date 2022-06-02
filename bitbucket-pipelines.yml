@@ -15,7 +15,8 @@ pipelines:
             name: Build and Test
             script:
               - IMAGE_NAME=glyco
-              - docker build . --file Dockerfile --tag ${IMAGE_NAME}
+              - cd Glyco
+              - docker build . --tag ${IMAGE_NAME}
             services:
               - docker
             caches:
@@ -24,6 +25,7 @@ pipelines:
             name: Lint the Dockerfile
             image: hadolint/hadolint:latest-debian
             script:
+              - cd Glyco
               - hadolint Dockerfile
   branches:
     development:
@@ -31,8 +33,9 @@ pipelines:
           name: Build and Test
           script:
             - IMAGE_NAME=glyco
-            - docker build . --file Dockerfile --tag ${IMAGE_NAME}
-            - docker save ${IMAGE_NAME} --output "${IMAGE_NAME}.tar"
+            - cd Glyco
+            - docker build . --tag ${IMAGE_NAME}
+            - docker save ${IMAGE_NAME} --output "../${IMAGE_NAME}.tar"
           services:
             - docker
           caches:
