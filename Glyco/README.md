@@ -8,7 +8,11 @@ Glyco and the Sail-based emulator can be run as a [Docker](https://www.docker.co
 ### Glyco
 Glyco is written in [Swift](https://www.swift.org/), an opinionated programming language developed by a famous fruit stand.
 
-For Linux-based distros, [download the right Swift toolchain](https://www.swift.org/download/) and untar it — Swift 5.6.1 and newer should be okay. You can (should?) verify the download's PGP signature. The toolchain contains a `usr/bin` folder; update your `PATH` variable to include a path to that folder.
+For Linux-based distros, install the toolchain's prerequisites (command shown below for Ubuntu 20.04), [install the right dependencies and download the right Swift toolchain](https://www.swift.org/download/), and untar it — Swift 5.6.1 and newer should be okay.
+
+	apt-get install binutils git gnupg2 libc6-dev libcurl4 libedit2 libgcc-9-dev libpython2.7 libsqlite3-0 libstdc++-9-dev libxml2 libz3-dev pkg-config tzdata uuid-dev zlib1g-dev
+
+You can (should?) verify the download's PGP signature. The toolchain contains a `usr/bin` folder; update your `PATH` variable to include a path to that folder.
 
 Swift is available as part of Xcode (and Xcode Command Line Tools) on macOS.
 
