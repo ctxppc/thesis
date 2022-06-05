@@ -1,10 +1,3 @@
-default:
-  image: swift:5.6.1-focal
-  cache:
-    key: "shared cache"
-    paths:
-      - "Glyco/.build"
-
 stages:
   - build
   - test
@@ -12,16 +5,47 @@ stages:
 
 build: &build
   stage: build
+  image:
+    name: gcr.io/kaniko-project/executor:debug
+    entrypoint: [""]
+  script:
+    - mkdir -p /kaniko/.docker
+    - |-
+       KANIKOPROXYBUILDARGS=""
+       KANIKOCFG="\"auths\":{\"${CI_REGISTRY}\":{\"auth\":\"$(printf "%s:%s" "${CI_REGISTRY_USER}" "${CI_REGISTRY_PASSWORD}" | base64 | tr -d '\n')\"}}"
+       if [ "x${http_proxy}" != "x" -o "x${https_proxy}" != "x" ]; then
+         KANIKOCFG="${KANIKOCFG}, \"proxies\": { \"default\": { \"httpProxy\": \"${http_proxy}\", \"httpsProxy\": \"${https_proxy}\", \"noProxy\": \"${no_proxy}\"}}"
+         KANIKOPROXYBUILDARGS="--build-arg http_proxy=${http_proxy} --build-arg https_proxy=${https_proxy} --build-arg no_proxy=${no_proxy}"
+       fi
+       KANIKOCFG="{ ${KANIKOCFG} }"
+       echo "${KANIKOCFG}" > /kaniko/.docker/config.json
+    - >-
+      /kaniko/executor
+      --cache=true
+      --cache-dir=/cache
+      --cache-ttl=4368h
+      --context "${CI_PROJECT_DIR}/Glyco"
+      --dockerfile "${CI_PROJECT_DIR}/Glyco/Dockerfile"
+      "${KANIKOPROXYBUILDARGS}"
+      --destination "${CI_REGISTRY_IMAGE}/glyco:${CI_COMMIT_SHORT_SHA}"
+  cache:
+    key: "Kaniko cache"
+    paths:
+      - "/cache"
+
+test: &test
+  stage: test
+  needs: []
+  image: swift:5.6.1-focal
   script:
     - cd Glyco
-    - swift build -c release -Xswiftc -static-executable
-    - cp -a $(swift build -c release --show-bin-path) ../Glyco_release_Ubuntu20.04
-    - cd ..
-  artifacts:
+    - swift test
+  cache:
+    key: "Glyco build cache"
     paths:
-      - Glyco_release_Ubuntu20.04
+      - "Glyco/.build"
 
-text:
+text: &text
   stage: text
   needs: []
   image: texlive/texlive:latest
@@ -31,10 +55,7 @@ text:
   artifacts:
     paths:
       - Text/main.pdf
-
-test: &test
-  stage: test
-  needs: [build]
-  script:
-    - cd Glyco
-    - swift test
+  cache:
+    key: "Intermediate LaTeX files"
+    paths:
+      - "Text"
