@@ -24,7 +24,6 @@
 \usepackage[capitalise, nameinlink]{cleveref}	% Better references — keep after hyperref
 \usepackage[toc]{glossaries}					% Glossary — keep after hyperref
 
-\usepackage{lipsum}								% Fake lorem ipsum text — TODO: Remove when done
 \usepackage{minted}								% Source code
 \usepackage{natbib}								% More natural citations
 \usepackage{sidecap}							% Side-captions (for narrow figures)
@@ -33,8 +32,6 @@
 \usepackage{todonotes}							% Marks TODOs — TODO: Remove when done
 \usepackage{wrapfig}							% Text wrapping around figures
 \usepackage{xparse}								% Advanced command parsing — used in newdualentry
-
-\newcommand{\shb}[1]{\todo[color=orange!40, author=Sander, inline]{#1}}
 
 \DeclareUnicodeCharacter{039B}{$\Lambda$}
 \DeclareUnicodeCharacter{03BB}{$\lambda$}
@@ -101,9 +98,16 @@
 \renewcommand{\notinsubfile}[1]{#1}
 \def\biblio{}
 
-\begin{preface}
-	\lipsum[5]
-	\todo{Write something funny here}
+\begin{preface}[Constantino Tsarouhas\\Brussels, 6 June 2022]
+	Writing this the day before submitting my thesis text, it's been 620 days since I had my first lecture of my master's degree. My academic life was fun, interesting, yet incredibly serpentine. 10 years ago I would not have imagined ever arriving at this stage, so it is my honour and pleasure to be able to submit this text for the fulfilment of the graduation requirements of the \emph{Master in de ingenieurswetenschappen: computerwetenschappen}.
+	
+	This thesis deals with two (relatively orthogonal) disciplines in computer science, namely compiler design and capability machines, which align nicely with my interests in compilers, formal systems, and software security. Whilst researching the literature for my thesis, I discovered modern methods that I did not know existed, and at the end of this long road, I am personally convinced they will be increasingly part of modern compiler designs and modern system architectures.
+	
+	I would like to express my sincere gratitude to my two mentors, Steven Keuchel and Sander Huyghebaert, who guided me almost every week through what is my first large academic research project, as well as my supervisor, Dominique Devriese, for the interesting thesis topic and his helpful advice. I would also like to extend my gratitude to all my friends and colleagues for their support past years. Last but not least, my utmost gratitude goes to my mother Stamatia and aunt Chrisoula who supported me throughout my whole life and without whose support I certainly would not have had any chance at pursuing an academical degree.
+	
+	I hope you enjoy reading this text as much as I enjoyed writing it.
+	
+	\iil/hope(enjoyment, equals: maximum)/
 \end{preface}
 
 \tableofcontents*
