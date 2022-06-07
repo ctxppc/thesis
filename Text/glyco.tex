@@ -22,7 +22,7 @@ The \textbf{Calling Convention} language (CC) is a procedural programming langua
 
 \textbf{Inferred Declarations} (ID), \textbf{Abstract Locations} (AL), and \textbf{Abstract Locations Annotated} (ALA) are three structured imperative languages with support for variables and conditionals; all three are discussed in \cref{sct:id}. ID programs do not need to declare local variables whereas AL programs do need to declare them. The transformation between the two languages performs a basic inference algorithm to discover the names and types of variables. AL programs are then \lowered{} to ALA programs which contain additional liveness and conflict information. This information is then used to perform register allocation and assign a register or memory location to each variable, resulting in a CD program.
 
-In \cref{sct:cd} we go over \textbf{Conditionals} (CD), a structured imperative language with support for conditionals. CD programs are flattened over several passes to \textbf{Flexible Operands} (FO) programs, which consists of labelled and unlabelled effects in a similar way to labelled and unlabelled instructions in an assembly program. We then tackle the last few languages and transformations in \cref{sct:fo} before getting an assembly program.
+In \cref{sct:cd} we go over \textbf{Conditionals} (CD), a structured imperative language with support for conditionals. CD programs are flattened over several passes to \textbf{Flexible Operands} (FO) programs, which consist of labelled and unlabelled effects in a similar way to labelled and unlabelled instructions in an assembly program. We then tackle the last few languages and transformations in \cref{sct:fo} that finally produce an ELF executable.
 
 This chapter discusses the feature set and languages of Glyco 0.1,\footnote{The source code is available at \url{https://tsarouhas.eu/glyco/0.1/}.} which allows us to focus in each chapter on one set of functionality. It also permits us to evaluate how the nanopass approach performs with extensions in future versions which we discuss in later chapters.
 
@@ -35,7 +35,7 @@ The nanopass design allows the compiler engineer to design and implement their c
 
 An important benefit of the nanopass approach is each new iteration begins and ends with a working compiler. After each iteration, users can start writing and compiling programs in the new \g{il} and unit tests can be written that ensure that the new \gls{nanopass} produces the expected transformations. For experimental architectures such as CHERI-RISC-V, this also means that designers can experiment more quickly with new ideas, something that may be harder to do on a full-fledged production compiler such as Clang.
 
-Glyco 0.1 defines 17 \gs{il},\footnote{We don't consider ELF to be an \g{il} in this thesis.} a majority of which is adapted from the student compiler by \citet{compcourse} for x86 targets. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
+Glyco 0.1 defines 17 \gs{il},\footnote{We don't consider ELF to be an \g{il} in this thesis.} a majority of which are adapted from the student compiler by \citet{compcourse} for x86 targets. Each language is usually named after the new abstraction or feature it brings compared to the \g{lowerlang}. We discuss the \gs{il} in reverse chronological order (from high-level to low-level languages) as opposed to the order in which the \gs{il} were defined (from low-level to high-level languages). This allows us to explain the compiler pipeline using example programs, showing how they are manipulated by the compiler's \gs{nanopass}.
 
 \newpage
 
@@ -281,11 +281,11 @@ This section deals with the final major abstractions over straight-line programs
 
 \plfig[8]{v0.1 CD}
 
-In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to the procedure's code. These three features make CD a block-structured programming language which the upcoming \gs{nanopass} remove to get to a form that can be readily translated into assembly.
+In CD, a \textbf{conditional} consists of a predicate, an affirmative branch, and a negative branch. Whenever the predicate evaluates to true, the affirmative branch is executed, otherwise the negative branch is executed. A \textbf{sequence} sequentially executes its contained effects. A \textbf{procedure} can be invoked with a \texttt{call} effect which updates the \texttt{cra} register with the address of the next effect, then jumps to the procedure's code. These three features make CD a block-structured programming language. The upcoming \gs{nanopass} get programs to a form that can be readily translated into assembly.
 
-\paragraph{From CD to PR} The CD to PR (Predicates) \g{nanopass} flattens conditionals, sequences, and procedures into \gs{bblock}. A \textbf{\g{bblock}} is \glsdesc*{bblock}. A \g{bblock}'s effects are followed by a \textbf{continuation}, which is a jump, branch, or call. For example, the CD program
+\paragraph{From CD to PR} The CD to PR (Predicates) \g{nanopass} flattens conditionals, sequences, and procedures into \gs{bblock}. A \textbf{\g{bblock}} is a labelled sequence of effects that is executed from beginning to end, before jumping or branching to itself or to other blocks. No effect in the block but the first is labelled. A \g{bblock}'s effects are followed by a \textbf{continuation}, which is a jump, branch, or call. No effect except the continuation is a jump, call, or branch. For example, the CD program (code belonging to every even \g{bblock} highlighted)
 \ilfile[highlightlines={3-5, 9-10, 12-15}]{Programs/ifproc.cd}
-is \lowered{} to the PR program
+is \lowered{} to the PR program (every even \gs{bblock} highlighted)
 \ilfile[highlightlines={2-6, 8-12, 14-18}, tabsize=1]{Programs/ifproc.pr}
 
 This program can be presented as a control-flow graph like in \cref{fig:cfg} where the edges are transitions specified by continuations and vertices are either basic blocks or (implied) callers. The graph contains one connected subgraph for the main program and for each procedure. Control jumps from one subgraph to another via \texttt{call} and \texttt{return} continuations. Each \texttt{branch} continuation specifies two outgoing edges.
@@ -319,7 +319,7 @@ This section briefly discusses the last \gs{il}, which provide some useful basic
 
 To abstract this complexity away in FO and higher \gs{il}, the FO to MM (Managed Memory) \g{nanopass} inserts the necessary loads and stores and reorders operands to realise an effect using CHERI-RISC-V instructions in a lower \g{nanopass}.
 
-\paragraph{From MM to RV} MM introduces the call stack and heap and operations on them such as call frame pushing and popping and buffer allocation.
+\paragraph{From MM to RV} MM introduces the call stack, heap, and operations on them.
 
 The MM to RV (CHERI-RISC-V) \g{nanopass} translates call frame operations such as \texttt{pushFrame}, \texttt{popFrame}, \texttt{load}, and \texttt{store} into manipulations of the stack capability register \texttt{csp} and frame capability register \texttt{cfp}.
 
