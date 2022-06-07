@@ -45,7 +45,7 @@ A second new feature is support for defining new (\textbf{named}) \textbf{types}
 \end{itemize}
 where \iil/S/ is \iil/true/ if the capability is sealed and \iil/false/ otherwise. A type can be defined using a \textbf{\texttt{letType} value} in one of two ways.
 
-\paragraph{Alias types} An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it's defined as. An alias type can have a shorter or semantically meaningful type name that the type it's defined as.
+\paragraph{Alias types} An \textbf{alias type definition} creates an \textbf{alias type}, a type that is equivalent to the type it is defined as. An alias type can have a shorter or semantically meaningful type name that the type it is defined as.
 
 For instance, the following NT program defines an alias type named \iil/Sequence/ and uses it in a simple computation that evaluates to 4. The value \iil/pi/ created by \iil/vector(0, count: 3)/ is typed \iil/cap(vector(s32, sealed: false))/ but is accepted by the function which takes an argument typed \iil/Sequence/.
 \ilfile{Programs/alias.nt}
@@ -159,7 +159,7 @@ Glyco 0.3 generalises the \g{scall} \g{rtrt} introduced in \cref{ch:ghscc} (cf. 
 An assembly excerpt of the seal creation routine is given in \cref{lst:cseal}.
 \begin{listing}[ht]
 	\asmfile[firstline=107, lastline=116]{Programs/42heap.s}
-	\caption{Assembly code of the seal creation routine as inserted in each program. The CHERI LLVM assembler did not support the \iasm/cclear/ instruction at the time of development so it's encoded directly by Glyco instead. The \g{sealcap} is stored at \texttt{mm.cseal_seal_cap} and is initialised by the initialisation routine (which is part of the \g{rt}).}
+	\caption{Assembly code of the seal creation routine as inserted in each program. The CHERI LLVM assembler did not support the \iasm/cclear/ instruction at the time of development so it is encoded directly by Glyco instead. The \g{sealcap} is stored at \texttt{mm.cseal_seal_cap} and is initialised by the initialisation routine (which is part of the \g{rt}).}
 	\label{lst:cseal}
 \end{listing}
 
@@ -173,25 +173,25 @@ Similarly to what we did in \cref{sct:ghscc-eval}, we evaluate the impact of the
 	\label{fig:pipeline03}
 \end{figure}
 
-\paragraph{Managed Memory (MM)} The \g{scall} \g{rtrt} is generalised to a seal allocation routine, given that both \g{scall} and object type definition only need a \g{rtrt} to securely provide a unique \g{sealcap} for next invocation resp. object type definition. The language now provides new \texttt{createSeal} and \texttt{seal} effects. The \texttt{call} effect's \g{lowering} under \g{ghscc} is modified to invoke the seal allocation routine and use the returned \g{sealcap} to seal the return–frame capability pair.
+\paragraph{Managed Memory (MM)} The \g{scall} \g{rtrt} is generalised to a seal allocation routine, given that both \gs{scall} and object type definitions only need a \g{rtrt} to securely provide a unique \g{sealcap} for the next invocation resp. object type definition. The language now provides new \texttt{createSeal} and \texttt{seal} effects. The \texttt{call} effect's \g{lowering} under \g{ghscc} is modified to invoke the seal allocation routine and use the returned \g{sealcap} to seal the return–frame capability pair.
 
 A \texttt{callSealed} effect is also added to the \g{il}'s syntax which performs roughly the same as the \texttt{call} effect, except that it accepts a sealed code–data capability pair, as required for method invocation.
 
-\paragraph{Flexible Operands (FO)} The \texttt{createSeal}, \texttt{seal}, and \texttt{callSealed} effects from MM are propagated to FO. Just like for other FO effects, the FO to MM \g{nanopass} inserts any required loads and stores around the underlying MM effect.
+\paragraph{Flexible Operands (FO)} The \texttt{createSeal}, \texttt{seal}, and \texttt{callSealed} effects from MM are propagated to FO. Just like for other FO effects, the FO to MM \g{nanopass} inserts any required loads and stores around the \lowered{} effect.
 
 The \texttt{call} effect is updated to accept any kind of source, not just labels. This is needed to enable calling code capability values, which is how lambdas are represented across the compiler pipeline.
 
 \paragraph{Basic Blocks (BB) and Predicates (PR)} The \texttt{createSeal}, \texttt{seal}, and updated \texttt{call} effects from FO are propagated to BB and PR. A new \texttt{callSealed} continuation is added.
 
-\paragraph{Conditionals (CD) through Structured Values (SV)} The 3 new effects and updated \texttt{call} effect are propagated through these 5 \gs{il}, usually with a trivial \gs{lowering}.
+\paragraph{Conditionals (CD) through Structured Values (SV)} The 3 new effects and the updated \texttt{call} effect are propagated through these 5 \gs{il}, usually with trivial \gs{lowering}.
 
 \paragraph{Structured Values (SV)} An additional \g{sealcap} value type is added. The \texttt{createSeal} effect creates capabilities of this type while the \texttt{seal} effect uses them.
 
 \paragraph{Calling Convention (CC)} The \texttt{createSeal}, \texttt{seal}, and updated \texttt{call} effects from SV are propagated to CC but the \texttt{callSealed} effect is not. Instead, individual parameters can now be marked as being sealed. The \texttt{call} effect is lowered using a \texttt{call} resp. \texttt{callSealed} effect in SV when the target procedure has zero resp. one sealed parameter(s). CC does not support calling procedures with two or more sealed parameters.\footnote{One way to implement support for such procedures is to transform each procedure taking multiple sealed parameters to first call itself multiple times, each time unsealing a different argument.}
 
-\paragraph{Canonical Assignments (CA)} The \texttt{createSeal} and \texttt{seal} effects from CC as propagated to CA as sources. The \texttt{call} effect is updated to accept any kind of source for its procedure operand instead of only accepting labels.
+\paragraph{Canonical Assignments (CA)} The \texttt{createSeal} and \texttt{seal} effects from CC are propagated to CA as sources. The \texttt{call} effect is updated to accept any kind of source for its procedure operand instead of only accepting labels.
 
-\paragraph{Computed Values (CV) through Expressions (EX)} The \texttt{createSeal} and \texttt{seal} sources from CA as propagated to CV, DF, LS, and EX as values. The evaluate value is similarly updated to accept any kind of source for its procedure operand.
+\paragraph{Computed Values (CV) through Expressions (EX)} The \texttt{createSeal} and \texttt{seal} sources from CA as propagated to CV, DF, LS, and EX as values. The \texttt{evaluate} value is similarly updated to accept any kind of source for its procedure operand.
 
 \paragraph{Lambdas (Λ) through Objects (OB)} These new \gs{il} are described in the preceding sections.
 

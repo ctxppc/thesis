@@ -26,7 +26,7 @@ The closure here is implemented as a capability to a record containing a code ca
 
 The contents of a closure's saved environment are established at the point of closure definition. In most programmer models, the captured value \iil/offset/ from the example above should remain fixed at \iil/5/, which is the value of \iil/offset/ at closure definition. A user of a closure should not be able to execute the closure with a different value for \iil/offset/ than the closure's creator intended. They should only be able to influence the closure's result by providing different arguments, and possibly by influencing any global state that the user has access to and the closure relies on.
 
-In this OB example, it's almost trivially simple to change the value of the \iil/offset/ field, e.g., by writing \iil/do(setField(offset, of: env, to: 10), then: evaluate(…))/.
+In this OB example, it is almost trivially simple to change the value of the \iil/offset/ field, e.g., by writing \iil/do(setField(offset, of: env, to: 10), then: evaluate(…))/.
 
 \section{Sealed Closures} \label{sct:cls-sealed}
 The encapsulation problem presented in the previous section is solved in \textbf{sealed closures}, which are closures whose \textbf{captured environment cannot be accessed from outside the closure body}. Sealed closures are presented in a new \g{il} \textbf{CL} (Closures), built on top of OB. CL does not provide any new syntax but instead increases the expressive power provided by λ values, which can now mention names defined outside of the lambda definition. The OB closure example above can now be expressed more elegantly as

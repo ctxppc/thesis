@@ -1,34 +1,34 @@
 \newglossaryentry{sealing}{
 	name=sealing,
-	description={the act of setting the object type of an unsealed capability to either the address of a \sealcap{} or to a special value indicating that it's a \sentry{}, so that it can no longer be modified or dereferenced until it\'s \glslink{unsealing}{unsealed} again}
+	description={the act of setting the object type of an unsealed capability to either the address of a \g{sealcap} or to a special value indicating that it is a \g{sentry}, so that it can no longer be modified or dereferenced until it is \glslink{unsealing}{unsealed} again}
 }
 
 \newglossaryentry{unsealing}{
 	name=unsealing,
-	description={the act of setting the object type of a sealed capability to $-1$ so that it's no longer sealed and thus can be used normally}
+	description={the act of setting the object type of a sealed capability to $-1$ so that it is no longer sealed and thus can be used normally}
 }
 
 \newglossaryentry{sentry}{
 	name=sentry capability,
 	plural=sentry capabilities,
-	description={a sealed entry capability, a sealed capability created with the \texttt{CSealEntry} instruction which can only be unsealed by jumping to its address using the \texttt{CJALR} instruction}
+	description={a sealed entry capability, a sealed capability created with the \iasm/CSealEntry/ instruction which can only be unsealed by jumping to its address using the \iasm/CJALR/ instruction}
 }
 
 \newglossaryentry{sealcap}{
 	name=seal capability,
 	plural=seal capabilities,
-	description={a capability with the \emph{Permit seal} permission which can be used with the \texttt{CSeal} instruction to seal an unsealed capability with the seal capability's address}
+	description={a capability with the \emph{Permit seal} permission which can be used with the \iasm/CSeal/ instruction to seal an unsealed capability with the seal capability's address}
 }
 
 \newglossaryentry{unsealcap}{
 	name=unseal capability,
 	plural=unseal capabilities,
-	description={a capability with the \emph{Permit unseal} permission which can be used with the \texttt{CUnseal} instruction to unseal a capability sealed with the unseal capability's address}
+	description={a capability with the \emph{Permit unseal} permission which can be used with the \iasm/CUnseal/ instruction to unseal a capability sealed with the unseal capability's address}
 }
 
 \newglossaryentry{otype}{
 	name=object type,
-	description={a numerical property of a capability indicating if it's unsealed (object type $-1$), sealed as a \g{sentry} (object type $-2$), or sealed using a \g{sealcap} (object type matching the \g{sealcap}'s address)}
+	description={a numerical property of a capability indicating if it is unsealed (object type $-1$), sealed as a \g{sentry} (object type $-2$), or sealed using a \g{sealcap} (object type matching the \g{sealcap}'s address)}
 }
 
 \newdualentry{il}{IL}{intermediate language}{a language produced or parsed by a \gls{nanopass} as part of the compiler's routine}
@@ -52,12 +52,12 @@
 
 \newglossaryentry{cc}{
 	name=calling convention,
-	description={a set of rules governing the invocation of procedures on a specific platform dealing with matters such as parameter \& result passing, register availability, call frame structure, jumping to the callee, and returning to the caller}
+	description={a set of rules governing the invocation of procedures on a specific platform and architecture dealing with matters such as argument \& result passing, register availability, call frame structure, jumping to the callee, and returning to the caller}
 }
 
-\newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \cc{} implemented in Glyco that is similar to a RISC-V \g{cc}}
+\newdualentry{gccc}{GCCC}{Glyco Conventional Calling Convention}{a \g{cc} implemented in Glyco that is similar to a RISC-V \g{cc}}
 
-\newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \cc{} implemented in Glyco that ensures \gls{lse} by securely allocating call frames on the heap and sealing return \& frame capabilities with a unique seal before invocation}
+\newdualentry{ghscc}{GHSCC}{Glyco Heap-based Secure Calling Convention}{a \g{cc} implemented in Glyco that ensures \gls{lse} by securely allocating call frames on the heap, clearing non-argument and non-result registers before passing control, and sealing return \& frame capabilities with a unique seal before invocation}
 
 \newglossaryentry{lse}{
 	name=local state encapsulation,
@@ -87,17 +87,17 @@
 
 \newglossaryentry{rtrt}{
 	name=runtime routine,
-	description={a procedure provided by the runtime with a possibly different \gls{cc} and more privileges afforded to it than a normal procedure}
+	description={a procedure provided by the runtime with a possibly different \g{cc} and more privileges afforded to it than a normal procedure}
 }
 
 \newglossaryentry{cersaved}{
 	name=caller-saved register,
-	description={a register that a procedure can use freely but needs to save if they wish to preserve their contents across a procedure call; contrast with \g{cersaved}}
+	description={a register that a procedure can use freely but whose contents it must save if it wishes to preserve them across a procedure call; contrast with \g{cersaved}}
 }
 
 \newglossaryentry{ceesaved}{
 	name=callee-saved register,
-	description={a register that a procedure can only use after saving its previous contents and restoring them when the procedure is done using the register; contrast with \g{cersaved}}
+	description={a register that a procedure can only use after saving its previous contents, to be restored when the procedure is done using the register; contrast with \g{cersaved}}
 }
 
 \newglossaryentry{stackcap}{
@@ -125,7 +125,7 @@
 
 \newglossaryentry{scall}{
 	name=s-call,
-	description={a procedure call mediated by the s-call \g{rtrt} which seals the frame and return capabilities using a unique \g{sealcap}, thereby ensuring the callee cannot dereference either capability and requiring that the callee use \texttt{CInvoke} to return to the caller}
+	description={a procedure call mediated by the s-call \g{rtrt} which seals the frame and return capabilities using a unique \g{sealcap}, thereby ensuring the callee cannot dereference either capability and requiring that the callee use \iasm/CInvoke/ to return to the caller}
 }
 
 \newglossaryentry{init}{
