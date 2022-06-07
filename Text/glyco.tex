@@ -319,7 +319,7 @@ This section briefly discusses the last \gs{il}, which provide some useful basic
 
 To abstract this complexity away in FO and higher \gs{il}, the FO to MM (Managed Memory) \g{nanopass} inserts the necessary loads and stores and reorders operands to realise an effect using CHERI-RISC-V instructions in a lower \g{nanopass}.
 
-\paragraph{From MM to RV} MM introduces the call stack, heap, and operations on them.
+\paragraph{From MM to RV} MM introduces the call stack, the heap, and operations on them.
 
 The MM to RV (CHERI-RISC-V) \g{nanopass} translates call frame operations such as \texttt{pushFrame}, \texttt{popFrame}, \texttt{load}, and \texttt{store} into manipulations of the stack capability register \texttt{csp} and frame capability register \texttt{cfp}.
 
