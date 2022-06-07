@@ -11,7 +11,11 @@ final class IntermediateProgramsTestCase : XCTestCase {
 			for convention in CompilationConfiguration.CallingConvention.allCases {
 				try verifyPrograms(
 					programsURL:	.init(fileURLWithPath: "Tests/Test Programs/\(convention).\(target)"),
-					configuration:	.init(target: target, callingConvention: convention)
+					configuration:	.init(
+						target:				target,
+						toolchainURL:		ProcessInfo.processInfo.environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:)),
+						callingConvention:	convention
+					)
 				)
 			}
 		}

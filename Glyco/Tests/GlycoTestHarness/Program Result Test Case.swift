@@ -14,7 +14,11 @@ final class ProgramResultTestCase : XCTestCase {
 				try verifyPrograms(
 					programsURL:	.init(fileURLWithPath: "Tests/Test Programs/\(convention).\(target)"),
 					simulatorURL:	.init(fileURLWithPath: simulatorPath),
-					configuration:	.init(target: target, callingConvention: convention)
+					configuration:	.init(
+						target:				target,
+						toolchainURL:		ProcessInfo.processInfo.environment["CHERITOOLCHAIN"].map(URL.init(fileURLWithPath:)),
+						callingConvention:	convention
+					)
 				)
 			}
 		}
