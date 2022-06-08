@@ -2,18 +2,29 @@
 	let((ls.arg, source(0)) (ls.arg$1, source(1)), in: evaluate(procedure(fib), ls.arg ls.arg$1)),
 	functions: (
 		fib,
-		takes: (ls.first, s32, sealed: false) (ls.second, s32, sealed: false),
+		takes: (ls.first, s32) (ls.second, s32),
 		returns: s32,
 		in: let(
-			(ls.arg, source(2)) (ls.arg$1, source(29)) (ls.arg$2, vector(s32, count: 30)),
-			in: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2)
+			(ls.nums, vector(s32, count: 30)),
+			in: do(
+				let(
+					(ls.vec$1, source(ls.nums)) (ls.idx$1, source(0)) (ls.elem$1, source(ls.first)),
+					in: setElement(of: ls.vec$1, at: ls.idx$1, to: ls.elem$1)
+				)
+				let(
+					(ls.vec$3, source(ls.nums)) (ls.idx$3, source(1)) (ls.elem$3, source(ls.second)),
+					in: setElement(of: ls.vec$3, at: ls.idx$3, to: ls.elem$3)
+				),
+				then: let(
+					(ls.arg, source(2)) (ls.arg$1, source(29)) (ls.arg$2, source(ls.nums)),
+					in: evaluate(procedure(recFib), ls.arg ls.arg$1 ls.arg$2)
+				)
+			)
 		)
 	)
 	(
 		recFib,
-		takes: (ls.index, s32, sealed: false)
-		(ls.lastIndex, s32, sealed: false)
-		(ls.nums, cap(vector(of: s32, sealed: false)), sealed: false),
+		takes: (ls.index, s32) (ls.lastIndex, s32) (ls.nums, cap(vector(of: s32, sealed: false))),
 		returns: s32,
 		in: if(
 			let((ls.lhs, source(ls.index)) (ls.rhs, source(ls.lastIndex)), in: relation(ls.lhs, gt, ls.rhs)),

@@ -2,21 +2,28 @@
 	do(set(ls.arg, to: 0) set(ls.arg$1, to: 1) call(procedure(fib), ls.arg ls.arg$1, result: df.result) return(df.result)),
 	procedures: (
 		fib,
-		takes: (ls.first, s32, sealed: false) (ls.second, s32, sealed: false),
+		takes: (ls.first, s32) (ls.second, s32),
 		returns: s32,
 		in: do(
+			createVector(s32, count: 30, capability: ls.nums, scoped: false)
+			set(ls.vec$1, to: ls.nums)
+			set(ls.idx$1, to: 0)
+			set(ls.elem$1, to: ls.first)
+			setElement(of: ls.vec$1, index: ls.idx$1, to: ls.elem$1)
+			set(ls.vec$3, to: ls.nums)
+			set(ls.idx$3, to: 1)
+			set(ls.elem$3, to: ls.second)
+			setElement(of: ls.vec$3, index: ls.idx$3, to: ls.elem$3)
 			set(ls.arg, to: 2)
 			set(ls.arg$1, to: 29)
-			createVector(s32, count: 30, capability: ls.arg$2, scoped: false)
+			set(ls.arg$2, to: ls.nums)
 			call(procedure(recFib), ls.arg ls.arg$1 ls.arg$2, result: df.result$1)
 			return(df.result$1)
 		)
 	)
 	(
 		recFib,
-		takes: (ls.index, s32, sealed: false)
-		(ls.lastIndex, s32, sealed: false)
-		(ls.nums, cap(vector(of: s32, sealed: false)), sealed: false),
+		takes: (ls.index, s32) (ls.lastIndex, s32) (ls.nums, cap(vector(of: s32, sealed: false))),
 		returns: s32,
 		in: if(
 			do(set(ls.lhs, to: ls.index) set(ls.rhs, to: ls.lastIndex), then: relation(ls.lhs, gt, ls.rhs)),

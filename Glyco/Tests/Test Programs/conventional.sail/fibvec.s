@@ -117,17 +117,29 @@ cd.ret:			clc cra, -16(cfp)
 				cjalr cnull, cra
 fib:			csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
-				cincoffsetimm csp, csp, -32
-cd.then$10:		csc cra, -16(cfp)
-				addi a0, zero, 2
-				addi a1, zero, 29
+				cincoffsetimm csp, csp, -48
+				csc cs1, -16(cfp)
+cd.then$9:		csc cra, -32(cfp)
 				addi t0, zero, 120
 				cllc ct1, mm.alloc_cap
 				clc ct1, 0(ct1)
 				cjalr ct1, ct1
 				cmove ca2, ct0
+				cmove cs1, ca2
+				addi ra, zero, 0
+				slli ra, ra, 2
+				cincoffset ct0, cs1, ra
+				csw a0, 0(ct0)
+				cmove cs1, ca2
+				addi ra, zero, 1
+				slli ra, ra, 2
+				cincoffset ct0, cs1, ra
+				csw a1, 0(ct0)
+				addi a0, zero, 2
+				addi a1, zero, 29
 				cjal cra, recFib
-cd.then$21:		clc cra, -16(cfp)
+cd.ret$1:		clc cs1, -16(cfp)
+cd.then$19:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
@@ -135,14 +147,14 @@ recFib:			csc cfp, -16(csp)
 				cincoffsetimm cfp, csp, -16
 				cincoffsetimm csp, csp, -48
 				csc cs1, -16(cfp)
-cd.then$31:		csc cra, -32(cfp)
+cd.then$29:		csc cra, -32(cfp)
 				mv a4, a0
 				mv a6, a1
 				cmove ca5, ca2
 				mv ra, a4
 				mv s1, a6
 cd.pred:		nop
-				bgt ra, s1, cd.then$32
+				bgt ra, s1, cd.then$30
 cd.else:		cmove ca3, ca5
 				mv a2, a4
 				cmove ca0, ca5
@@ -170,17 +182,17 @@ cd.else:		cmove ca3, ca5
 				cmove ca2, ca5
 				cjal cra, recFib
 cd.ret$2:		clc cs1, -16(cfp)
-cd.then$52:		clc cra, -32(cfp)
+cd.then$50:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra
-cd.then$32:		cmove cs1, ca5
+cd.then$30:		cmove cs1, ca5
 				mv ra, a6
 				slli ra, ra, 2
 				cincoffset ca0, cs1, ra
 				clw a0, 0(ca0)
 				clc cs1, -16(cfp)
-cd.then$42:		clc cra, -32(cfp)
+cd.then$40:		clc cra, -32(cfp)
 				cincoffsetimm csp, cfp, 16
 				clc cfp, 0(cfp)
 				cjalr cnull, cra

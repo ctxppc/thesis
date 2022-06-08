@@ -2,18 +2,29 @@
 	let((ex.arg, source(0)) (ex.arg$1, source(1)), in: evaluate(function(fib), ex.arg ex.arg$1)),
 	functions: (
 		fib,
-		takes: (first, s32, sealed: false) (second, s32, sealed: false),
+		takes: (first, s32) (second, s32),
 		returns: s32,
 		in: let(
-			(ex.arg, source(2)) (ex.arg$1, source(29)) (ex.arg$2, vector(s32, count: 30)),
-			in: evaluate(function(recFib), ex.arg ex.arg$1 ex.arg$2)
+			(nums, vector(s32, count: 30)),
+			in: do(
+				let(
+					(ex.vec, source(nums)) (ex.idx, source(0)) (ex.elem, source(first)),
+					in: setElement(of: ex.vec, at: ex.idx, to: ex.elem)
+				)
+				let(
+					(ex.vec$1, source(nums)) (ex.idx$1, source(1)) (ex.elem$1, source(second)),
+					in: setElement(of: ex.vec$1, at: ex.idx$1, to: ex.elem$1)
+				),
+				then: let(
+					(ex.arg, source(2)) (ex.arg$1, source(29)) (ex.arg$2, source(nums)),
+					in: evaluate(function(recFib), ex.arg ex.arg$1 ex.arg$2)
+				)
+			)
 		)
 	)
 	(
 		recFib,
-		takes: (index, s32, sealed: false)
-		(lastIndex, s32, sealed: false)
-		(nums, cap(vector(of: s32, sealed: false)), sealed: false),
+		takes: (index, s32) (lastIndex, s32) (nums, cap(vector(of: s32, sealed: false))),
 		returns: s32,
 		in: if(
 			let((ex.lhs, source(index)) (ex.rhs, source(lastIndex)), in: relation(ex.lhs, gt, ex.rhs)),
