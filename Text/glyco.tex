@@ -336,7 +336,6 @@ Buffer allocation is implemented using a dedicated heap capability register \tex
 \end{listing}
 
 \paragraph{From S to ELF} The final step of the compiler pipeline is assembling and linking. These two steps are delegated to the assembler from the CHERI LLVM compiler toolchain.\footnote{This last step is unrelated to the research problem, hence this dependency on LLVM.} The result is an ELF file that, depending on the compilation target, can be executed in either the Sail-based CHERI-RISC-V emulator or in CheriBSD.
-% TODO: Remove reference to CheriBSD if needed.
 
 \biblio{}
 \onlyinsubfile{\glsaddall\printglossaries}

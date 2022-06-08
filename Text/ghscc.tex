@@ -156,9 +156,9 @@ We now evaluate \g{ghscc} itself by benchmarking a few test programs against the
 
 \paragraph{Increased binary footprint} For measuring the binary footprint, we decided to measure the number of statements and instructions in the assembly of a few test programs as opposed to measuring the byte size of the executables themselves. The latter metric is less informative since the space taken up by ELF headers and structures dominates the space occupied by the code of interest.
 
-The test programs are compiled in Glyco 0.2 using a default configuration targeting the CHERI-RISC-V Sail emulator and using the \g{gccc} and \g{ghscc} \gs{cc}. The default configuration enables all optimisations provided by Glyco.
+We compile the test programs in Glyco 0.2 using a default configuration targeting the CHERI-RISC-V Sail emulator and using the \g{gccc} and \g{ghscc} \gs{cc}. The default configuration enables all optimisations provided by Glyco.
 
-The minimalistic test program 42 immediately evaluates to the number 42. The fib test program computes the 30th or 300th number of the Fibonacci sequence using a recursive function with accumulator parameters to avoid redundant computations. The Euclid test program computes the greatest common divisor of 20 and 50 or of 441 and 520 using a simple subtraction algorithm. As shown in \cref{tbl:ghscc-size}, a visible increase in binary footprint can be observed.
+The minimalistic test program 42 immediately evaluates to the number 42. The fib test program computes the 30th or 300th number of the Fibonacci sequence using a recursive function with accumulator parameters to avoid redundant computations. The fibvec test program does the same but by computing the sequence in a vector.\footnote{Vectors are stack-allocated in the \g{gccc} configuration in Glyco 0.2.} The Euclid test program computes the greatest common divisor of 20 and 50 or of 441 and 520 using a simple subtraction algorithm. As shown in \cref{tbl:ghscc-size}, we can observe a visible increase in binary footprint.
 
 \begin{table}[ht]
 	\medskip	% fixes glitch where heading seems vertically compressed
@@ -167,8 +167,8 @@ The minimalistic test program 42 immediately evaluates to the number 42. The fib
 		\footnotesize
 		\begin{tabular}{ccccccccccc}
 			\toprule
-								& \multicolumn{4}{c}{\g{gccc}}			& \multicolumn{3}{c}{\g{ghscc}}		& \multicolumn{3}{c}{$\Delta$}		\\
-								\cmidrule(lr){2-5}						\cmidrule(lr){6-8}					\cmidrule(lr){9-11}
+								& \multicolumn{4}{c}{\g{gccc}}			& \multicolumn{3}{c}{\g{ghscc}}	& \multicolumn{3}{c}{$\Delta$}		\\
+								\cmidrule(lr){2-5}						\cmidrule(lr){6-8}				\cmidrule(lr){9-11}
 			Program				& Size	& Time		& Stack		& Heap	& Size	& Time		& Heap		& Size		& Time		& S + H		\\
 			\midrule
 			Runtime				& 75	& —			& —			& —		& 110	& —			& —			& $+47\%$	& —			& —			\\
@@ -176,18 +176,18 @@ The minimalistic test program 42 immediately evaluates to the number 42. The fib
 			42					& 45	& 107 t		& 32 B		& 0 B	& 66	& 207 t		& 96 B		& $+47\%$	& $+93\%$	& $+200\%$	\\
 			fib(0, 1, 30)		& 53	& 705 t		& 1.50 kB	& 0 B	& 114	& 2.41 kt	& 2.51 kB	& $+115\%$	& $+241\%$	& $+67\%$	\\
 			fib(0, 1, 300)		& 53	& 1.61 kt	& 14.4 kB	& 0 B	& 114	& 22.1 kt	& 15.4 kB	& $+115\%$	& $+1278\%$	& $+7\%$	\\
+			fibvec(0, 1, 30)	& 106	& 1.34 kt	& 1.58 kB	& 0 B	& 198	& 3.00 kt	& 2.91 kB	& $+87\%$	& $+124\%$	& $+84\%$	\\
+			fibvec(0, 1, 300)	& 106	& 12.9 kt	& 15.6 kB	& 0 B	& 198	& 28.9 kt	& 15.6 kB	& $+87\%$	& $+123\%$	& $+0\%$	\\
 			Euclid(20, 50)		& 62	& 170 t		& 208 B		& 0 B	& 151	& 441 t		& 1.36 kB	& $+144\%$	& $+159\%$	& $+554\%$	\\
 			Euclid(441, 520)	& 62	& 478 t		& 880 B		& 0 B	& 151	& 1.49 kt	& 2.08 kB	& $+144\%$	& $+212\%$	& $+136\%$	\\
 			\bottomrule
 		\end{tabular}
 	\end{adjustwidth}
-	\caption{Benchmarking test programs in \g{gccc} and \g{ghscc} in Glyco 0.2. The program size is measured in number of assembly statements and is split between the runtime and the rest of the program. Time is measured in ticks (or kiloticks), with one instruction being executed per tick. Stack and heap sizes are maxima.}
+	\caption{Benchmarking test programs in \g{gccc} and \g{ghscc} in Glyco 0.2. The program size is measured in number of assembly statements and is split between the runtime and the rest of the program. Time is measured in ticks (or kiloticks), with one instruction being executed per tick. Stack and heap sizes are maxima reached during execution. 1 kB = 1000 B.}
 	\label{tbl:ghscc-size}
 \end{table}
 
 \paragraph{Increased runtime and memory overhead} For measuring runtime overhead, we execute the same test programs in the CHERI-RISC-V Sail emulator, counting the number of steps to completion. For memory overhead, we determine the distance between the highest and lowest address of the \g{stackcap} and \g{heapcap} (after runtime initialisation). As shown in \cref{tbl:ghscc-size}, we can observe a significant degradation in performance when using \g{ghscc} in a function call-heavy program.
-
-\todo{Add test program that always allocates something on the heap.}
 
 \section{Related Work: Alternative Secure Calling Conventions} \label{sct:alt-scc}
 The heap-based \g{cc} proposed in this chapter and implemented in Glyco is but one \g{cc} providing \g{lse}, albeit without a rigorous proof. Several alternatives have been proposed in literature or are implemented in CHERI software, some of which also provide \g{wbcf}.
