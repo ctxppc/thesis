@@ -28,6 +28,7 @@ build: &build
       --dockerfile "${CI_PROJECT_DIR}/Glyco/Dockerfile"
       "${KANIKOPROXYBUILDARGS}"
       --destination "${CI_REGISTRY_IMAGE}/glyco:${CI_COMMIT_SHORT_SHA}"
+      --destination "${CI_REGISTRY_IMAGE}/glyco:latest"
   cache:
     key: "Kaniko cache"
     paths:
@@ -35,15 +36,13 @@ build: &build
 
 test: &test
   stage: test
-  needs: []
-  image: swift:5.6.1-focal
+  needs: [build]
+  image:
+    name: ${CI_REGISTRY_IMAGE}/glyco:latest
+    entrypoint: [""]
   script:
-    - cd Glyco
+    - cd /glyco
     - swift test
-  cache:
-    key: "Glyco build cache"
-    paths:
-      - "Glyco/.build"
 
 text: &text
   stage: text
